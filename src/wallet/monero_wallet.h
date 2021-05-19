@@ -788,6 +788,34 @@ namespace monero {
     }
 
     /**
+     * Freeze an output.
+     *
+     * @param key_image key image of the output to freeze
+     */
+    virtual void freeze(const std::string& key_image) {
+      throw std::runtime_error("freeze() not supported");
+    }
+
+    /**
+     * Thaw a frozen output.
+     *
+     * @param key_image key image of the output to thaw
+     */
+    virtual void thaw(const std::string& key_image) {
+      throw std::runtime_error("thaw() not supported");
+    }
+
+    /**
+     * Check if an output is frozen.
+     *
+     * @param key_image key image of the output to check if frozen
+     * @return true if the output is frozen, false otherwise
+     */
+    virtual bool is_frozen(const std::string& key_image) {
+      throw std::runtime_error("is_frozen() not supported");
+    }
+
+    /**
      * Create a transaction to transfer funds from this wallet.
      *
      * @param config configures the transaction to create

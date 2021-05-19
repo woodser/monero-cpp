@@ -1754,6 +1754,27 @@ namespace monero {
     return result;
   }
 
+  void monero_wallet_full::freeze(const std::string& key_image) {
+    if (key_image.empty()) throw std::runtime_error("Must specify key image to freeze");
+    crypto::key_image ki;
+    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw new std::runtime_error("failed to parse key imge");
+    m_w2->freeze(ki);
+  }
+
+  void monero_wallet_full::thaw(const std::string& key_image) {
+    if (key_image.empty()) throw std::runtime_error("Must specify key image to thaw");
+    crypto::key_image ki;
+    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw new std::runtime_error("failed to parse key imge");
+    m_w2->thaw(ki);
+  }
+
+  bool monero_wallet_full::is_frozen(const std::string& key_image) {
+    if (key_image.empty()) throw std::runtime_error("Must specify key image to check if frozen");
+    crypto::key_image ki;
+    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw new std::runtime_error("failed to parse key imge");
+    return m_w2->frozen(ki);
+  }
+
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::create_txs(const monero_tx_config& config) {
     MTRACE("monero_wallet_full::create_txs");
     //std::cout << "monero_tx_config: " << config.serialize()  << std::endl;
@@ -3333,7 +3354,7 @@ namespace monero {
       std::list<std::pair<crypto::hash, tools::wallet2::pool_payment_details>> payments;
       m_w2->get_unconfirmed_payments(payments, account_index, subaddress_indices);
       for (std::list<std::pair<crypto::hash, tools::wallet2::pool_payment_details>>::const_iterator i = payments.begin(); i != payments.end(); ++i) {
-        if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->second.m_pd.m_tx_hash)) == tx_query->m_hashes.end()); // skip if hash filtered
+        if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->second.m_pd.m_tx_hash)) == tx_query->m_hashes.end()) continue; // skip if hash filtered
         std::shared_ptr<monero_tx_wallet> tx = build_tx_with_incoming_transfer_unconfirmed(*m_w2, height, i->first, i->second);
         merge_tx(tx, tx_map, block_map);
       }

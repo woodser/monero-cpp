@@ -1093,6 +1093,7 @@ namespace monero {
     if (m_subaddress_index != boost::none && (output->m_subaddress_index == boost::none || *m_subaddress_index != *output->m_subaddress_index)) return false;
     if (m_amount != boost::none && (output->m_amount == boost::none || *m_amount != *output->m_amount)) return false;
     if (m_is_spent != boost::none && (output->m_is_spent == boost::none || *m_is_spent != *output->m_is_spent)) return false;
+    if (m_is_frozen != boost::none && (output->m_is_frozen == boost::none || *m_is_frozen != *output->m_is_frozen)) return false;
 
     // filter on output key image
     if (m_key_image != boost::none) {
