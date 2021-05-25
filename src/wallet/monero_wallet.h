@@ -792,8 +792,8 @@ namespace monero {
      *
      * @param key_image key image of the output to freeze
      */
-    virtual void freeze(const std::string& key_image) {
-      throw std::runtime_error("freeze() not supported");
+    virtual void freeze_output(const std::string& key_image) {
+      throw std::runtime_error("freeze_output() not supported");
     }
 
     /**
@@ -801,8 +801,8 @@ namespace monero {
      *
      * @param key_image key image of the output to thaw
      */
-    virtual void thaw(const std::string& key_image) {
-      throw std::runtime_error("thaw() not supported");
+    virtual void thaw_output(const std::string& key_image) {
+      throw std::runtime_error("thaw_output() not supported");
     }
 
     /**
@@ -811,8 +811,8 @@ namespace monero {
      * @param key_image key image of the output to check if frozen
      * @return true if the output is frozen, false otherwise
      */
-    virtual bool is_frozen(const std::string& key_image) {
-      throw std::runtime_error("is_frozen() not supported");
+    virtual bool is_output_frozen(const std::string& key_image) {
+      throw std::runtime_error("is_output_frozen() not supported");
     }
 
     /**
