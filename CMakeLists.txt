@@ -15,22 +15,22 @@ set(BUILD_SAMPLE ON)
 set(BUILD_SCRATCHPAD ON)
 
 ###################
-# monero-project
+# townforge
 ###################
 
-set(MONERO_PROJECT "${CMAKE_SOURCE_DIR}/external/monero-project")
-set(MONERO_PROJECT_SRC "${MONERO_PROJECT}/src")
+set(TOWNFORGE "${CMAKE_SOURCE_DIR}/external/townforge")
+set(TOWNFORGE_SRC "${TOWNFORGE}/src")
 
 # header includes
 include_directories(src/)
-include_directories("${MONERO_PROJECT}/contrib/epee/include")
-include_directories("${MONERO_PROJECT}/external/")
-include_directories("${MONERO_PROJECT}/external/easylogging++")
-include_directories("${MONERO_PROJECT}/external/rapidjson/include")
-include_directories("${MONERO_PROJECT_SRC}/")
-include_directories("${MONERO_PROJECT_SRC}/wallet")
-include_directories("${MONERO_PROJECT_SRC}/wallet/api")
-include_directories("${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/")
+include_directories("${TOWNFORGE}/contrib/epee/include")
+include_directories("${TOWNFORGE}/external/")
+include_directories("${TOWNFORGE}/external/easylogging++")
+include_directories("${TOWNFORGE}/external/rapidjson/include")
+include_directories("${TOWNFORGE_SRC}/")
+include_directories("${TOWNFORGE_SRC}/wallet")
+include_directories("${TOWNFORGE_SRC}/wallet/api")
+include_directories("${TOWNFORGE_SRC}/crypto/crypto_ops_builder/include/")
 
 set(EXTERNAL_LIBS_DIR ${CMAKE_SOURCE_DIR}/external-libs)
 message(STATUS EXTERNAL_LIBS_DIR : ${EXTERNAL_LIBS_DIR})
@@ -146,100 +146,100 @@ include_directories(${HIDAPI_INCLUDE_DIR})
 # Monero
 #############
 
-set(MONERO_PROJECT_BUILD "${MONERO_PROJECT}/build/release")
-message(STATUS "Using monero-project build" : ${MONERO_PROJECT_BUILD})
+set(TOWNFORGE_BUILD "${TOWNFORGE}/build/release")
+message(STATUS "Using townforge build" : ${TOWNFORGE_BUILD})
 
 add_library(wallet_merged STATIC IMPORTED)
 set_target_properties(wallet_merged PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/lib/libwallet_merged.a)
+    ${TOWNFORGE_BUILD}/lib/libwallet_merged.a)
     
 add_library(wallet STATIC IMPORTED)
 set_target_properties(wallet PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/lib/libwallet.a)
+    ${TOWNFORGE_BUILD}/lib/libwallet.a)
     
 add_library(wallet_crypto STATIC IMPORTED)
 set_target_properties(wallet_crypto PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/crypto/wallet/libwallet-crypto.a)
+    ${TOWNFORGE_BUILD}/src/crypto/wallet/libwallet-crypto.a)
     
 add_library(lmdb STATIC IMPORTED)
 set_target_properties(lmdb PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/external/db_drivers/liblmdb/liblmdb.a)
+    ${TOWNFORGE_BUILD}/external/db_drivers/liblmdb/liblmdb.a)
     
 add_library(epee STATIC IMPORTED)
 set_target_properties(epee PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/contrib/epee/src/libepee.a)
+    ${TOWNFORGE_BUILD}/contrib/epee/src/libepee.a)
     
 add_library(unbound STATIC IMPORTED)
 set_target_properties(unbound PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/external/unbound/libunbound.a)
+    ${TOWNFORGE_BUILD}/external/unbound/libunbound.a)
     
 add_library(easylogging STATIC IMPORTED)
 set_target_properties(easylogging PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/external/easylogging++/libeasylogging.a)
+    ${TOWNFORGE_BUILD}/external/easylogging++/libeasylogging.a)
 
 add_library(cryptonote_core STATIC IMPORTED)
 set_target_properties(cryptonote_core PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/cryptonote_core/libcryptonote_core.a)
+    ${TOWNFORGE_BUILD}/src/cryptonote_core/libcryptonote_core.a)
 
 add_library(cryptonote_basic STATIC IMPORTED)
 set_target_properties(cryptonote_basic PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/cryptonote_basic/libcryptonote_basic.a)
+    ${TOWNFORGE_BUILD}/src/cryptonote_basic/libcryptonote_basic.a)
     
 add_library(cryptonote_format_utils_basic STATIC IMPORTED)
 set_target_properties(cryptonote_format_utils_basic PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/cryptonote_basic/libcryptonote_format_utils_basic.a)
+    ${TOWNFORGE_BUILD}/src/cryptonote_basic/libcryptonote_format_utils_basic.a)
 
 add_library(mnemonics STATIC IMPORTED)
 set_target_properties(mnemonics PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/mnemonics/libmnemonics.a)
+    ${TOWNFORGE_BUILD}/src/mnemonics/libmnemonics.a)
 
 add_library(common STATIC IMPORTED)
 set_target_properties(common PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/common/libcommon.a)
+    ${TOWNFORGE_BUILD}/src/common/libcommon.a)
 
 add_library(cncrypto STATIC IMPORTED)
 set_target_properties(cncrypto PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/crypto/libcncrypto.a)
+    ${TOWNFORGE_BUILD}/src/crypto/libcncrypto.a)
 
 add_library(ringct STATIC IMPORTED)
 set_target_properties(ringct PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/ringct/libringct.a)
+    ${TOWNFORGE_BUILD}/src/ringct/libringct.a)
 
 add_library(ringct_basic STATIC IMPORTED)
 set_target_properties(ringct_basic PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/ringct/libringct_basic.a)
+    ${TOWNFORGE_BUILD}/src/ringct/libringct_basic.a)
 
 add_library(blockchain_db STATIC IMPORTED)
 set_target_properties(blockchain_db PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/blockchain_db/libblockchain_db.a)
+    ${TOWNFORGE_BUILD}/src/blockchain_db/libblockchain_db.a)
 
 add_library(blocks STATIC IMPORTED)
 set_target_properties(blocks PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/blocks/libblocks.a)
+    ${TOWNFORGE_BUILD}/src/blocks/libblocks.a)
 
 add_library(checkpoints STATIC IMPORTED)
 set_target_properties(checkpoints PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/checkpoints/libcheckpoints.a)
+    ${TOWNFORGE_BUILD}/src/checkpoints/libcheckpoints.a)
 
 add_library(device STATIC IMPORTED)
 set_target_properties(device PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/device/libdevice.a)
+    ${TOWNFORGE_BUILD}/src/device/libdevice.a)
     
 add_library(device_trezor STATIC IMPORTED)
 set_target_properties(device_trezor PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/device_trezor/libdevice_trezor.a)
+    ${TOWNFORGE_BUILD}/src/device_trezor/libdevice_trezor.a)
 
 add_library(multisig STATIC IMPORTED)
 set_target_properties(multisig PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/multisig/libmultisig.a)
+    ${TOWNFORGE_BUILD}/src/multisig/libmultisig.a)
 
 add_library(version STATIC IMPORTED)
 set_target_properties(version PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/libversion.a)
+    ${TOWNFORGE_BUILD}/src/libversion.a)
     
 add_library(randomx STATIC IMPORTED)
 set_target_properties(randomx PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/external/randomx/librandomx.a)
+    ${TOWNFORGE_BUILD}/external/randomx/librandomx.a)
     
 ########################
 # Build c++ library
