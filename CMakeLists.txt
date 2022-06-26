@@ -305,6 +305,22 @@ if (BUILD_LIBRARY)
         ${HIDAPI_LIBRARIES}
         ${EXTRA_LIBRARIES}
     )
+
+     INSTALL(FILES src/daemon/monero_daemon.h
+                   src/daemon/monero_daemon_model.h
+             DESTINATION include/daemon)
+     INSTALL(FILES src/utils/gen_utils.h
+                   src/utils/monero_utils.h
+             DESTINATION include/utils)
+     INSTALL(FILES src/wallet/monero_wallet_full.h
+                   src/wallet/monero_wallet.h
+                   src/wallet/monero_wallet_keys.h
+                   src/wallet/monero_wallet_model.h
+             DESTINATION include/wallet)
+     INSTALL(TARGETS monero-cpp
+             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 endif()
 
 ########################
