@@ -153,10 +153,14 @@ list(APPEND CMAKE_MODULE_PATH "${MONERO_PROJECT}/cmake")
 add_library(wallet STATIC IMPORTED)
 set_target_properties(wallet PROPERTIES IMPORTED_LOCATION
     ${MONERO_PROJECT_BUILD}/lib/libwallet.a)
-    
-add_library(wallet_crypto STATIC IMPORTED)
-set_target_properties(wallet_crypto PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/crypto/wallet/libwallet-crypto.a)
+
+# libwallet-crypto.a provides x86_64 asm for some wallet functions
+if (EXISTS ${MONERO_PROJECT_BUILD}/src/crypto/wallet/libwallet-crypto.a)
+  add_library(wallet_crypto_lib STATIC IMPORTED)
+  set_target_properties(wallet_crypto_lib PROPERTIES IMPORTED_LOCATION
+      ${MONERO_PROJECT_BUILD}/src/crypto/wallet/libwallet-crypto.a)
+  set(wallet_crypto wallet_crypto_lib)
+endif()
     
 add_library(lmdb STATIC IMPORTED)
 set_target_properties(lmdb PROPERTIES IMPORTED_LOCATION
@@ -274,7 +278,8 @@ if (BUILD_LIBRARY)
     
     target_link_libraries(monero-cpp
         wallet
-        wallet_crypto
+        cncrypto
+        ${wallet_crypto}
         rpc_base
         net
         hardforks
@@ -337,7 +342,8 @@ if (BUILD_SAMPLE)
     
     target_link_libraries(sample_code
         wallet
-        wallet_crypto
+        cncrypto
+        ${wallet_crypto}
         rpc_base
         net
         hardforks
@@ -385,7 +391,8 @@ if (BUILD_SCRATCHPAD)
     
     target_link_libraries(scratchpad
         wallet
-        wallet_crypto
+        cncrypto
+        ${wallet_crypto}
         rpc_base
         net
         hardforks
