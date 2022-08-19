@@ -55,6 +55,7 @@
 #include "utils/monero_utils.h"
 #include <chrono>
 #include <iostream>
+#include <zmq.h>
 #include "mnemonics/electrum-words.h"
 #include "mnemonics/english.h"
 #include "wallet/wallet_rpc_server_commands_defs.h"
@@ -2700,6 +2701,34 @@ namespace monero {
     result.m_signature_type = result_w2.type == tools::wallet2::message_signature_type_t::sign_with_spend_key ? monero_message_signature_type::SIGN_WITH_SPEND_KEY : monero_message_signature_type::SIGN_WITH_VIEW_KEY;
     result.m_version = result_w2.version;
     return result;
+  }
+
+  std::string monero_wallet_full::encrypt_message(const std::string& plaintext, uint64_t& pad, bool authenticated) const {
+    auto padded_plaintext = epee::string_tools::pad_to_div_by(4, plaintext);
+    pad = padded_plaintext.size() - plaintext.size();
+    auto secret_key = m_w2->get_account().get_keys().m_spend_secret_key;
+    auto ciphertext = m_w2->encrypt(padded_plaintext, secret_key, authenticated);
+    const std::vector<uint8_t> binary(begin(ciphertext), end(ciphertext));
+    std::vector<char> z85(binary.size()*5/4 + 1);
+    if (not zmq_z85_encode(z85.data(), binary.data(), binary.size())) {
+      throw std::runtime_error("z85 encode unsuccessful");
+    }
+    return z85.data();
+  }
+
+  std::string monero_wallet_full::decrypt_message(const std::string& ciphertext_z85, uint64_t pad, bool authenticated) const {
+    if (ciphertext_z85.size() % 5 != 0) {
+      throw std::runtime_error("ciphertext length to decrypt must be divisble by 5");
+    }
+    std::vector<uint8_t> binary(ciphertext_z85.size()*4/5);
+    if (not zmq_z85_decode(binary.data(), ciphertext_z85.data())) {
+      throw std::runtime_error("z85 decode unsuccessful");
+    }
+    std::string binary_str(begin(binary), end(binary));
+    auto secret_key = m_w2->get_account().get_keys().m_spend_secret_key;
+    std::string cleartext = m_w2->decrypt(binary_str, secret_key, authenticated);
+    if (pad) cleartext.resize(cleartext.size() - pad);
+    return cleartext;
   }
 
   std::string monero_wallet_full::get_tx_key(const std::string& tx_hash) const {

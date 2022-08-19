@@ -240,7 +240,9 @@ set_target_properties(version PROPERTIES IMPORTED_LOCATION
 add_library(randomx STATIC IMPORTED)
 set_target_properties(randomx PROPERTIES IMPORTED_LOCATION
     ${MONERO_PROJECT_BUILD}/external/randomx/librandomx.a)
-    
+
+find_library (ZMQ_LIBRARY NAMES zmq REQUIRED)
+
 ########################
 # Build c++ library
 ########################
@@ -293,6 +295,7 @@ if (BUILD_LIBRARY)
         ${OPENSSL_LIBRARIES}
         ${SODIUM_LIBRARY}
         ${HIDAPI_LIBRARIES}
+        ${ZMQ_LIBRARY}
         ${EXTRA_LIBRARIES}
     )
 endif()
@@ -340,6 +343,7 @@ if (BUILD_SAMPLE)
         ${OPENSSL_LIBRARIES}
         ${SODIUM_LIBRARY}
         ${HIDAPI_LIBRARIES}
+        ${ZMQ_LIBRARY}
         ${EXTRA_LIBRARIES}
     )
 endif()
@@ -387,6 +391,7 @@ if (BUILD_SCRATCHPAD)
         ${OPENSSL_LIBRARIES}
         ${SODIUM_LIBRARY}
         ${HIDAPI_LIBRARIES}
+        ${ZMQ_LIBRARY}
         ${EXTRA_LIBRARIES}
     )
 endif()

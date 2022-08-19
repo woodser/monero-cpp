@@ -968,6 +968,30 @@ namespace monero {
     }
 
     /**
+     * Encrypt a message.
+     *
+     * @param plaintext - the message to sign
+     * @param[in,out] pad - the number of characters appended to the plaintext so that the length is divisible 4 (required for decryption)
+     * @param[in] authenticated - true to also sign the message
+     * @return the encrypted message
+     */
+    virtual std::string encrypt_message(const std::string& plaintext, uint64_t& pad, bool authenticated = true) const {
+      throw std::runtime_error("encrypt_message() not supported");
+    }
+
+    /**
+     * Decrypt a message.
+     *
+     * @param ciphertext_z85 - the encrypted message encoded in z85 format
+     * @param[in] pad - the number of characters appended to the plaintext before encryption
+     * @param[in] authenticated - true to also verify the message authenticity
+     * @return the decrypted message
+     */
+    virtual std::string decrypt_message(const std::string& ciphertext_z85, uint64_t pad, bool authenticated = true) const {
+      throw std::runtime_error("decrypt_message() not supported");
+    }
+
+    /**
      * Get a transaction's secret key from its hash.
      *
      * @param tx_hash is the transaction's hash
