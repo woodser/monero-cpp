@@ -62,6 +62,36 @@ using namespace monero;
 namespace monero {
 
   /**
+   * Configures a wallet to create.
+   */
+  struct monero_wallet_config : public serializable_struct {
+    boost::optional<std::string> m_path;
+    boost::optional<std::string> m_password;
+    boost::optional<monero_network_type> m_network_type;
+    boost::optional<std::string> m_server_uri;
+    boost::optional<std::string> m_server_username;
+    boost::optional<std::string> m_server_password;
+    boost::optional<std::string> m_mnemonic;
+    boost::optional<std::string> m_seed_offset;
+    boost::optional<std::string> m_primary_address;
+    boost::optional<std::string> m_private_view_key;
+    boost::optional<std::string> m_private_spend_key;
+    boost::optional<uint64_t> m_restore_height;
+    boost::optional<std::string> m_language;
+    boost::optional<bool> m_save_current;
+    boost::optional<uint64_t> m_account_lookahead;
+    boost::optional<uint64_t> m_subaddress_lookahead;
+
+    monero_wallet_config() {}
+    monero_wallet_config(const monero_wallet_config& config);
+    monero_wallet_config copy() const;
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static std::shared_ptr<monero_wallet_config> deserialize(const std::string& config_json);
+    void set_server(const monero_rpc_connection& server);
+    monero_rpc_connection get_server() const;
+  };
+
+  /**
    * Models a result of syncing a wallet.
    */
   struct monero_sync_result : public serializable_struct {
