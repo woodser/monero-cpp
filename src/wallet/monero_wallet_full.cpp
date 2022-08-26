@@ -81,22 +81,6 @@ namespace monero {
 
   // ----------------------- INTERNAL PRIVATE HELPERS -----------------------
 
-  std::string get_default_daemon_port(const monero_network_type network_type) {
-    if (network_type == monero_network_type::MAINNET) return "18081";
-    else if (network_type == monero_network_type::TESTNET) return "28081";
-    else if (network_type == monero_network_type::STAGENET) return "38081";
-    else throw std::runtime_error("Unhandled network type");
-  }
-
-  std::string get_default_daemon_uri(const monero_network_type network_type) {
-    return std::string("http://localhost:") + get_default_daemon_port(network_type);
-  }
-
-  void init_daemon_connection(monero_wallet_full* wallet, const monero_network_type network_type, const monero_rpc_connection& daemon_connection) {
-    if (daemon_connection.m_uri == boost::none || daemon_connection.m_uri->empty()) wallet->set_daemon_connection(get_default_daemon_uri(network_type));
-    else wallet->set_daemon_connection(daemon_connection);
-  }
-
   struct key_image_list
   {
     std::list<std::string> key_images;
@@ -1074,7 +1058,7 @@ namespace monero {
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(network_type), 1, true, std::move(http_client_factory)));
     wallet->m_w2->load("", password, keys_data, cache_data);
     wallet->m_w2->init("");
-    init_daemon_connection(wallet, network_type, daemon_connection);
+    wallet->set_daemon_connection(daemon_connection);
     wallet->init_common();
     return wallet;
   }
@@ -1085,7 +1069,7 @@ namespace monero {
     monero_wallet_full* wallet = new monero_wallet_full();
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(network_type), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(network_type), 1, true, std::move(http_client_factory)));
-    init_daemon_connection(wallet, network_type, daemon_connection);
+    wallet->set_daemon_connection(daemon_connection);
     wallet->m_w2->set_seed_language(language);
     crypto::secret_key secret_key;
     wallet->m_w2->generate(path, password, secret_key, false, false);
@@ -1111,7 +1095,7 @@ namespace monero {
     // initialize wallet
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(network_type), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(network_type), 1, true, std::move(http_client_factory)));
-    init_daemon_connection(wallet, network_type, daemon_connection);
+    wallet->set_daemon_connection(daemon_connection);
     wallet->m_w2->set_seed_language(language);
     wallet->m_w2->generate(path, password, recovery_key, true, false);
     wallet->m_w2->set_refresh_from_block_height(restore_height);
@@ -1178,7 +1162,7 @@ namespace monero {
     if (has_spend_key && has_view_key) wallet->m_w2->generate(path, password, address_info.address, spend_key_sk, view_key_sk);
     else if (has_spend_key) wallet->m_w2->generate(path, password, spend_key_sk, true, false);
     else wallet->m_w2->generate(path, password, address_info.address, view_key_sk);
-    init_daemon_connection(wallet, network_type, daemon_connection);
+    wallet->set_daemon_connection(daemon_connection);
     wallet->m_w2->set_refresh_from_block_height(restore_height);
     wallet->m_w2->set_seed_language(language);
     wallet->init_common();
