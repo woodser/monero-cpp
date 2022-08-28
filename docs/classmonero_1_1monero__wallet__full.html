@@ -567,6 +567,8 @@ Static Public Member Functions</h2></td></tr>
 <tr class="separator:aaf1dd304d6aa159d0cda0fb90496a82a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fc25c7c3bc60162c7f60bf8eb0b15eb"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classmonero_1_1monero__wallet__full.html">monero_wallet_full</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a3fc25c7c3bc60162c7f60bf8eb0b15eb">open_wallet_data</a> (const std::string &amp;password, const <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a>, const std::string &amp;keys_data, const std::string &amp;cache_data, const <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &amp;daemon_connection=<a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a>(), std::unique_ptr&lt; epee::net_utils::http::http_client_factory &gt; http_client_factory=nullptr)</td></tr>
 <tr class="separator:a3fc25c7c3bc60162c7f60bf8eb0b15eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a402ea547ced268555feb8d19751c4788"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classmonero_1_1monero__wallet__full.html">monero_wallet_full</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a402ea547ced268555feb8d19751c4788">create_wallet</a> (const <a class="el" href="structmonero_1_1monero__wallet__config.html">monero_wallet_config</a> &amp;config, std::unique_ptr&lt; epee::net_utils::http::http_client_factory &gt; http_client_factory=nullptr)</td></tr>
+<tr class="separator:a402ea547ced268555feb8d19751c4788"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c42b24017d3b7732cebec0609fc2c4d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classmonero_1_1monero__wallet__full.html">monero_wallet_full</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a1c42b24017d3b7732cebec0609fc2c4d">create_wallet_random</a> (const std::string &amp;path, const std::string &amp;password, const <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a> network_type, const <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &amp;daemon_connection=<a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a>(), const std::string &amp;language=&quot;English&quot;, std::unique_ptr&lt; epee::net_utils::http::http_client_factory &gt; http_client_factory=nullptr)</td></tr>
 <tr class="separator:a1c42b24017d3b7732cebec0609fc2c4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c11977c43f6e4eebd55151d8d8d4c4d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classmonero_1_1monero__wallet__full.html">monero_wallet_full</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a2c11977c43f6e4eebd55151d8d8d4c4d">create_wallet_from_mnemonic</a> (const std::string &amp;path, const std::string &amp;password, const <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a> network_type, const std::string &amp;mnemonic, const <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &amp;daemon_connection=<a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a>(), uint64_t restore_height=0, const std::string &amp;seed_offset=&quot;&quot;, std::unique_ptr&lt; epee::net_utils::http::http_client_factory &gt; http_client_factory=nullptr)</td></tr>
@@ -1106,6 +1108,51 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <dl class="section return"><dt>Returns</dt><dd>the created transactions </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a142472298876d1d56f0a6d9952e0d4de">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
+<a id="a402ea547ced268555feb8d19751c4788" name="a402ea547ced268555feb8d19751c4788"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a402ea547ced268555feb8d19751c4788">&#9670;&nbsp;</a></span>create_wallet()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classmonero_1_1monero__wallet__full.html">monero_wallet_full</a> * monero::monero_wallet_full::create_wallet </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structmonero_1_1monero__wallet__config.html">monero_wallet_config</a> &amp;&#160;</td>
+          <td class="paramname"><em>config</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::unique_ptr&lt; epee::net_utils::http::http_client_factory &gt;&#160;</td>
+          <td class="paramname"><em>http_client_factory</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Create a new wallet with the given configuration.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">config</td><td>is the wallet configuration </td></tr>
+    <tr><td class="paramname">http_client_factory</td><td>allows use of custom http clients </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a pointer to the wallet instance </dd></dl>
 
 </div>
 </div>

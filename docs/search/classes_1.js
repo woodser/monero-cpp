@@ -32,7 +32,8 @@ var searchData=
   ['monero_5ftx_5fwallet_29',['monero_tx_wallet',['../structmonero_1_1monero__tx__wallet.html',1,'monero']]],
   ['monero_5fversion_30',['monero_version',['../structmonero_1_1monero__version.html',1,'monero']]],
   ['monero_5fwallet_31',['monero_wallet',['../classmonero_1_1monero__wallet.html',1,'monero']]],
-  ['monero_5fwallet_5ffull_32',['monero_wallet_full',['../classmonero_1_1monero__wallet__full.html',1,'monero']]],
-  ['monero_5fwallet_5fkeys_33',['monero_wallet_keys',['../classmonero_1_1monero__wallet__keys.html',1,'monero']]],
-  ['monero_5fwallet_5flistener_34',['monero_wallet_listener',['../classmonero_1_1monero__wallet__listener.html',1,'monero']]]
+  ['monero_5fwallet_5fconfig_32',['monero_wallet_config',['../structmonero_1_1monero__wallet__config.html',1,'monero']]],
+  ['monero_5fwallet_5ffull_33',['monero_wallet_full',['../classmonero_1_1monero__wallet__full.html',1,'monero']]],
+  ['monero_5fwallet_5fkeys_34',['monero_wallet_keys',['../classmonero_1_1monero__wallet__keys.html',1,'monero']]],
+  ['monero_5fwallet_5flistener_35',['monero_wallet_listener',['../classmonero_1_1monero__wallet__listener.html',1,'monero']]]
 ];
