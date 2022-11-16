@@ -2,10 +2,23 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 cmake_minimum_required(VERSION 3.4.1)
 
+if (WIN32)
+# "'sleep_for' is not a member of 'std::this_thread'" in gcc 4.7/4.8
+add_definitions( "-D_GLIBCXX_USE_NANOSLEEP=1" )
+add_definitions( "-DWIN32_LEAN_AND_MEAN" )
+endif()
+
+#target_compile_options(gmock-matchers_test PRIVATE "-Wa,-mbig-obj")
+
+
 #SET(CMAKE_C_COMPILER /path/to/c/compiler)
 #SET(CMAKE_CXX_COMPILER /path/to/cpp/compiler)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread")
-#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
+if (WIN32)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -O2 -fPIC -std=c++14 -F/Library/Frameworks -pthread -lcrypto -lcrypt32") 
+else()
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread")
+endif()
+#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}-fsanitize=address")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread -fsanitize=address")    # TODO: way to enable sanitize?  get runtime error with this on
 
 project(MoneroCppLibrary)
@@ -102,11 +115,17 @@ find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
 include_directories(${OPENSSL_INCLUDE_DIR})
 
+
 if(STATIC AND NOT IOS)
   if(UNIX)
     set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_DL_LIBS};${CMAKE_THREAD_LIBS_INIT}")
   endif()
 endif()
+
+if (WIN32)
+  list(APPEND OPENSSL_LIBRARIES ws2_32 crypt32)
+endif()
+
 
 ############
 # libsodium
@@ -173,13 +192,25 @@ set_target_properties(epee PROPERTIES IMPORTED_LOCATION
 
 # Unbound
 find_package(Unbound)
-include_directories(${UNBOUND_INCLUDE_DIR})
-if ("${UNBOUND_LIBRARIES}" MATCHES "libunbound")
-  message(STATUS "Using libunbound: ${UNBOUND_LIBRARIES}")
-  add_library(unbound SHARED IMPORTED)
-  set_target_properties(unbound PROPERTIES IMPORTED_LOCATION
-      ${UNBOUND_LIBRARIES})
+
+if(NOT UNBOUND_INCLUDE_DIR)
+  die("Could not find libunbound")
+else()
+  message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
+  if(UNBOUND_LIBRARIES)
+    message(STATUS "Found libunbound library")
+    include_directories(${UNBOUND_INCLUDE_DIR})
+    if (WIN32)
+        add_library(unbound STATIC IMPORTED)
+    else()
+        add_library(unbound SHARED IMPORTED)
+    endif()
+    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
+  else()
+    die("Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
+  endif()
 endif()
+
 
 add_library(rpc_base STATIC IMPORTED)
 set_target_properties(rpc_base PROPERTIES IMPORTED_LOCATION
@@ -371,7 +402,6 @@ if (BUILD_SAMPLE)
         multisig
         version
         randomx
-        dl
         epee
         hardforks
         cncrypto
@@ -385,7 +415,11 @@ if (BUILD_SAMPLE)
         ${SODIUM_LIBRARY}
         ${HIDAPI_LIBRARIES}
         ${EXTRA_LIBRARIES}
+	
     )
+    if (NOT WIN32)
+	target_link_libraries(sample_code dl)
+    endif()
 endif()
 
 ########################
@@ -420,7 +454,6 @@ if (BUILD_SCRATCHPAD)
         multisig
         version
         randomx
-        dl
         epee
         hardforks
         cncrypto
@@ -435,4 +468,8 @@ if (BUILD_SCRATCHPAD)
         ${HIDAPI_LIBRARIES}
         ${EXTRA_LIBRARIES}
     )
+    if (NOT WIN32)
+        target_link_libraries(sample_code dl)
+    endif()
+
 endif()
