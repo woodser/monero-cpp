@@ -1079,6 +1079,7 @@ namespace monero {
     if (config.m_seed_offset == boost::none) config_normalized.m_seed_offset = std::string("");
     if (config.m_account_lookahead != boost::none && config.m_subaddress_lookahead == boost::none) throw std::runtime_error("No subaddress lookahead provided with account lookahead");
     if (config.m_account_lookahead == boost::none && config.m_subaddress_lookahead != boost::none) throw std::runtime_error("No account lookahead provided with subaddress lookahead");
+    if (config.m_restore_height == boost::none) config_normalized.m_restore_height = 0;
 
     // create wallet
     if (!config_normalized.m_mnemonic.get().empty()) {
