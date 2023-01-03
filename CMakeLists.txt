@@ -69,10 +69,12 @@ message(STATUS EXTRA_LIBRARIES: ${EXTRA_LIBRARIES})
 # Protobuf
 ############
 
-include(FindProtobuf)
-find_package(Protobuf)
-message(STATUS "Protobuf lib: ${Protobuf_LIBRARY}, inc: ${Protobuf_INCLUDE_DIR}, protoc: ${Protobuf_PROTOC_EXECUTABLE}")
-include_directories(${Protobuf_INCLUDE_DIR})
+if (NOT APPLE)
+  include(FindProtobuf)
+  find_package(Protobuf)
+  message(STATUS "Protobuf lib: ${Protobuf_LIBRARY}, inc: ${Protobuf_INCLUDE_DIR}, protoc: ${Protobuf_PROTOC_EXECUTABLE}")
+  include_directories(${Protobuf_INCLUDE_DIR})
+endif()
 
 ############
 # LibUSB
