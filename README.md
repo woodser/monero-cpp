@@ -166,6 +166,8 @@ This project may be compiled as part of another application or built as a shared
 
 For example, [monero-java](https://github.com/monero-ecosystem/monero-java) compiles this project to a shared library to support Java JNI bindings, while [monero-javascript](https://github.com/monero-ecosystem/monero-javascript) compiles this project to WebAssembly binaries.
 
+### Building monero-cpp on Mac & Linux
+
 1. If building this library standalone instead of as a submodule in another project, clone the project repository and update its submodules:
     1. `git clone --recurse-submodules https://github.com/monero-ecosystem/monero-cpp.git`
     2. `cd ./monero-cpp && ./bin/update_submodules.sh`
@@ -173,75 +175,67 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
     1. `sudo apt update && sudo apt install build-essential cmake pkg-config libssl-dev libzmq3-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libpgm-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev python3 ccache`
     2. Install expat (dependency of unbound):
 
-        ```
-        cd ~
-        wget https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2
-        tar -xf expat-2.4.8.tar.bz2
-        rm expat-2.4.8.tar.bz2
-        cd expat-2.4.8
-        ./configure --enable-static --disable-shared
-        make
-        sudo make install
-        cd ../
-        ```
-    3. Install unbound:
+         ```
+         cd ~
+         wget https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2
+         tar -xf expat-2.4.8.tar.bz2
+         sudo rm expat-2.4.8.tar.bz2
+         cd expat-2.4.8
+         ./configure --enable-static --disable-shared
+         make
+         sudo make install
+         cd ../
+         ```
+     3. Install unbound:
 
-        ```
-        cd ~
-        wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.17.0.tar.gz
-        tar xzf unbound-1.17.0.tar.gz
-        sudo apt update
-        sudo apt install -y build-essential
-        sudo apt install -y libssl-dev
-        sudo apt install -y libexpat1-dev
-        sudo apt-get install -y bison
-        sudo apt-get install -y flex
-        cd unbound-1.17.0
-        ./configure --with-libexpat=/usr --with-ssl=/usr
-        make
-        sudo make install
-        cd ../
-        ```
+         ```
+         cd ~
+         wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.17.0.tar.gz
+         tar xzf unbound-1.17.0.tar.gz
+         sudo apt update
+         sudo apt install -y build-essential
+         sudo apt install -y libssl-dev
+         sudo apt install -y libexpat1-dev
+         sudo apt-get install -y bison
+         sudo apt-get install -y flex
+         cd unbound-1.17.0
+         ./configure --with-libexpat=/usr --with-ssl=/usr
+         make
+         sudo make install
+         cd ../
+         ```
 3. `export MONERO_CPP=path/to/monero-cpp`
 4. `cd $MONERO_CPP/external/monero-project`
 5. Build monero-project to create .a libraries, e.g.: `make release-static -j8`
 6. Link to this library's source files in your application or build as a shared library in ./build/: `cd $MONERO_CPP && ./bin/build_libmonero_cpp.sh`
 
-## Instructions for building libmonero-cpp.dll on Windows
+### Building libmonero-cpp.dll on Windows
 
 1. Download and install [MSYS2](https://www.msys2.org/).
-2. Press windows button and type ```MSYS2 MINGW64``` for 64 bit systems or ```MSYS2 MINGW32``` for 32 bit.
-3. Update packages:
-    ```pacman -Syu```
-4. Install dependencies
-    For 64 bit
-    ```
-    pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb
-    ```
-    For 32 bit
-    ```
-    pacman -S  mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium mingw-w64-i686-hidapi mingw-w64-i686-unbound mingw-w64-i686-protobuf git mingw-w64-i686-libusb
-    ```
-5. Clone repo
-   ```
-   git clone --recurse-submodules https://github.com/monero-ecosystem/monero-cpp.git
-   ```
-6. Update submodules
-   ```
-   cd ./monero-cpp && ./bin/update_submodules.sh
-   ```
-7. ```export MONERO_CPP=path/to/monero-cpp```
-8. ```cd $MONERO_CPP/external/monero-project```
-9. Build monero-project for 64 bit
-   ```
-   make release-static-win64
-   ```
-   or for 32 bit
-   ```
-   make release-static-win32
-   ```
-10. Build as a shared library in ./build/:
-```cd $MONERO_CPP && ./bin/build_libmonero_cpp_dll.sh```
+2. Press the Windows button and launch `MSYS2 MINGW64` for 64 bit systems or `MSYS2 MINGW32` for 32 bit.
+3. Update packages: `pacman -Syu` and `pacman -Syy`
+4. Relaunch MSYS2 (if necessary) and install dependencies:
+
+    For 64 bit:
+
+     ```
+     pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb make gettext base-devel
+     ```
+
+     For 32 bit:
+
+     ```
+     pacman -S  mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium mingw-w64-i686-hidapi mingw-w64-i686-unbound mingw-w64-i686-protobuf git mingw-w64-i686-libusb make gettext base-devel
+     ```
+5. Clone repo if installing standalone (skip if building as part of another repo like monero-java or monero-javascript): `git clone --recursive https://github.com/monero-ecosystem/monero-cpp.git`
+6. Update submodules: `cd <path/to/monero-cpp> && ./bin/update_submodules.sh`
+7. `cd ./external/monero-project`
+9. Build monero-project:
+
+    For 64 bit: `make release-static-win64`
+    
+    For 32 bit: `make release-static-win32`
+10. Build as a shared library in ./build/: `cd ../../ && ./bin/build_libmonero_cpp_dll.sh`
 
 ## Related projects
 

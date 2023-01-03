@@ -3,22 +3,16 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 cmake_minimum_required(VERSION 3.4.1)
 
 if (WIN32)
-# "'sleep_for' is not a member of 'std::this_thread'" in gcc 4.7/4.8
-add_definitions( "-D_GLIBCXX_USE_NANOSLEEP=1" )
-add_definitions( "-DWIN32_LEAN_AND_MEAN" )
-endif()
-
-#target_compile_options(gmock-matchers_test PRIVATE "-Wa,-mbig-obj")
-
-
-#SET(CMAKE_C_COMPILER /path/to/c/compiler)
-#SET(CMAKE_CXX_COMPILER /path/to/cpp/compiler)
-if (WIN32)
+  add_definitions( "-D_GLIBCXX_USE_NANOSLEEP=1" ) # "'sleep_for' is not a member of 'std::this_thread'" in gcc 4.7/4.8
+  add_definitions( "-DWIN32_LEAN_AND_MEAN" )
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -O2 -fPIC -std=c++14 -F/Library/Frameworks -pthread -lcrypto -lcrypt32") 
 else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread")
 endif()
-#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}-fsanitize=address")
+
+#SET(CMAKE_C_COMPILER /path/to/c/compiler)
+#SET(CMAKE_CXX_COMPILER /path/to/cpp/compiler)
+#SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread -fsanitize=address")    # TODO: way to enable sanitize?  get runtime error with this on
 
 project(MoneroCppLibrary)
@@ -115,7 +109,6 @@ find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
 include_directories(${OPENSSL_INCLUDE_DIR})
 
-
 if(STATIC AND NOT IOS)
   if(UNIX)
     set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_DL_LIBS};${CMAKE_THREAD_LIBS_INIT}")
@@ -125,7 +118,6 @@ endif()
 if (WIN32)
   list(APPEND OPENSSL_LIBRARIES ws2_32 crypt32)
 endif()
-
 
 ############
 # libsodium
@@ -143,16 +135,6 @@ if(APPLE)
   include_directories(SYSTEM /usr/include/malloc)
   if(POLICY CMP0042)
     cmake_policy(SET CMP0042 NEW)
-  endif()
-endif()
-
-if (APPLE AND NOT IOS)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -fvisibility=default -std=c++11")
-  if (NOT OPENSSL_ROOT_DIR)
-      EXECUTE_PROCESS(COMMAND brew --prefix openssl
-        OUTPUT_VARIABLE OPENSSL_ROOT_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
-    message(STATUS "Using OpenSSL found at ${OPENSSL_ROOT_DIR}")
   endif()
 endif()
 
@@ -192,7 +174,6 @@ set_target_properties(epee PROPERTIES IMPORTED_LOCATION
 
 # Unbound
 find_package(Unbound)
-
 if(NOT UNBOUND_INCLUDE_DIR)
   die("Could not find libunbound")
 else()
@@ -201,16 +182,15 @@ else()
     message(STATUS "Found libunbound library")
     include_directories(${UNBOUND_INCLUDE_DIR})
     if (WIN32)
-        add_library(unbound STATIC IMPORTED)
+      add_library(unbound STATIC IMPORTED)
     else()
-        add_library(unbound SHARED IMPORTED)
+      add_library(unbound SHARED IMPORTED)
     endif()
     set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
   else()
     die("Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
   endif()
 endif()
-
 
 add_library(rpc_base STATIC IMPORTED)
 set_target_properties(rpc_base PROPERTIES IMPORTED_LOCATION
@@ -312,62 +292,62 @@ set(
 )
 
 if (BUILD_LIBRARY)
-    add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
-    
-    target_link_libraries(monero-cpp
-        wallet
-        rpc_base
-        net
-        lmdb
-        unbound
-        easylogging
-        cryptonote_core
-        cryptonote_protocol
-        cryptonote_basic
-        cryptonote_format_utils_basic
-        mnemonics
-        ringct
-        ringct_basic
-        common
-        cncrypto
-        blockchain_db
-        blocks
-        checkpoints
-        device
-        device_trezor
-        multisig
-        version
-        randomx
-        epee
-        hardforks
-        cncrypto
-        ${wallet_crypto}
-        
-        ${UNBOUND_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${Protobuf_LIBRARY}
-        ${LibUSB_LIBRARIES}
-        ${OPENSSL_LIBRARIES}
-        ${SODIUM_LIBRARY}
-        ${HIDAPI_LIBRARIES}
-        ${EXTRA_LIBRARIES}
-    )
+  add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+  
+  target_link_libraries(monero-cpp
+      wallet
+      rpc_base
+      net
+      lmdb
+      unbound
+      easylogging
+      cryptonote_core
+      cryptonote_protocol
+      cryptonote_basic
+      cryptonote_format_utils_basic
+      mnemonics
+      ringct
+      ringct_basic
+      common
+      cncrypto
+      blockchain_db
+      blocks
+      checkpoints
+      device
+      device_trezor
+      multisig
+      version
+      randomx
+      epee
+      hardforks
+      cncrypto
+      ${wallet_crypto}
+      
+      ${UNBOUND_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Protobuf_LIBRARY}
+      ${LibUSB_LIBRARIES}
+      ${OPENSSL_LIBRARIES}
+      ${SODIUM_LIBRARY}
+      ${HIDAPI_LIBRARIES}
+      ${EXTRA_LIBRARIES}
+  )
 
-     INSTALL(FILES src/daemon/monero_daemon.h
-                   src/daemon/monero_daemon_model.h
-             DESTINATION include/daemon)
-     INSTALL(FILES src/utils/gen_utils.h
-                   src/utils/monero_utils.h
-             DESTINATION include/utils)
-     INSTALL(FILES src/wallet/monero_wallet_full.h
-                   src/wallet/monero_wallet.h
-                   src/wallet/monero_wallet_keys.h
-                   src/wallet/monero_wallet_model.h
-             DESTINATION include/wallet)
-     INSTALL(TARGETS monero-cpp
-             RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
-             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
-             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
+  INSTALL(FILES src/daemon/monero_daemon.h
+          src/daemon/monero_daemon_model.h
+          DESTINATION include/daemon)
+  INSTALL(FILES src/utils/gen_utils.h
+          src/utils/monero_utils.h
+          DESTINATION include/utils)
+  INSTALL(FILES src/wallet/monero_wallet_full.h
+          src/wallet/monero_wallet.h
+          src/wallet/monero_wallet_keys.h
+          src/wallet/monero_wallet_model.h
+          DESTINATION include/wallet)
+  INSTALL(TARGETS monero-cpp
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)
 endif()
 
 ########################
@@ -375,51 +355,50 @@ endif()
 ########################
 
 if (BUILD_SAMPLE)
-    set(SAMPLE_CODE_SRC_FILES test/sample_code.cpp)
-    
-    add_executable(sample_code ${LIBRARY_SRC_FILES} ${SAMPLE_CODE_SRC_FILES})
-    
-    target_link_libraries(sample_code
-        wallet
-        rpc_base
-        net
-        lmdb
-        easylogging
-        cryptonote_core
-        cryptonote_protocol
-        cryptonote_basic
-        cryptonote_format_utils_basic
-        mnemonics
-        ringct
-        ringct_basic
-        common
-        cncrypto
-        blockchain_db
-        blocks
-        checkpoints
-        device
-        device_trezor
-        multisig
-        version
-        randomx
-        epee
-        hardforks
-        cncrypto
-        ${wallet_crypto}
+  set(SAMPLE_CODE_SRC_FILES test/sample_code.cpp)
+  
+  add_executable(sample_code ${LIBRARY_SRC_FILES} ${SAMPLE_CODE_SRC_FILES})
+  
+  target_link_libraries(sample_code
+      wallet
+      rpc_base
+      net
+      lmdb
+      easylogging
+      cryptonote_core
+      cryptonote_protocol
+      cryptonote_basic
+      cryptonote_format_utils_basic
+      mnemonics
+      ringct
+      ringct_basic
+      common
+      cncrypto
+      blockchain_db
+      blocks
+      checkpoints
+      device
+      device_trezor
+      multisig
+      version
+      randomx
+      epee
+      hardforks
+      cncrypto
+      ${wallet_crypto}
 
-        ${UNBOUND_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${Protobuf_LIBRARY}
-        ${LibUSB_LIBRARIES}
-        ${OPENSSL_LIBRARIES}
-        ${SODIUM_LIBRARY}
-        ${HIDAPI_LIBRARIES}
-        ${EXTRA_LIBRARIES}
-	
-    )
-    if (NOT WIN32)
-	target_link_libraries(sample_code dl)
-    endif()
+      ${UNBOUND_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Protobuf_LIBRARY}
+      ${LibUSB_LIBRARIES}
+      ${OPENSSL_LIBRARIES}
+      ${SODIUM_LIBRARY}
+      ${HIDAPI_LIBRARIES}
+      ${EXTRA_LIBRARIES}
+  )
+  if (NOT WIN32)
+    target_link_libraries(sample_code dl)
+  endif()
 endif()
 
 ########################
@@ -427,49 +406,48 @@ endif()
 ########################
 
 if (BUILD_SCRATCHPAD)
-    set(SCRATCHPAD_SRC_FILES test/scratchpad.cpp)
-    
-    add_executable(scratchpad ${LIBRARY_SRC_FILES} ${SCRATCHPAD_SRC_FILES})
-    
-    target_link_libraries(scratchpad
-        wallet
-        rpc_base
-        net
-        lmdb
-        easylogging
-        cryptonote_core
-        cryptonote_protocol
-        cryptonote_basic
-        cryptonote_format_utils_basic
-        mnemonics
-        ringct
-        ringct_basic
-        common
-        cncrypto
-        blockchain_db
-        blocks
-        checkpoints
-        device
-        device_trezor
-        multisig
-        version
-        randomx
-        epee
-        hardforks
-        cncrypto
-        ${wallet_crypto}
-        
-        ${UNBOUND_LIBRARIES}
-        ${Boost_LIBRARIES}
-        ${Protobuf_LIBRARY}
-        ${LibUSB_LIBRARIES}
-        ${OPENSSL_LIBRARIES}
-        ${SODIUM_LIBRARY}
-        ${HIDAPI_LIBRARIES}
-        ${EXTRA_LIBRARIES}
-    )
-    if (NOT WIN32)
-        target_link_libraries(sample_code dl)
-    endif()
-
+  set(SCRATCHPAD_SRC_FILES test/scratchpad.cpp)
+  
+  add_executable(scratchpad ${LIBRARY_SRC_FILES} ${SCRATCHPAD_SRC_FILES})
+  
+  target_link_libraries(scratchpad
+      wallet
+      rpc_base
+      net
+      lmdb
+      easylogging
+      cryptonote_core
+      cryptonote_protocol
+      cryptonote_basic
+      cryptonote_format_utils_basic
+      mnemonics
+      ringct
+      ringct_basic
+      common
+      cncrypto
+      blockchain_db
+      blocks
+      checkpoints
+      device
+      device_trezor
+      multisig
+      version
+      randomx
+      epee
+      hardforks
+      cncrypto
+      ${wallet_crypto}
+      
+      ${UNBOUND_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Protobuf_LIBRARY}
+      ${LibUSB_LIBRARIES}
+      ${OPENSSL_LIBRARIES}
+      ${SODIUM_LIBRARY}
+      ${HIDAPI_LIBRARIES}
+      ${EXTRA_LIBRARIES}
+  )
+  if (NOT WIN32)
+    target_link_libraries(scratchpad dl)
+  endif()
 endif()

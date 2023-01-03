@@ -44,7 +44,7 @@
  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * strict LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
  * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
@@ -78,7 +78,7 @@ namespace monero {
   // ------------------------- INITIALIZE CONSTANTS ---------------------------
 
   static const int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 1000 * 30; // default connection timeout 30 sec
-  static const bool strict = false; // relies exclusively on blockchain data if true, includes local wallet data if false TODO: good use case to expose externally?
+  static const bool STRICT_ = false; // relies exclusively on blockchain data if true, includes local wallet data if false TODO: good use case to expose externally? (note: cannot use `STRICT` due to namespace collision on Windows)
 
   // ----------------------- INTERNAL PRIVATE HELPERS -----------------------
 
@@ -1590,29 +1590,29 @@ namespace monero {
   // isMultisigImportNeeded
 
   uint64_t monero_wallet_full::get_balance() const {
-    return m_w2->balance_all(strict);
+    return m_w2->balance_all(STRICT_);
   }
 
   uint64_t monero_wallet_full::get_balance(uint32_t account_idx) const {
-    return m_w2->balance(account_idx, strict);
+    return m_w2->balance(account_idx, STRICT_);
   }
 
   uint64_t monero_wallet_full::get_balance(uint32_t account_idx, uint32_t subaddress_idx) const {
-    std::map<uint32_t, uint64_t> balance_per_subaddress = m_w2->balance_per_subaddress(account_idx, strict);
+    std::map<uint32_t, uint64_t> balance_per_subaddress = m_w2->balance_per_subaddress(account_idx, STRICT_);
     auto iter = balance_per_subaddress.find(subaddress_idx);
     return iter == balance_per_subaddress.end() ? 0 : iter->second;
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance() const {
-    return m_w2->unlocked_balance_all(strict);
+    return m_w2->unlocked_balance_all(STRICT_);
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance(uint32_t account_idx) const {
-    return m_w2->unlocked_balance(account_idx, strict);
+    return m_w2->unlocked_balance(account_idx, STRICT_);
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance(uint32_t account_idx, uint32_t subaddress_idx) const {
-    std::map<uint32_t, std::pair<uint64_t, std::pair<uint64_t, uint64_t>>> unlocked_balance_per_subaddress = m_w2->unlocked_balance_per_subaddress(account_idx, strict);
+    std::map<uint32_t, std::pair<uint64_t, std::pair<uint64_t, uint64_t>>> unlocked_balance_per_subaddress = m_w2->unlocked_balance_per_subaddress(account_idx, STRICT_);
     auto iter = unlocked_balance_per_subaddress.find(subaddress_idx);
     return iter == unlocked_balance_per_subaddress.end() ? 0 : iter->second.first;
   }
@@ -1630,8 +1630,8 @@ namespace monero {
       monero_account account;
       account.m_index = account_idx;
       account.m_primary_address = get_address(account_idx, 0);
-      account.m_balance = m_w2->balance(account_idx, strict);
-      account.m_unlocked_balance = m_w2->unlocked_balance(account_idx, strict);
+      account.m_balance = m_w2->balance(account_idx, STRICT_);
+      account.m_unlocked_balance = m_w2->unlocked_balance(account_idx, STRICT_);
       if (include_subaddresses) account.m_subaddresses = get_subaddresses_aux(account_idx, std::vector<uint32_t>(), transfers);
       accounts.push_back(account);
     }
@@ -1650,8 +1650,8 @@ namespace monero {
     monero_account account;
     account.m_index = account_idx;
     account.m_primary_address = get_address(account_idx, 0);
-    account.m_balance = m_w2->balance(account_idx, strict);
-    account.m_unlocked_balance = m_w2->unlocked_balance(account_idx, strict);
+    account.m_balance = m_w2->balance(account_idx, STRICT_);
+    account.m_unlocked_balance = m_w2->unlocked_balance(account_idx, STRICT_);
     if (include_subaddresses) account.m_subaddresses = get_subaddresses_aux(account_idx, std::vector<uint32_t>(), transfers);
     return account;
   }
@@ -3697,8 +3697,8 @@ namespace monero {
     std::vector<monero_subaddress> subaddresses;
 
     // get balances per subaddress as maps
-    std::map<uint32_t, uint64_t> balance_per_subaddress = m_w2->balance_per_subaddress(account_idx, strict);
-    std::map<uint32_t, std::pair<uint64_t, std::pair<uint64_t, uint64_t>>> unlocked_balance_per_subaddress = m_w2->unlocked_balance_per_subaddress(account_idx, strict);
+    std::map<uint32_t, uint64_t> balance_per_subaddress = m_w2->balance_per_subaddress(account_idx, STRICT_);
+    std::map<uint32_t, std::pair<uint64_t, std::pair<uint64_t, uint64_t>>> unlocked_balance_per_subaddress = m_w2->unlocked_balance_per_subaddress(account_idx, STRICT_);
 
     // get all indices if no indices given
     std::vector<uint32_t> subaddress_indices_req;
