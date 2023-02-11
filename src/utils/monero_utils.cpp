@@ -350,7 +350,16 @@ std::shared_ptr<monero_tx> monero_utils::cn_tx_to_tx(const cryptonote::transacti
     output->m_tx = tx;
     tx->m_outputs.push_back(output);
     output->m_amount = cnVout.amount;
-    const crypto::public_key& cnStealthPublicKey = boost::get<txout_to_tagged_key>(cnVout.target).key;
+
+    // before HF_VERSION_VIEW_TAGS, outputs with public keys are of type txout_to_key
+    // after HF_VERSION_VIEW_TAGS, outputs with public keys are of type txout_to_tagged_key
+    crypto::public_key cnStealthPublicKey;
+    if (cnVout.target.type() == typeid(txout_to_key))
+      cnStealthPublicKey = boost::get<txout_to_key>(cnVout.target).key;
+    else if (cnVout.target.type() == typeid(txout_to_tagged_key))
+      cnStealthPublicKey = boost::get<txout_to_tagged_key>(cnVout.target).key;
+    else
+      throw std::runtime_error(std::string("Unexpected output target type found: ") + std::string(cnVout.target.type().name()));
     output->m_stealth_public_key = epee::string_tools::pod_to_hex(cnStealthPublicKey);
   }
 
