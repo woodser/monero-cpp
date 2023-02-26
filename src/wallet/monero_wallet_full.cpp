@@ -1085,7 +1085,7 @@ namespace monero {
       if (config.m_restore_height == boost::none) config_normalized.m_restore_height = 0;
       if (!config_normalized.m_language.get().empty()) throw std::runtime_error("Cannot specify language when creating wallet from mnemonic");
       return create_wallet_from_mnemonic(config_normalized, std::move(http_client_factory));
-    } else if (!config_normalized.m_primary_address.get().empty() || !config_normalized.m_private_spend_key.get().empty()) {
+    } else if (!config_normalized.m_primary_address.get().empty() || !config_normalized.m_private_spend_key.get().empty() || !config_normalized.m_private_view_key.get().empty()) {
       if (config.m_restore_height == boost::none) config_normalized.m_restore_height = 0;
       if (!config_normalized.m_seed_offset.get().empty()) throw std::runtime_error("Cannot specify seed offset when creating wallet from keys");
       if (config_normalized.m_language.get().empty()) config_normalized.m_language = std::string("English");
