@@ -1283,6 +1283,10 @@ namespace monero {
     is_connected_to_daemon(); // update m_is_connected cache // TODO: better naming?
   }
 
+  void monero_wallet_full::set_daemon_proxy(const std::string& uri) {
+    m_w2->set_proxy(uri);
+  }
+
   void monero_wallet_full::set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
     if (connection == boost::none) set_daemon_connection("");
     else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get());

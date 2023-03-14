@@ -160,6 +160,13 @@ namespace monero {
     }
 
     /**
+     * Set the Tor proxy to the daemon.
+     */
+    virtual void set_daemon_proxy(const std::string& uri = "") {
+      throw std::runtime_error("set_daemon_proxy() not supported");
+    }
+
+    /**
      * Get the wallet's daemon connection.
      *
      * @return the wallet's daemon connection
