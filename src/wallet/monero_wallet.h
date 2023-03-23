@@ -690,6 +690,17 @@ namespace monero {
     }
 
     /**
+     * Set a subaddress label.
+     * 
+     * @param account_idx index of the account to set the label for
+     * @param subaddressIdx index of the subaddress to set the label for
+     * @param label the label to set
+     */
+    virtual void set_subaddress_label(uint32_t account_idx, uint32_t subaddress_idx, const std::string& label = "") {
+      throw std::runtime_error("set_subaddress_label() not supported");
+    }
+
+    /**
      * Get all wallet transactions.  Wallet transactions contain one or more
      * transfers that are either incoming or outgoing to the wallet.
      *
