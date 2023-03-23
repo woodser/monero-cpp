@@ -1706,6 +1706,12 @@ namespace monero {
     return subaddress;
   }
 
+  void monero_wallet_full::set_subaddress_label(const uint32_t account_idx, const uint32_t subaddress_idx, const std::string& label) {
+    MTRACE("set_subaddress_label(" << account_idx << ", " << subaddress_idx << ", " << label << ")");
+    cryptonote::subaddress_index index = {account_idx, subaddress_idx};
+    m_w2->set_subaddress_label(index, label);
+  }
+
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs() const {
     return get_txs(monero_tx_query());
   }
