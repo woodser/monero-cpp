@@ -1454,12 +1454,12 @@ namespace monero {
     return m_w2->get_blockchain_current_height();
   }
 
-  uint64_t monero_wallet_full::get_sync_height() const {  // TODO: rename to get_sync_from_height()
+  uint64_t monero_wallet_full::get_restore_height() const {  // TODO: rename to get_sync_from_height()
     return m_w2->get_refresh_from_block_height();
   }
 
-  void monero_wallet_full::set_sync_height(uint64_t sync_height) {
-    m_w2->set_refresh_from_block_height(sync_height);
+  void monero_wallet_full::set_restore_height(uint64_t restore_height) {
+    m_w2->set_refresh_from_block_height(restore_height);
   }
 
   uint64_t monero_wallet_full::get_daemon_height() const {
@@ -3796,8 +3796,8 @@ namespace monero {
     MTRACE("sync_aux()");
 
     // determine sync start height
-    uint64_t sync_start_height = start_height == boost::none ? std::max(get_height(), get_sync_height()) : *start_height;
-    if (sync_start_height < get_sync_height()) set_sync_height(sync_start_height); // TODO monero-project: start height processed > requested start height unless sync height manually set
+    uint64_t sync_start_height = start_height == boost::none ? std::max(get_height(), get_restore_height()) : *start_height;
+    if (sync_start_height < get_restore_height()) set_restore_height(sync_start_height); // TODO monero-project: start height processed > requested start height unless sync height manually set
 
     // notify listeners of sync start
     m_w2_listener->on_sync_start(sync_start_height);

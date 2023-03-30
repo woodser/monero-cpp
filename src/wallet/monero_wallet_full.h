@@ -205,8 +205,8 @@ namespace monero {
     monero_integrated_address get_integrated_address(const std::string& standard_address = "", const std::string& payment_id = "") const override;
     monero_integrated_address decode_integrated_address(const std::string& integrated_address) const override;
     uint64_t get_height() const override;
-    uint64_t get_sync_height() const override;
-    void set_sync_height(uint64_t sync_height) override;
+    uint64_t get_restore_height() const override;
+    void set_restore_height(uint64_t restore_height) override;
     uint64_t get_daemon_height() const override;
     uint64_t get_daemon_max_peer_height() const override;
     uint64_t get_height_by_date(uint16_t year, uint8_t month, uint8_t day) const override;
