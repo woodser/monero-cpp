@@ -693,7 +693,7 @@ namespace monero {
      * Set a subaddress label.
      * 
      * @param account_idx index of the account to set the label for
-     * @param subaddressIdx index of the subaddress to set the label for
+     * @param subaddress_idx index of the subaddress to set the label for
      * @param label the label to set
      */
     virtual void set_subaddress_label(uint32_t account_idx, uint32_t subaddress_idx, const std::string& label = "") {
