@@ -211,19 +211,19 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
 
 1. Download and install [MSYS2](https://www.msys2.org/).
 2. Press the Windows button and launch `MSYS2 MINGW64` for 64 bit systems or `MSYS2 MINGW32` for 32 bit.
-3. Update packages: `pacman -Syu` and `pacman -Syy`
+3. Update packages: `pacman -Syu` and confirm at prompts.
 4. Relaunch MSYS2 (if necessary) and install dependencies:
 
     For 64 bit:
 
      ```
-     pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb make gettext base-devel
+     pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb gettext base-devel
      ```
 
      For 32 bit:
 
      ```
-     pacman -S  mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium mingw-w64-i686-hidapi mingw-w64-i686-unbound mingw-w64-i686-protobuf git mingw-w64-i686-libusb make gettext base-devel
+     pacman -S  mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium mingw-w64-i686-hidapi mingw-w64-i686-unbound mingw-w64-i686-protobuf git mingw-w64-i686-libusb gettext base-devel
      ```
 5. Clone repo if installing standalone (skip if building as part of another repo like monero-java or monero-javascript): `git clone --recursive https://github.com/monero-ecosystem/monero-cpp.git`
 6. Update submodules: `cd <path/to/monero-cpp> && ./bin/update_submodules.sh`
@@ -233,7 +233,7 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
     For 64 bit: `make release-static-win64`
     
     For 32 bit: `make release-static-win32`
-10. Build as a shared library in ./build/: `cd ../../ && ./bin/build_libmonero_cpp_dll.sh`
+10. Build as a shared library to ./build/: `cd ../../ && ./bin/build_libmonero_cpp.sh`
 
 ## Related projects
 
