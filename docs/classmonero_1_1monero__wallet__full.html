@@ -96,6 +96,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afa2fdb0edca4f399822d5b6bf226cecc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a108de050f007e0ec0f308c53ab9fefcf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a108de050f007e0ec0f308c53ab9fefcf">set_daemon_connection</a> (const boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;connection) override</td></tr>
 <tr class="separator:a108de050f007e0ec0f308c53ab9fefcf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11cd98b9d76c0792458e27949b7cd316"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a11cd98b9d76c0792458e27949b7cd316">set_daemon_proxy</a> (const std::string &amp;uri=&quot;&quot;) override</td></tr>
+<tr class="separator:a11cd98b9d76c0792458e27949b7cd316"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54eb65f1a897991749cfcb70258ba8ec"><td class="memItemLeft" align="right" valign="top">boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a54eb65f1a897991749cfcb70258ba8ec">get_daemon_connection</a> () const override</td></tr>
 <tr class="separator:a54eb65f1a897991749cfcb70258ba8ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae8f28b266f7cb745c100bfe893ae056"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#aae8f28b266f7cb745c100bfe893ae056">is_connected_to_daemon</a> () const override</td></tr>
@@ -134,10 +136,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5a0996ab777d2a44161968ef2b3b4bc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6811bbc709aaf7be8b396dad28a1750"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#ad6811bbc709aaf7be8b396dad28a1750">get_height</a> () const override</td></tr>
 <tr class="separator:ad6811bbc709aaf7be8b396dad28a1750"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adb005b3f60e6148dda0b898b149d1c76"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#adb005b3f60e6148dda0b898b149d1c76">get_sync_height</a> () const override</td></tr>
-<tr class="separator:adb005b3f60e6148dda0b898b149d1c76"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0db8899bb862eb8c8914defe8bc96431"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a0db8899bb862eb8c8914defe8bc96431">set_sync_height</a> (uint64_t sync_height) override</td></tr>
-<tr class="separator:a0db8899bb862eb8c8914defe8bc96431"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b27eab5ff9609400b83e65dae562063"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a0b27eab5ff9609400b83e65dae562063">get_restore_height</a> () const override</td></tr>
+<tr class="separator:a0b27eab5ff9609400b83e65dae562063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6c33a2be4b95eec8540dcf69f997fa2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#af6c33a2be4b95eec8540dcf69f997fa2">set_restore_height</a> (uint64_t restore_height) override</td></tr>
+<tr class="separator:af6c33a2be4b95eec8540dcf69f997fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9e3522fc52cb56998f95589b773d4b3"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#ae9e3522fc52cb56998f95589b773d4b3">get_daemon_height</a> () const override</td></tr>
 <tr class="separator:ae9e3522fc52cb56998f95589b773d4b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adae3b3f02bf19d2724f3a55bc737c913"><td class="memItemLeft" align="right" valign="top">uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#adae3b3f02bf19d2724f3a55bc737c913">get_daemon_max_peer_height</a> () const override</td></tr>
@@ -190,6 +192,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a20905c4cc03485d65328a4bb688bbe8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ce8da5afc25411f5dd1384543d9e6a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a2ce8da5afc25411f5dd1384543d9e6a0">create_subaddress</a> (uint32_t account_idx, const std::string &amp;label=&quot;&quot;) override</td></tr>
 <tr class="separator:a2ce8da5afc25411f5dd1384543d9e6a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9500587ef6d520358a1c5831c6cdaa2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#ae9500587ef6d520358a1c5831c6cdaa2">set_subaddress_label</a> (uint32_t account_idx, uint32_t subaddress_idx, const std::string &amp;label=&quot;&quot;) override</td></tr>
+<tr class="separator:ae9500587ef6d520358a1c5831c6cdaa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f751d58a46342674b25584a20011f3a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#a5f751d58a46342674b25584a20011f3a">get_txs</a> () const override</td></tr>
 <tr class="separator:a5f751d58a46342674b25584a20011f3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3ea881f83a3abbb76587b7b1cfbfd43"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet__full.html#aa3ea881f83a3abbb76587b7b1cfbfd43">get_txs</a> (const <a class="el" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a> &amp;query) const override</td></tr>
@@ -322,6 +326,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_cache_file
 <tr class="separator:a8d048f27f904555d63db208daf88d5ca inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadd20ff644751c3f8690cf1798103886 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aadd20ff644751c3f8690cf1798103886">set_daemon_connection</a> (const boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;connection)</td></tr>
 <tr class="separator:aadd20ff644751c3f8690cf1798103886 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b87b99b509637f14d2d3516e6bef2c9 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a6b87b99b509637f14d2d3516e6bef2c9">set_daemon_proxy</a> (const std::string &amp;uri=&quot;&quot;)</td></tr>
+<tr class="separator:a6b87b99b509637f14d2d3516e6bef2c9 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf6b4b721b18a9b66e54a78deb9d7c85 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aaf6b4b721b18a9b66e54a78deb9d7c85">get_daemon_connection</a> () const</td></tr>
 <tr class="separator:aaf6b4b721b18a9b66e54a78deb9d7c85 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78d5a9303854a743333d1ba226a673c1 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a78d5a9303854a743333d1ba226a673c1">is_connected_to_daemon</a> () const</td></tr>
@@ -362,10 +368,10 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_cache_file
 <tr class="separator:a7a0c8667be57e608559e747f8f87e27b inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a9835efe3ba16f26b2cd96fe08bf954 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a4a9835efe3ba16f26b2cd96fe08bf954">get_height</a> () const</td></tr>
 <tr class="separator:a4a9835efe3ba16f26b2cd96fe08bf954 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab06c5dcf7170bee5154882427a5654c0 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#ab06c5dcf7170bee5154882427a5654c0">get_sync_height</a> () const</td></tr>
-<tr class="separator:ab06c5dcf7170bee5154882427a5654c0 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2265e3cac21b55067592942c44d945a2 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a2265e3cac21b55067592942c44d945a2">set_sync_height</a> (uint64_t sync_height)</td></tr>
-<tr class="separator:a2265e3cac21b55067592942c44d945a2 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72bce80953209cdd83246c3b8adee874 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a72bce80953209cdd83246c3b8adee874">get_restore_height</a> () const</td></tr>
+<tr class="separator:a72bce80953209cdd83246c3b8adee874 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7e461520ff360fbcfb66484b953a4ed inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aa7e461520ff360fbcfb66484b953a4ed">set_restore_height</a> (uint64_t restore_height)</td></tr>
+<tr class="separator:aa7e461520ff360fbcfb66484b953a4ed inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a208093344861ded703f0a4e99f97e109 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a208093344861ded703f0a4e99f97e109">get_daemon_height</a> () const</td></tr>
 <tr class="separator:a208093344861ded703f0a4e99f97e109 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a66e346a50478c38bc3ce46a99f1da1a8 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a66e346a50478c38bc3ce46a99f1da1a8">get_daemon_max_peer_height</a> () const</td></tr>
@@ -430,6 +436,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_cache_file
 <tr class="separator:aa1fde8e1361233c51d4cad7aba28a10e inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1500500b3fcbd60b6c8bd9384a6c09e inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#ac1500500b3fcbd60b6c8bd9384a6c09e">create_subaddress</a> (uint32_t account_idx, const std::string &amp;label=&quot;&quot;)</td></tr>
 <tr class="separator:ac1500500b3fcbd60b6c8bd9384a6c09e inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adf6ca25d7d7c8a2a2ac20a2be1dcc730 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#adf6ca25d7d7c8a2a2ac20a2be1dcc730">set_subaddress_label</a> (uint32_t account_idx, uint32_t subaddress_idx, const std::string &amp;label=&quot;&quot;)</td></tr>
+<tr class="separator:adf6ca25d7d7c8a2a2ac20a2be1dcc730 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba45b4d40c883209fdba8e69e140594c inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aba45b4d40c883209fdba8e69e140594c">get_txs</a> () const</td></tr>
 <tr class="separator:aba45b4d40c883209fdba8e69e140594c inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefe57f72ad6aafc40102d4a0ec17f902 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aefe57f72ad6aafc40102d4a0ec17f902">get_txs</a> (const <a class="el" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a> &amp;query) const</td></tr>
@@ -2883,6 +2891,35 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 
 </div>
 </div>
+<a id="a0b27eab5ff9609400b83e65dae562063" name="a0b27eab5ff9609400b83e65dae562063"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b27eab5ff9609400b83e65dae562063">&#9670;&nbsp;</a></span>get_restore_height()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint64_t monero::monero_wallet_full::get_restore_height </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Get the height of the first block that the wallet scans.</p>
+<dl class="section return"><dt>Returns</dt><dd>the height of the first block that the wallet scans </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a72bce80953209cdd83246c3b8adee874">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
 <a id="a540bbade4f891a51d065d8126267cd53" name="a540bbade4f891a51d065d8126267cd53"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a540bbade4f891a51d065d8126267cd53">&#9670;&nbsp;</a></span>get_spend_proof()</h2>
 
@@ -2974,35 +3011,6 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <dl class="section return"><dt>Returns</dt><dd>the retrieved subaddresses </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a5eb46580b410754a531b8440bedd62a1">monero::monero_wallet</a>.</p>
-
-</div>
-</div>
-<a id="adb005b3f60e6148dda0b898b149d1c76" name="adb005b3f60e6148dda0b898b149d1c76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adb005b3f60e6148dda0b898b149d1c76">&#9670;&nbsp;</a></span>get_sync_height()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint64_t monero::monero_wallet_full::get_sync_height </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Get the height of the first block that the wallet scans.</p>
-<dl class="section return"><dt>Returns</dt><dd>the height of the first block that the wallet scans </dd></dl>
-
-<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#ab06c5dcf7170bee5154882427a5654c0">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
@@ -4392,8 +4400,8 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 
 </div>
 </div>
-<a id="a0db8899bb862eb8c8914defe8bc96431" name="a0db8899bb862eb8c8914defe8bc96431"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0db8899bb862eb8c8914defe8bc96431">&#9670;&nbsp;</a></span>set_sync_height()</h2>
+<a id="a11cd98b9d76c0792458e27949b7cd316" name="a11cd98b9d76c0792458e27949b7cd316"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a11cd98b9d76c0792458e27949b7cd316">&#9670;&nbsp;</a></span>set_daemon_proxy()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4402,10 +4410,39 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void monero::monero_wallet_full::set_sync_height </td>
+          <td class="memname">void monero::monero_wallet_full::set_daemon_proxy </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>uri</em> = <code>&quot;&quot;</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Set the Tor proxy to the daemon. </p>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a6b87b99b509637f14d2d3516e6bef2c9">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
+<a id="af6c33a2be4b95eec8540dcf69f997fa2" name="af6c33a2be4b95eec8540dcf69f997fa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6c33a2be4b95eec8540dcf69f997fa2">&#9670;&nbsp;</a></span>set_restore_height()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void monero::monero_wallet_full::set_restore_height </td>
           <td>(</td>
           <td class="paramtype">uint64_t&#160;</td>
-          <td class="paramname"><em>sync_height</em></td><td>)</td>
+          <td class="paramname"><em>restore_height</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -4418,12 +4455,65 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <p >Set the height of the first block that the wallet scans.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">sync_height</td><td>is the height of the first block that the wallet scans </td></tr>
+    <tr><td class="paramname">restore_height</td><td>is the height of the first block that the wallet scans </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a2265e3cac21b55067592942c44d945a2">monero::monero_wallet</a>.</p>
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aa7e461520ff360fbcfb66484b953a4ed">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
+<a id="ae9500587ef6d520358a1c5831c6cdaa2" name="ae9500587ef6d520358a1c5831c6cdaa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae9500587ef6d520358a1c5831c6cdaa2">&#9670;&nbsp;</a></span>set_subaddress_label()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void monero::monero_wallet_full::set_subaddress_label </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>account_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>subaddress_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>label</em> = <code>&quot;&quot;</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Set a subaddress label.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">account_idx</td><td>index of the account to set the label for </td></tr>
+    <tr><td class="paramname">subaddress_idx</td><td>index of the subaddress to set the label for </td></tr>
+    <tr><td class="paramname">label</td><td>the label to set </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#adf6ca25d7d7c8a2a2ac20a2be1dcc730">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
