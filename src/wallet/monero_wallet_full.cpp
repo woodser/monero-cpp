@@ -1346,10 +1346,17 @@ namespace monero {
   }
 
   std::string monero_wallet_full::get_mnemonic() const {
-    if (m_w2->watch_only()) return "";
-    epee::wipeable_string wipeable_mnemonic;
-    m_w2->get_seed(wipeable_mnemonic);
-    return std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
+    epee::wipeable_string seed;
+    bool ready;
+    if (m_w2->multisig(&ready)) {
+      if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
+      if (!m_w2->get_multisig_seed(seed)) throw std::runtime_error("Failed to get multisig seed.");
+    } else {
+      if (m_w2->watch_only()) return "";
+      if (!m_w2->is_deterministic()) return "";
+      if (!m_w2->get_seed(seed)) throw std::runtime_error("Failed to get seed.");
+    }
+    return std::string(seed.data(), seed.size());
   }
 
   std::string monero_wallet_full::get_mnemonic_language() const {
