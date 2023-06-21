@@ -62,6 +62,14 @@
 using namespace cryptonote;
 using namespace monero_utils;
 
+void monero_utils::set_log_level(int level) {
+  mlog_set_log_level(level);
+}
+
+void monero_utils::configure_logging(const std::string& path, bool console) {
+  mlog_configure(path, console);
+}
+
 // --------------------------- VALIDATION UTILS -------------------------------
 
 monero_integrated_address monero_utils::get_integrated_address(monero_network_type network_type, const std::string& standard_address, const std::string& payment_id) {
