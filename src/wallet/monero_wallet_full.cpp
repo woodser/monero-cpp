@@ -1491,19 +1491,16 @@ namespace monero {
   }
 
   void monero_wallet_full::add_listener(monero_wallet_listener& listener) {
-    MTRACE("add_listener()");
     m_listeners.insert(&listener);
     m_w2_listener->update_listening();
   }
 
   void monero_wallet_full::remove_listener(monero_wallet_listener& listener) {
-    MTRACE("remove_listener()");
     m_listeners.erase(&listener);
     if (!m_sync_loop_running) m_w2_listener->update_listening(); // listener is unregistered after sync to avoid segfault
   }
 
   std::set<monero_wallet_listener*> monero_wallet_full::get_listeners() {
-    MTRACE("get_listeners()");
     return m_listeners;
   }
 
