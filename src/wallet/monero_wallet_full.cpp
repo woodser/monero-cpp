@@ -3440,9 +3440,9 @@ namespace monero {
 
   void monero_wallet_full::change_password(const std::string& old_password, const std::string& new_password) {
     MTRACE("change_password(" << "***" << ", ***)");
-    #if !defined(__EMSCRIPTEN__) // TODO: wallet2 verify_password loads from disk so password is verified in js for wasm
+    if (!get_path().empty()) { // TODO: skipping password verification of in-memory wallet
       if (!m_w2->verify_password(old_password)) throw std::runtime_error("Invalid original password.");
-    #endif
+    }
     m_w2->change_password(m_w2->get_wallet_file(), old_password, new_password);
   }
 
@@ -3463,8 +3463,8 @@ namespace monero {
     return buf;
   }
 
-  std::string monero_wallet_full::get_cache_file_buffer(const epee::wipeable_string& password) const {
-    boost::optional<wallet2::cache_file_data> cache_file_data = m_w2->get_cache_file_data(password);
+  std::string monero_wallet_full::get_cache_file_buffer() const {
+    boost::optional<wallet2::cache_file_data> cache_file_data = m_w2->get_cache_file_data();
     std::string buf;
     ::serialization::dump_binary(cache_file_data.get(), buf);
     return buf;
