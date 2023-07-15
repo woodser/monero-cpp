@@ -375,6 +375,7 @@ namespace monero {
     boost::optional<std::string> m_address;
     boost::optional<uint64_t> m_amount;
     std::vector<std::shared_ptr<monero_destination>> m_destinations;
+    std::vector<uint32_t> m_subtract_fee_from;
     boost::optional<std::string> m_payment_id;
     boost::optional<monero_tx_priority> m_priority;
     boost::optional<uint32_t> m_ring_size;
