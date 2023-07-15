@@ -1280,6 +1280,7 @@ namespace monero {
         m_destinations.push_back(destination->copy(destination, std::make_shared<monero_destination>()));
       }
     }
+    m_subtract_fee_from = config.m_subtract_fee_from;
     m_payment_id = config.m_payment_id;
     m_priority = config.m_priority;
     m_ring_size = config.m_ring_size;
@@ -1328,6 +1329,7 @@ namespace monero {
     // set sub-arrays
     if (!m_destinations.empty()) root.AddMember("destinations", monero_utils::to_rapidjson_val(allocator, m_destinations), allocator);
     if (!m_subaddress_indices.empty()) root.AddMember("subaddressIndices", monero_utils::to_rapidjson_val(allocator, m_subaddress_indices), allocator);
+    if (!m_subtract_fee_from.empty()) root.AddMember("subtractFeeFrom", monero_utils::to_rapidjson_val(allocator, m_subtract_fee_from), allocator);
 
     // return root
     return root;
@@ -1352,6 +1354,7 @@ namespace monero {
           config->m_destinations.push_back(destination);
         }
       }
+      else if (key == std::string("subtractFeeFrom")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) config->m_subtract_fee_from.push_back(it2->second.get_value<uint32_t>());
       else if (key == std::string("paymentId")) config->m_payment_id = it->second.data();
       else if (key == std::string("priority")) {
         uint32_t priority_num = it->second.get_value<uint32_t>();

@@ -619,9 +619,9 @@ namespace monero {
     return amount;
   }
   //------------------------------------------------------------------------------------------------------------------------------
-  template<typename Ts, typename Tu, typename Tk>
+  template<typename Ts, typename Tu, typename Tk, typename Ta>
   bool fill_response(wallet2* m_w2, std::vector<tools::wallet2::pending_tx> &ptx_vector,
-      bool get_tx_key, Ts& tx_key, Tu &amount, Tu &fee, Tu &weight, std::string &multisig_txset, std::string &unsigned_txset, bool do_not_relay,
+      bool get_tx_key, Ts& tx_key, Tu &amount, Ta &amounts_by_dest, Tu &fee, Tu &weight, std::string &multisig_txset, std::string &unsigned_txset, bool do_not_relay,
       Ts &tx_hash, bool get_tx_hex, Ts &tx_blob, bool get_tx_metadata, Ts &tx_metadata, Tk &spent_key_images, epee::json_rpc::error &er)
   {
     for (const auto & ptx : ptx_vector)
@@ -637,6 +637,12 @@ namespace monero {
       fill(amount, total_amount(ptx));
       fill(fee, ptx.fee);
       fill(weight, cryptonote::get_transaction_weight(ptx.tx));
+
+      // add amounts by destination
+      tools::wallet_rpc::amounts_list abd;
+      for (const auto& dst : ptx.dests)
+        abd.amounts.push_back(dst.amount);
+      fill(amounts_by_dest, abd);
 
       // add spent key images
       key_image_list key_image_list;
@@ -1569,13 +1575,13 @@ namespace monero {
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
 
     // convert string ids to crypto hashes
-    std::vector<crypto::hash> tx_hashes;
+    std::unordered_set<crypto::hash> tx_hashes;
     std::vector<std::string>::const_iterator i = tx_ids.begin();
     while (i != tx_ids.end()) {
       cryptonote::blobdata tx_hash_blob;
       if (!epee::string_tools::parse_hexstr_to_binbuff(*i++, tx_hash_blob) || tx_hash_blob.size() != sizeof(crypto::hash)) throw std::runtime_error("TX ID has invalid format");
       crypto::hash tx_hash = *reinterpret_cast<const crypto::hash*>(tx_hash_blob.data());
-      tx_hashes.push_back(tx_hash);
+      tx_hashes.insert(tx_hash);
     }
 
     // scan txs
@@ -1984,14 +1990,21 @@ namespace monero {
     uint32_t account_index = config.m_account_index.get();
     std::set<uint32_t> subaddress_indices;
     for (const uint32_t& subaddress_idx : config.m_subaddress_indices) subaddress_indices.insert(subaddress_idx);
+    std::set<uint32_t> subtract_fee_from;
+    for (const uint32_t& subtract_fee_from_idx : config.m_subtract_fee_from) subtract_fee_from.insert(subtract_fee_from_idx);
 
     // prepare transactions
-    std::vector<wallet2::pending_tx> ptx_vector = m_w2->create_transactions_2(dsts, mixin, unlock_height, priority, extra, account_index, subaddress_indices);
+    std::vector<wallet2::pending_tx> ptx_vector = m_w2->create_transactions_2(dsts, mixin, unlock_height, priority, extra, account_index, subaddress_indices, subtract_fee_from);
     if (ptx_vector.empty()) throw std::runtime_error("No transaction created");
 
     // check if request cannot be fulfilled due to splitting
-    if (config.m_can_split != boost::none && config.m_can_split.get() == false && ptx_vector.size() != 1) {
-      throw std::runtime_error("Transaction would be too large.  Try create_txs()");
+    if (ptx_vector.size() > 1) {
+      if (config.m_can_split != boost::none && !config.m_can_split.get()) {
+        throw std::runtime_error("Transaction would be too large.  Try create_txs()");
+      }
+      if (subtract_fee_from.size() > 0 && config.m_can_split != boost::none && config.m_can_split.get()) {
+        throw std::runtime_error("subtractfeefrom transfers cannot be split over multiple transactions yet");
+      }
     }
 
     // config for fill_response()
@@ -2004,6 +2017,7 @@ namespace monero {
     // commit txs (if relaying) and get response using wallet rpc's fill_response()
     std::list<std::string> tx_keys;
     std::list<uint64_t> tx_amounts;
+    std::list<tools::wallet_rpc::amounts_list> tx_amounts_by_dest;
     std::list<uint64_t> tx_fees;
     std::list<uint64_t> tx_weights;
     std::string multisig_tx_hex;
@@ -2012,7 +2026,7 @@ namespace monero {
     std::list<std::string> tx_blobs;
     std::list<std::string> tx_metadatas;
     std::list<key_image_list> input_key_images_list;
-    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
+    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
       throw std::runtime_error("need to handle error filling response!");  // TODO
     }
 
@@ -2021,11 +2035,14 @@ namespace monero {
     auto tx_hashes_iter = tx_hashes.begin();
     auto tx_keys_iter = tx_keys.begin();
     auto tx_amounts_iter = tx_amounts.begin();
+    auto tx_amounts_by_dest_iter = tx_amounts_by_dest.begin();
     auto tx_fees_iter = tx_fees.begin();
     auto tx_weights_iter = tx_weights.begin();
     auto tx_blobs_iter = tx_blobs.begin();
     auto tx_metadatas_iter = tx_metadatas.begin();
     auto input_key_images_list_iter = input_key_images_list.begin();
+    std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
+    auto destinations_iter = destinations.begin();
     while (tx_fees_iter != tx_fees.end()) {
 
       // init tx with outgoing transfer from filled values
@@ -2051,6 +2068,15 @@ namespace monero {
         input->m_key_image.get()->m_hex = input_key_image;
       }
 
+      // init destinations
+      for (const uint64_t tx_amount_by_dest : (*tx_amounts_by_dest_iter).amounts) {
+        std::shared_ptr<monero_destination> destination = std::make_shared<monero_destination>();
+        destination->m_address = (*destinations_iter)->m_address;
+        destination->m_amount = tx_amount_by_dest;
+        tx->m_outgoing_transfer.get()->m_destinations.push_back(destination);
+        destinations_iter++;
+      }
+
       // init other known fields
       tx->m_is_outgoing = true;
       tx->m_payment_id = config.m_payment_id;
@@ -2072,15 +2098,13 @@ namespace monero {
       // iterate to next element
       tx_keys_iter++;
       tx_amounts_iter++;
+      tx_amounts_by_dest_iter++;
       tx_fees_iter++;
       tx_hashes_iter++;
       tx_blobs_iter++;
       tx_metadatas_iter++;
       input_key_images_list_iter++;
     }
-
-    // copy destinations if single tx
-    if (txs.size() == 1) txs[0]->m_outgoing_transfer.get()->m_destinations = config.get_normalized_destinations();
 
     // build tx set
     std::shared_ptr<monero_tx_set> tx_set = std::make_shared<monero_tx_set>();
@@ -2170,6 +2194,7 @@ namespace monero {
     if (destinations[0]->m_amount != boost::none) throw std::runtime_error("Cannot specify destination amount to sweep");
     if (config.m_key_image != boost::none) throw std::runtime_error("Cannot define key image in sweep_account(); use sweep_output() to sweep an output by its key image");
     if (config.m_sweep_each_subaddress != boost::none && config.m_sweep_each_subaddress.get() == true) throw std::runtime_error("Cannot sweep each subaddress individually with sweep_account");
+    if (config.m_subtract_fee_from.size() > 0) throw std::runtime_error("Sweep transfers do not support subtracting fees from destinations");
 
     // validate the transfer requested and populate dsts & extra
     std::list<wallet_rpc::transfer_destination> destination;
@@ -2208,6 +2233,7 @@ namespace monero {
     // commit txs (if relaying) and get response using wallet rpc's fill_response()
     std::list<std::string> tx_keys;
     std::list<uint64_t> tx_amounts;
+    std::list<tools::wallet_rpc::amounts_list> tx_amounts_by_dest;
     std::list<uint64_t> tx_fees;
     std::list<uint64_t> tx_weights;
     std::string multisig_tx_hex;
@@ -2216,7 +2242,7 @@ namespace monero {
     std::list<std::string> tx_blobs;
     std::list<std::string> tx_metadatas;
     std::list<key_image_list> input_key_images_list;
-    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
+    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
       throw std::runtime_error("need to handle error filling response!");  // TODO
     }
 
@@ -2302,6 +2328,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
     if (config.m_key_image == boost::none || config.m_key_image.get().empty()) throw std::runtime_error("Must provide key image of output to sweep");
     if (destinations.size() != 1 || destinations[0]->m_address == boost::none || destinations[0]->m_address.get().empty()) throw std::runtime_error("Must provide exactly one destination address to sweep output to");
+    if (config.m_subtract_fee_from.size() > 0) throw std::runtime_error("Sweeping output does not support subtracting fees from destinations");
 
     // validate the transfer queried and populate dsts & extra
     std::string m_payment_id = config.m_payment_id == boost::none ? std::string("") : config.m_payment_id.get();
@@ -2344,6 +2371,7 @@ namespace monero {
     // commit txs (if relaying) and get response using wallet rpc's fill_response()
     std::list<std::string> tx_keys;
     std::list<uint64_t> tx_amounts;
+    std::list<tools::wallet_rpc::amounts_list> tx_amounts_by_dest;
     std::list<uint64_t> tx_fees;
     std::list<uint64_t> tx_weights;
     std::string multisig_tx_hex;
@@ -2352,7 +2380,7 @@ namespace monero {
     std::list<std::string> tx_blobs;
     std::list<std::string> tx_metadatas;
     std::list<key_image_list> input_key_images_list;
-    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
+    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
       throw std::runtime_error("need to handle error filling response!");  // TODO: return err message
     }
 
@@ -2450,6 +2478,7 @@ namespace monero {
     // commit txs (if relaying) and get response using wallet rpc's fill_response()
     std::list<std::string> tx_keys;
     std::list<uint64_t> tx_amounts;
+    std::list<tools::wallet_rpc::amounts_list> tx_amounts_by_dest;
     std::list<uint64_t> tx_fees;
     std::list<uint64_t> tx_weights;
     std::string multisig_tx_hex;
@@ -2459,7 +2488,7 @@ namespace monero {
     std::list<std::string> tx_metadatas;
     std::list<key_image_list> input_key_images_list;
     epee::json_rpc::error er;
-    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, er)) {
+    if (!fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, er)) {
       throw std::runtime_error("need to handle error filling response!");  // TODO: return err message
     }
 
