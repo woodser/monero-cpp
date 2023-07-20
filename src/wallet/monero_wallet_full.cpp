@@ -1323,15 +1323,15 @@ namespace monero {
       if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
       if (!m_w2->get_multisig_seed(seed)) throw std::runtime_error("Failed to get multisig seed.");
     } else {
-      if (m_w2->watch_only()) return "";
-      if (!m_w2->is_deterministic()) return "";
+      if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed.");
+      if (!m_w2->is_deterministic()) throw std::runtime_error("The wallet is non-deterministic. Cannot display seed.");
       if (!m_w2->get_seed(seed)) throw std::runtime_error("Failed to get seed.");
     }
     return std::string(seed.data(), seed.size());
   }
 
   std::string monero_wallet_full::get_seed_language() const {
-    if (m_w2->watch_only()) return "";
+    if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed language.");
     return m_w2->get_seed_language();
   }
 
@@ -1352,6 +1352,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_private_spend_key() const {
     MTRACE("get_private_spend_key()");
+    if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve spend key.");
     std::string spend_key = epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_spend_secret_key);
     if (spend_key == "0000000000000000000000000000000000000000000000000000000000000000") spend_key = "";
     return spend_key;
