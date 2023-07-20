@@ -74,36 +74,30 @@ namespace monero {
     /**
      * Create a new wallet with a randomly generated seed.
      *
-     * @param network_type is the wallet's network type (default = monero_network_type.MAINNET)
-     * @param language is the wallet and mnemonic's language (default = "English")
+     * @param config is the wallet configuration (network type and language)
      */
-    static monero_wallet_keys* create_wallet_random(const monero_network_type network_type, const std::string& language = "English");
+    static monero_wallet_keys* create_wallet_random(const monero_wallet_config& config);
 
     /**
-     * Create a wallet from an existing mnemonic phrase.
+     * Create a wallet from an existing mnemonic phrase or seed.
      *
-     * @param network_type is the wallet's network type
-     * @param mnemonic is the mnemonic of the wallet to construct
+     * @param config is the wallet configuration (network type, seed, seed offset, isMultisig)
      */
-    static monero_wallet_keys* create_wallet_from_mnemonic(const monero_network_type network_type, const std::string& mnemonic, const std::string& seed_offset);
+    static monero_wallet_keys* create_wallet_from_seed(const monero_wallet_config& config);
 
     /**
      * Create a wallet from an address, view key, and spend key.
-     *
-     * @param network_type is the wallet's network type
-     * @param address is the address of the wallet to construct
-     * @param view_key is the private view key of the wallet to construct
-     * @param spend_key is the private spend key of the wallet to construct
-     * @param language is the wallet and mnemonic's language (default = "English")
+     * 
+     * @param config is the wallet configuration (network type, address, view key, spend key, language)
      */
-    static monero_wallet_keys* create_wallet_from_keys(const monero_network_type network_type, const std::string& address, const std::string& view_key, const std::string& spend_key, const std::string& language = "English");
+    static monero_wallet_keys* create_wallet_from_keys(const monero_wallet_config& config);
 
     /**
-     * Get a list of available languages for the wallet's mnemonic phrase.
+     * Get a list of available languages for the wallet's seed.
      *
-     * @return the available languages for the wallet's mnemonic phrase
+     * @return the available languages for the wallet's seed
      */
-    static std::vector<std::string> get_mnemonic_languages();
+    static std::vector<std::string> get_seed_languages();
 
     // ----------------------------- WALLET METHODS -----------------------------
 
@@ -118,8 +112,8 @@ namespace monero {
     bool is_view_only() const override { return m_is_view_only; }
     monero_version get_version() const override;
     monero_network_type get_network_type() const override { return m_network_type; }
-    std::string get_mnemonic() const override { return m_mnemonic; }
-    std::string get_mnemonic_language() const override { return m_language; }
+    std::string get_seed() const override { return m_seed; }
+    std::string get_seed_language() const override { return m_language; }
     std::string get_private_view_key() const override { return m_prv_view_key; }
     std::string get_private_spend_key() const override { return m_prv_spend_key; }
     std::string get_public_view_key() const override { return m_pub_view_key; }
@@ -140,7 +134,7 @@ namespace monero {
     bool m_is_view_only;
     monero_network_type m_network_type;
     cryptonote::account_base m_account;
-    std::string m_mnemonic;
+    std::string m_seed;
     std::string m_language;
     std::string m_pub_view_key;
     std::string m_prv_view_key;

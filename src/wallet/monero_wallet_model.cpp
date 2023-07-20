@@ -99,7 +99,7 @@ namespace monero {
     m_server_uri = config.m_server_uri;
     m_server_username = config.m_server_username;
     m_server_password = config.m_server_password;
-    m_mnemonic = config.m_mnemonic;
+    m_seed = config.m_seed;
     m_seed_offset = config.m_seed_offset;
     m_primary_address = config.m_primary_address;
     m_private_view_key = config.m_private_view_key;
@@ -109,6 +109,7 @@ namespace monero {
     m_save_current = config.m_save_current;
     m_account_lookahead = config.m_account_lookahead;
     m_subaddress_lookahead = config.m_subaddress_lookahead;
+    m_is_multisig = config.m_is_multisig;
   }
 
   monero_wallet_config monero_wallet_config::copy() const {
@@ -134,7 +135,7 @@ namespace monero {
     if (m_server_uri != boost::none) monero_utils::add_json_member("serverUri", m_server_uri.get(), allocator, root, value_str);
     if (m_server_username != boost::none) monero_utils::add_json_member("serverUsername", m_server_username.get(), allocator, root, value_str);
     if (m_server_password != boost::none) monero_utils::add_json_member("serverPassword", m_server_password.get(), allocator, root, value_str);
-    if (m_mnemonic != boost::none) monero_utils::add_json_member("mnemonic", m_mnemonic.get(), allocator, root, value_str);
+    if (m_seed != boost::none) monero_utils::add_json_member("seed", m_seed.get(), allocator, root, value_str);
     if (m_seed_offset != boost::none) monero_utils::add_json_member("seedOffset", m_seed_offset.get(), allocator, root, value_str);
     if (m_primary_address != boost::none) monero_utils::add_json_member("primaryAddress", m_primary_address.get(), allocator, root, value_str);
     if (m_private_view_key != boost::none) monero_utils::add_json_member("privateViewKey", m_private_view_key.get(), allocator, root, value_str);
@@ -145,6 +146,7 @@ namespace monero {
 
     // set bool values
     if (m_save_current != boost::none) monero_utils::add_json_member("saveCurrent", m_save_current.get(), allocator, root);
+    if (m_is_multisig != boost::none) monero_utils::add_json_member("isMultisig", m_is_multisig.get(), allocator, root);
 
     // return root
     return root;
@@ -173,7 +175,7 @@ namespace monero {
       else if (key == std::string("serverUri")) config->m_server_uri = it->second.data();
       else if (key == std::string("serverUsername")) config->m_server_username = it->second.data();
       else if (key == std::string("serverPassword")) config->m_server_password = it->second.data();
-      else if (key == std::string("mnemonic")) config->m_mnemonic = it->second.data();
+      else if (key == std::string("seed")) config->m_seed = it->second.data();
       else if (key == std::string("seedOffset")) config->m_seed_offset = it->second.data();
       else if (key == std::string("primaryAddress")) config->m_primary_address = it->second.data();
       else if (key == std::string("privateViewKey")) config->m_private_view_key = it->second.data();
@@ -183,6 +185,7 @@ namespace monero {
       else if (key == std::string("saveCurrent")) config->m_save_current = it->second.get_value<bool>();
       else if (key == std::string("accountLookahead")) config->m_account_lookahead = it->second.get_value<uint64_t>();
       else if (key == std::string("subaddressLookahead")) config->m_subaddress_lookahead = it->second.get_value<uint64_t>();
+      else if (key == std::string("isMultisig")) config->m_is_multisig = it->second.get_value<bool>();
     }
 
     return config;

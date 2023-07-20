@@ -71,7 +71,7 @@ namespace monero {
     boost::optional<std::string> m_server_uri;
     boost::optional<std::string> m_server_username;
     boost::optional<std::string> m_server_password;
-    boost::optional<std::string> m_mnemonic;
+    boost::optional<std::string> m_seed;
     boost::optional<std::string> m_seed_offset;
     boost::optional<std::string> m_primary_address;
     boost::optional<std::string> m_private_view_key;
@@ -81,6 +81,7 @@ namespace monero {
     boost::optional<bool> m_save_current;
     boost::optional<uint64_t> m_account_lookahead;
     boost::optional<uint64_t> m_subaddress_lookahead;
+    boost::optional<bool> m_is_multisig;
 
     monero_wallet_config() {}
     monero_wallet_config(const monero_wallet_config& config);
