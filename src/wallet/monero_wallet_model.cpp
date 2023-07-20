@@ -1290,7 +1290,7 @@ namespace monero {
     m_fee = config.m_fee;
     m_account_index = config.m_account_index;
     m_subaddress_indices = config.m_subaddress_indices;
-    m_unlock_height = config.m_unlock_height;
+    m_unlock_time = config.m_unlock_time;
     m_can_split = config.m_can_split;
     m_relay = config.m_relay;
     m_note = config.m_note;
@@ -1314,7 +1314,7 @@ namespace monero {
     if (m_priority != boost::none) monero_utils::add_json_member("priority", m_priority.get(), allocator, root, value_num);
     if (m_ring_size != boost::none) monero_utils::add_json_member("ringSize", m_ring_size.get(), allocator, root, value_num);
     if (m_account_index != boost::none) monero_utils::add_json_member("accountIndex", m_account_index.get(), allocator, root, value_num);
-    if (m_unlock_height != boost::none) monero_utils::add_json_member("unlockHeight", m_unlock_height.get(), allocator, root, value_num);
+    if (m_unlock_time != boost::none) monero_utils::add_json_member("unlockTime", m_unlock_time.get(), allocator, root, value_num);
     if (m_below_amount != boost::none) monero_utils::add_json_member("belowAmount", m_below_amount.get(), allocator, root, value_num);
 
     // set string values
@@ -1371,7 +1371,7 @@ namespace monero {
       else if (key == std::string("fee")) config->m_fee = it->second.get_value<uint64_t>();
       else if (key == std::string("accountIndex")) config->m_account_index = it->second.get_value<uint32_t>();
       else if (key == std::string("subaddressIndices")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) config->m_subaddress_indices.push_back(it2->second.get_value<uint32_t>());
-      else if (key == std::string("unlockHeight")) config->m_unlock_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("unlockTime")) config->m_unlock_time = it->second.get_value<uint64_t>();
       else if (key == std::string("canSplit")) config->m_can_split = it->second.get_value<bool>();
       else if (key == std::string("relay")) config->m_relay = it->second.get_value<bool>();
       else if (key == std::string("note")) config->m_note = it->second.data();
