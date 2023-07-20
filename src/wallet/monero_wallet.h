@@ -727,18 +727,6 @@ namespace monero {
     }
 
     /**
-     * Same as get_txs(query) but collects missing tx hashes instead of throwing an error.
-     * This method is separated because WebAssembly does not support exception handling.
-     *
-     * @param query filters results (optional)
-     * @param missing_tx_hashes are populated with requested tx hashes that are not part of the wallet
-     * @return wallet transactions per the request
-     */
-    virtual std::vector<std::shared_ptr<monero_tx_wallet>> get_txs(const monero_tx_query& query, std::vector<std::string>& missing_tx_hashes) const {
-      throw std::runtime_error("get_txs(query, missing_tx_hashes) not supported");
-    }
-
-    /**
      * Get incoming and outgoing transfers to and from this wallet.  An outgoing
      * transfer represents a total amount sent from one or more subaddresses
      * within an account to individual destination addresses, each with their
