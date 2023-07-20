@@ -301,7 +301,7 @@ namespace monero {
     if (m_fee != boost::none) monero_utils::add_json_member("fee", m_fee.get(), allocator, root, value_num);
     if (m_ring_size != boost::none) monero_utils::add_json_member("ringSize", m_ring_size.get(), allocator, root, value_num);
     if (m_num_confirmations != boost::none) monero_utils::add_json_member("numConfirmations", m_num_confirmations.get(), allocator, root, value_num);
-    if (m_unlock_height != boost::none) monero_utils::add_json_member("unlockHeight", m_unlock_height.get(), allocator, root, value_num);
+    if (m_unlock_time != boost::none) monero_utils::add_json_member("unlockTime", m_unlock_time.get(), allocator, root, value_num);
     if (m_last_relayed_timestamp != boost::none) monero_utils::add_json_member("lastRelayedTimestamp", m_last_relayed_timestamp.get(), allocator, root, value_num);
     if (m_received_timestamp != boost::none) monero_utils::add_json_member("receivedTimestamp", m_received_timestamp.get(), allocator, root, value_num);
     if (m_size != boost::none) monero_utils::add_json_member("size", m_size.get(), allocator, root, value_num);
@@ -362,7 +362,7 @@ namespace monero {
       else if (key == std::string("isConfirmed")) tx->m_is_confirmed = it->second.get_value<bool>();
       else if (key == std::string("inTxPool")) tx->m_in_tx_pool = it->second.get_value<bool>();
       else if (key == std::string("numConfirmations")) tx->m_num_confirmations = it->second.get_value<uint64_t>();
-      else if (key == std::string("unlockHeight")) tx->m_unlock_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("unlockTime")) tx->m_unlock_time = it->second.get_value<uint64_t>();
       else if (key == std::string("lastRelayedTimestamp")) tx->m_last_relayed_timestamp = it->second.get_value<uint64_t>();
       else if (key == std::string("receivedTimestamp")) tx->m_received_timestamp = it->second.get_value<uint64_t>();
       else if (key == std::string("isDoubleSpendSeen")) tx->m_is_double_spend_seen = it->second.get_value<bool>();
@@ -404,7 +404,7 @@ namespace monero {
     tgt->m_is_confirmed = src->m_is_confirmed;
     tgt->m_in_tx_pool = src->m_in_tx_pool;
     tgt->m_num_confirmations = src->m_num_confirmations;
-    tgt->m_unlock_height = src->m_unlock_height;
+    tgt->m_unlock_time = src->m_unlock_time;
     tgt->m_last_relayed_timestamp = src->m_last_relayed_timestamp;
     tgt->m_received_timestamp = src->m_received_timestamp;
     tgt->m_is_double_spend_seen = src->m_is_double_spend_seen;
@@ -498,7 +498,7 @@ namespace monero {
     m_max_used_block_height = gen_utils::reconcile(m_max_used_block_height, other->m_max_used_block_height, "tx m_max_used_block_height");
     m_max_used_block_hash = gen_utils::reconcile(m_max_used_block_hash, other->m_max_used_block_hash, "tx m_max_used_block_hash");
     //m_signatures = gen_utils::reconcile(m_signatures, other->m_signatures, "tx m_signatures"); // TODO
-    m_unlock_height = gen_utils::reconcile(m_unlock_height, other->m_unlock_height, "tx m_unlock_height");
+    m_unlock_time = gen_utils::reconcile(m_unlock_time, other->m_unlock_time, "tx m_unlock_time");
     m_num_confirmations = gen_utils::reconcile(m_num_confirmations, other->m_num_confirmations, boost::none, boost::none, true, "tx m_num_confirmations"); // num confirmations can increase
 
     // merge inputs
