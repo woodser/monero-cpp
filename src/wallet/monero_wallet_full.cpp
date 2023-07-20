@@ -919,8 +919,7 @@ namespace monero {
       tx_query.m_hashes = tx_hashes;
       tx_query.m_include_outputs = true;
       tx_query.m_is_locked = true;
-      std::vector<std::string> missing_tx_hashes;
-      on_spend_txs(m_wallet.get_txs(tx_query, missing_tx_hashes));
+      on_spend_txs(m_wallet.get_txs(tx_query));
     }
 
     void on_spend_txs(const std::vector<std::shared_ptr<monero_tx_wallet>>& txs) {
@@ -986,8 +985,7 @@ namespace monero {
         query.m_hashes = tx_hashes_no_longer_locked;
         query.m_is_locked = false;
         query.m_include_outputs = true;
-        std::vector<std::string> missing_tx_hashes;
-        txs_no_longer_locked = m_wallet.get_txs(query, missing_tx_hashes);
+        txs_no_longer_locked = m_wallet.get_txs(query);
       }
 
       // notify listeners of newly unlocked inputs and outputs
@@ -1693,13 +1691,6 @@ namespace monero {
   }
   
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs(const monero_tx_query& query) const {
-    std::vector<std::string> missing_tx_hashes;
-    std::vector<std::shared_ptr<monero_tx_wallet>> txs = get_txs(query, missing_tx_hashes);
-    if (!missing_tx_hashes.empty()) throw std::runtime_error("Tx not found in wallet: " + missing_tx_hashes[0]);
-    return txs;
-  }
-
-  std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs(const monero_tx_query& query, std::vector<std::string>& missing_tx_hashes) const {
     MTRACE("get_txs(query)");
 
     // copy query
@@ -1784,17 +1775,16 @@ namespace monero {
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
       if (*tx->m_is_confirmed && tx->m_block == boost::none) {
         std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
-        return get_txs(*_query, missing_tx_hashes);
+        return get_txs(*_query);
       }
     }
 
-    // if tx hashes requested, order txs and collect missing hashes
+    // if tx hashes requested, order txs
     if (!_query->m_hashes.empty()) {
       txs.clear();
       for (const std::string& tx_hash : _query->m_hashes) {
         std::map<std::string, std::shared_ptr<monero_tx_wallet>>::const_iterator tx_iter = tx_map.find(tx_hash);
         if (tx_iter != tx_map.end()) txs.push_back(tx_iter->second);
-        else missing_tx_hashes.push_back(tx_hash);
       }
     }
 
