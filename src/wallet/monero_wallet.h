@@ -239,21 +239,21 @@ namespace monero {
     }
 
     /**
-     * Get the wallet's mnemonic phrase.
+     * Get the wallet's mnemonic phrase or seed.
      *
-     * @param mnemonic is assigned the wallet's mnemonic phrase
+     * @return the wallet's mnemonic phrase or seed.
      */
-    virtual std::string get_mnemonic() const {
-      throw std::runtime_error("get_mnemonic() not supported");
+    virtual std::string get_seed() const {
+      throw std::runtime_error("get_seed() not supported");
     }
 
     /**
-     * Get the language of the wallet's mnemonic phrase.
+     * Get the language of the wallet's mnemonic phrase or seed.
      *
-     * @return the language of the wallet's mnemonic phrase
+     * @return the language of the wallet's mnemonic phrase or seed.
      */
-    virtual std::string get_mnemonic_language() const {
-      throw std::runtime_error("get_mnemonic_language() not supported");
+    virtual std::string get_seed_language() const {
+      throw std::runtime_error("get_seed_language() not supported");
     }
 
     /**
