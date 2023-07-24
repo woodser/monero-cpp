@@ -113,10 +113,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a8554771610e805aa18e023fc0d3b16fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a34be813b6285ed15fd61fcc3200cb8"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a8a34be813b6285ed15fd61fcc3200cb8">get_network_type</a> () const</td></tr>
 <tr class="separator:a8a34be813b6285ed15fd61fcc3200cb8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a292c1a06b6896858a75533d6e229368a"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a292c1a06b6896858a75533d6e229368a">get_mnemonic</a> () const</td></tr>
-<tr class="separator:a292c1a06b6896858a75533d6e229368a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a48a81da08b5cf031ea3e239d89bf2a55"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a48a81da08b5cf031ea3e239d89bf2a55">get_mnemonic_language</a> () const</td></tr>
-<tr class="separator:a48a81da08b5cf031ea3e239d89bf2a55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad98f1ff0533d654f29a4155f6efcc8c2"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#ad98f1ff0533d654f29a4155f6efcc8c2">get_seed</a> () const</td></tr>
+<tr class="separator:ad98f1ff0533d654f29a4155f6efcc8c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa7cbec0ed2215f22829c05979416cee"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#afa7cbec0ed2215f22829c05979416cee">get_seed_language</a> () const</td></tr>
+<tr class="separator:afa7cbec0ed2215f22829c05979416cee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa14e6da8c148be38336f9a987fc60643"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aa14e6da8c148be38336f9a987fc60643">get_public_view_key</a> () const</td></tr>
 <tr class="separator:aa14e6da8c148be38336f9a987fc60643"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02a0dffa31a1ad6ba9b8c407b07965a1"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a02a0dffa31a1ad6ba9b8c407b07965a1">get_private_view_key</a> () const</td></tr>
@@ -211,8 +211,6 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aba45b4d40c883209fdba8e69e140594c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aefe57f72ad6aafc40102d4a0ec17f902"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aefe57f72ad6aafc40102d4a0ec17f902">get_txs</a> (const <a class="el" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a> &amp;query) const</td></tr>
 <tr class="separator:aefe57f72ad6aafc40102d4a0ec17f902"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a24013824a10a8bd8fcc444dbc0d2b8cc"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a24013824a10a8bd8fcc444dbc0d2b8cc">get_txs</a> (const <a class="el" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a> &amp;query, std::vector&lt; std::string &gt; &amp;missing_tx_hashes) const</td></tr>
-<tr class="separator:a24013824a10a8bd8fcc444dbc0d2b8cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab71825b6ad0d72d5d120e5b816ea7eb6"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__transfer.html">monero_transfer</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#ab71825b6ad0d72d5d120e5b816ea7eb6">get_transfers</a> (const <a class="el" href="structmonero_1_1monero__transfer__query.html">monero_transfer_query</a> &amp;query) const</td></tr>
 <tr class="separator:ab71825b6ad0d72d5d120e5b816ea7eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73113818c6f961f11db791aa218120f5"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__output__wallet.html">monero_output_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a73113818c6f961f11db791aa218120f5">get_outputs</a> (const <a class="el" href="structmonero_1_1monero__output__query.html">monero_output_query</a> &amp;query) const</td></tr>
@@ -2015,69 +2013,6 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a292c1a06b6896858a75533d6e229368a" name="a292c1a06b6896858a75533d6e229368a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a292c1a06b6896858a75533d6e229368a">&#9670;&nbsp;</a></span>get_mnemonic()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::string monero::monero_wallet::get_mnemonic </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Get the wallet's mnemonic phrase.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mnemonic</td><td>is assigned the wallet's mnemonic phrase </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a36fb4acc0dc5807e7bd43898a068c6bd">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#adbd25fc8a99d2f58abfeb949193c23c3">monero::monero_wallet_keys</a>.</p>
-
-</div>
-</div>
-<a id="a48a81da08b5cf031ea3e239d89bf2a55" name="a48a81da08b5cf031ea3e239d89bf2a55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a48a81da08b5cf031ea3e239d89bf2a55">&#9670;&nbsp;</a></span>get_mnemonic_language()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::string monero::monero_wallet::get_mnemonic_language </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Get the language of the wallet's mnemonic phrase.</p>
-<dl class="section return"><dt>Returns</dt><dd>the language of the wallet's mnemonic phrase </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a80bc709c0876863b84cf843b595564c5">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#abb98e76ecadd4bb739569586b1efbeb4">monero::monero_wallet_keys</a>.</p>
-
-</div>
-</div>
 <a id="aa6e19b5d3eead2d07f2546f48c7cf11e" name="aa6e19b5d3eead2d07f2546f48c7cf11e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa6e19b5d3eead2d07f2546f48c7cf11e">&#9670;&nbsp;</a></span>get_multisig_info()</h2>
 
@@ -2502,6 +2437,64 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ad98f1ff0533d654f29a4155f6efcc8c2" name="ad98f1ff0533d654f29a4155f6efcc8c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad98f1ff0533d654f29a4155f6efcc8c2">&#9670;&nbsp;</a></span>get_seed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string monero::monero_wallet::get_seed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Get the wallet's mnemonic phrase or seed.</p>
+<dl class="section return"><dt>Returns</dt><dd>the wallet's mnemonic phrase or seed. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a01693fb79192a5f5909d92beaa23a8ed">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#acfa833fcc9b5369fcba5f8ee1caad6f3">monero::monero_wallet_keys</a>.</p>
+
+</div>
+</div>
+<a id="afa7cbec0ed2215f22829c05979416cee" name="afa7cbec0ed2215f22829c05979416cee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa7cbec0ed2215f22829c05979416cee">&#9670;&nbsp;</a></span>get_seed_language()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string monero::monero_wallet::get_seed_language </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p >Get the language of the wallet's mnemonic phrase or seed.</p>
+<dl class="section return"><dt>Returns</dt><dd>the language of the wallet's mnemonic phrase or seed. </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac214c5e6558bcaab543b48f22876af35">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a890195401d087b65a1e8aba61c5bafad">monero::monero_wallet_keys</a>.</p>
+
+</div>
+</div>
 <a id="a070af75f28e9b6a6e0240ab64de2dc4c" name="a070af75f28e9b6a6e0240ab64de2dc4c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a070af75f28e9b6a6e0240ab64de2dc4c">&#9670;&nbsp;</a></span>get_spend_proof()</h2>
 
@@ -2874,7 +2867,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="aba45b4d40c883209fdba8e69e140594c" name="aba45b4d40c883209fdba8e69e140594c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aba45b4d40c883209fdba8e69e140594c">&#9670;&nbsp;</a></span>get_txs() <span class="overload">[1/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aba45b4d40c883209fdba8e69e140594c">&#9670;&nbsp;</a></span>get_txs() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2903,7 +2896,7 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <a id="aefe57f72ad6aafc40102d4a0ec17f902" name="aefe57f72ad6aafc40102d4a0ec17f902"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aefe57f72ad6aafc40102d4a0ec17f902">&#9670;&nbsp;</a></span>get_txs() <span class="overload">[2/3]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aefe57f72ad6aafc40102d4a0ec17f902">&#9670;&nbsp;</a></span>get_txs() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2936,53 +2929,6 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>wallet transactions per the query </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa3ea881f83a3abbb76587b7b1cfbfd43">monero::monero_wallet_full</a>.</p>
-
-</div>
-</div>
-<a id="a24013824a10a8bd8fcc444dbc0d2b8cc" name="a24013824a10a8bd8fcc444dbc0d2b8cc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a24013824a10a8bd8fcc444dbc0d2b8cc">&#9670;&nbsp;</a></span>get_txs() <span class="overload">[3/3]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt; monero::monero_wallet::get_txs </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a> &amp;&#160;</td>
-          <td class="paramname"><em>query</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">std::vector&lt; std::string &gt; &amp;&#160;</td>
-          <td class="paramname"><em>missing_tx_hashes</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p >Same as get_txs(query) but collects missing tx hashes instead of throwing an error. This method is separated because WebAssembly does not support exception handling.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">query</td><td>filters results (optional) </td></tr>
-    <tr><td class="paramname">missing_tx_hashes</td><td>are populated with requested tx hashes that are not part of the wallet </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>wallet transactions per the request </dd></dl>
-
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac5a57106e109194be6c4fb2ad13c1ac5">monero::monero_wallet_full</a>.</p>
 
 </div>
 </div>
