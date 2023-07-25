@@ -21,9 +21,9 @@ A C++ library for creating Monero applications using native bindings to [monero 
 ## Sample code
 
 ```c++
-// create a wallet from a mnemonic phrase
+// create a wallet from a seed phrase
 monero_wallet_config wallet_config;
-wallet_config.m_mnemonic = "hefty value later extra artistic firm radar yodel talent future fungal nutshell because sanity awesome nail unjustly rage unafraid cedar delayed thumbs comb custom sanity";
+wallet_config.m_seed = "hefty value later extra artistic firm radar yodel talent future fungal nutshell because sanity awesome nail unjustly rage unafraid cedar delayed thumbs comb custom sanity";
 wallet_config.m_path = "MyWalletRestored";
 wallet_config.m_password = "supersecretpassword123";
 wallet_config.m_network_type = monero_network_type::STAGENET;
@@ -72,7 +72,7 @@ monero_output_query output_query;
 output_query.m_is_spent = false;
 vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
 
-// create and sync a new wallet with a random mnemonic phrase
+// create and sync a new wallet with a random seed phrase
 wallet_config = monero_wallet_config();
 wallet_config.m_path = "MyWalletRandom";
 wallet_config.m_password = "supersecretpassword123";
@@ -88,7 +88,7 @@ wallet_random->sync();
 wallet_random->start_syncing(5000);
 
 // get wallet info
-string random_mnemonic = wallet_random->get_mnemonic();
+string random_seed = wallet_random->get_seed();
 string random_primary = wallet_random->get_primary_address();
 uint64_t random_height = wallet_random->get_height();
 bool random_is_synced = wallet_random->is_synced();
