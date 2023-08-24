@@ -54,23 +54,27 @@ uint64_t unlocked_account_balance = account.m_unlocked_balance.get(); // get boo
 // query a transaction by hash
 monero_tx_query tx_query;
 tx_query.m_hash = "314a0f1375db31cea4dac4e0a51514a6282b43792269b3660166d4d2b46437ca";
-shared_ptr<monero_tx_wallet> tx = wallet_restored->get_txs(tx_query)[0];
+vector<shared_ptr<monero_tx_wallet>> txs = wallet_restored->get_txs(tx_query);
+shared_ptr<monero_tx_wallet> tx = txs[0];
 for (const shared_ptr<monero_transfer> transfer : tx->get_transfers()) {
   bool is_incoming = transfer->is_incoming().get();
   uint64_t in_amount = transfer->m_amount.get();
   int account_index = transfer->m_account_index.get();
 }
+monero_utils::free(txs);
 
 // query incoming transfers to account 1
 monero_transfer_query transfer_query;
 transfer_query.m_is_incoming = true;
 transfer_query.m_account_index = 1;
 vector<shared_ptr<monero_transfer>> transfers = wallet_restored->get_transfers(transfer_query);
+monero_utils::free(transfers);
 
 // query unspent outputs
 monero_output_query output_query;
 output_query.m_is_spent = false;
 vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
+monero_utils::free(outputs);
 
 // create and sync a new wallet with a random seed phrase
 wallet_config = monero_wallet_config();
@@ -116,6 +120,7 @@ tx_config.m_amount = 50000;
 tx_config.m_relay = true;
 shared_ptr<monero_tx_wallet> sent_tx = wallet_restored->create_tx(tx_config);
 bool in_pool = sent_tx->m_in_tx_pool.get();  // true
+monero_utils::free(sent_tx);
 
 // mine with 7 threads to push the network along
 int num_threads = 7;
@@ -146,10 +151,13 @@ tx_config.m_destinations = destinations;
 shared_ptr<monero_tx_wallet> created_tx = wallet_restored->create_tx(tx_config);
 uint64_t fee = created_tx->m_fee.get(); // "Are you sure you want to send ...?"
 wallet_restored->relay_tx(*created_tx); // recipient receives notification within 5 seconds
+monero_utils::free(created_tx);
 
 // save and close the wallets
 wallet_restored->close(true);
 wallet_random->close(true);
+delete wallet_restored;
+delete wallet_random;
 ```
 
 ## Documentation

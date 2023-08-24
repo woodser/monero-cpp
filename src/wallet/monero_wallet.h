@@ -704,7 +704,7 @@ namespace monero {
      * Get all wallet transactions.  Wallet transactions contain one or more
      * transfers that are either incoming or outgoing to the wallet.
      *
-     * @return all wallet transactions
+     * @return all wallet transactions (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const {
       throw std::runtime_error("get_txs() not supported");
@@ -720,7 +720,7 @@ namespace monero {
      * not defined.
      *
      * @param query filters query results (optional)
-     * @return wallet transactions per the query
+     * @return wallet transactions per the query (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_tx_wallet>> get_txs(const monero_tx_query& query) const {
       throw std::runtime_error("get_txs(query) not supported");
@@ -740,7 +740,7 @@ namespace monero {
      * defined.
      *
      * @param query filters query results (optional)
-     * @return wallet transfers per the query
+     * @return wallet transfers per the query (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_transfer>> get_transfers(const monero_transfer_query& query) const {
       throw std::runtime_error("get_transfers() not supported");
@@ -756,7 +756,7 @@ namespace monero {
      * filtering is optional and no filtering is applied when not defined.
      *
      * @param query specifies query options (optional)
-     * @return wallet outputs per the query
+     * @return wallet outputs per the query (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const {
       throw std::runtime_error("get_outputs() not supported");
@@ -834,7 +834,7 @@ namespace monero {
      * Create a transaction to transfer funds from this wallet.
      *
      * @param config configures the transaction to create
-     * @return the created transaction
+     * @return the created transaction (free memory using monero_utils::free)
      */
     virtual std::shared_ptr<monero_tx_wallet> create_tx(const monero_tx_config& config) {
       if (config.m_can_split != boost::none && config.m_can_split.get()) throw std::runtime_error("Cannot split transactions with create_tx(); use create_txs() instead");
@@ -847,7 +847,7 @@ namespace monero {
      * Create one or more transactions to transfer funds from this wallet.
      *
      * @param config configures the transactions to create
-     * @return the created transactions
+     * @return the created transactions (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& config) {
       throw std::runtime_error("create_txs() not supported");
@@ -857,7 +857,7 @@ namespace monero {
      * Sweep unlocked funds according to the given config.
      *
      * @param config is the sweep configuration
-     * @return the created transactions
+     * @return the created transactions (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_tx_wallet>> sweep_unlocked(const monero_tx_config& config) {
       throw std::runtime_error("sweep_unlocked() not supported");
@@ -867,7 +867,7 @@ namespace monero {
      * Sweep an output with a given key image.
      *
      * @param config configures the sweep transaction
-     * @return the created transaction
+     * @return the created transaction (free memory using monero_utils::free)
      */
     virtual std::shared_ptr<monero_tx_wallet> sweep_output(const monero_tx_config& config) {
       throw std::runtime_error("sweep_output() not supported");
@@ -877,7 +877,7 @@ namespace monero {
      * Sweep all unmixable dust outputs back to the wallet to make them easier to spend and mix.
      *
      * @param relay specifies if the resulting transaction should be relayed (default false)
-     * @return the created transactions
+     * @return the created transactions (free memory using monero_utils::free)
      */
     virtual std::vector<std::shared_ptr<monero_tx_wallet>> sweep_dust(bool relay = false) {
       throw std::runtime_error("sweep_dust() not supported");

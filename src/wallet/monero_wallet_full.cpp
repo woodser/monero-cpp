@@ -819,8 +819,7 @@ namespace monero {
           m_prev_locked_tx_hashes.insert(tx->m_hash.get());
 
           // free memory
-          output.reset();
-          tx.reset();
+          monero_utils::free(tx);
         } catch (std::exception& e) {
           std::cout << "Error processing unconfirmed output received: " << std::string(e.what()) << std::endl;
         }
@@ -862,8 +861,6 @@ namespace monero {
 
           // free memory
           monero_utils::free(block);
-          output.reset();
-          tx.reset();
         } catch (std::exception& e) {
           std::cout << "Error processing confirmed output received: " << std::string(e.what()) << std::endl;
         }
@@ -905,8 +902,6 @@ namespace monero {
 
           // free memory
           monero_utils::free(block);
-          output.reset();
-          tx.reset();
         } catch (std::exception& e) {
           std::cout << "Error processing confirmed output spent: " << std::string(e.what()) << std::endl;
         }
@@ -998,6 +993,10 @@ namespace monero {
       for (const std::shared_ptr<monero_tx_wallet>& locked_tx : locked_txs) {
         m_prev_locked_tx_hashes.insert(locked_tx->m_hash.get());
       }
+
+      // free memory
+      monero_utils::free(locked_txs);
+      monero_utils::free(txs_no_longer_locked);
     }
 
     void notify_outputs(const std::shared_ptr<monero_tx_wallet>& tx) {
@@ -1023,8 +1022,9 @@ namespace monero {
           block_notify->m_txs.push_back(tx_notify);
         }
         
-        // notify listeners
+        // notify listeners and free memory
         for (monero_wallet_listener* listener : m_wallet.get_listeners()) listener->on_output_spent(*input);
+        monero_utils::free(tx_notify);
       }
 
       // notify received outputs
@@ -1741,6 +1741,7 @@ namespace monero {
     temp_transfer_query->m_tx_query = decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
     temp_transfer_query->m_tx_query.get()->m_transfer_query = temp_transfer_query;
     std::vector<std::shared_ptr<monero_transfer>> transfers = get_transfers_aux(*temp_transfer_query);
+    monero_utils::free(temp_transfer_query->m_tx_query.get());
 
     // collect unique txs from transfers while retaining order
     std::vector<std::shared_ptr<monero_tx_wallet>> txs = std::vector<std::shared_ptr<monero_tx_wallet>>();
@@ -1765,6 +1766,7 @@ namespace monero {
       temp_output_query->m_tx_query = decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
       temp_output_query->m_tx_query.get()->m_output_query = temp_output_query;
       std::vector<std::shared_ptr<monero_output_wallet>> outputs = get_outputs_aux(*temp_output_query);
+      monero_utils::free(temp_output_query->m_tx_query.get());
 
       // merge output txs one time while retaining order
       std::unordered_set<std::shared_ptr<monero_tx_wallet>> output_txs;
@@ -1802,7 +1804,9 @@ namespace monero {
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
       if (*tx->m_is_confirmed && tx->m_block == boost::none) {
         std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
-        return get_txs(*_query);
+        std::vector<std::shared_ptr<monero_tx_wallet>> txs = get_txs(*_query);
+        monero_utils::free(_query);
+        return txs;
       }
     }
 
@@ -1815,6 +1819,8 @@ namespace monero {
       }
     }
 
+    // free query and return
+    monero_utils::free(_query);
     return txs;
   }
 
@@ -3567,6 +3573,7 @@ namespace monero {
 
     // check if fetching pool txs contradicted by configuration
     if (tx_query->m_in_tx_pool != boost::none && tx_query->m_in_tx_pool.get() && !can_be_in_tx_pool) {
+      monero_utils::free(tx_query);
       throw std::runtime_error("Cannot fetch pool transactions because it contradicts configuration");
     }
 
@@ -3633,7 +3640,7 @@ namespace monero {
     }
     sort(txs.begin(), txs.end(), tx_height_less_than);
 
-    // filter and return transfers
+    // filter transfers
     std::vector<std::shared_ptr<monero_transfer>> transfers;
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
 
@@ -3654,6 +3661,8 @@ namespace monero {
     }
     MTRACE("monero_wallet_full.cpp get_transfers() returning " << transfers.size() << " transfers");
 
+    // free query and return transfers
+    monero_utils::free(tx_query);
     return transfers;
   }
 
@@ -3683,6 +3692,7 @@ namespace monero {
       }
     }
     if (_query->m_tx_query == boost::none) _query->m_tx_query = std::make_shared<monero_tx_query>();
+    std::shared_ptr<monero_tx_query> tx_query = _query->m_tx_query.get();
 
     // get output data from wallet2
     tools::wallet2::transfer_container outputs_w2;
@@ -3717,6 +3727,9 @@ namespace monero {
       // remove txs without outputs
       if (tx->m_outputs.empty() && tx->m_block != boost::none) tx->m_block.get()->m_txs.erase(std::remove(tx->m_block.get()->m_txs.begin(), tx->m_block.get()->m_txs.end(), tx), tx->m_block.get()->m_txs.end()); // TODO, no way to use const_iterator?
     }
+
+    // free query and return outputs
+    monero_utils::free(tx_query);
     return outputs;
   }
 
