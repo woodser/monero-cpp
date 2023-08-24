@@ -163,28 +163,119 @@ $(function() {
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>    <span class="keywordflow">return</span> ss.str();</div>
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>  }</div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span> </div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::shared_ptr&lt;monero_block&gt; block) {</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_tx&gt;&amp; tx : block-&gt;m_txs) {</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>      tx-&gt;m_block.reset();</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>      <a class="code hl_struct" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a>* tx_wallet = <span class="keyword">dynamic_cast&lt;</span><a class="code hl_struct" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a>*<span class="keyword">&gt;</span>(tx.get());</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      <span class="keywordflow">if</span> (tx_wallet != <span class="keyword">nullptr</span>) {</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        <span class="keywordflow">if</span> (tx_wallet-&gt;m_outgoing_transfer != boost::none) tx_wallet-&gt;m_outgoing_transfer.get()-&gt;m_tx.reset();</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_transfer&gt; transfer : tx_wallet-&gt;m_incoming_transfers) transfer-&gt;m_tx.reset();</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_output&gt; output : tx_wallet-&gt;m_outputs) output-&gt;m_tx.reset();</div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_output&gt; input : tx_wallet-&gt;m_inputs) {</div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>          input-&gt;m_key_image.reset();</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>          input-&gt;m_tx.reset();</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        }</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>      }</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    }</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>    block.reset();</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>  }</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; blocks) {</div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>    <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_block&gt;&amp; block : blocks) monero_utils::free(block);</div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>  }</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>}</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span><span class="preprocessor">#endif </span><span class="comment">/* monero_utils_h */</span><span class="preprocessor"></span></div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>  <span class="comment">// ----------------------------- GATHER BLOCKS ------------------------------</span></div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span> </div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>  <span class="keyword">static</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; get_blocks_from_txs(std::vector&lt;std::shared_ptr&lt;monero_tx_wallet&gt;&gt; txs) {</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    std::shared_ptr&lt;monero_block&gt; unconfirmed_block = <span class="keyword">nullptr</span>; <span class="comment">// placeholder for unconfirmed txs</span></div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>    std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; blocks;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    std::unordered_set&lt;std::shared_ptr&lt;monero_block&gt;&gt; seen_block_ptrs;</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <span class="keywordflow">for</span> (<span class="keyword">const</span> std::shared_ptr&lt;monero_tx_wallet&gt;&amp; tx : txs) {</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>      <span class="keywordflow">if</span> (tx-&gt;m_block == boost::none) {</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        <span class="keywordflow">if</span> (unconfirmed_block == <span class="keyword">nullptr</span>) unconfirmed_block = std::make_shared&lt;monero_block&gt;();</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        tx-&gt;m_block = unconfirmed_block;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        unconfirmed_block-&gt;m_txs.push_back(tx);</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>      }</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>      std::unordered_set&lt;std::shared_ptr&lt;monero_block&gt;&gt;::const_iterator got = seen_block_ptrs.find(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>      <span class="keywordflow">if</span> (got == seen_block_ptrs.end()) {</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        seen_block_ptrs.insert(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        blocks.push_back(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>      }</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    }</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <span class="keywordflow">return</span> blocks;</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>  }</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>  <span class="keyword">static</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; get_blocks_from_transfers(std::vector&lt;std::shared_ptr&lt;monero_transfer&gt;&gt; transfers) {</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>    std::shared_ptr&lt;monero_block&gt; unconfirmed_block = <span class="keyword">nullptr</span>; <span class="comment">// placeholder for unconfirmed txs in return json</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; blocks;</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    std::unordered_set&lt;std::shared_ptr&lt;monero_block&gt;&gt; seen_block_ptrs;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span>&amp; transfer : transfers) {</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>      std::shared_ptr&lt;monero_tx_wallet&gt; tx = transfer-&gt;m_tx;</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>      <span class="keywordflow">if</span> (tx-&gt;m_block == boost::none) {</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        <span class="keywordflow">if</span> (unconfirmed_block == <span class="keyword">nullptr</span>) unconfirmed_block = std::make_shared&lt;monero_block&gt;();</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        tx-&gt;m_block = unconfirmed_block;</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        unconfirmed_block-&gt;m_txs.push_back(tx);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>      }</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>      std::unordered_set&lt;std::shared_ptr&lt;monero_block&gt;&gt;::const_iterator got = seen_block_ptrs.find(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>      <span class="keywordflow">if</span> (got == seen_block_ptrs.end()) {</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>        seen_block_ptrs.insert(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>        blocks.push_back(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>      }</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    }</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <span class="keywordflow">return</span> blocks;</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>  }</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span> </div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>  <span class="keyword">static</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; get_blocks_from_outputs(std::vector&lt;std::shared_ptr&lt;monero_output_wallet&gt;&gt; outputs) {</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>    std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; blocks;</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    std::unordered_set&lt;std::shared_ptr&lt;monero_block&gt;&gt; seen_block_ptrs;</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> <span class="keyword">const</span>&amp; output : outputs) {</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>      std::shared_ptr&lt;monero_tx_wallet&gt; tx = std::static_pointer_cast&lt;monero_tx_wallet&gt;(output-&gt;m_tx);</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>      <span class="keywordflow">if</span> (tx-&gt;m_block == boost::none) <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Need to handle unconfirmed output&quot;</span>);</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>      std::unordered_set&lt;std::shared_ptr&lt;monero_block&gt;&gt;::const_iterator got = seen_block_ptrs.find(*tx-&gt;m_block);</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>      <span class="keywordflow">if</span> (got == seen_block_ptrs.end()) {</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>        seen_block_ptrs.insert(*tx-&gt;m_block);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        blocks.push_back(*tx-&gt;m_block);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>      }</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    }</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    <span class="keywordflow">return</span> blocks;</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>  }</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span> </div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>  <span class="comment">// ------------------------------ FREE MEMORY -------------------------------</span></div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::shared_ptr&lt;monero_block&gt; block) {</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>    <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_tx&gt;&amp; tx : block-&gt;m_txs) {</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>      tx-&gt;m_block-&gt;reset();</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>      <a class="code hl_struct" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a>* tx_wallet = <span class="keyword">dynamic_cast&lt;</span><a class="code hl_struct" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a>*<span class="keyword">&gt;</span>(tx.get());</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>      <span class="keywordflow">if</span> (tx_wallet != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        <span class="keywordflow">if</span> (tx_wallet-&gt;m_tx_set != boost::none) tx_wallet-&gt;m_tx_set-&gt;reset();</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>        <span class="keywordflow">if</span> (tx_wallet-&gt;m_outgoing_transfer != boost::none) tx_wallet-&gt;m_outgoing_transfer.get()-&gt;m_tx.reset();</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>        <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_transfer&gt; transfer : tx_wallet-&gt;m_incoming_transfers) transfer-&gt;m_tx.reset();</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>        <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_output&gt; output : tx_wallet-&gt;m_outputs) output-&gt;m_tx.reset();</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_output&gt; input : tx_wallet-&gt;m_inputs) {</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>          input-&gt;m_key_image.reset();</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>          input-&gt;m_tx.reset();</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>        }</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>      }</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>      <a class="code hl_struct" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a>* tx_query = <span class="keyword">dynamic_cast&lt;</span><a class="code hl_struct" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a>*<span class="keyword">&gt;</span>(tx.get());</div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>      <span class="keywordflow">if</span> (tx_query != <span class="keyword">nullptr</span>) {</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>        <span class="keywordflow">if</span> (tx_query-&gt;m_transfer_query != boost::none) {</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>          tx_query-&gt;m_transfer_query.get()-&gt;m_tx_query-&gt;reset();</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>          tx_query-&gt;m_transfer_query.get().reset();</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        }</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>        <span class="keywordflow">if</span> (tx_query-&gt;m_output_query != boost::none) {</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>          tx_query-&gt;m_output_query.get()-&gt;m_tx_query-&gt;reset();</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>          tx_query-&gt;m_output_query.get().reset();</div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>        }</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span>      }</div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    }</div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    block.reset();</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>  }</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span> </div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; blocks) {</div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <span class="keywordflow">for</span> (std::shared_ptr&lt;monero_block&gt;&amp; block : blocks) monero_utils::free(block);</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>  }</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::shared_ptr&lt;monero_tx&gt; tx) {</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="keywordflow">if</span> (tx-&gt;m_block == boost::none) {</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>      std::shared_ptr&lt;monero_block&gt; block = std::make_shared&lt;monero_block&gt;();</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>      tx-&gt;m_block = block;</div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>      block-&gt;m_txs.push_back(tx);</div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    }</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>    monero_utils::free(tx-&gt;m_block.get());</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>  }</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span> </div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::vector&lt;std::shared_ptr&lt;monero_tx_wallet&gt;&gt; txs) {</div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    <span class="keywordflow">return</span> monero_utils::free(monero_utils::get_blocks_from_txs(txs));</div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>  }</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span> </div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::vector&lt;std::shared_ptr&lt;monero_transfer&gt;&gt; transfers) {</div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <span class="keywordflow">return</span> monero_utils::free(monero_utils::get_blocks_from_transfers(transfers));</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>  }</div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span> </div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>  <span class="keyword">static</span> <span class="keywordtype">void</span> free(std::vector&lt;std::shared_ptr&lt;monero_output_wallet&gt;&gt; outputs) {</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>    <span class="keywordflow">return</span> monero_utils::free(monero_utils::get_blocks_from_outputs(outputs));</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>  }</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>}</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span><span class="preprocessor">#endif </span><span class="comment">/* monero_utils_h */</span><span class="preprocessor"></span></div>
 <div class="ttc" id="anamespacemonero__utils_html"><div class="ttname"><a href="namespacemonero__utils.html">monero_utils</a></div><div class="ttdef"><b>Definition:</b> monero_utils.h:67</div></div>
 <div class="ttc" id="anamespacemonero__utils_html_a3b9ee3d8bd81e28c3bbdf4e747300277"><div class="ttname"><a href="namespacemonero__utils.html#a3b9ee3d8bd81e28c3bbdf4e747300277">monero_utils::is_valid_language</a></div><div class="ttdeci">bool is_valid_language(const std::string &amp;language)</div><div class="ttdef"><b>Definition:</b> monero_utils.cpp:303</div></div>
 <div class="ttc" id="anamespacemonero__utils_html_ab2fb8889ec17d02e54541e90a3ffd47f"><div class="ttname"><a href="namespacemonero__utils.html#ab2fb8889ec17d02e54541e90a3ffd47f">monero_utils::cn_block_to_block</a></div><div class="ttdeci">std::shared_ptr&lt; monero_block &gt; cn_block_to_block(const cryptonote::block &amp;cn_block)</div><div class="ttdef"><b>Definition:</b> monero_utils.cpp:316</div></div>
@@ -192,6 +283,7 @@ $(function() {
 <div class="ttc" id="anamespacemonero__utils_html_ad4b5df3026350e762bfa40c6acdb6a0d"><div class="ttname"><a href="namespacemonero__utils.html#ad4b5df3026350e762bfa40c6acdb6a0d">monero_utils::cn_tx_to_tx</a></div><div class="ttdeci">std::shared_ptr&lt; monero_tx &gt; cn_tx_to_tx(const cryptonote::transaction &amp;cn_tx, bool init_as_tx_wallet=false)</div><div class="ttdef"><b>Definition:</b> monero_utils.cpp:332</div></div>
 <div class="ttc" id="anamespacemonero_html_ac9023a1d513e2526775d1e061bb5beed"><div class="ttname"><a href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero::monero_network_type</a></div><div class="ttdeci">monero_network_type</div><div class="ttdef"><b>Definition:</b> monero_daemon_model.h:90</div></div>
 <div class="ttc" id="astructmonero_1_1monero__integrated__address_html"><div class="ttname"><a href="structmonero_1_1monero__integrated__address.html">monero::monero_integrated_address</a></div><div class="ttdef"><b>Definition:</b> monero_wallet_model.h:354</div></div>
+<div class="ttc" id="astructmonero_1_1monero__tx__query_html"><div class="ttname"><a href="structmonero_1_1monero__tx__query.html">monero::monero_tx_query</a></div><div class="ttdef"><b>Definition:</b> monero_wallet_model.h:309</div></div>
 <div class="ttc" id="astructmonero_1_1monero__tx__wallet_html"><div class="ttname"><a href="structmonero_1_1monero__tx__wallet.html">monero::monero_tx_wallet</a></div><div class="ttdef"><b>Definition:</b> monero_wallet_model.h:275</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
