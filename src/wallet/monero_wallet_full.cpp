@@ -743,6 +743,7 @@ namespace monero {
         m_sync_start_height = start_height;
         m_sync_end_height = m_wallet.get_daemon_height();
       });
+      waiter.wait(); // TODO: this processes notification on thread, process off thread
     }
 
     void on_sync_end() {
@@ -754,6 +755,7 @@ namespace monero {
         m_sync_end_height = boost::none;
       });
       m_notification_pool->recycle();
+      waiter.wait();
     }
 
     void on_new_block(uint64_t height, const cryptonote::block& cn_block) override {
@@ -785,6 +787,7 @@ namespace monero {
         // notify when txs unlock after wallet is synced
         if (balances_changed && m_wallet.is_synced()) check_for_changed_unlocked_txs();
       });
+      waiter.wait();
     }
 
     void on_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& cn_tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index) override {
@@ -824,6 +827,7 @@ namespace monero {
           std::cout << "Error processing unconfirmed output received: " << std::string(e.what()) << std::endl;
         }
       });
+      waiter.wait();
     }
 
     void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& cn_tx, uint64_t amount, uint64_t burnt, const cryptonote::subaddress_index& subaddr_index, bool is_change, uint64_t unlock_time) override {
@@ -865,6 +869,7 @@ namespace monero {
           std::cout << "Error processing confirmed output received: " << std::string(e.what()) << std::endl;
         }
       });
+      waiter.wait();
     }
 
     void on_money_spent(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& cn_tx_in, uint64_t amount, const cryptonote::transaction& cn_tx_out, const cryptonote::subaddress_index& subaddr_index) override {
@@ -906,6 +911,7 @@ namespace monero {
           std::cout << "Error processing confirmed output spent: " << std::string(e.what()) << std::endl;
         }
       });
+      waiter.wait();
     }
 
     void on_spend_tx_hashes(const std::vector<std::string>& tx_hashes) {
@@ -924,6 +930,7 @@ namespace monero {
         check_for_changed_balances();
         for (const std::shared_ptr<monero_tx_wallet>& tx : txs) notify_outputs(tx);
       });
+      waiter.wait();
     }
 
   private:
