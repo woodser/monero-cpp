@@ -20,6 +20,7 @@ project(MoneroCppLibrary)
 set(BUILD_LIBRARY ON)
 set(BUILD_SAMPLE ON)
 set(BUILD_SCRATCHPAD ON)
+set(BUILD_TESTS ON)
 
 ###################
 # monero-project
@@ -455,5 +456,56 @@ if (BUILD_SCRATCHPAD)
   )
   if (NOT WIN32)
     target_link_libraries(scratchpad dl)
+  endif()
+endif()
+
+########################
+# Build C++ tests
+########################
+
+if (BUILD_TESTS)
+  set(TEST_SRC_FILES test/monero_tests.cpp)
+  
+  add_executable(monero_tests ${LIBRARY_SRC_FILES} ${TEST_SRC_FILES})
+  
+  target_link_libraries(monero_tests
+      wallet
+      rpc_base
+      net
+      lmdb
+      easylogging
+      cryptonote_core
+      cryptonote_protocol
+      cryptonote_basic
+      cryptonote_format_utils_basic
+      mnemonics
+      ringct
+      ringct_basic
+      common
+      cncrypto
+      blockchain_db
+      blocks
+      checkpoints
+      device
+      device_trezor
+      multisig
+      version
+      randomx
+      epee
+      hardforks
+      cncrypto
+      ${wallet_crypto}
+      
+      ${UNBOUND_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Protobuf_LIBRARY}
+      ${LibUSB_LIBRARIES}
+      ${OPENSSL_LIBRARIES}
+      ${SODIUM_LIBRARY}
+      ${HIDAPI_LIBRARIES}
+      ${EXTRA_LIBRARIES}
+  )
+  if (NOT WIN32)
+    target_link_libraries(monero_tests dl)
   endif()
 endif()

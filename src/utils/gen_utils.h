@@ -55,6 +55,10 @@
 #define gen_utils_h
 
 #include <boost/lexical_cast.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+#include <chrono>
 #include "include_base_utils.h"
 #include "common/util.h"
 
@@ -63,6 +67,27 @@
  */
 namespace gen_utils
 {
+
+ /**
+  * Return a unique identifier.
+  * 
+  * @return a unique id
+  */
+  static std::string get_uuid() {
+    boost::uuids::random_generator generator;
+    boost::uuids::uuid uuid = generator();
+    return boost::uuids::to_string(uuid);
+  }
+
+ /**
+  * Wait for the given duration.
+  * 
+  * @param duration_ms the duration to wait in milliseconds
+  */
+  static void wait_for(uint64_t duration_ms) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(duration_ms));
+  }
+
   // ------------------------- VALUE RECONCILATION ----------------------------
 
   // TODO: refactor common template code

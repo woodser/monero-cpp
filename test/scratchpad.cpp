@@ -7,7 +7,7 @@
 using namespace std;
 
 /**
- * Scratchpad main entry point.
+ * Main entry point for scratchpad.
  */
 int main(int argc, const char* argv[]) {
 
