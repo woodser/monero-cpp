@@ -243,6 +243,17 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
     For 32 bit: `make release-static-win32`
 10. Build as a shared library to ./build/: `cd ../../ && ./bin/build_libmonero_cpp.sh`
 
+## Running sample code and tests
+
+1. In CMakeLists.txt, set the flags to build:
+
+         set(BUILD_LIBRARY ON)
+         set(BUILD_SAMPLE ON)
+         set(BUILD_SCRATCHPAD ON)
+         set(BUILD_TESTS ON)
+2. `./bin/build_libmonero_cpp.sh`
+3. Run the app, for example: `./build/sample_code`
+
 ## Related projects
 
 * [monero-java](https://github.com/monero-ecosystem/monero-java)
