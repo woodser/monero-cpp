@@ -123,6 +123,17 @@ namespace monero {
     return root;
   }
 
+  monero_rpc_connection monero_rpc_connection::from_property_tree(const boost::property_tree::ptree& node) {
+    monero_rpc_connection connection;
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("uri")) connection.m_uri = it->second.data();
+      else if (key == std::string("username")) connection.m_username = it->second.data();
+      else if (key == std::string("password")) connection.m_password = it->second.data();
+    }
+    return connection;
+  }
+
   // ------------------------- MONERO BLOCK HEADER ----------------------------
 
   rapidjson::Value monero_block_header::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {

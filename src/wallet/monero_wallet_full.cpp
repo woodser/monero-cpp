@@ -1130,7 +1130,7 @@ namespace monero {
     monero_wallet_full* wallet = new monero_wallet_full();
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
-    wallet->set_daemon_connection(config.get_server());
+    wallet->set_daemon_connection(config.m_server);
     wallet->m_w2->set_seed_language(language);
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
 
@@ -1224,7 +1224,7 @@ namespace monero {
     if (has_spend_key && has_view_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, spend_key_sk, view_key_sk);
     else if (has_spend_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), spend_key_sk, true, false);
     else wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, view_key_sk);
-    wallet->set_daemon_connection(config.get_server());
+    wallet->set_daemon_connection(config.m_server);
     wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->m_w2->set_seed_language(config.m_language.get());
     wallet->init_common();
@@ -1242,7 +1242,7 @@ namespace monero {
     monero_wallet_full* wallet = new monero_wallet_full();
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
-    wallet->set_daemon_connection(config.get_server());
+    wallet->set_daemon_connection(config.m_server);
     wallet->m_w2->set_seed_language(config.m_language.get());
     crypto::secret_key secret_key;
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());

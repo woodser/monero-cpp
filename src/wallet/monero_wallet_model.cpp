@@ -96,9 +96,7 @@ namespace monero {
     m_path = config.m_path;
     m_password = config.m_password;
     m_network_type = config.m_network_type;
-    m_server_uri = config.m_server_uri;
-    m_server_username = config.m_server_username;
-    m_server_password = config.m_server_password;
+    m_server = config.m_server;
     m_seed = config.m_seed;
     m_seed_offset = config.m_seed_offset;
     m_primary_address = config.m_primary_address;
@@ -121,6 +119,9 @@ namespace monero {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
 
+    // set sub-objects
+    if (m_server != boost::none) root.AddMember("server", m_server.get().to_rapidjson_val(allocator), allocator);
+
     // set num values
     rapidjson::Value value_num(rapidjson::kNumberType);
     if (m_network_type != boost::none) monero_utils::add_json_member("networkType", m_network_type.get(), allocator, root, value_num);
@@ -132,9 +133,6 @@ namespace monero {
     rapidjson::Value value_str(rapidjson::kStringType);
     if (m_path != boost::none) monero_utils::add_json_member("path", m_path.get(), allocator, root, value_str);
     if (m_password != boost::none) monero_utils::add_json_member("password", m_password.get(), allocator, root, value_str);
-    if (m_server_uri != boost::none) monero_utils::add_json_member("serverUri", m_server_uri.get(), allocator, root, value_str);
-    if (m_server_username != boost::none) monero_utils::add_json_member("serverUsername", m_server_username.get(), allocator, root, value_str);
-    if (m_server_password != boost::none) monero_utils::add_json_member("serverPassword", m_server_password.get(), allocator, root, value_str);
     if (m_seed != boost::none) monero_utils::add_json_member("seed", m_seed.get(), allocator, root, value_str);
     if (m_seed_offset != boost::none) monero_utils::add_json_member("seedOffset", m_seed_offset.get(), allocator, root, value_str);
     if (m_primary_address != boost::none) monero_utils::add_json_member("primaryAddress", m_primary_address.get(), allocator, root, value_str);
@@ -172,9 +170,7 @@ namespace monero {
         else if (network_type_num == 2) config->m_network_type = monero_network_type::STAGENET;
         else throw std::runtime_error("Invalid network type number: " + std::to_string(network_type_num));
       }
-      else if (key == std::string("serverUri")) config->m_server_uri = it->second.data();
-      else if (key == std::string("serverUsername")) config->m_server_username = it->second.data();
-      else if (key == std::string("serverPassword")) config->m_server_password = it->second.data();
+      else if (key == std::string("server")) config->m_server = monero_rpc_connection::from_property_tree(it->second);
       else if (key == std::string("seed")) config->m_seed = it->second.data();
       else if (key == std::string("seedOffset")) config->m_seed_offset = it->second.data();
       else if (key == std::string("primaryAddress")) config->m_primary_address = it->second.data();
@@ -189,19 +185,6 @@ namespace monero {
     }
 
     return config;
-  }
-
-  void monero_wallet_config::set_server(const monero_rpc_connection& server) {
-    m_server_uri = server.m_uri;
-    m_server_username = server.m_username;
-    m_server_password = server.m_password;
-  }
-
-  monero_rpc_connection monero_wallet_config::get_server() const {
-    return monero_rpc_connection(
-        std::string(m_server_uri == boost::none ? "" : m_server_uri.get()),
-        std::string(m_server_username == boost::none ? "" : m_server_username.get()),
-        std::string(m_server_password == boost::none ? "" : m_server_password.get()));
   }
 
   // -------------------------- MONERO SYNC RESULT ----------------------------

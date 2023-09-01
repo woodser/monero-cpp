@@ -68,9 +68,7 @@ namespace monero {
     boost::optional<std::string> m_path;
     boost::optional<std::string> m_password;
     boost::optional<monero_network_type> m_network_type;
-    boost::optional<std::string> m_server_uri;
-    boost::optional<std::string> m_server_username;
-    boost::optional<std::string> m_server_password;
+    boost::optional<monero_rpc_connection> m_server;
     boost::optional<std::string> m_seed;
     boost::optional<std::string> m_seed_offset;
     boost::optional<std::string> m_primary_address;
@@ -88,8 +86,6 @@ namespace monero {
     monero_wallet_config copy() const;
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static std::shared_ptr<monero_wallet_config> deserialize(const std::string& config_json);
-    void set_server(const monero_rpc_connection& server);
-    monero_rpc_connection get_server() const;
   };
 
   /**
