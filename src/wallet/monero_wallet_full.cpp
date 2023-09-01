@@ -1809,9 +1809,11 @@ namespace monero {
 
     // special case: re-fetch txs if inconsistency caused by needing to make multiple wallet calls  // TODO monero-project: offer wallet.get_txs(...)
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
-      if (*tx->m_is_confirmed && tx->m_block == boost::none) {
+      if (*tx->m_is_confirmed && tx->m_block == boost::none || !*tx->m_is_confirmed & tx->m_block != boost::none) {
         std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
-        std::vector<std::shared_ptr<monero_tx_wallet>> txs = get_txs(*_query);
+        monero_utils::free(txs);
+        txs.clear();
+        txs = get_txs(*_query);
         monero_utils::free(_query);
         return txs;
       }
