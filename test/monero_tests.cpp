@@ -267,9 +267,6 @@ void test_multisig_stress(monero_wallet* funding_wallet, string wallet_name = ""
   vector<monero_wallet*> participants;
   try {
     for (int i = 0; i < N; i++) {
-      monero_wallet_config wallet_config;
-      wallet_config.m_path = wallet_path + string("_") + std::to_string(i);
-      wallet_config.m_server_uri = DAEMON_URI;
       participants.push_back(monero_wallet_full::open_wallet(wallet_path + string("_") + std::to_string(i), "", NETWORK_TYPE));
     }
     for (int i = 0; i < participants.size(); i++) {
@@ -282,7 +279,7 @@ void test_multisig_stress(monero_wallet* funding_wallet, string wallet_name = ""
       monero_wallet_config wallet_config;
       wallet_config.m_path = wallet_path + string("_") + std::to_string(i);
       wallet_config.m_network_type = monero_network_type::TESTNET;
-      wallet_config.m_server_uri = DAEMON_URI;
+      wallet_config.m_server = monero_rpc_connection(DAEMON_URI);
       participants.push_back(monero_wallet_full::create_wallet(wallet_config));
     }
     for (int i = 0; i < participants.size(); i++) {

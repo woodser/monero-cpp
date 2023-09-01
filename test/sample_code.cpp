@@ -26,9 +26,7 @@ int main(int argc, const char* argv[]) {
   wallet_config.m_path = "MyWalletRestored";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::STAGENET;
-  wallet_config.m_server_uri = "http://localhost:38081";
-  wallet_config.m_server_username = "superuser";
-  wallet_config.m_server_password = "abctesting123";
+  wallet_config.m_server = monero_rpc_connection("http://localhost:38081", "superuser", "abctesting123");
   wallet_config.m_restore_height = 380104;
   wallet_config.m_seed_offset = "";
   monero_wallet* wallet_restored = monero_wallet_full::create_wallet(wallet_config);
@@ -80,9 +78,7 @@ int main(int argc, const char* argv[]) {
   wallet_config.m_path = "MyWalletRandom";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::STAGENET;
-  wallet_config.m_server_uri = "http://localhost:38081";
-  wallet_config.m_server_username = "superuser";
-  wallet_config.m_server_password = "abctesting123";
+  wallet_config.m_server = monero_rpc_connection("http://localhost:38081", "superuser", "abctesting123");
   wallet_config.m_language = "English";
   monero_wallet* wallet_random = monero_wallet_full::create_wallet(wallet_config);
   wallet_random->sync();

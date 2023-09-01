@@ -111,8 +111,9 @@ namespace monero {
     boost::optional<std::string> m_username;
     boost::optional<std::string> m_password;
 
-    monero_rpc_connection(const boost::optional<std::string>& uri = boost::none, const boost::optional<std::string>& username = boost::none, const boost::optional<std::string>& password = boost::none) : m_uri(uri), m_username(username), m_password(password) {}
+    monero_rpc_connection(const std::string& uri = "", const std::string& username = "", const std::string& password = "") : m_uri(uri), m_username(username), m_password(password) {}
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static monero_rpc_connection from_property_tree(const boost::property_tree::ptree& node);
   };
 
   // forward declarations
