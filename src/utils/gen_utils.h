@@ -59,6 +59,7 @@
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
+#include <thread>
 #include "include_base_utils.h"
 #include "common/util.h"
 
