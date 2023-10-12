@@ -2192,7 +2192,7 @@ namespace monero {
     if (destinations[0]->m_amount != boost::none) throw std::runtime_error("Cannot specify destination amount to sweep");
     if (config.m_key_image != boost::none) throw std::runtime_error("Cannot define key image in sweep_account(); use sweep_output() to sweep an output by its key image");
     if (config.m_sweep_each_subaddress != boost::none && config.m_sweep_each_subaddress.get() == true) throw std::runtime_error("Cannot sweep each subaddress individually with sweep_account");
-    if (config.m_subtract_fee_from.size() > 0) throw std::runtime_error("Sweep transfers do not support subtracting fees from destinations");
+    if (config.m_subtract_fee_from.size() > 0) throw std::runtime_error("Sweep transactions do not support subtracting fees from destinations");
 
     // validate the transfer requested and populate dsts & extra
     std::list<wallet_rpc::transfer_destination> destination;
@@ -2326,7 +2326,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
     if (config.m_key_image == boost::none || config.m_key_image.get().empty()) throw std::runtime_error("Must provide key image of output to sweep");
     if (destinations.size() != 1 || destinations[0]->m_address == boost::none || destinations[0]->m_address.get().empty()) throw std::runtime_error("Must provide exactly one destination address to sweep output to");
-    if (config.m_subtract_fee_from.size() > 0) throw std::runtime_error("Sweeping output does not support subtracting fees from destinations");
+    if (config.m_subtract_fee_from.size() > 0) throw std::runtime_error("Sweep transactions do not support subtracting fees from destinations");
 
     // validate the transfer queried and populate dsts & extra
     std::string m_payment_id = config.m_payment_id == boost::none ? std::string("") : config.m_payment_id.get();
