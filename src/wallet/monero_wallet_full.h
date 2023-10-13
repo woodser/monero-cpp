@@ -252,11 +252,15 @@ namespace monero {
     std::string get_keys_file_buffer(const epee::wipeable_string& password, bool view_only) const;
     std::string get_cache_file_buffer() const;
 
+  // --------------------------------- PROTECTED --------------------------------
+
+  protected:
+      std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
+
   // ---------------------------------- PRIVATE ---------------------------------
 
   private:
     friend struct wallet2_listener;
-    std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
     std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
     std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
 
