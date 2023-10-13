@@ -255,7 +255,7 @@ namespace monero {
   // --------------------------------- PROTECTED --------------------------------
 
   protected:
-      std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
+    std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
 
   // ---------------------------------- PRIVATE ---------------------------------
 
