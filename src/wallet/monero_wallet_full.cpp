@@ -2657,7 +2657,7 @@ namespace monero {
       int first_known_non_zero_change_index = -1;
       for (int64_t n = 0; n < tx_constructions.size(); ++n)
       {
-        // pre-initialize tx
+        // init tx
         std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
         tx->m_is_outgoing = true;
         tx->m_input_sum = 0;
@@ -2769,7 +2769,7 @@ namespace monero {
   }
 
   // implementation based on monero-project wallet_rpc_server.cpp::on_sign_transfer()
-  std::string monero_wallet_full::sign_txs(const std::string& unsigned_tx_hex) {
+  monero_tx_set monero_wallet_full::sign_txs(const std::string& unsigned_tx_hex) {
     if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
     if (m_w2->watch_only()) throw std::runtime_error("command not supported by view-only wallet");
 
@@ -2780,11 +2780,28 @@ namespace monero {
     if(!m_w2->parse_unsigned_tx_from_str(blob, exported_txs)) throw std::runtime_error("cannot load unsigned_txset");
 
     std::vector<tools::wallet2::pending_tx> ptxs;
+    std::vector<std::shared_ptr<monero_tx_wallet>> txs;
     try {
       tools::wallet2::signed_tx_set signed_txs;
       std::string ciphertext = m_w2->sign_tx_dump_to_str(exported_txs, ptxs, signed_txs);
       if (ciphertext.empty()) throw std::runtime_error("Failed to sign unsigned tx");
-      return epee::string_tools::buff_to_hex_nodelimer(ciphertext);
+
+      // init tx set
+      monero_tx_set tx_set;
+      tx_set.m_signed_tx_hex = epee::string_tools::buff_to_hex_nodelimer(ciphertext);
+      for (auto &ptx : ptxs) {
+
+        // init tx
+        std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
+        tx->m_is_outgoing = true;
+        tx->m_hash = epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx));
+        tx->m_key = epee::string_tools::pod_to_hex(ptx.tx_key);
+        for (const crypto::secret_key& additional_tx_key : ptx.additional_tx_keys) {
+            tx->m_key = tx->m_key.get() += epee::string_tools::pod_to_hex(additional_tx_key);
+        }
+        tx_set.m_txs.push_back(tx);
+      }
+      return tx_set;
     } catch (const std::exception &e) {
       throw std::runtime_error(std::string("Failed to sign unsigned tx: ") + e.what());
     }
