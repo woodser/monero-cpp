@@ -941,16 +941,16 @@ namespace monero {
      * Sign unsigned transactions from a view-only wallet.
      *
      * @param unsigned_tx_hex is unsigned transaction hex from when the transactions were created
-     * @return the signed transaction hex
+     * @return the signed transaction set
      */
-    virtual std::string sign_txs(const std::string& unsigned_tx_hex) {
+    virtual monero_tx_set sign_txs(const std::string& unsigned_tx_hex) {
       throw std::runtime_error("sign_txs() not supported");
     }
 
     /**
      * Submit signed transactions from a view-only wallet.
      *
-     * @param signed_tx_hex is signed transaction hex from signTxs()
+     * @param signed_tx_hex is signed transaction hex from sign_txs()
      * @return the resulting transaction hashes
      */
     virtual std::vector<std::string> submit_txs(const std::string& signed_tx_hex) {
