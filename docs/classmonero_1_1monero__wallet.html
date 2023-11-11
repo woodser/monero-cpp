@@ -249,8 +249,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6a6af8b8edc0cc504c5fcdd443faf84d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20cb4581a06ad94db80a3da2cdfa2279"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__tx__set.html">monero_tx_set</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a20cb4581a06ad94db80a3da2cdfa2279">describe_tx_set</a> (const <a class="el" href="structmonero_1_1monero__tx__set.html">monero_tx_set</a> &amp;tx_set)</td></tr>
 <tr class="separator:a20cb4581a06ad94db80a3da2cdfa2279"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7610e05a65fa72df26b6890dbe2c630a"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a7610e05a65fa72df26b6890dbe2c630a">sign_txs</a> (const std::string &amp;unsigned_tx_hex)</td></tr>
-<tr class="separator:a7610e05a65fa72df26b6890dbe2c630a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a479f9c37761ecb34126df8125a6db941"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__tx__set.html">monero_tx_set</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a479f9c37761ecb34126df8125a6db941">sign_txs</a> (const std::string &amp;unsigned_tx_hex)</td></tr>
+<tr class="separator:a479f9c37761ecb34126df8125a6db941"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb2e854c9507276a9d1affa249370ec5"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aeb2e854c9507276a9d1affa249370ec5">submit_txs</a> (const std::string &amp;signed_tx_hex)</td></tr>
 <tr class="separator:aeb2e854c9507276a9d1affa249370ec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af65667677cd03973ab87389c1dc0c545"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#af65667677cd03973ab87389c1dc0c545">sign_message</a> (const std::string &amp;msg, <a class="el" href="namespacemonero.html#a5ada8f66cddd59159701650a6a8c078b">monero_message_signature_type</a> signature_type, uint32_t account_idx=0, uint32_t subaddress_idx=0) const</td></tr>
@@ -4318,8 +4318,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a7610e05a65fa72df26b6890dbe2c630a" name="a7610e05a65fa72df26b6890dbe2c630a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7610e05a65fa72df26b6890dbe2c630a">&#9670;&nbsp;</a></span>sign_txs()</h2>
+<a id="a479f9c37761ecb34126df8125a6db941" name="a479f9c37761ecb34126df8125a6db941"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a479f9c37761ecb34126df8125a6db941">&#9670;&nbsp;</a></span>sign_txs()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -4328,7 +4328,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::string monero::monero_wallet::sign_txs </td>
+          <td class="memname">virtual <a class="el" href="structmonero_1_1monero__tx__set.html">monero_tx_set</a> monero::monero_wallet::sign_txs </td>
           <td>(</td>
           <td class="paramtype">const std::string &amp;&#160;</td>
           <td class="paramname"><em>unsigned_tx_hex</em></td><td>)</td>
@@ -4348,9 +4348,9 @@ Public Member Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the signed transaction hex </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the signed transaction set </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a858c1dae560dea7d336912b1eaf806e5">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5eccfcdd50c3d43367a8d2f32451c1bf">monero::monero_wallet_full</a>.</p>
 
 </div>
 </div>
@@ -4560,7 +4560,7 @@ Public Member Functions</h2></td></tr>
 <p >Submit signed transactions from a view-only wallet.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">signed_tx_hex</td><td>is signed transaction hex from signTxs() </td></tr>
+    <tr><td class="paramname">signed_tx_hex</td><td>is signed transaction hex from <a class="el" href="classmonero_1_1monero__wallet.html#a479f9c37761ecb34126df8125a6db941">sign_txs()</a> </td></tr>
   </table>
   </dd>
 </dl>
