@@ -64,6 +64,8 @@
  */
 namespace monero {
 
+  struct monero_wallet_factory;
+
   // -------------------------------- LISTENERS -------------------------------
 
   // forward declaration of internal wallet2 listener
@@ -257,9 +259,12 @@ namespace monero {
   protected:
     std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
 
+    void init_common();
+
   // ---------------------------------- PRIVATE ---------------------------------
 
   private:
+    friend struct monero_wallet_factory;
     friend struct wallet2_listener;
     std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
     std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
@@ -268,7 +273,6 @@ namespace monero {
     static monero_wallet_full* create_wallet_from_keys(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
     static monero_wallet_full* create_wallet_random(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
 
-    void init_common();
     std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
