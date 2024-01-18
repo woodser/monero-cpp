@@ -4,7 +4,7 @@ A C++ library for creating Monero applications using native bindings to [monero 
 
 * Supports fully client-side wallets by wrapping [wallet2.h](https://github.com/monero-project/monero/blob/master/src/wallet/wallet2.h).
 * Supports multisig, view-only, and offline wallets.
-* Uses a clearly defined [data model and API specification](https://moneroecosystem.org/monero-java/monero-spec.pdf) intended to be intuitive and robust.
+* Uses a clearly defined [data model and API specification](https://woodser.github.io/monero-java/monero-spec.pdf) intended to be intuitive and robust.
 * Query wallet transactions, transfers, and outputs by their properties.
 * Receive notifications when wallets sync, send, or receive.
 * Tested by over 100 tests in [monero-java](https://github.com/monero-ecosystem/monero-java) and [monero-ts](https://github.com/monero-ecosystem/monero-ts) using JNI and WebAssembly bindings.
@@ -158,8 +158,8 @@ delete wallet_random;
 
 ## Documentation
 
-* [API documentation](https://moneroecosystem.org/monero-cpp/annotated.html)
-* [API and model overview with visual diagrams](https://moneroecosystem.org/monero-java/monero-spec.pdf)
+* [API documentation](https://woodser.github.io/monero-cpp/annotated.html)
+* [API and model overview with visual diagrams](https://woodser.github.io/monero-java/monero-spec.pdf)
 * [monero-ts documentation](https://github.com/monero-ecosystem/monero-ts#documentation) provides additional documentation which translates to monero-cpp
 
 ## Using monero-cpp in your project
