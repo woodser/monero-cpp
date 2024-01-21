@@ -7,7 +7,7 @@ A C++ library for creating Monero applications using native bindings to [monero 
 * Uses a clearly defined [data model and API specification](https://woodser.github.io/monero-java/monero-spec.pdf) intended to be intuitive and robust.
 * Query wallet transactions, transfers, and outputs by their properties.
 * Receive notifications when wallets sync, send, or receive.
-* Tested by over 100 tests in [monero-java](https://github.com/monero-ecosystem/monero-java) and [monero-ts](https://github.com/monero-ecosystem/monero-ts) using JNI and WebAssembly bindings.
+* Tested by over 100 tests in [monero-java](https://github.com/woodser/monero-java) and [monero-ts](https://github.com/woodser/monero-ts) using JNI and WebAssembly bindings.
 
 ## Table of contents
 
@@ -160,18 +160,18 @@ delete wallet_random;
 
 * [API documentation](https://woodser.github.io/monero-cpp/annotated.html)
 * [API and model overview with visual diagrams](https://woodser.github.io/monero-java/monero-spec.pdf)
-* [monero-ts documentation](https://github.com/monero-ecosystem/monero-ts#documentation) provides additional documentation which translates to monero-cpp
+* [monero-ts documentation](https://github.com/woodser/monero-ts#documentation) provides additional documentation which translates to monero-cpp
 
 ## Using monero-cpp in your project
 
 This project may be compiled as part of another application or built as a shared or static library.
 
-For example, [monero-java](https://github.com/monero-ecosystem/monero-java) compiles this project to a shared library to support Java JNI bindings, while [monero-ts](https://github.com/monero-ecosystem/monero-ts) compiles this project to WebAssembly binaries.
+For example, [monero-java](https://github.com/woodser/monero-java) compiles this project to a shared library to support Java JNI bindings, while [monero-ts](https://github.com/woodser/monero-ts) compiles this project to WebAssembly binaries.
 
 ### Linux
 
 
-1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/monero-ecosystem/monero-cpp.git`
+1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
 2. Update submodules: `cd monero-cpp && ./bin/update_submodules.sh`
 3. `sudo apt update && sudo apt install build-essential cmake pkg-config libssl-dev libzmq3-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libpgm-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev python3 ccache`
 4. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for Linux to your home directory (e.g. `~/unbound-1.19.0`).
@@ -211,7 +211,7 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
 
 ### macOS
 
-1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/monero-ecosystem/monero-cpp.git`
+1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
 2. Update submodules: `cd monero-cpp && ./bin/update_submodules.sh`
 3. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for macOS to your home directory (e.g. `~/unbound-1.19.0`).
 4. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with: `make release-static -j8`
@@ -235,7 +235,7 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
      ```
      pacman -S  mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium mingw-w64-i686-hidapi mingw-w64-i686-unbound mingw-w64-i686-protobuf git mingw-w64-i686-libusb gettext base-devel
      ```
-5. Clone repo if installing standalone (skip if building as part of another repo like monero-java or monero-ts): `git clone --recursive https://github.com/monero-ecosystem/monero-cpp.git`
+5. Clone repo if installing standalone (skip if building as part of another repo like monero-java or monero-ts): `git clone --recursive https://github.com/woodser/monero-cpp.git`
 6. Update submodules: `cd monero-cpp && ./bin/update_submodules.sh`
 7. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with:
 
@@ -257,8 +257,8 @@ For example, [monero-java](https://github.com/monero-ecosystem/monero-java) comp
 
 ## Related projects
 
-* [monero-java](https://github.com/monero-ecosystem/monero-java)
-* [monero-ts](https://github.com/monero-ecosystem/monero-ts)
+* [monero-java](https://github.com/woodser/monero-java)
+* [monero-ts](https://github.com/woodser/monero-ts)
 
 ## License
 
