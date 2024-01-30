@@ -291,6 +291,7 @@ set(
     src/daemon/monero_daemon.cpp
     src/wallet/monero_wallet_model.cpp
     src/wallet/monero_wallet_keys.cpp
+    src/wallet/monero_wallet_factory.cpp
     src/wallet/monero_wallet_full.cpp
 )
 
@@ -347,6 +348,7 @@ endif()
           src/utils/monero_utils.h
           DESTINATION include/utils)
   INSTALL(FILES src/wallet/monero_wallet_full.h
+          src/wallet/monero_wallet_factory.h
           src/wallet/monero_wallet.h
           src/wallet/monero_wallet_keys.h
           src/wallet/monero_wallet_model.h
