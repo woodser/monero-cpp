@@ -1583,6 +1583,7 @@ namespace monero {
     }
 
     // scan txs
+    boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize scanning
     m_w2->scan_tx(tx_hashes);
   }
 
