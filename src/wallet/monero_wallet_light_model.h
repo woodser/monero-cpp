@@ -74,11 +74,11 @@ namespace monero {
         boost::optional<uint64_t> m_height;
 
         static std::shared_ptr<monero_light_output> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_rates {
         static std::shared_ptr<monero_light_rates> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_spend {
         boost::optional<std::string> m_amount;
@@ -88,7 +88,7 @@ namespace monero {
         boost::optional<uint32_t> m_mixin;
 
         static std::shared_ptr<monero_light_spend> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_transaction {
         boost::optional<uint64_t> m_id;
@@ -105,7 +105,7 @@ namespace monero {
         boost::optional<uint32_t> m_mixin;
 
         static std::shared_ptr<monero_light_transaction> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_random_output {
         boost::optional<std::string> m_global_index;
@@ -113,21 +113,21 @@ namespace monero {
         boost::optional<std::string> m_rct;
 
         static std::shared_ptr<monero_light_random_output> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_random_outputs {
         boost::optional<std::string> m_amount;
         boost::optional<std::vector<monero_light_random_output>> m_outputs;
 
         static std::shared_ptr<monero_light_random_outputs> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_get_address_info_request {
         boost::optional<std::string> m_address;
         boost::optional<std::string> m_view_key;
 
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_get_address_info_response {
         boost::optional<std::string> m_locked_funds;
@@ -142,14 +142,14 @@ namespace monero {
         boost::optional<monero_light_rates> m_rates;
         
         static std::shared_ptr<monero_light_get_address_info_response> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_get_address_txs_request : public serializable_struct {
         boost::optional<std::string> m_address;
         boost::optional<std::string> m_view_key;
 
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_get_address_txs_response {
         boost::optional<std::string> m_total_received;
@@ -160,20 +160,20 @@ namespace monero {
         boost::optional<std::vector<monero_light_transaction>> m_transactions;
 
         static std::shared_ptr<monero_light_get_address_txs_response> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_get_random_outs_request : public serializable_struct {
         boost::optional<uint32_t> m_count;
         boost::optional<std::vector<std::string>> m_amounts;
         
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_get_random_outs_response {
         boost::optional<std::vector<monero_light_random_output>> m_amount_outs;
         
         static std::shared_ptr<monero_light_get_random_outs_response> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_get_unspent_outs_request : public serializable_struct {
         boost::optional<std::string> m_address;
@@ -184,7 +184,7 @@ namespace monero {
         boost::optional<std::string> m_dust_threshold;
         
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_get_unspent_outs_response {
         boost::optional<std::string> m_per_byte_fee;
@@ -193,14 +193,14 @@ namespace monero {
         boost::optional<std::vector<monero_light_output>> m_outputs;
         
         static std::shared_ptr<monero_light_get_unspent_outs_response> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_import_request_request : public serializable_struct {
         boost::optional<std::string> m_address;
         boost::optional<std::string> m_view_key;
         
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_import_request_response {
         boost::optional<std::string> m_payment_address;
@@ -211,7 +211,7 @@ namespace monero {
         boost::optional<std::string> m_status;
         
         static std::shared_ptr<monero_light_import_request_response> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_login_request : public serializable_struct {
         boost::optional<std::string> m_address;
@@ -220,7 +220,7 @@ namespace monero {
         boost::optional<bool> m_generated_locally;
         
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_login_response {
         boost::optional<bool> m_new_address;
@@ -228,18 +228,18 @@ namespace monero {
         boost::optional<uint64_t> m_start_height;
         
         static std::shared_ptr<monero_light_login_response> deserialize(const std::string& config_json);
-    }
+    };
 
     struct monero_light_submit_raw_tx_request : public serializable_struct {
         boost::optional<std::string> m_tx;
         
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
-    }
+    };
 
     struct monero_light_submit_raw_tx_response {
         boost::optional<std::string> m_status;
         
         static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
-    }
+    };
 
 }

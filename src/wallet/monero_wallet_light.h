@@ -54,6 +54,7 @@
 
 #include "utils/monero_utils.h"
 #include "monero_wallet.h"
+#include "wallet/wallet2.h"
 #include "monero_wallet_light_model.h"
 #include "cryptonote_basic/account.h"
 
@@ -68,7 +69,7 @@ namespace monero {
    public:
     std::string uri;
     std::string token;
-  }
+  };
 
   /**
    * Implements a Monero wallet to provide basic lws management.
@@ -98,8 +99,6 @@ namespace monero {
      */
     bool is_view_only() const override { return true; }
     void set_daemon_connection(std::string host, std::string port);
-    void set_daemon_connection(std::string uri, std::string port, std::string adminUri, std::string adminPort, std::string token);
-    void set_daemon_connection(std::string uri, std::string port, std::string token) { set_daemon_connection(uri, port, "admin", port, token); };
     bool is_connected_to_daemon() const override;
     bool is_daemon_synced() const override;
     bool is_synced() const override;
@@ -120,37 +119,51 @@ namespace monero {
     uint64_t get_balance() const override;
     uint64_t get_unlocked_balance() const override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
+    std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
     bool is_multisig_import_needed() const override { return false; }
     bool is_multisig() const override { return false; }
 
     void close(bool save = false) override;
 
-    monero_light_get_address_info_response get_address_info get_address_info() {
+    monero_light_get_address_info_response get_address_info() const {
       return get_address_info(m_primary_address, m_prv_view_key);
     };
 
-    monero_light_get_address_txs_response get_address_txs() {
+    monero_light_get_address_txs_response get_address_txs() const {
       return get_address_txs(m_primary_address, m_prv_view_key);
     }
 
-    monero_light_get_unspent_outs_response get_unspent_outs(std::string amount, uint32_t mixin, bool use_dust, std::string dust_threshold) {
+    monero_light_get_unspent_outs_response get_unspent_outs(std::string amount, uint32_t mixin, bool use_dust, std::string dust_threshold) const {
       return get_unspent_outs(m_primary_address, m_prv_view_key, amount, mixin, use_dust, dust_threshold);
     }
 
-    monero_light_import_request_response import_request() {
+    monero_light_get_unspent_outs_response get_unspent_outs(uint32_t mixin, bool use_dust = true, std::string dust_threshold = "0") const {
+      uint64_t balance = get_balance();
+      std::ostringstream o;
+      o << balance;
+      std::string amount = o.str();
+
+      return get_unspent_outs(amount, mixin, use_dust, dust_threshold);
+    }
+
+    monero_light_get_unspent_outs_response get_unspent_outs() const {
+      return get_unspent_outs(m_mixin);
+    }
+
+    monero_light_import_request_response import_request() const {
       return import_request(m_primary_address, m_prv_view_key);
     }
 
-    monero_light_login_response login() {
+    monero_light_login_response login() const {
       return login(false);
     }
 
-    monero_light_login_response login(bool create_account) {
+    monero_light_login_response login(bool create_account) const {
       return login(create_account, false);
     }
 
-    monero_light_login_response login(bool create_account, bool generated_locally) {
+    monero_light_login_response login(bool create_account, bool generated_locally) const {
       return login(m_primary_address, m_prv_view_key, create_account, generated_locally);
     }
 
@@ -162,10 +175,14 @@ namespace monero {
     std::string m_prv_view_key;
     std::string m_primary_address;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
-    
+    std::chrono::milliseconds m_timeout = std::chrono::milliseconds(120000);
+    std::string m_host;
+    std::string m_port;
+    uint64_t m_mixin = 4;
+
     void init_common();
 
-    monero_light_get_address_info_response get_address_info(std::string address, std::string view_key) { 
+    monero_light_get_address_info_response get_address_info(std::string address, std::string view_key) const { 
       monero_light_get_address_info_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -173,7 +190,7 @@ namespace monero {
       return get_address_info(request);
     };
 
-    monero_light_get_address_txs_response get_address_txs(std::string address, std::string view_key) {
+    monero_light_get_address_txs_response get_address_txs(std::string address, std::string view_key) const {
       monero_light_get_address_txs_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -181,7 +198,7 @@ namespace monero {
       return get_address_txs(request);
     }
 
-    monero_light_get_random_outs_response get_random_outs(uint32_t count, std::string amounts) {
+    monero_light_get_random_outs_response get_random_outs(uint32_t count, std::vector<std::string> amounts) const {
       monero_light_get_random_outs_request request;
       request.m_count = count;
       request.m_amounts = amounts;
@@ -192,7 +209,7 @@ namespace monero {
     monero_light_get_unspent_outs_response get_unspent_outs(
       std::string address, std::string view_key, std::string amount, uint32_t mixin,
       bool use_dust, std::string dust_threshold
-    ){
+    ) const {
       monero_light_get_unspent_outs_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -204,7 +221,13 @@ namespace monero {
       return get_unspent_outs(request);
     };
 
-    monero_light_import_request_response import_request(std::string address, std::string view_key) {
+    monero_light_submit_raw_tx_response submit_raw_tx(std::string tx) const {
+      monero_light_submit_raw_tx_request request;
+      request.m_tx = tx;
+      return submit_raw_tx(request);
+    }
+
+    monero_light_import_request_response import_request(std::string address, std::string view_key) const {
       monero_light_import_request_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -215,7 +238,7 @@ namespace monero {
     monero_light_login_response login(
       std::string address, std::string view_key,
       bool create_account, bool generated_locally
-    ){
+    ) const {
       monero_light_login_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -225,11 +248,15 @@ namespace monero {
       return login(request);
     };
 
-    monero_light_get_address_info_response get_address_info(monero_light_get_address_info_request request);
-    monero_light_get_address_txs_response get_address_txs(monero_light_get_address_txs_request request);
-    monero_light_get_random_outs_response get_random_outs(monero_light_get_random_outs_request request);
-    monero_light_get_unspent_outs_response get_unspent_outs(monero_light_get_unspent_outs_request request);
-    monero_light_import_request_response import_request(monero_light_import_request_request request);
-    monero_light_login_response login(monero_light_login_request request);
+    monero_light_get_address_info_response get_address_info(monero_light_get_address_info_request request) const;
+    monero_light_get_address_txs_response get_address_txs(monero_light_get_address_txs_request request) const;
+    monero_light_get_random_outs_response get_random_outs(monero_light_get_random_outs_request request) const;
+    monero_light_get_unspent_outs_response get_unspent_outs(monero_light_get_unspent_outs_request request) const;
+    monero_light_submit_raw_tx_response submit_raw_tx(monero_light_submit_raw_tx_request request) const;
+    monero_light_import_request_response import_request(monero_light_import_request_request request) const;
+    monero_light_login_response login(monero_light_login_request request) const;
+
+    epee::net_utils::http::http_response_info* post(std::string method, std::string &body) const;
+
   };
 }
