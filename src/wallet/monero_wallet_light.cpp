@@ -123,7 +123,12 @@ namespace monero {
     close();
   }
 
-  void monero_wallet_light::set_daemon_connection(std::string host, std::string port) {
+  void monero_wallet_light::set_daemon_connection(const boost::optional<monero_lws_connection>& connection) {
+    if (connection == boost::none) set_daemon_connection("", "");
+    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_port == boost::none ? "" : connection->m_port.get());
+  }
+
+  void monero_wallet_light::set_daemon_connection(std::string host, std::string port = "", std::string adminHost = "", std::string adminPort = "", std::string token = "") {
     m_host = host;
     m_port = port;
   }
@@ -171,6 +176,18 @@ namespace monero {
     monero_light_get_address_info_response address_info = get_address_info();
 
     return address_info.m_blockchain_height.get();
+  }
+
+  monero_sync_result monero_wallet_light::sync() {
+    rescan(0, m_primary_address);
+
+    // should wait until is scanned
+  }
+
+  monero_sync_result monero_wallet_light::sync(uint64_t start_height) {
+    rescan(start_height, m_primary_address);
+
+    // should wait until is scanned
   }
 
   uint64_t monero_wallet_light::get_balance() const {
@@ -269,7 +286,12 @@ namespace monero {
     std::vector<std::shared_ptr<monero_output_wallet>> outputs;
 
     for(monero_light_output light_output : response.m_outputs.get()) {
-      
+      std::shared_ptr<monero_output_wallet> output = std::shared_ptr<monero_output_wallet>();
+      output->m_account_index = 0;
+      output->m_amount = light_output.m_amount;
+      output->m_index = light_output.m_index;
+
+      outputs.push_back(output);
     }
 
     return outputs;
@@ -294,15 +316,23 @@ namespace monero {
     const cryptonote::account_keys& keys = m_account.get_keys();
     m_prv_view_key = epee::string_tools::pod_to_hex(keys.m_view_secret_key);
 
-    m_http_client->connect(m_timeout);
+    if (m_host != "") {
+      std::string address = m_host;
+
+      if (m_port != "") {
+        address = address + ":" + m_port;
+      }
+
+      m_http_client->set_server(address, boost::none);
+      m_http_client->connect(m_timeout);
+    }
+
   }
 
   epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body) const {
-    std::string uri = m_host + m_port + method;
-
     epee::net_utils::http::http_response_info *response = nullptr;
 
-    if (!m_http_client->invoke_post(uri, body, m_timeout, &response)) {
+    if (!m_http_client->invoke_post(method, body, m_timeout, &response)) {
       throw std::runtime_error("Network error");
     }
 

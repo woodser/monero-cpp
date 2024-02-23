@@ -59,6 +59,37 @@ using namespace monero;
 
 namespace monero {
 
+    /**
+     * Models a connection to a light wallet server.
+     */
+    struct monero_lws_connection : public serializable_struct {
+        boost::optional<std::string> m_uri;
+        boost::optional<std::string> m_port;
+
+        monero_lws_connection(const std::string& uri = "", const std::string& port = "") : m_uri(uri), m_port(port) {}
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+        static monero_lws_connection from_property_tree(const boost::property_tree::ptree& node);
+    };
+
+    /**
+     * Models a connection to a light wallet administration server.
+     */
+    struct monero_lws_admin_connection : public monero_lws_connection {
+        boost::optional<std::string> m_uri;
+        boost::optional<std::string> m_port;
+        boost::optional<std::string> m_admin_uri;
+        boost::optional<std::string> m_admin_port;
+        boost::optional<std::string> m_token;
+
+        monero_lws_admin_connection(
+            const std::string& uri = "", const std::string& port = "",
+            const std::string& admin_uri = "", const std::string& admin_port = "",
+            const std::string& token = "") : m_uri(uri), m_port(port), m_admin_uri(admin_uri), m_admin_port(admin_port), m_token(token) {}
+
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+        static monero_lws_admin_connection from_property_tree(const boost::property_tree::ptree& node);
+    };
+
     struct monero_light_output {
         boost::optional<uint64_t> m_tx_id;
         boost::optional<std::string> m_amount;
@@ -242,4 +273,68 @@ namespace monero {
         static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
     };
 
+    struct monero_light_accept_requests_request : public serializable_struct {
+        boost::optional<std::string> m_type;
+        boost::optional<std::vector<std::string>> m_addresses;
+
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
+
+    struct monero_light_add_account_request : public serializable_struct {
+        boost::optional<std::string> m_address;
+        boost::optional<std::string> m_key;
+
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
+
+    struct monero_light_list_accounts_request : public serializable_struct {
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
+
+    struct monero_light_account {
+        boost::optional<std::string> m_address;
+        boost::optional<uint64_t> m_scan_height;
+        boost::optional<uint64_t> m_access_time;
+
+        static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
+    };
+
+    struct monero_light_list_accounts_response {
+        boost::optional<std::vector<monero_light_account>> m_active;
+        boost::optional<std::vector<monero_light_account>> m_inactive;
+        boost::optional<std::vector<monero_light_account>> m_hidden;
+
+        static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
+    };
+
+    struct monero_light_list_requests_request : public serializable_struct {
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
+
+    struct monero_light_list_requests_response {
+        static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
+    };
+
+    struct monero_light_modify_account_status_request : public serializable_struct {
+        boost::optional<std::string> m_status;
+        boost::optional<std::vector<std::string>> m_addresses;
+
+        monero_light_modify_account_status_request(std::string status, std::vector<std::string> addresses): m_status(status), m_addresses(addresses) {}
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
+
+    struct monero_light_reject_requests_request : public serializable_struct {
+        boost::optional<std::string> m_type;
+        boost::optional<std::vector<std::string>> m_addresses;
+
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
+
+    struct monero_light_rescan_request : public serializable_struct {
+        boost::optional<uint64_t> m_height;
+        boost::optional<std::vector<std::string>> m_addresses;
+
+        monero_light_rescan_request(uint64_t &height, std::vector<std::string> addresses): m_height(height), m_addresses(addresses) {}
+        rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    };
 }
