@@ -111,6 +111,7 @@ namespace monero {
     // initialize remaining wallet
     wallet->m_network_type = config_normalized.m_network_type.get();
     wallet->m_http_client = http_client_factory->create();
+    wallet->m_http_admin_client = http_client_factory->create();
     wallet->init_common();
 
     return wallet;
@@ -128,9 +129,21 @@ namespace monero {
     else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_port == boost::none ? "" : connection->m_port.get());
   }
 
-  void monero_wallet_light::set_daemon_connection(std::string host, std::string port = "", std::string adminHost = "", std::string adminPort = "", std::string token = "") {
+  void monero_wallet_light::set_daemon_connection(const boost::optional<monero_lws_admin_connection>& connection) {
+    if (connection == boost::none) set_daemon_connection("", "");
+    else set_daemon_connection(
+      connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_port == boost::none ? "" : connection->m_port.get(), 
+      connection->m_admin_uri == boost::none ? "" : connection->m_admin_uri.get(), connection->m_admin_port == boost::none ? "" : connection->m_admin_port.get(), 
+      connection->m_token == boost::none ? "" : connection->m_token.get()
+      );
+  }
+
+  void monero_wallet_light::set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "") {
     m_host = host;
     m_port = port;
+    m_admin_uri = admin_uri;
+    m_admin_port = admin_port;
+    m_token = token;
   }
 
   bool monero_wallet_light::is_connected_to_daemon() const {
@@ -169,7 +182,7 @@ namespace monero {
   }
 
   void monero_wallet_light::set_restore_height(uint64_t restore_height) {
-    throw std::runtime_error("not supported yet");
+    rescan(restore_height);
   }
 
   uint64_t monero_wallet_light::get_daemon_height() const {
@@ -303,13 +316,19 @@ namespace monero {
     }
   }
 
+  uint64_t monero_wallet_light::wait_for_next_block() {
+    uint64_t current_block = get_daemon_height();
+    // to do
+    return current_block + 1;
+  }
+
   void monero_wallet_light::close(bool save) {
     if (save) throw std::runtime_error("MoneroWalletLight does not support saving");
     m_http_client->disconnect();
     // no pointers to destroy
   }
 
-  // ------------------------------- PRIVATE HELPERS ----------------------------
+  // ------------------------------- PROTECTED HELPERS ----------------------------
 
   void monero_wallet_light::init_common() {
     m_primary_address = m_account.get_public_address_str(static_cast<cryptonote::network_type>(m_network_type));
@@ -327,13 +346,33 @@ namespace monero {
       m_http_client->connect(m_timeout);
     }
 
+    if (m_admin_uri != "") {
+      std::string address = m_admin_uri;
+
+      if (m_admin_port != "") {
+        address = address + ":" + m_admin_port;
+      }
+
+      m_http_admin_client->set_server(address, boost::none);
+      m_http_client->connect(m_timeout);
+    }
+
   }
 
-  epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body) const {
-    epee::net_utils::http::http_response_info *response = nullptr;
+  // ------------------------------- PROTECTED LWS HELPERS ----------------------------
 
-    if (!m_http_client->invoke_post(method, body, m_timeout, &response)) {
-      throw std::runtime_error("Network error");
+  epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body, bool admin = false) const {
+    epee::net_utils::http::http_response_info *response = nullptr;
+    
+    if (admin) {
+      if (!m_http_admin_client->invoke_post(method, body, m_timeout, &response)) {
+        throw std::runtime_error("Network error");
+      }    
+    }
+    else {
+      if (!m_http_client->invoke_post(method, body, m_timeout, &response)) {
+        throw std::runtime_error("Network error");
+      }
     }
 
     return response;
@@ -416,4 +455,74 @@ namespace monero {
 
     return *monero_light_login_response::deserialize(response->m_body);
   }
+
+  // ------------------------------- PROTECTED LWS ADMIN HELPERS ----------------------------
+
+  void monero_wallet_light::accept_requests(monero_light_accept_requests_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/accept_requests", body, true);
+  }
+
+  void monero_wallet_light::reject_requests(monero_light_reject_requests_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/reject_requests", body, true);
+  }
+  
+  void monero_wallet_light::add_account(monero_light_add_account_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/add_account", body, true);
+  }
+  
+  monero_light_list_accounts_response monero_wallet_light::list_accounts(monero_light_list_accounts_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/list_accounts", body, true);
+
+    return *monero_light_list_accounts_response::deserialize(response->m_body);
+  }
+  
+  monero_light_list_requests_response monero_wallet_light::list_requests(monero_light_list_requests_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/list_requests", body, true);
+
+    return *monero_light_list_requests_response::deserialize(response->m_body);
+  }
+  
+  void monero_wallet_light::modify_account_status(monero_light_modify_account_status_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/modify_account_status", body, true);
+  }
+  
+  void monero_wallet_light::rescan(monero_light_rescan_request request) const {
+    rapidjson::Document document(rapidjson::Type::kObjectType);
+    rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
+
+    std::string body = req.GetString();
+
+    epee::net_utils::http::http_response_info *response = post("/rescan", body, true);
+  }
+
 }

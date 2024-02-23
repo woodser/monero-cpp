@@ -93,7 +93,8 @@ namespace monero {
      */
     bool is_view_only() const override { return true; }
     void set_daemon_connection(const boost::optional<monero_lws_connection>& connection);
-    void set_daemon_connection(std::string host, std::string port = "", std::string adminHost = "", std::string adminPort = "", std::string token = "");
+    void set_daemon_connection(const boost::optional<monero_lws_admin_connection>& connection);
+    void set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "");
     bool is_connected_to_daemon() const override;
     bool is_daemon_synced() const override;
     bool is_synced() const override;
@@ -116,6 +117,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
+    uint64_t wait_for_next_block() override;
     bool is_multisig_import_needed() const override { return false; }
     bool is_multisig() const override { return false; }
 
@@ -170,12 +172,18 @@ namespace monero {
     std::string m_prv_view_key;
     std::string m_primary_address;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
+    std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_admin_client;
     std::chrono::milliseconds m_timeout = std::chrono::milliseconds(120000);
     std::string m_host;
     std::string m_port;
+    std::string m_admin_uri;
+    std::string m_admin_port;
+    std::string m_token;
     uint64_t m_mixin = 4;
 
     void init_common();
+    
+    // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
 
     monero_light_get_address_info_response get_address_info(std::string address, std::string view_key) const { 
       monero_light_get_address_info_request request;
@@ -201,10 +209,7 @@ namespace monero {
       return get_random_outs(request);
     };
 
-    monero_light_get_unspent_outs_response get_unspent_outs(
-      std::string address, std::string view_key, std::string amount, uint32_t mixin,
-      bool use_dust, std::string dust_threshold
-    ) const {
+    monero_light_get_unspent_outs_response get_unspent_outs(std::string address, std::string view_key, std::string amount, uint32_t mixin, bool use_dust, std::string dust_threshold) const {
       monero_light_get_unspent_outs_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -230,10 +235,7 @@ namespace monero {
       return import_request(request);
     };
 
-    monero_light_login_response login(
-      std::string address, std::string view_key,
-      bool create_account, bool generated_locally
-    ) const {
+    monero_light_login_response login(std::string address, std::string view_key, bool create_account, bool generated_locally) const {
       monero_light_login_request request;
       request.m_address = address;
       request.m_view_key = view_key;
@@ -286,11 +288,15 @@ namespace monero {
     }
 
     void rescan() const {
-      return rescan(m_primary_address);
+      rescan(m_primary_address);
+    }
+
+    void rescan(uint64_t start_height) {
+      rescan(start_height, m_primary_address);
     }
 
     void rescan(std::string address) const {
-      return rescan(0, address);
+      rescan(0, address);
     }
 
     void rescan(uint64_t height, std::string address) const {
@@ -314,6 +320,8 @@ namespace monero {
     monero_light_import_request_response import_request(monero_light_import_request_request request) const;
     monero_light_login_response login(monero_light_login_request request) const;
 
+    // --------------------------------- LIGHT WALLET ADMIN METHODS ------------------------------------------
+
     void accept_requests(monero_light_accept_requests_request request) const;
     void reject_requests(monero_light_reject_requests_request request) const;
     void add_account(monero_light_add_account_request request) const;
@@ -322,7 +330,7 @@ namespace monero {
     void modify_account_status(monero_light_modify_account_status_request request) const;
     void rescan(monero_light_rescan_request request) const;
 
-    epee::net_utils::http::http_response_info* post(std::string method, std::string &body) const;
+    epee::net_utils::http::http_response_info* post(std::string method, std::string &body, bool admin = false) const;
 
   };
 }

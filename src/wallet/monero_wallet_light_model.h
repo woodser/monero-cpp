@@ -274,6 +274,7 @@ namespace monero {
     };
 
     struct monero_light_accept_requests_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         boost::optional<std::string> m_type;
         boost::optional<std::vector<std::string>> m_addresses;
 
@@ -281,6 +282,7 @@ namespace monero {
     };
 
     struct monero_light_add_account_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         boost::optional<std::string> m_address;
         boost::optional<std::string> m_key;
 
@@ -288,6 +290,7 @@ namespace monero {
     };
 
     struct monero_light_list_accounts_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     };
 
@@ -304,18 +307,20 @@ namespace monero {
         boost::optional<std::vector<monero_light_account>> m_inactive;
         boost::optional<std::vector<monero_light_account>> m_hidden;
 
-        static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
+        static std::shared_ptr<monero_light_list_accounts_response> deserialize(const std::string& config_json);
     };
 
     struct monero_light_list_requests_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     };
 
     struct monero_light_list_requests_response {
-        static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
+        static std::shared_ptr<monero_light_list_requests_response> deserialize(const std::string& config_json);
     };
 
     struct monero_light_modify_account_status_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         boost::optional<std::string> m_status;
         boost::optional<std::vector<std::string>> m_addresses;
 
@@ -324,6 +329,7 @@ namespace monero {
     };
 
     struct monero_light_reject_requests_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         boost::optional<std::string> m_type;
         boost::optional<std::vector<std::string>> m_addresses;
 
@@ -331,6 +337,7 @@ namespace monero {
     };
 
     struct monero_light_rescan_request : public serializable_struct {
+        boost::optional<std::string> m_token;
         boost::optional<uint64_t> m_height;
         boost::optional<std::vector<std::string>> m_addresses;
 
