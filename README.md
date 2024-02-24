@@ -158,7 +158,7 @@ delete wallet_random;
 
 ## Documentation
 
-* [API documentation](https://woodser.github.io/monero-cpp/annotated.html)
+* [API documentation](https://woodser.github.io/monero-cpp/doxygen/annotated.html)
 * [API and model overview with visual diagrams](https://woodser.github.io/monero-java/monero-spec.pdf)
 * [monero-ts documentation](https://github.com/woodser/monero-ts#documentation) provides additional documentation which translates to monero-cpp
 
