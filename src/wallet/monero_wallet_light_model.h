@@ -105,10 +105,34 @@ namespace monero {
         boost::optional<uint64_t> m_height;
 
         static std::shared_ptr<monero_light_output> deserialize(const std::string& config_json);
+        static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_output>& output);
     };
 
     struct monero_light_rates {
+        boost::optional<float> m_aud;
+        boost::optional<float> m_brl;
+        boost::optional<float> m_btc;
+        boost::optional<float> m_cad;
+        boost::optional<float> m_chf;
+        boost::optional<float> m_cny;
+        boost::optional<float> m_eur;
+        boost::optional<float> m_gbp;
+        boost::optional<float> m_hkd;
+        boost::optional<float> m_inr;
+        boost::optional<float> m_jpy;
+        boost::optional<float> m_krw;
+        boost::optional<float> m_mxn;
+        boost::optional<float> m_nok;
+        boost::optional<float> m_nzd;
+        boost::optional<float> m_sek;
+        boost::optional<float> m_sgd;
+        boost::optional<float> m_try;
+        boost::optional<float> m_usd;
+        boost::optional<float> m_rub;
+        boost::optional<float> m_zar;
+
         static std::shared_ptr<monero_light_rates> deserialize(const std::string& config_json);
+        static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_rates>& rates);
     };
 
     struct monero_light_spend {
@@ -119,6 +143,7 @@ namespace monero {
         boost::optional<uint32_t> m_mixin;
 
         static std::shared_ptr<monero_light_spend> deserialize(const std::string& config_json);
+        static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_spend>& spend);
     };
 
     struct monero_light_transaction {
@@ -136,6 +161,7 @@ namespace monero {
         boost::optional<uint32_t> m_mixin;
 
         static std::shared_ptr<monero_light_transaction> deserialize(const std::string& config_json);
+        static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_transaction>& transaction);
     };
 
     struct monero_light_random_output {
@@ -144,6 +170,7 @@ namespace monero {
         boost::optional<std::string> m_rct;
 
         static std::shared_ptr<monero_light_random_output> deserialize(const std::string& config_json);
+        static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_random_output>& random_output);
     };
 
     struct monero_light_random_outputs {
@@ -151,6 +178,7 @@ namespace monero {
         boost::optional<std::vector<monero_light_random_output>> m_outputs;
 
         static std::shared_ptr<monero_light_random_outputs> deserialize(const std::string& config_json);
+        
     };
 
     struct monero_light_get_address_info_request {
@@ -299,7 +327,8 @@ namespace monero {
         boost::optional<uint64_t> m_scan_height;
         boost::optional<uint64_t> m_access_time;
 
-        static std::shared_ptr<monero_light_submit_raw_tx_response> deserialize(const std::string& config_json);
+        static std::shared_ptr<monero_light_account> deserialize(const std::string& config_json);
+        static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_account>& account);
     };
 
     struct monero_light_list_accounts_response {

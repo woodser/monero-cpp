@@ -53,6 +53,7 @@
 #include "monero_wallet_light.h"
 
 #include "utils/monero_utils.h"
+#include <thread>
 #include <chrono>
 #include <iostream>
 #include "mnemonics/electrum-words.h"
@@ -194,13 +195,17 @@ namespace monero {
   monero_sync_result monero_wallet_light::sync() {
     rescan(0, m_primary_address);
 
-    // should wait until is scanned
+    while(!is_synced()) {
+      std::this_thread::sleep_for(std::chrono::seconds(120));
+    }
   }
 
   monero_sync_result monero_wallet_light::sync(uint64_t start_height) {
     rescan(start_height, m_primary_address);
 
-    // should wait until is scanned
+    while(!is_synced()) {
+      std::this_thread::sleep_for(std::chrono::seconds(120));
+    }
   }
 
   uint64_t monero_wallet_light::get_balance() const {
@@ -284,8 +289,6 @@ namespace monero {
       tx_wallet->m_payment_id = light_tx.m_payment_id;
       tx_wallet->m_in_tx_pool = light_tx.m_mempool;
       tx_wallet->m_is_miner_tx = light_tx.m_coinbase;
-      
-      // to do outputs
 
       txs.push_back(tx_wallet);
     }
@@ -303,6 +306,13 @@ namespace monero {
       output->m_account_index = 0;
       output->m_amount = light_output.m_amount;
       output->m_index = light_output.m_index;
+      output->m_amount = light_output.m_amount;
+      output->m_stealth_public_key = light_output.m_public_key;
+
+      output->m_tx = std::make_shared<monero_tx>();
+      output->m_tx->m_hash = light_output.m_tx_hash;
+      output->m_tx->m_key = light_output.m_tx_pub_key;
+      output->m_tx->m_rct_signatures = light_output.m_rct;
 
       outputs.push_back(output);
     }
@@ -311,15 +321,26 @@ namespace monero {
   }
 
   std::vector<std::string> monero_wallet_light::relay_txs(const std::vector<std::string>& tx_metadatas) {
-    for (std::string tx_metadata: tx_metadatas) {
+    for (std::string tx_metadata : tx_metadatas) {
       submit_raw_tx(tx_metadata);
     }
   }
 
   uint64_t monero_wallet_light::wait_for_next_block() {
-    uint64_t current_block = get_daemon_height();
-    // to do
-    return current_block + 1;
+    uint64_t last_block = get_daemon_height();
+        
+    while(true) {
+      uint64_t current_block = get_daemon_height();
+
+      if (current_block > last_block) {
+        last_block = current_block;
+        break;
+      }
+
+      std::this_thread::sleep_for(std::chrono::seconds(120));
+    }
+
+    return last_block;
   }
 
   void monero_wallet_light::close(bool save) {
