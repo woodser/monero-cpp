@@ -346,6 +346,14 @@ namespace monero {
   void monero_wallet_light::close(bool save) {
     if (save) throw std::runtime_error("MoneroWalletLight does not support saving");
     m_http_client->disconnect();
+    m_http_admin_client->disconnect();
+
+    epee::net_utils::http::abstract_http_client *release_client = m_http_client.release();
+    delete release_client;
+
+    epee::net_utils::http::abstract_http_client *release_admin_client = m_http_admin_client.release();
+    delete release_admin_client;
+
     // no pointers to destroy
   }
 
