@@ -151,7 +151,7 @@ include_directories(${HIDAPI_INCLUDE_DIR})
 #############
 
 set(MONERO_PROJECT_BUILD "${MONERO_PROJECT}/build/release" CACHE STRING "Monero project build directory")
-message(STATUS "Using monero-project build" : ${MONERO_PROJECT_BUILD})
+message(STATUS "Using monero-project build: " ${MONERO_PROJECT_BUILD})
 
 list(APPEND CMAKE_MODULE_PATH "${MONERO_PROJECT}/cmake")
 
@@ -175,10 +175,13 @@ add_library(epee STATIC IMPORTED)
 set_target_properties(epee PROPERTIES IMPORTED_LOCATION
     ${MONERO_PROJECT_BUILD}/contrib/epee/src/libepee.a)
 
+############
 # Unbound
+############
+
 find_package(Unbound)
 if(NOT UNBOUND_INCLUDE_DIR)
-  die("Could not find libunbound")
+  message(FATAL_ERROR "Could not find libunbound")
 else()
   message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
   if(UNBOUND_LIBRARIES)
@@ -191,7 +194,7 @@ else()
     endif()
     set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
   else()
-    die("Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
+    message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
   endif()
 endif()
 
@@ -323,7 +326,6 @@ if (BUILD_LIBRARY)
       randomx
       epee
       hardforks
-      cncrypto
       ${wallet_crypto}
       
       ${UNBOUND_LIBRARIES}
@@ -391,7 +393,6 @@ if (BUILD_SAMPLE)
       randomx
       epee
       hardforks
-      cncrypto
       ${wallet_crypto}
 
       ${UNBOUND_LIBRARIES}
@@ -442,7 +443,6 @@ if (BUILD_SCRATCHPAD)
       randomx
       epee
       hardforks
-      cncrypto
       ${wallet_crypto}
       
       ${UNBOUND_LIBRARIES}
@@ -493,7 +493,6 @@ if (BUILD_TESTS)
       randomx
       epee
       hardforks
-      cncrypto
       ${wallet_crypto}
       
       ${UNBOUND_LIBRARIES}
