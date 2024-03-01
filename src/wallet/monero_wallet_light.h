@@ -53,7 +53,6 @@
 #pragma once
 
 #include <vector>
-#include "daemon/monero_daemon_model.h"
 #include "utils/monero_utils.h"
 #include "monero_wallet.h"
 #include "wallet/wallet2.h"
