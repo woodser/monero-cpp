@@ -873,7 +873,7 @@ namespace monero {
     rapidjson::Value value_obj(rapidjson::kObjectType);
 
     if (m_token != boost::none) monero_utils::add_json_member("auth", m_token.get(), allocator, root, value_str);
-    if (m_addresses != boost::none) monero_utils::add_json_member("addresses", m_addresses.get(), allocator, parameters, value_str);
+    if (m_addresses != boost::none) parameters.AddMember("addresses", m_addresses.get(), allocator);
     if (m_status != boost::none) monero_utils::add_json_member("key", m_status.get(), allocator, parameters, value_str);
 
     root.AddMember("parameters", parameters, allocator);
