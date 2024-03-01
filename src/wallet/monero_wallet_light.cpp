@@ -1040,11 +1040,19 @@ namespace monero {
   }
 
   monero_sync_result monero_wallet_light::sync() {
+    monero_sync_result result;
+
     rescan(0, m_primary_address);
 
     while(!is_synced()) {
       std::this_thread::sleep_for(std::chrono::seconds(120));
     }
+
+    result.m_num_blocks_fetched = get_height();
+
+    // to do m_received_money
+
+    return result;
   }
 
   monero_sync_result monero_wallet_light::sync(uint64_t start_height) {
@@ -1053,6 +1061,13 @@ namespace monero {
     while(!is_synced()) {
       std::this_thread::sleep_for(std::chrono::seconds(120));
     }
+
+    monero_sync_result result;
+    uint64_t height = get_height();
+
+    result.m_num_blocks_fetched = (start_height > height) ? 0 : height - start_height;
+
+    return result;
   }
 
   uint64_t monero_wallet_light::get_balance() const {
@@ -1168,9 +1183,15 @@ namespace monero {
   }
 
   std::vector<std::string> monero_wallet_light::relay_txs(const std::vector<std::string>& tx_metadatas) {
+    std::vector<std::string> result = std::vector<std::string>();
+    
+    // to do: is possible to get tx hash from tx_metadatas?
+
     for (std::string tx_metadata : tx_metadatas) {
       submit_raw_tx(tx_metadata);
     }
+
+    return result;
   }
 
   uint64_t monero_wallet_light::wait_for_next_block() {
@@ -1237,8 +1258,8 @@ namespace monero {
 
   // ------------------------------- PROTECTED LWS HELPERS ----------------------------
 
-  epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body, bool admin) const {
-    epee::net_utils::http::http_response_info *response = nullptr;
+  const epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body, bool admin) const {
+    const epee::net_utils::http::http_response_info *response = nullptr;
     
     if (admin) {
       if (!m_http_admin_client->invoke_post(method, body, m_timeout, &response)) {

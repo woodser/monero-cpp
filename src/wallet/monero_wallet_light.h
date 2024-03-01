@@ -646,7 +646,7 @@ namespace monero {
     void modify_account_status(monero_light_modify_account_status_request request) const;
     void rescan(monero_light_rescan_request request) const;
 
-    epee::net_utils::http::http_response_info* post(std::string method, std::string &body, bool admin = false) const;
+    const epee::net_utils::http::http_response_info* post(std::string method, std::string &body, bool admin = false) const;
 
   };
 }
