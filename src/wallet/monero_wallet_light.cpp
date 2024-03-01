@@ -893,7 +893,7 @@ namespace monero {
     rapidjson::Value value_obj(rapidjson::kObjectType);
 
     if (m_token != boost::none) monero_utils::add_json_member("auth", m_token.get(), allocator, root, value_str);
-    if (m_addresses != boost::none) monero_utils::add_json_member("addresses", m_addresses.get(), allocator, parameters, value_str);
+    if (m_addresses != boost::none) parameters.AddMember("addresses", m_addresses.get(), allocator);
     if (m_type != boost::none) monero_utils::add_json_member("type", m_type.get(), allocator, parameters, value_str);
 
     root.AddMember("parameters", parameters, allocator);
@@ -913,7 +913,7 @@ namespace monero {
     rapidjson::Value value_obj(rapidjson::kObjectType);
 
     if (m_token != boost::none) monero_utils::add_json_member("auth", m_token.get(), allocator, root, value_str);
-    if (m_addresses != boost::none) monero_utils::add_json_member("addresses", m_addresses.get(), allocator, parameters, value_str);
+    if (m_addresses != boost::none) parameters.AddMember("addresses", m_addresses.get(), allocator);
     if (m_height != boost::none) monero_utils::add_json_member("height", m_height.get(), allocator, parameters, value_str);
 
     root.AddMember("parameters", parameters, allocator);
