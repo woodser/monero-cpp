@@ -50,8 +50,9 @@
  * Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
  */
 
+#pragma once
+
 #include <vector>
-#include "utils/monero_utils.h"
 #include "monero_wallet.h"
 #include "wallet/wallet2.h"
 #include "cryptonote_basic/account.h"
