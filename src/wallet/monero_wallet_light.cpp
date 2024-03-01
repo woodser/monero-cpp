@@ -94,19 +94,13 @@ namespace monero {
       throw std::out_of_range("String provided is not a valid u");
     }
 
-    try {
-      uint64_t uint64;
-      std::stol(str, &uint64);
-      return uint64 == str.size();
-    } 
-    catch (const std::invalid_argument&) {
-      // if no conversion could be performed.
-      return false;   
-    } 
-    catch (const std::out_of_range&) {
-      //  if the converted value would fall out of the range of the result type.
-      return false;
-    }
+    uint64_t value;
+    
+    std::istringstream itr(str);
+
+    itr >> value;
+
+    return value;
   }
 
   std::shared_ptr<monero_light_output> monero_light_output::deserialize(const std::string& config_json) {
