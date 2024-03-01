@@ -1282,7 +1282,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/get_address_info", body);
+    const epee::net_utils::http::http_response_info *response = post("/get_address_info", body);
 
     return *monero_light_get_address_info_response::deserialize(response->m_body);
   }
@@ -1293,7 +1293,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/get_address_txs", body);
+    const epee::net_utils::http::http_response_info *response = post("/get_address_txs", body);
 
     return *monero_light_get_address_txs_response::deserialize(response->m_body);
   }
@@ -1304,7 +1304,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/get_random_outs", body);
+    const epee::net_utils::http::http_response_info *response = post("/get_random_outs", body);
 
     return *monero_light_get_random_outs_response::deserialize(response->m_body);
   }
@@ -1315,7 +1315,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/get_unspent_outs", body);
+    const epee::net_utils::http::http_response_info *response = post("/get_unspent_outs", body);
 
     return *monero_light_get_unspent_outs_response::deserialize(response->m_body);
   }
@@ -1326,7 +1326,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/import_request", body);
+    const epee::net_utils::http::http_response_info *response = post("/import_request", body);
 
     return *monero_light_import_request_response::deserialize(response->m_body);
   }
@@ -1337,7 +1337,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/submit_raw_tx", body);
+    const epee::net_utils::http::http_response_info *response = post("/submit_raw_tx", body);
 
     return *monero_light_submit_raw_tx_response::deserialize(response->m_body);
   }
@@ -1348,7 +1348,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/login", body);
+    const epee::net_utils::http::http_response_info *response = post("/login", body);
 
     return *monero_light_login_response::deserialize(response->m_body);
   }
@@ -1361,7 +1361,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/accept_requests", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/accept_requests", body, true);
   }
 
   void monero_wallet_light::reject_requests(monero_light_reject_requests_request request) const {
@@ -1370,7 +1370,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/reject_requests", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/reject_requests", body, true);
   }
   
   void monero_wallet_light::add_account(monero_light_add_account_request request) const {
@@ -1379,7 +1379,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/add_account", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/add_account", body, true);
   }
   
   monero_light_list_accounts_response monero_wallet_light::list_accounts(monero_light_list_accounts_request request) const {
@@ -1388,7 +1388,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/list_accounts", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/list_accounts", body, true);
 
     return *monero_light_list_accounts_response::deserialize(response->m_body);
   }
@@ -1399,7 +1399,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/list_requests", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/list_requests", body, true);
 
     return *monero_light_list_requests_response::deserialize(response->m_body);
   }
@@ -1410,7 +1410,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/modify_account_status", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/modify_account_status", body, true);
   }
   
   void monero_wallet_light::rescan(monero_light_rescan_request request) const {
@@ -1419,7 +1419,7 @@ namespace monero {
 
     std::string body = req.GetString();
 
-    epee::net_utils::http::http_response_info *response = post("/rescan", body, true);
+    const epee::net_utils::http::http_response_info *response = post("/rescan", body, true);
   }
 
 }
