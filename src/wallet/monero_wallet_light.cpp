@@ -958,8 +958,8 @@ namespace monero {
 
     // initialize remaining wallet
     wallet->m_network_type = config_normalized.m_network_type.get();
-    wallet->m_http_client = http_client_factory->create();
-    wallet->m_http_admin_client = http_client_factory->create();
+    wallet->m_http_client = http_client_factory != nullptr ? http_client_factory->create() : net::http::client_factory().create();
+    wallet->m_http_admin_client = http_client_factory != nullptr ? http_client_factory->create() : net::http::client_factory().create();
     wallet->init_common();
 
     return wallet;
@@ -986,7 +986,7 @@ namespace monero {
       );
   }
 
-  void monero_wallet_light::set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "") {
+  void monero_wallet_light::set_daemon_connection(std::string host, std::string port, std::string admin_uri, std::string admin_port, std::string token) {
     m_host = host;
     m_port = port;
     m_admin_uri = admin_uri;
@@ -1237,7 +1237,7 @@ namespace monero {
 
   // ------------------------------- PROTECTED LWS HELPERS ----------------------------
 
-  epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body, bool admin = false) const {
+  epee::net_utils::http::http_response_info* monero_wallet_light::post(std::string method, std::string &body, bool admin) const {
     epee::net_utils::http::http_response_info *response = nullptr;
     
     if (admin) {
