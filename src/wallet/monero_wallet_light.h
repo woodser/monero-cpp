@@ -66,6 +66,11 @@ using namespace monero;
  */
 namespace monero {
 
+  struct monero_wallet_light_utils {
+    static bool is_uint64_t(const std::string& str);
+    static uint64_t uint64_t_cast(const std::string& str);
+  };
+
   /**
    * Models a connection to a light wallet server.
    */

@@ -73,6 +73,42 @@ using namespace crypto;
  */
 namespace monero {
 
+  bool monero_wallet_light_utils::is_uint64_t(const std::string& str) {
+    try {
+      uint64_t sz;
+      std::stol(str, &sz);
+      return sz == str.size();
+    } 
+    catch (const std::invalid_argument&) {
+      // if no conversion could be performed.
+      return false;   
+    } 
+    catch (const std::out_of_range&) {
+      //  if the converted value would fall out of the range of the result type.
+      return false;
+    }
+  }
+
+  uint64_t monero_wallet_light_utils::uint64_t_cast(const std::string& str) {
+    if (!is_uint64_t(str)) {
+      throw std::out_of_range("String provided is not a valid u");
+    }
+
+    try {
+      uint64_t uint64;
+      std::stol(str, &uint64);
+      return uint64 == str.size();
+    } 
+    catch (const std::invalid_argument&) {
+      // if no conversion could be performed.
+      return false;   
+    } 
+    catch (const std::out_of_range&) {
+      //  if the converted value would fall out of the range of the result type.
+      return false;
+    }
+  }
+
   std::shared_ptr<monero_light_output> monero_light_output::deserialize(const std::string& config_json) {
     // deserialize monero output json to property node
     std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
