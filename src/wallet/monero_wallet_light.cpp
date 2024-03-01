@@ -1205,9 +1205,8 @@ namespace monero {
     for(monero_light_output light_output : response.m_outputs.get()) {
       std::shared_ptr<monero_output_wallet> output = std::shared_ptr<monero_output_wallet>();
       output->m_account_index = 0;
-      output->m_amount = light_output.m_amount;
       output->m_index = light_output.m_index;
-      output->m_amount = light_output.m_amount;
+      output->m_amount = monero_wallet_light_utils::uint64_t_cast(light_output.m_amount.get());
       output->m_stealth_public_key = light_output.m_public_key;
 
       output->m_tx = std::make_shared<monero_tx>();
