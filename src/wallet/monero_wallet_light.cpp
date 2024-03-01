@@ -130,7 +130,7 @@ namespace monero {
         else if (key == std::string("tx_prefix_hash")) output->m_tx_prefix_hash = it->second.data();
         else if (key == std::string("public_key")) output->m_public_key = it->second.data();
         else if (key == std::string("tx_pub_key")) output->m_tx_pub_key = it->second.data();
-        else if (key == std::string("spend_key_images")) output->m_spend_key_images = it->second.get_value<std::vector<std::string>>();
+        else if (key == std::string("spend_key_images")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) output->m_spend_key_images.get().push_back(it2->second.data());
         else if (key == std::string("timestamp")) output->m_timestamp = it->second.data();
         else if (key == std::string("height")) output->m_height = it->second.get_value<uint64_t>();
     }
@@ -593,7 +593,7 @@ namespace monero {
         else if (key == std::string("tx_prefix_hash")) output->m_tx_prefix_hash = it->second.data();
         else if (key == std::string("public_key")) output->m_public_key = it->second.data();
         else if (key == std::string("tx_pub_key")) output->m_tx_pub_key = it->second.data();
-        else if (key == std::string("spend_key_images")) output->m_spend_key_images = it->second.get_value<std::vector<std::string>>();
+        else if (key == std::string("spend_key_images")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) output->m_spend_key_images.get().push_back(it2->second.data());
         else if (key == std::string("timestamp")) output->m_timestamp = it->second.data();
         else if (key == std::string("height")) output->m_height = it->second.get_value<uint64_t>();
     }
