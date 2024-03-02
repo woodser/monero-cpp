@@ -52,7 +52,6 @@
 
 #include "monero_wallet_light.h"
 
-#include "utils/gen_utils.h"
 #include "utils/monero_utils.h"
 #include <thread>
 #include <chrono>
@@ -102,6 +101,41 @@ namespace monero {
 
     return value;
   }
+
+  std::string monero_wallet_light_utils::tx_hex_to_hash(std::string hex) {
+    cryptonote::blobdata blob;
+    if (!epee::string_tools::parse_hexstr_to_binbuff(hex, blob))
+    {
+      throw std::runtime_error("Failed to parse hex.");
+    }
+
+    bool loaded = false;
+    tools::wallet2::pending_tx ptx;
+
+    try
+    {
+      binary_archive<false> ar{epee::strspan<std::uint8_t>(blob)};
+      if (::serialization::serialize(ar, ptx))
+        loaded = true;
+    }
+    catch(...) {}
+
+    if (!loaded)
+    {
+      try
+      {
+        std::istringstream iss(blob);
+        boost::archive::portable_binary_iarchive ar(iss);
+        ar >> ptx;
+      }
+      catch (...) {
+        throw std::runtime_error("Failed to parse tx metadata.");
+      }
+    }
+
+    return epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx));
+  }
+
 
   std::shared_ptr<monero_light_output> monero_light_output::deserialize(const std::string& config_json) {
     // deserialize monero output json to property node
@@ -222,7 +256,7 @@ namespace monero {
                 transaction->m_spent_outputs->push_back(*spend);
             }
         }
-        else if (key == std::string("payemnt_id")) transaction->m_payment_id = it->second.data();
+        else if (key == std::string("payment_id")) transaction->m_payment_id = it->second.data();
         else if (key == std::string("coinbase")) transaction->m_coinbase = it->second.get_value<bool>();
         else if (key == std::string("mempool")) transaction->m_mempool = it->second.get_value<bool>();
         else if (key == std::string("mixin")) transaction->m_height = it->second.get_value<uint32_t>();
@@ -419,7 +453,7 @@ namespace monero {
         else if (key == std::string("payment_id")) import_request->m_payment_id = it->second.data();
         else if (key == std::string("import_fee")) import_request->m_import_fee = it->second.data();
         else if (key == std::string("new_request")) import_request->m_new_request = it->second.get_value<bool>();
-        else if (key == std::string("request_fullfilled")) import_request->m_request_fullfilled = it->second.get_value<bool>();
+        else if (key == std::string("request_fulfilled")) import_request->m_request_fullfilled = it->second.get_value<bool>();
         else if (key == std::string("status")) import_request->m_status = it->second.data();
     }
 
@@ -539,7 +573,17 @@ namespace monero {
     
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
         std::string key = it->first;
-
+        
+        if (key == std::string("create")) {
+          std::shared_ptr<monero_light_create_account_request> request;
+          monero_light_create_account_request::from_property_tree(it->second, request);
+          requests->m_create->push_back(*request);
+        }
+        else if (key == std::string("import")) {
+          std::shared_ptr<monero_light_import_account_request> request;
+          monero_light_import_account_request::from_property_tree(it->second, request);
+          requests->m_import->push_back(*request);
+        }
     }
 
     return requests;
@@ -655,7 +699,7 @@ namespace monero {
                 transaction->m_spent_outputs->push_back(*spend);
             }
         }
-        else if (key == std::string("payemnt_id")) transaction->m_payment_id = it->second.data();
+        else if (key == std::string("payment_id")) transaction->m_payment_id = it->second.data();
         else if (key == std::string("coinbase")) transaction->m_coinbase = it->second.get_value<bool>();
         else if (key == std::string("mempool")) transaction->m_mempool = it->second.get_value<bool>();
         else if (key == std::string("mixin")) transaction->m_height = it->second.get_value<uint32_t>();
@@ -678,6 +722,21 @@ namespace monero {
         if (key == std::string("address")) account->m_address = it->second.data();
         else if (key == std::string("scan_height")) account->m_scan_height = it->second.get_value<uint64_t>();
         else if (key == std::string("access_time")) account->m_access_time = it->second.get_value<uint64_t>();
+    }
+  }
+
+  void monero_light_create_account_request::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_create_account_request>& request) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+        std::string key = it->first;
+        if (key == std::string("address")) request->m_address = it->second.data();
+        else if (key == std::string("start_height")) request->m_start_height = it->second.get_value<uint64_t>();
+    }
+  }
+
+  void monero_light_import_account_request::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_import_account_request>& request) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+        std::string key = it->first;
+        if (key == std::string("address")) request->m_address = it->second.data();
     }
   }
 
@@ -1082,8 +1141,9 @@ namespace monero {
     }
 
     result.m_num_blocks_fetched = get_height();
-
-    // to do m_received_money
+    monero_light_get_address_info_response address_info = get_address_info();
+    uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(address_info.m_total_received.get());
+    result.m_received_money = total_received > 0;
 
     return result;
   }
@@ -1168,7 +1228,7 @@ namespace monero {
         tx_wallet->m_is_outgoing = true;
         tx_wallet->m_is_incoming = false;
         tx_wallet->m_change_amount = total_sent;
-      } else if (light_tx.m_coinbase.get() == true) {
+      } else if (light_tx.m_coinbase.get()) {
         tx_wallet->m_is_incoming = true;
         tx_wallet->m_is_outgoing = false;
         tx_wallet->m_change_amount = total_received;
@@ -1217,10 +1277,17 @@ namespace monero {
   std::vector<std::string> monero_wallet_light::relay_txs(const std::vector<std::string>& tx_metadatas) {
     std::vector<std::string> result = std::vector<std::string>();
     
-    // to do: is possible to get tx hash from tx_metadatas?
-
     for (std::string tx_metadata : tx_metadatas) {
-      submit_raw_tx(tx_metadata);
+      monero_light_submit_raw_tx_response response = submit_raw_tx(tx_metadata);
+
+      std::string status = response.m_status.get();
+
+      if (status != std::string("success")) {
+        throw std::runtime_error("Invalid tx metadata.");
+      }
+
+      std::string tx_hash = monero_wallet_light_utils::tx_hex_to_hash(tx_metadata);
+      result.push_back(tx_hash);
     }
 
     return result;
