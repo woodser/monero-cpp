@@ -243,6 +243,7 @@ namespace monero {
         else if (key == std::string("timestamp")) transaction->m_timestamp = it->second.data();
         else if (key == std::string("total_received")) transaction->m_total_received = it->second.data();
         else if (key == std::string("total_sent")) transaction->m_total_sent = it->second.data();
+        else if (key == std::string("fee")) transaction->m_fee = it->second.data();
         else if (key == std::string("unlock_time")) transaction->m_unlock_time = it->second.get_value<uint64_t>();
         else if (key == std::string("height")) transaction->m_height = it->second.get_value<uint64_t>();
         else if (key == std::string("spent_outputs")) {
@@ -686,6 +687,7 @@ namespace monero {
         else if (key == std::string("timestamp")) transaction->m_timestamp = it->second.data();
         else if (key == std::string("total_received")) transaction->m_total_received = it->second.data();
         else if (key == std::string("total_sent")) transaction->m_total_sent = it->second.data();
+        else if (key == std::string("fee")) transaction->m_fee = it->second.data();
         else if (key == std::string("unlock_time")) transaction->m_unlock_time = it->second.get_value<uint64_t>();
         else if (key == std::string("height")) transaction->m_height = it->second.get_value<uint64_t>();
         else if (key == std::string("spent_outputs")) {
@@ -1227,6 +1229,7 @@ namespace monero {
       } else if (total_received == 0 && total_sent > 0) {
         tx_wallet->m_is_outgoing = true;
         tx_wallet->m_is_incoming = false;
+        
         tx_wallet->m_change_amount = total_sent;
       } else if (light_tx.m_coinbase.get()) {
         tx_wallet->m_is_incoming = true;
@@ -1244,7 +1247,13 @@ namespace monero {
       tx_wallet->m_payment_id = light_tx.m_payment_id;
       tx_wallet->m_in_tx_pool = light_tx.m_mempool;
       tx_wallet->m_is_miner_tx = light_tx.m_coinbase;
-
+      tx_wallet->m_is_locked = light_tx.m_unlock_time.get() == 0;
+      uint64_t num_confirmations = response.m_blockchain_height.get() - light_tx.m_height.get();
+      tx_wallet->m_num_confirmations = num_confirmations;
+      tx_wallet->m_is_confirmed = num_confirmations > 0;
+      tx_wallet->m_fee = monero_wallet_light_utils::uint64_t_cast(light_tx.m_fee.get());
+      tx_wallet->m_is_failed = false;
+      
       txs.push_back(tx_wallet);
     }
 

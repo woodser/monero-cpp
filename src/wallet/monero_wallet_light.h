@@ -163,6 +163,7 @@ namespace monero {
     boost::optional<std::string> m_timestamp;
     boost::optional<std::string> m_total_received;
     boost::optional<std::string> m_total_sent;
+    boost::optional<std::string> m_fee;
     boost::optional<uint64_t> m_unlock_time;
     boost::optional<uint64_t> m_height;
     boost::optional<std::vector<monero_light_spend>> m_spent_outputs;
