@@ -1271,7 +1271,7 @@ namespace monero {
       output->m_index = light_output.m_index;
       output->m_amount = monero_wallet_light_utils::uint64_t_cast(light_output.m_amount.get());
       output->m_stealth_public_key = light_output.m_public_key;
-
+      
       output->m_tx = std::make_shared<monero_tx>();
       output->m_tx->m_hash = light_output.m_tx_hash;
       output->m_tx->m_key = light_output.m_tx_pub_key;
