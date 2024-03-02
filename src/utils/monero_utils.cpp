@@ -124,6 +124,64 @@ bool monero_utils::is_valid_private_spend_key(const std::string& private_spend_k
   }
 }
 
+bool monero_utils::generate_key_image(
+  const crypto::public_key& account_pub_spend_key, 
+  const crypto::secret_key& account_sec_spend_key, 
+  const crypto::secret_key& account_sec_view_key,
+  const crypto::public_key& tx_public_key,
+  uint64_t out_index,
+  crypto::key_image &key_image) {
+    key_image = {};
+    //
+    bool r = false;
+    //
+    // "Subaddresses aren't supported in mymonero/openmonero yet. Roll out the original scheme:
+    //   compute D = a*R
+    //   compute P = Hs(D || i)*G + B
+    //   compute x = Hs(D || i) + b      (and check if P==x*G)
+    //   compute I = x*Hp(P)"
+    crypto::key_derivation derivation;
+    r = crypto::generate_key_derivation(tx_public_key, account_sec_view_key, derivation);
+    if (!r) {
+      //retVals.did_error = true;
+      //std::ostringstream ss{};
+      //ss << "failed to generate_key_derivation(" << tx_public_key << ", " << account_sec_view_key << ")";
+      //retVals.err_string = ss.str();
+      //
+      return false;
+    }
+    cryptonote::keypair in_ephemeral;
+    r = crypto::derive_public_key(derivation, out_index, account_pub_spend_key, in_ephemeral.pub);
+    if (!r) {
+      //retVals.did_error = true;
+      //std::ostringstream ss{};
+      //ss << "failed to derive_public_key (" << derivation << ", " << out_index << ", " << account_pub_spend_key << ")";
+      //retVals.err_string = ss.str();
+      //
+      return false;
+    }
+    crypto::derive_secret_key(derivation, out_index, account_sec_spend_key, in_ephemeral.sec);
+    crypto::public_key out_pkey_test;
+    r = crypto::secret_key_to_public_key(in_ephemeral.sec, out_pkey_test);
+    if (!r) {
+      //retVals.did_error = true;
+      //std::ostringstream ss{};
+      //ss << "failed to secret_key_to_public_key(" << in_ephemeral.sec << ")";
+      //retVals.err_string = ss.str();
+      //
+      return false;
+    }
+    if (in_ephemeral.pub != out_pkey_test) {
+      //retVals.did_error = true;
+      //retVals.err_string = "derived secret key doesn't match derived public key";
+      //
+      return false;
+    }
+    crypto::generate_key_image(in_ephemeral.pub, in_ephemeral.sec, key_image);
+    //
+    return true;
+  }
+
 void monero_utils::validate_address(const std::string& address, monero_network_type network_type) {
   cryptonote::address_parse_info info;
   if (!get_account_address_from_str(info, static_cast<cryptonote::network_type>(network_type), address)) throw std::runtime_error("Invalid address");
