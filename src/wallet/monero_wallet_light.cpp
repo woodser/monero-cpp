@@ -1049,7 +1049,7 @@ namespace monero {
     if (!src->m_spent_outputs.get().empty()) {
       tgt->m_spent_outputs = std::vector<monero_light_spend>();
       for (const monero_light_spend& spent_output : src->m_spent_outputs.get()) {
-        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output->copy(std::make_shared<monero_light_spend>(spent_output), std::make_shared<monero_light_spend>());
+        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output.copy(std::make_shared<monero_light_spend>(spent_output), std::make_shared<monero_light_spend>());
         tgt->m_spent_outputs.get().push_back(*spent_output_copy);
       }
     }
@@ -1206,7 +1206,7 @@ namespace monero {
       m_transactions = std::vector<monero_light_transaction>();
 
       for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
-        monero_light_transaction transaction = raw_transaction.copy(raw_transaction, std::make_shared<monero_light_transaction>(),true);
+        monero_light_transaction transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
 
         for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
           std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
