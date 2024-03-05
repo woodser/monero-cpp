@@ -155,6 +155,8 @@ namespace monero {
 
     static std::shared_ptr<monero_light_spend> deserialize(const std::string& config_json);
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_spend>& spend);
+    std::shared_ptr<monero_light_spend> copy(const std::shared_ptr<monero_light_spend>& src, const std::shared_ptr<monero_light_spend>& tgt) const;
+
   };
 
   struct monero_light_transaction {
@@ -174,6 +176,7 @@ namespace monero {
 
     static std::shared_ptr<monero_light_transaction> deserialize(const std::string& config_json);
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_light_transaction>& transaction);
+    std::shared_ptr<monero_light_transaction> copy(const std::shared_ptr<monero_light_transaction>& src, const std::shared_ptr<monero_light_transaction>& tgt, bool exclude_spend = false) const;
   };
 
   struct monero_light_random_output {

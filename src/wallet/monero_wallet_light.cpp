@@ -1013,6 +1013,57 @@ namespace monero {
     return root;
   }
 
+  std::shared_ptr<monero_light_spend> monero_light_spend::copy(const std::shared_ptr<monero_light_spend>& src, const std::shared_ptr<monero_light_spend>& tgt) const {
+    if (this != src.get()) throw std::runtime_error("this spend != src");
+
+    // copy base class
+    monero_tx::copy(std::static_pointer_cast<monero_tx>(src), std::static_pointer_cast<monero_tx>(tgt));
+
+    // copy wallet extensions
+    tgt->m_amount = src->m_amount;
+    tgt->m_key_image = src->m_key_image;
+    tgt->m_tx_pub_key = src->m_tx_pub_key;
+    tgt->m_out_index = src->m_out_index;
+    tgt->m_mixin = src->m_mixin;
+
+    return tgt;
+  }
+
+  std::shared_ptr<monero_light_transaction> monero_light_transaction::copy(const std::shared_ptr<monero_light_transaction>& src, const std::shared_ptr<monero_light_transaction>& tgt, boolean exclude_spend) const {
+    if (this != src.get()) throw std::runtime_error("this light_tx != src");
+
+    // copy base class
+    monero_tx::copy(std::static_pointer_cast<monero_tx>(src), std::static_pointer_cast<monero_tx>(tgt));
+
+    // copy wallet extensions
+    tgt->m_id = src->m_id;
+    tgt->m_hash = src->m_hash;
+    tgt->m_timestamp = src->m_timestamp;
+    tgt->m_total_received = src->m_total_received;
+    tgt->m_total_sent = src->m_total_sent;
+    tgt->m_fee = src->m_fee;
+    tgt->m_unlock_time = src->m_unlock_time;
+    tgt->m_height = src->m_height;
+    tgt->m_payment_id = src->m_payment_id;
+    tgt->m_coinbase = src->m_coinbase;
+    tgt->m_mempool = src->m_mempool;
+    tgt->m_mixin = src->m_mixin;
+
+    if (exclude_spend) {
+      return tgt;
+    }
+
+    if (!src->m_spent_outputs.empty()) {
+      tgt->m_spent_outputs = std::vector<std::shared_ptr<monero_light_spend>>();
+      for (const monero_light_spend& spent_output : src->m_spent_outputs.get()) {
+        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output->copy(spent_output, std::make_shared<monero_light_spend>());
+        tgt->m_spent_outputs.push_back(*transfer_copy);
+      }
+    }
+
+    return tgt;
+  }
+
   // ---------------------------- WALLET MANAGEMENT ---------------------------
 
   monero_wallet_light* monero_wallet_light::create_wallet_from_keys(const monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory) {
@@ -1162,7 +1213,7 @@ namespace monero {
       m_transactions = std::vector<monero_light_transaction>();
 
       for (monero_light_transaction raw_transaction : m_raw_transactions) {
-        monero_light_transaction transaction;
+        monero_light_transaction transaction = raw_transaction.copy(raw_transaction, std::make_shared<monero_light_transaction>(),true);
 
         for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
           std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
