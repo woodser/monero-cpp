@@ -1165,10 +1165,14 @@ namespace monero {
         monero_light_transaction transaction;
 
         for(monero_light_output spent_output : raw_transaction.m_spent_outputs.get()) {
-          std::string key_image = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
+          std::string key_image = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_index.get());
+          std::vector<std::string> possible_key_images = spent_output.m_spend_key_images.get();
 
-          if (key_image == spent_output.m_key_image.get()) {
-            transaction.m_spent_outputs.push_back(spent_output);
+          for(std::string possible_key_image : possible_key_images) {
+            if (key_image == possible_key_image) {
+              transaction.m_spent_outputs.get().push_back(spent_output);
+              break;
+            }
           }
         }
 
@@ -1339,6 +1343,7 @@ namespace monero {
   void monero_wallet_light::init_common() {
     m_primary_address = m_account.get_public_address_str(static_cast<cryptonote::network_type>(m_network_type));
     const cryptonote::account_keys& keys = m_account.get_keys();
+    m_pub_spend_key = epee::string_tools::pod_to_hex(keys.m_account_address.m_spend_public_key);
     m_prv_view_key = epee::string_tools::pod_to_hex(keys.m_view_secret_key);
     m_prv_spend_key = epee::string_tools::pod_to_hex(keys.m_spend_secret_key);
     if (m_prv_spend_key == "0000000000000000000000000000000000000000000000000000000000000000") m_prv_spend_key = "";
@@ -1374,21 +1379,21 @@ namespace monero {
    uint64_t total_pending_received = 0;
    uint64_t total_pending_sent = 0;
    uint64_t total_locked_received = 0;
-   uint64_t total_locked_sent 0 0;
+   uint64_t total_locked_sent = 0;
 
    for (monero_light_transaction transaction : m_transactions) {
     if (transaction.m_mempool != boost::none && transaction.m_mempool.get()) {
-      total_pending_sent += monero_utils::uint64_t_cast(transaction.m_total_sent.get());
-      total_pending_received += monero_utils::uint64_t_cast(transaction.m_total_received.get());
+      total_pending_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
+      total_pending_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
     } else {
       // transaction has confirmations
       if (transaction.m_confirmations.get() < 10) {
-        total_locked_sent += monero_utils::uint64_t_cast(transaction.m_total_sent.get());
-        total_locked_received += monero_utils::uint64_t_cast(transaction.m_total_received.get());
+        total_locked_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
+        total_locked_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
       }
 
-      total_received += monero_utils::uint64_t_cast(transaction.m_total_received.get());
-      total_sent += monero_utils::uint64_t_cast(transaction.m_total_sent.get());
+      total_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
+      total_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
     }
    }
 
@@ -1398,8 +1403,40 @@ namespace monero {
   }
 
   std::string monero_wallet_light::generate_key_image(std::string tx_public_key, uint64_t output_index) {
-    return monero_utils::generate_key_image();
-    //return std::string("");
+    crypto::secret_key sec_view_key{};
+    crypto::secret_key sec_spend_key{};
+    crypto::public_key pub_spend_key{};
+    crypto::public_key tx_pub_key{};
+    bool r = false;
+
+    r = epee::string_tools::hex_to_pod(m_prv_view_key, sec_view_key);
+    if (!r) {
+      throw std::runtime_error("Invalid secret view key");
+    }
+
+    r = epee::string_tools::hex_to_pod(m_prv_spend_key, sec_spend_key);
+    if (!r) {
+      throw std::runtime_error("Invalid secret spend key");
+    }
+
+    r = epee::string_tools::hex_to_pod(m_pub_spend_key, pub_spend_key);
+    if (!r) {
+      throw std::runtime_error("Invalid public spend key");
+    }
+
+    r = epee::string_tools::hex_to_pod(tx_public_key, tx_pub_key);
+    if (!r) {
+      throw std::runtime_error("Invalid tx pub key");
+    }
+
+    crypto::key_image key_image;
+    
+    r = monero_wallet_light_utils::generate_key_image(pub_spend_key, sec_spend_key, sec_view_key, tx_pub_key, output_index, key_image);    
+    if (!r) {
+      throw std::runtime_error("Error while generating key image");
+    }
+    
+    return epee::string_tools::pod_to_hex(key_image);
   }
 
   // ------------------------------- PROTECTED LWS HELPERS ----------------------------

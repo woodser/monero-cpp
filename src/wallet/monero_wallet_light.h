@@ -440,7 +440,7 @@ namespace monero {
     std::string get_private_view_key() const override { return m_prv_view_key; }
     std::string get_primary_address() const override { return m_primary_address; }
     uint64_t get_height() const override { return m_scanned_block_height; };
-    uint64_t get_restore_height() const override { return m_start_height };
+    uint64_t get_restore_height() const override { return m_start_height; };
     void set_restore_height(uint64_t restore_height) override;
     uint64_t get_daemon_height() const override { return m_blockchain_height; };
     monero_sync_result sync() override;
@@ -506,8 +506,11 @@ namespace monero {
     cryptonote::account_base m_account;
     monero_network_type m_network_type;
     bool m_is_view_only;
+    std::string m_seed;
+    std::string m_language;
     std::string m_prv_spend_key;
     std::string m_prv_view_key;
+    std::string m_pub_spend_key;
     std::string m_primary_address;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_admin_client;
