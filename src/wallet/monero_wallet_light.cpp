@@ -1015,10 +1015,6 @@ namespace monero {
 
   std::shared_ptr<monero_light_spend> monero_light_spend::copy(const std::shared_ptr<monero_light_spend>& src, const std::shared_ptr<monero_light_spend>& tgt) const {
     if (this != src.get()) throw std::runtime_error("this spend != src");
-
-    // copy base class
-    monero_tx::copy(std::static_pointer_cast<monero_tx>(src), std::static_pointer_cast<monero_tx>(tgt));
-
     // copy wallet extensions
     tgt->m_amount = src->m_amount;
     tgt->m_key_image = src->m_key_image;
@@ -1029,11 +1025,8 @@ namespace monero {
     return tgt;
   }
 
-  std::shared_ptr<monero_light_transaction> monero_light_transaction::copy(const std::shared_ptr<monero_light_transaction>& src, const std::shared_ptr<monero_light_transaction>& tgt, boolean exclude_spend) const {
+  std::shared_ptr<monero_light_transaction> monero_light_transaction::copy(const std::shared_ptr<monero_light_transaction>& src, const std::shared_ptr<monero_light_transaction>& tgt, bool exclude_spend) const {
     if (this != src.get()) throw std::runtime_error("this light_tx != src");
-
-    // copy base class
-    monero_tx::copy(std::static_pointer_cast<monero_tx>(src), std::static_pointer_cast<monero_tx>(tgt));
 
     // copy wallet extensions
     tgt->m_id = src->m_id;
