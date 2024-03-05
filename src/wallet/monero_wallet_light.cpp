@@ -1165,7 +1165,7 @@ namespace monero {
         monero_light_transaction transaction;
 
         for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
-          std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_index.get());
+          std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
           if (key_img == spent_output.m_key_image.get()) {
             transaction.m_spent_outputs.get().push_back(spent_output);
             break;
@@ -1383,7 +1383,7 @@ namespace monero {
       total_pending_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
     } else {
       // transaction has confirmations
-      uint64_t tx_confirmations = m_scanned_height - transaction.m_height.get();
+      uint64_t tx_confirmations = m_scanned_block_height - transaction.m_height.get();
       if (tx_confirmations < 10) {
         total_locked_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
         total_locked_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
