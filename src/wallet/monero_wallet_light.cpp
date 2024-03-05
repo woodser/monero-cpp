@@ -1047,9 +1047,9 @@ namespace monero {
     }
 
     if (!src->m_spent_outputs.get().empty()) {
-      tgt->m_spent_outputs = std::vector<<monero_light_spend>();
+      tgt->m_spent_outputs = std::vector<monero_light_spend>();
       for (const monero_light_spend& spent_output : src->m_spent_outputs.get()) {
-        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output->copy(spent_output, std::make_shared<monero_light_spend>());
+        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output->copy(std::make_shared<monero_light_spend>(spent_output), std::make_shared<monero_light_spend>());
         tgt->m_spent_outputs.get().push_back(*spent_output_copy);
       }
     }
