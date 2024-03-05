@@ -1206,17 +1206,17 @@ namespace monero {
       m_transactions = std::vector<monero_light_transaction>();
 
       for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
-        monero_light_transaction transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
+        std::shared_ptr<monero_light_transaction> transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
 
         for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
           std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
           if (key_img == spent_output.m_key_image.get()) {
-            transaction.m_spent_outputs.get().push_back(spent_output);
+            transaction->m_spent_outputs.get().push_back(spent_output);
             break;
           }
         }
 
-        m_transactions.push_back(transaction);
+        m_transactions.push_back(*transaction);
       }
     }
 
