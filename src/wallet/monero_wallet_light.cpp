@@ -90,7 +90,7 @@ namespace monero {
 
   uint64_t monero_wallet_light_utils::uint64_t_cast(const std::string& str) {
     if (!is_uint64_t(str)) {
-      throw std::out_of_range("String provided is not a valid u");
+      throw std::out_of_range("String provided is not a valid uint64_t");
     }
 
     uint64_t value;
@@ -1016,10 +1016,25 @@ namespace monero {
   // ---------------------------- WALLET MANAGEMENT ---------------------------
 
   monero_wallet_light* monero_wallet_light::create_wallet_from_keys(const monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory) {
-    if (http_client_factory == nullptr) throw std::runtime_error("Must provide a http client factory");
     // validate and normalize config
     monero_wallet_config config_normalized = config.copy();
     if (config.m_network_type == boost::none) throw std::runtime_error("Must provide wallet network type");
+    if (config.m_language == boost::none || config_normalized.m_language.get().empty()) config_normalized.m_language = "English";
+    if (config.m_private_spend_key == boost::none) config_normalized.m_private_spend_key = std::string("");
+    if (config.m_private_view_key == boost::none) config_normalized.m_private_view_key = std::string("");
+    if (!monero_utils::is_valid_language(config_normalized.m_language.get())) throw std::runtime_error("Unknown language: " + config_normalized.m_language.get());
+
+    // parse and validate private spend key
+    crypto::secret_key spend_key_sk;
+    bool has_spend_key = false;
+    if (!config_normalized.m_private_spend_key.get().empty()) {
+      cryptonote::blobdata spend_key_data;
+      if (!epee::string_tools::parse_hexstr_to_binbuff(config.m_private_spend_key.get(), spend_key_data) || spend_key_data.size() != sizeof(crypto::secret_key)) {
+        throw std::runtime_error("failed to parse secret spend key");
+      }
+      has_spend_key = true;
+      spend_key_sk = *reinterpret_cast<const crypto::secret_key*>(spend_key_data.data());
+    }
 
     // parse and validate private view key
     crypto::secret_key view_key_sk;
@@ -1048,10 +1063,25 @@ namespace monero {
 
     // initialize wallet account
     monero_wallet_light* wallet = new monero_wallet_light();
-    wallet->m_account.create_from_viewkey(address_info.address, view_key_sk);
+    if (has_spend_key) {
+      wallet->m_account.create_from_keys(address_info.address, spend_key_sk, view_key_sk);
+    }
+    else {
+      wallet->m_account.create_from_viewkey(address_info.address, view_key_sk);
+    }
 
     // initialize remaining wallet
+    wallet->m_is_view_only = !has_spend_key;
     wallet->m_network_type = config_normalized.m_network_type.get();
+
+    if (!config_normalized.m_private_spend_key.get().empty()) {
+      wallet->m_language = config_normalized.m_language.get();
+      epee::wipeable_string wipeable_mnemonic;
+      if (!crypto::ElectrumWords::bytes_to_words(spend_key_sk, wipeable_mnemonic, wallet->m_language)) {
+        throw std::runtime_error("Failed to create mnemonic from private spend key for language: " + std::string(wallet->m_language));
+      }
+      wallet->m_seed = std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
+    }
     wallet->m_http_client = http_client_factory != nullptr ? http_client_factory->create() : net::http::client_factory().create();
     wallet->m_http_admin_client = http_client_factory != nullptr ? http_client_factory->create() : net::http::client_factory().create();
     wallet->init_common();
@@ -1095,7 +1125,7 @@ namespace monero {
   bool monero_wallet_light::is_synced() const {
     monero_light_get_address_info_response address_info = get_address_info();
 
-    return address_info.m_scanned_block_height.get() == address_info.m_scanned_height.get();
+    return address_info.m_blockchain_height.get() == m_blockchain_height;
   }
 
   bool monero_wallet_light::is_daemon_synced() const {
@@ -1111,93 +1141,64 @@ namespace monero {
     return version;
   }
 
-  uint64_t monero_wallet_light::get_height() const {
-    monero_light_get_address_info_response address_info = get_address_info();
-
-    return address_info.m_scanned_height.get();
-  }
-
-  uint64_t monero_wallet_light::get_restore_height() const {
-    monero_light_get_address_info_response address_info = get_address_info();
-
-    return address_info.m_start_height.get();
-  }
-
   void monero_wallet_light::set_restore_height(uint64_t restore_height) {
     rescan(restore_height);
   }
 
-  uint64_t monero_wallet_light::get_daemon_height() const {
-    monero_light_get_address_info_response address_info = get_address_info();
-
-    return address_info.m_blockchain_height.get();
-  }
-
   monero_sync_result monero_wallet_light::sync() {
     monero_sync_result result;
+    monero_light_get_address_txs_response response = get_address_txs();
+    uint64_t old_scanned_height = m_scanned_block_height;
 
-    rescan(0, m_primary_address);
+    m_start_height = response.m_start_height.get();
+    m_scanned_block_height = response.m_scanned_block_height.get();
+    m_blockchain_height = response.m_blockchain_height.get();
 
-    while(!is_synced()) {
-      std::this_thread::sleep_for(std::chrono::seconds(120));
+    m_raw_transactions = response.m_transactions.get();
+
+    if (is_view_only()) {
+      m_transactions = m_raw_transactions;
+    } else {
+      m_transactions = std::vector<monero_light_transaction>();
+
+      for (monero_light_transaction raw_transaction : m_raw_transactions) {
+        monero_light_transaction transaction;
+
+        for(monero_light_output spent_output : raw_transaction.m_spent_outputs.get()) {
+          std::string key_image = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
+
+          if (key_image == spent_output.m_key_image.get()) {
+            transaction.m_spent_outputs.push_back(spent_output);
+          }
+        }
+
+        m_transactions.push_back(transaction);
+      }
     }
 
-    result.m_num_blocks_fetched = get_height();
-    monero_light_get_address_info_response address_info = get_address_info();
-    uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(address_info.m_total_received.get());
-    result.m_received_money = total_received > 0;
+    calculate_balances();
 
+    result.m_num_blocks_fetched = m_scanned_block_height - old_scanned_height;
+    result.m_received_money = false; // to do
     return result;
   }
 
   monero_sync_result monero_wallet_light::sync(uint64_t start_height) {
     rescan(start_height, m_primary_address);
+    monero_sync_result last_sync = sync();
 
     while(!is_synced()) {
       std::this_thread::sleep_for(std::chrono::seconds(120));
+      last_sync = sync();
     }
 
     monero_sync_result result;
     uint64_t height = get_height();
 
     result.m_num_blocks_fetched = (start_height > height) ? 0 : height - start_height;
+    result.m_received_money = last_sync.m_received_money;
 
     return result;
-  }
-
-  uint64_t monero_wallet_light::get_balance() const {
-    monero_light_get_address_info_response address_info = get_address_info();
-    uint64_t total_received;
-    uint64_t total_sent;
-    
-    std::istringstream itr(address_info.m_total_received.get());
-    std::istringstream its(address_info.m_total_sent.get());
-
-    itr >> total_received;
-    its >> total_sent;
-
-    if (total_sent > total_received) return 0;
-
-    return total_received - total_sent;
-  }
-
-  uint64_t monero_wallet_light::get_unlocked_balance() const {
-    monero_light_get_address_info_response address_info = get_address_info();
-    uint64_t total_received;
-    uint64_t total_sent;
-    uint64_t locked_funds;
-
-    std::istringstream itr(address_info.m_total_received.get());
-    std::istringstream its(address_info.m_total_sent.get());
-    std::istringstream itl(address_info.m_locked_funds.get());
-
-    itr >> total_received;
-    its >> total_sent;
-    itl >> locked_funds;
-
-    if (total_sent > total_received) return 0;
-
-    return total_received - total_sent - locked_funds;
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_light::get_txs() const {
@@ -1229,12 +1230,12 @@ namespace monero {
       } else if (total_received == 0 && total_sent > 0) {
         tx_wallet->m_is_outgoing = true;
         tx_wallet->m_is_incoming = false;
-        
         tx_wallet->m_change_amount = total_sent;
       } else if (light_tx.m_coinbase.get()) {
         tx_wallet->m_is_incoming = true;
         tx_wallet->m_is_outgoing = false;
         tx_wallet->m_change_amount = total_received;
+        
       }
 
       if (light_tx.m_unlock_time.get() == 0) {
@@ -1242,12 +1243,12 @@ namespace monero {
       } else {
         tx_wallet->m_is_confirmed = false;
       }
-
+    
       tx_wallet->m_unlock_time = light_tx.m_unlock_time;
       tx_wallet->m_payment_id = light_tx.m_payment_id;
       tx_wallet->m_in_tx_pool = light_tx.m_mempool;
       tx_wallet->m_is_miner_tx = light_tx.m_coinbase;
-      tx_wallet->m_is_locked = light_tx.m_unlock_time.get() == 0;
+      tx_wallet->m_is_locked = light_tx.m_unlock_time.get() != 0;
       uint64_t num_confirmations = response.m_blockchain_height.get() - light_tx.m_height.get();
       tx_wallet->m_num_confirmations = num_confirmations;
       tx_wallet->m_is_confirmed = num_confirmations > 0;
@@ -1276,7 +1277,7 @@ namespace monero {
       output->m_tx->m_hash = light_output.m_tx_hash;
       output->m_tx->m_key = light_output.m_tx_pub_key;
       output->m_tx->m_rct_signatures = light_output.m_rct;
-
+      
       outputs.push_back(output);
     }
 
@@ -1339,6 +1340,9 @@ namespace monero {
     m_primary_address = m_account.get_public_address_str(static_cast<cryptonote::network_type>(m_network_type));
     const cryptonote::account_keys& keys = m_account.get_keys();
     m_prv_view_key = epee::string_tools::pod_to_hex(keys.m_view_secret_key);
+    m_prv_spend_key = epee::string_tools::pod_to_hex(keys.m_spend_secret_key);
+    if (m_prv_spend_key == "0000000000000000000000000000000000000000000000000000000000000000") m_prv_spend_key = "";
+
 
     if (m_host != "") {
       std::string address = m_host;
@@ -1362,6 +1366,40 @@ namespace monero {
       m_http_client->connect(m_timeout);
     }
 
+  }
+
+  void monero_wallet_light::calculate_balances() {
+   uint64_t total_received = 0;
+   uint64_t total_sent = 0;
+   uint64_t total_pending_received = 0;
+   uint64_t total_pending_sent = 0;
+   uint64_t total_locked_received = 0;
+   uint64_t total_locked_sent 0 0;
+
+   for (monero_light_transaction transaction : m_transactions) {
+    if (transaction.m_mempool != boost::none && transaction.m_mempool.get()) {
+      total_pending_sent += monero_utils::uint64_t_cast(transaction.m_total_sent.get());
+      total_pending_received += monero_utils::uint64_t_cast(transaction.m_total_received.get());
+    } else {
+      // transaction has confirmations
+      if (transaction.m_confirmations.get() < 10) {
+        total_locked_sent += monero_utils::uint64_t_cast(transaction.m_total_sent.get());
+        total_locked_received += monero_utils::uint64_t_cast(transaction.m_total_received.get());
+      }
+
+      total_received += monero_utils::uint64_t_cast(transaction.m_total_received.get());
+      total_sent += monero_utils::uint64_t_cast(transaction.m_total_sent.get());
+    }
+   }
+
+   m_balance = total_received - total_sent;
+   m_balance_pending = total_pending_received - total_pending_sent;
+   m_balance_unlocked = m_balance - total_locked_received - total_locked_sent;
+  }
+
+  std::string monero_wallet_light::generate_key_image(std::string tx_public_key, uint64_t output_index) {
+    return monero_utils::generate_key_image();
+    //return std::string("");
   }
 
   // ------------------------------- PROTECTED LWS HELPERS ----------------------------

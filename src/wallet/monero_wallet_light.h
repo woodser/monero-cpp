@@ -427,7 +427,7 @@ namespace monero {
     /**
      * Supported wallet methods.
      */
-    bool is_view_only() const override { return true; }
+    bool is_view_only() const override { return m_is_view_only; }
     void set_daemon_connection(const boost::optional<monero_lws_connection>& connection);
     void set_daemon_connection(const boost::optional<monero_lws_admin_connection>& connection);
     void set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "");
@@ -439,17 +439,17 @@ namespace monero {
     monero_network_type get_network_type() const override { return m_network_type; }
     std::string get_private_view_key() const override { return m_prv_view_key; }
     std::string get_primary_address() const override { return m_primary_address; }
-    uint64_t get_height() const override;
-    uint64_t get_restore_height() const override;
+    uint64_t get_height() const override { return m_scanned_block_height; };
+    uint64_t get_restore_height() const override { return m_start_height };
     void set_restore_height(uint64_t restore_height) override;
-    uint64_t get_daemon_height() const override;
+    uint64_t get_daemon_height() const override { return m_blockchain_height; };
     monero_sync_result sync() override;
     monero_sync_result sync(uint64_t start_height) override;
     void start_syncing(uint64_t sync_period_in_ms = 10000) override { rescan(); }
     void stop_syncing() override { deactive_account(); };
     void rescan_blockchain() override { rescan(); };
-    uint64_t get_balance() const override;
-    uint64_t get_unlocked_balance() const override;
+    uint64_t get_balance() const override { return m_balance; };
+    uint64_t get_unlocked_balance() const override { return m_balance_unlocked; };
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
@@ -505,6 +505,8 @@ namespace monero {
   protected:
     cryptonote::account_base m_account;
     monero_network_type m_network_type;
+    bool m_is_view_only;
+    std::string m_prv_spend_key;
     std::string m_prv_view_key;
     std::string m_primary_address;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
@@ -515,10 +517,22 @@ namespace monero {
     std::string m_admin_uri;
     std::string m_admin_port;
     std::string m_token;
-    uint64_t m_mixin = 4;
+    uint64_t m_mixin = 15;
+
+    uint64_t m_start_height = 0;
+    uint64_t m_scanned_block_height = 0;
+    uint64_t m_blockchain_height = 0;
+    std::vector<monero_light_transaction> m_raw_transactions;
+
+    uint64_t m_balance = 0;
+    uint64_t m_balance_pending = 0;
+    uint64_t m_balance_unlocked = 0;
+
+    std::vector<monero_light_transaction> m_transactions;
 
     void init_common();
-    
+    void calculate_balances();
+    std::string generate_key_image(std::string tx_public_key, uint64_t output_index);
     // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
 
     monero_light_get_address_info_response get_address_info(std::string address, std::string view_key) const { 
