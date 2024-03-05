@@ -1164,15 +1164,11 @@ namespace monero {
       for (monero_light_transaction raw_transaction : m_raw_transactions) {
         monero_light_transaction transaction;
 
-        for(monero_light_output spent_output : raw_transaction.m_spent_outputs.get()) {
-          std::string key_image = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_index.get());
-          std::vector<std::string> possible_key_images = spent_output.m_spend_key_images.get();
-
-          for(std::string possible_key_image : possible_key_images) {
-            if (key_image == possible_key_image) {
-              transaction.m_spent_outputs.get().push_back(spent_output);
-              break;
-            }
+        for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
+          std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_index.get());
+          if (key_img == spent_output.m_key_image.get()) {
+            transaction.m_spent_outputs.get().push_back(spent_output);
+            break;
           }
         }
 
@@ -1387,7 +1383,8 @@ namespace monero {
       total_pending_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
     } else {
       // transaction has confirmations
-      if (transaction.m_confirmations.get() < 10) {
+      uint64_t tx_confirmations = m_scanned_height - transaction.m_height.get();
+      if (tx_confirmations < 10) {
         total_locked_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
         total_locked_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
       }
@@ -1430,8 +1427,8 @@ namespace monero {
     }
 
     crypto::key_image key_image;
-    
-    r = monero_wallet_light_utils::generate_key_image(pub_spend_key, sec_spend_key, sec_view_key, tx_pub_key, output_index, key_image);    
+
+    r = monero_utils::generate_key_image(pub_spend_key, sec_spend_key, sec_view_key, tx_pub_key, output_index, key_image);    
     if (!r) {
       throw std::runtime_error("Error while generating key image");
     }
