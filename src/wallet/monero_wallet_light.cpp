@@ -71,6 +71,7 @@ using namespace crypto;
  * Public library interface.
  */
 namespace monero {
+  // ------------------------------- UTILS -------------------------------
 
   bool monero_wallet_light_utils::is_uint64_t(const std::string& str) {
     try {
@@ -136,6 +137,7 @@ namespace monero {
     return epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx));
   }
 
+  // ------------------------------- DESERIALIZE UTILS -------------------------------
 
   std::shared_ptr<monero_light_output> monero_light_output::deserialize(const std::string& config_json) {
     // deserialize monero output json to property node
@@ -590,6 +592,8 @@ namespace monero {
     return requests;
   }
 
+  // ------------------------------- PROPERTY TREE UTILS -------------------------------
+
   monero_lws_connection monero_lws_connection::from_property_tree(const boost::property_tree::ptree& node) {
     monero_lws_connection *connection = new monero_lws_connection();
 
@@ -741,6 +745,8 @@ namespace monero {
         if (key == std::string("address")) request->m_address = it->second.data();
     }
   }
+
+  // ------------------------------- SERIALIZE UTILS -------------------------------
 
   rapidjson::Value monero_lws_connection::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
@@ -1013,6 +1019,8 @@ namespace monero {
     return root;
   }
 
+  // ------------------------------- COPY UTILS -------------------------------
+
   std::shared_ptr<monero_light_spend> monero_light_spend::copy(const std::shared_ptr<monero_light_spend>& src, const std::shared_ptr<monero_light_spend>& tgt) const {
     if (this != src.get()) throw std::runtime_error("this spend != src");
     // copy wallet extensions
@@ -1058,6 +1066,94 @@ namespace monero {
   }
 
   // ---------------------------- WALLET MANAGEMENT ---------------------------
+
+  monero_wallet_light* monero_wallet_light::create_wallet(const monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory) {
+    MTRACE("create_wallet(config)");
+
+    // validate and normalize config
+    monero_wallet_config config_normalized = config.copy();
+    if (config.m_path == boost::none) config_normalized.m_path = std::string("");
+    if (config.m_password == boost::none) config_normalized.m_password = std::string("");
+    if (config.m_language == boost::none) config_normalized.m_language = std::string("");
+    if (config.m_seed == boost::none) config_normalized.m_seed = std::string("");
+    if (config.m_primary_address == boost::none) config_normalized.m_primary_address = std::string("");
+    if (config.m_private_spend_key == boost::none) config_normalized.m_private_spend_key = std::string("");
+    if (config.m_private_view_key == boost::none) config_normalized.m_private_view_key = std::string("");
+    if (config.m_seed_offset == boost::none) config_normalized.m_seed_offset = std::string("");
+    if (config.m_is_multisig == boost::none) config_normalized.m_is_multisig = false;
+    if (config.m_account_lookahead != boost::none && config.m_subaddress_lookahead == boost::none) throw std::runtime_error("No subaddress lookahead provided with account lookahead");
+    if (config.m_account_lookahead == boost::none && config.m_subaddress_lookahead != boost::none) throw std::runtime_error("No account lookahead provided with subaddress lookahead");
+    if (config_normalized.m_language.get().empty()) config_normalized.m_language = std::string("English");
+    if (!monero_utils::is_valid_language(config_normalized.m_language.get())) throw std::runtime_error("Unknown language: " + config_normalized.m_language.get());
+    if (config.m_network_type == boost::none) throw std::runtime_error("Must provide wallet network type");
+
+    // create wallet
+    if (!config_normalized.m_primary_address.get().empty() && !config_normalized.m_private_view_key.get().empty()) {
+      return create_wallet_from_keys(config_normalized, std::move(http_client_factory));
+    } else {
+      throw std::runtime_error("Configuration must have primary address and private view key.");
+    }
+  }
+
+  monero_wallet_light* monero_wallet_light::create_wallet_random(const monero_wallet_config& config) {
+
+    // validate and normalize config
+    monero_wallet_config config_normalized = config.copy();
+    if (config_normalized.m_network_type == boost::none) throw std::runtime_error("Must provide wallet network type");
+    if (config_normalized.m_language == boost::none || config_normalized.m_language.get().empty()) config_normalized.m_language = "English";
+    if (!monero_utils::is_valid_language(config_normalized.m_language.get())) throw std::runtime_error("Unknown language: " + config_normalized.m_language.get());
+
+    // initialize random wallet account
+    monero_wallet_light* wallet = new monero_wallet_light();
+    crypto::secret_key spend_key_sk = wallet->m_account.generate();
+
+    // initialize remaining wallet
+    wallet->m_network_type = config_normalized.m_network_type.get();
+    wallet->m_language = config_normalized.m_language.get();
+    epee::wipeable_string wipeable_mnemonic;
+    if (!crypto::ElectrumWords::bytes_to_words(spend_key_sk, wipeable_mnemonic, wallet->m_language)) {
+      throw std::runtime_error("Failed to create mnemonic from private spend key for language: " + std::string(wallet->m_language));
+    }
+    wallet->m_seed = std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
+    wallet->init_common();
+
+    return wallet;
+  }
+
+  monero_wallet_light* monero_wallet_light::create_wallet_from_seed(const monero_wallet_config& config) {
+
+    // validate config
+    if (config.m_is_multisig != boost::none && config.m_is_multisig.get()) throw std::runtime_error("Restoring from multisig seed not supported");
+    if (config.m_network_type == boost::none) throw std::runtime_error("Must provide wallet network type");
+    if (config.m_seed == boost::none || config.m_seed.get().empty()) throw std::runtime_error("Must provide wallet seed");
+
+    // validate mnemonic and get recovery key and language
+    crypto::secret_key spend_key_sk;
+    std::string language;
+    bool is_valid = crypto::ElectrumWords::words_to_bytes(config.m_seed.get(), spend_key_sk, language);
+    if (!is_valid) throw std::runtime_error("Invalid mnemonic");
+    if (language == crypto::ElectrumWords::old_language_name) language = Language::English().get_language_name();
+
+    // apply offset if given
+    if (config.m_seed_offset != boost::none && !config.m_seed_offset.get().empty()) spend_key_sk = cryptonote::decrypt_key(spend_key_sk, config.m_seed_offset.get());
+
+    // initialize wallet account
+    monero_wallet_light* wallet = new monero_wallet_light();
+    wallet->m_account = cryptonote::account_base{};
+    wallet->m_account.generate(spend_key_sk, true, false);
+
+    // initialize remaining wallet
+    wallet->m_network_type = config.m_network_type.get();
+    wallet->m_language = language;
+    epee::wipeable_string wipeable_mnemonic;
+    if (!crypto::ElectrumWords::bytes_to_words(spend_key_sk, wipeable_mnemonic, wallet->m_language)) {
+      throw std::runtime_error("Failed to create mnemonic from private spend key for language: " + std::string(wallet->m_language));
+    }
+    wallet->m_seed = std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
+    wallet->init_common();
+
+    return wallet;
+  }
 
   monero_wallet_light* monero_wallet_light::create_wallet_from_keys(const monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory) {
     // validate and normalize config
@@ -1131,6 +1227,12 @@ namespace monero {
     wallet->init_common();
 
     return wallet;
+  }
+
+  std::vector<std::string> monero_wallet_light::get_seed_languages() {
+    std::vector<std::string> languages;
+    crypto::ElectrumWords::get_language_list(languages, true);
+    return languages;
   }
 
   // ----------------------------- WALLET METHODS -----------------------------
@@ -1207,17 +1309,27 @@ namespace monero {
 
       for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
         std::shared_ptr<monero_light_transaction> transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
+        uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_received.get());
 
-        for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
-          std::string key_img = generate_key_image(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
-          if (key_img == spent_output.m_key_image.get()) {
-            transaction->m_spent_outputs.get().push_back(spent_output);
-            break;
-          }
+        if (!result.m_received_money) {
+          result.m_received_money = total_received > 0;
         }
 
-        m_transactions.push_back(*transaction);
-      }
+        for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
+          bool is_spent = is_output_spent(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get(), spent_output.m_key_image.get());
+          if (is_spent) {
+            transaction->m_spent_outputs.get().push_back(spent_output);
+          } 
+          else {
+            uint64_t total_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
+            uint64_t spent_amount = monero_wallet_light_utils::uint64_t_cast(spent_output.m_amount.get());
+            uint64_t recalc_sent = total_sent - spent_amount;
+            transaction->m_total_sent = boost::lexical_cast<std::string>(recalc_sent);
+          }
+        
+          uint64_t final_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
+          m_transactions.push_back(*transaction);
+        }
     }
 
     calculate_balances();
@@ -1245,7 +1357,24 @@ namespace monero {
     return result;
   }
 
+  void monero_wallet_light::rescan_blockchain() {       
+    if (is_connected_to_admin_daemon())
+    {
+      rescan();
+      return;
+    }
+
+    monero_light_import_request_response response = import_request();
+
+    if (response.m_import_fee != boost::none) {
+      uint64_t import_fee = monero_wallet_light_utils::uint64_t_cast(response.m_import_fee.get());
+
+      if (import_fee > 0) throw std::runtime_error("Could not rescan blockhain beacuse current lws server requires an import fee.");
+    }
+  }
+
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_light::get_txs() const {
+    bool view_only = is_view_only();
     std::vector<std::shared_ptr<monero_tx_wallet>> txs = std::vector<std::shared_ptr<monero_tx_wallet>>();
     monero_light_get_address_txs_response response = get_address_txs();
 
@@ -1278,15 +1407,10 @@ namespace monero {
       } else if (light_tx.m_coinbase.get()) {
         tx_wallet->m_is_incoming = true;
         tx_wallet->m_is_outgoing = false;
-        tx_wallet->m_change_amount = total_received;
-        
+        tx_wallet->m_change_amount = total_received;       
       }
-
-      if (light_tx.m_unlock_time.get() == 0) {
-        tx_wallet->m_is_confirmed = true;
-      } else {
-        tx_wallet->m_is_confirmed = false;
-      }
+      
+      if(tx_wallet->m_is_outgoing && view_only) continue;
     
       tx_wallet->m_unlock_time = light_tx.m_unlock_time;
       tx_wallet->m_payment_id = light_tx.m_payment_id;
@@ -1309,6 +1433,7 @@ namespace monero {
     monero_light_get_unspent_outs_response response = get_unspent_outs();
 
     std::vector<std::shared_ptr<monero_output_wallet>> outputs;
+    bool view_only = is_view_only();
 
     for(monero_light_output light_output : response.m_outputs.get()) {
       std::shared_ptr<monero_output_wallet> output = std::shared_ptr<monero_output_wallet>();
@@ -1317,6 +1442,13 @@ namespace monero {
       output->m_amount = monero_wallet_light_utils::uint64_t_cast(light_output.m_amount.get());
       output->m_stealth_public_key = light_output.m_public_key;
       
+      if (view_only) {
+        output->m_key_image = std::make_shared<monero_key_image>();
+        output->m_key_image.get()->m_hex = "0100000000000000000000000000000000000000000000000000000000000000";
+      } else {
+
+      }
+
       output->m_tx = std::make_shared<monero_tx>();
       output->m_tx->m_hash = light_output.m_tx_hash;
       output->m_tx->m_key = light_output.m_tx_pub_key;
@@ -1388,6 +1520,8 @@ namespace monero {
     m_prv_spend_key = epee::string_tools::pod_to_hex(keys.m_spend_secret_key);
     if (m_prv_spend_key == "0000000000000000000000000000000000000000000000000000000000000000") m_prv_spend_key = "";
 
+    m_request_pending = false;
+    m_request_accepted = false;
 
     if (m_host != "") {
       std::string address = m_host;
@@ -1396,8 +1530,11 @@ namespace monero {
         address = address + ":" + m_port;
       }
 
-      m_http_client->set_server(address, boost::none);
-      m_http_client->connect(m_timeout);
+      if(!m_http_client->set_server(address, boost::none)) throw std::runtime_error("Invalid lws address");
+      if(!m_http_client->connect(m_timeout)) throw std::runtime_error("Could not connect to lws");
+      login();
+    } else {
+      throw std::runtime_error("Must provide a lws address");
     }
 
     if (m_admin_uri != "") {
@@ -1407,8 +1544,10 @@ namespace monero {
         address = address + ":" + m_admin_port;
       }
 
-      m_http_admin_client->set_server(address, boost::none);
-      m_http_client->connect(m_timeout);
+      if (!m_http_admin_client->set_server(address, boost::none)) throw std::runtime_error("Invalid admin lws address");
+      if (!m_http_admin_client->connect(m_timeout)) throw std::runtime_error("Could not connect to admin lws");
+    } else {
+      m_http_admin_client = nullptr;
     }
 
   }
@@ -1429,18 +1568,26 @@ namespace monero {
       // transaction has confirmations
       uint64_t tx_confirmations = m_scanned_block_height - transaction.m_height.get();
       if (tx_confirmations < 10) {
-        total_locked_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
+        if (!is_view_only()) total_locked_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
         total_locked_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
       }
 
       total_received += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_received.get());
-      total_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
+      if (!is_view_only()) total_sent += monero_wallet_light_utils::uint64_t_cast(transaction.m_total_sent.get());
     }
    }
 
    m_balance = total_received - total_sent;
    m_balance_pending = total_pending_received - total_pending_sent;
    m_balance_unlocked = m_balance - total_locked_received - total_locked_sent;
+  }
+
+  bool monero_wallet_light::is_output_spent(std::string tx_public_key, uint64_t output_index, std::string key_image) {
+    if (is_view_only()) throw std::runtime_error("Could not check if output is spent, wallet is view only");
+
+    std::string generated_key_image = generate_key_image(tx_public_key, uint64_t output_index);
+
+    return generated_key_image == key_image;
   }
 
   std::string monero_wallet_light::generate_key_image(std::string tx_public_key, uint64_t output_index) {
@@ -1486,6 +1633,9 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = nullptr;
     
     if (admin) {
+      if (m_http_admin_client == nullptr || m_admin_uri == "") {
+        throw std::runtime_error("Must set admin lws address before calling admin methods");
+      }
       if (!m_http_admin_client->invoke_post(method, body, m_timeout, &response)) {
         throw std::runtime_error("Network error");
       }    
@@ -1507,8 +1657,21 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_address_info", body);
+    int status_code = response->m_response_code;
 
-    return *monero_light_get_address_info_response::deserialize(response->m_body);
+    if (status_code == 403) {
+      if (m_request_pending) {
+        throw std::runtime_error("Authorization request is pending");
+      }
+
+      throw std::runtime_error("Not authorized");
+    }
+
+    else if (status_code == 200) {
+      return *monero_light_get_address_info_response::deserialize(response->m_body);
+    }
+
+    throw std::runtime_error("Unknown error");
   }
 
   monero_light_get_address_txs_response monero_wallet_light::get_address_txs(monero_light_get_address_txs_request request) const {
@@ -1518,8 +1681,21 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_address_txs", body);
+    int status_code = response->m_response_code;
 
-    return *monero_light_get_address_txs_response::deserialize(response->m_body);
+    if (status_code == 403) {
+      if (m_request_pending) {
+        throw std::runtime_error("Authorization request is pending");
+      }
+
+      throw std::runtime_error("Not authorized");
+    }
+
+    else if (status_code == 200) {
+      return *monero_light_get_address_txs_response::deserialize(response->m_body);
+    }
+
+    throw std::runtime_error("Unknown error");
   }
 
   monero_light_get_random_outs_response monero_wallet_light::get_random_outs(monero_light_get_random_outs_request request) const {
@@ -1529,8 +1705,12 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_random_outs", body);
+    int status_code = response->m_response_code;
+    if (status_code == 200) {
+      return *monero_light_get_random_outs_response::deserialize(response->m_body);
+    }
 
-    return *monero_light_get_random_outs_response::deserialize(response->m_body);
+    throw std::runtime_error("Unknown error");
   }
 
   monero_light_get_unspent_outs_response monero_wallet_light::get_unspent_outs(monero_light_get_unspent_outs_request request) const {
@@ -1540,8 +1720,22 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_unspent_outs", body);
+    int status_code = response->m_response_code;
+    if (status_code == 403) {
+      if (m_request_pending) {
+        throw std::runtime_error("Authorization request is pending");
+      }
 
-    return *monero_light_get_unspent_outs_response::deserialize(response->m_body);
+      throw std::runtime_error("Not authorized");
+    }
+    else if (status_code == 400) {
+      throw std::runtime_error("Outputs are less than amount");
+    }
+    else if (status_code == 200) {
+      return *monero_light_get_unspent_outs_response::deserialize(response->m_body);
+    }
+
+    throw std::runtime_error("Unknown error");
   }
 
   monero_light_import_request_response monero_wallet_light::import_request(monero_light_import_request_request request) const {
@@ -1551,6 +1745,11 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/import_request", body);
+    int status_code = response->m_response_code;
+
+    if (status_code != 200) {
+      throw std::runtime_error("Unknown error");
+    }
 
     return *monero_light_import_request_response::deserialize(response->m_body);
   }
@@ -1562,17 +1761,53 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/submit_raw_tx", body);
+    int status_code = response->m_response_code;
+    
+    if (status_code != 200) {
+      throw std::runtime_error("Unknown error");
+    }
 
     return *monero_light_submit_raw_tx_response::deserialize(response->m_body);
   }
 
-  monero_light_login_response monero_wallet_light::login(monero_light_login_request request) const {
+  monero_light_login_response monero_wallet_light::login(monero_light_login_request request) {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
 
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/login", body);
+    int status_code = response->m_response_code;
+
+    if (status_code == 501) {
+      throw std::runtime_error("Server does not allow account creations");
+    }
+    else if (status_code == 403) {
+      m_request_pending = true;
+      m_request_accepted = false;
+      throw std::runtime_error("Authorization request is pending");
+    } else if (status_code != 200) {
+      throw std::runtime_error("Unknown error");
+    }
+
+    if(m_request_pending) {
+      m_request_pending = false;
+      m_request_accepted = true;
+    } else if (!m_request_pending && !m_request_accepted) {
+      // first time?
+      const epee::net_utils::http::http_response_info *info = post("/login", body);
+      int status_code_info = info->m_response_code;
+
+      if (status_code_info == 403) {
+        m_request_pending = true;
+        m_request_accepted = false;
+      } else if (status_code_info == 200) {
+        m_request_pending = false;
+        m_request_accepted = true;
+      } else {
+        throw std::runtime_error("Unknown error while checking login request");
+      }
+    }
 
     return *monero_light_login_response::deserialize(response->m_body);
   }
@@ -1586,6 +1821,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/accept_requests", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
   }
 
   void monero_wallet_light::reject_requests(monero_light_reject_requests_request request) const {
@@ -1595,6 +1834,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/reject_requests", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
   }
   
   void monero_wallet_light::add_account(monero_light_add_account_request request) const {
@@ -1604,6 +1847,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/add_account", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
   }
   
   monero_light_list_accounts_response monero_wallet_light::list_accounts(monero_light_list_accounts_request request) const {
@@ -1613,6 +1860,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/list_accounts", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
 
     return *monero_light_list_accounts_response::deserialize(response->m_body);
   }
@@ -1624,6 +1875,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/list_requests", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
 
     return *monero_light_list_requests_response::deserialize(response->m_body);
   }
@@ -1635,6 +1890,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/modify_account_status", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
   }
   
   void monero_wallet_light::rescan(monero_light_rescan_request request) const {
@@ -1644,6 +1903,10 @@ namespace monero {
     std::string body = req.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/rescan", body, true);
+    int status_code = response->m_response_code;
+
+    if (m_status_code == 403) throw std::runtime_error("Not authorized");
+    if (m_status_code != 200) throw std::runtime_error("Unknown error");
   }
 
 }

@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/external/monero-project/external/boost/**",
+                "/usr/include/x86_64-linux-gnu/c++/11"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++-11",
+            "cStandard": "c17",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}
