@@ -1301,37 +1301,39 @@ namespace monero {
     m_blockchain_height = response.m_blockchain_height.get();
 
     m_raw_transactions = response.m_transactions.get();
+    m_transactions = std::vector<monero_light_transaction>();
 
-    if (is_view_only()) {
-      m_transactions = m_raw_transactions;
-    } else {
-      m_transactions = std::vector<monero_light_transaction>();
+    for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
+      std::shared_ptr<monero_light_transaction> transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
+      uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_received.get());
 
-      for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
-        std::shared_ptr<monero_light_transaction> transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
-        uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_received.get());
+      if (!result.m_received_money) {
+        result.m_received_money = total_received > 0;
+      }
+      if (is_view_only()) {
+        if (total_received == 0) continue;
 
-        if (!result.m_received_money) {
-          result.m_received_money = total_received > 0;
+        m_transactions.push_back(*transaction);
+        continue;
+      }
+
+      for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
+        bool is_spent = is_output_spent(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get(), spent_output.m_key_image.get());
+        if (is_spent) {
+          transaction->m_spent_outputs.get().push_back(spent_output);
+        } 
+        else {
+          uint64_t total_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
+          uint64_t spent_amount = monero_wallet_light_utils::uint64_t_cast(spent_output.m_amount.get());
+          uint64_t recalc_sent = total_sent - spent_amount;
+          transaction->m_total_sent = boost::lexical_cast<std::string>(recalc_sent);
         }
-
-        for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
-          bool is_spent = is_output_spent(spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get(), spent_output.m_key_image.get());
-          if (is_spent) {
-            transaction->m_spent_outputs.get().push_back(spent_output);
-          } 
-          else {
-            uint64_t total_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
-            uint64_t spent_amount = monero_wallet_light_utils::uint64_t_cast(spent_output.m_amount.get());
-            uint64_t recalc_sent = total_sent - spent_amount;
-            transaction->m_total_sent = boost::lexical_cast<std::string>(recalc_sent);
-          }
-        
-          uint64_t final_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
-          m_transactions.push_back(*transaction);
-        }
+      
+        uint64_t final_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
+        m_transactions.push_back(*transaction);
+      }
     }
-
+  
     calculate_balances();
 
     result.m_num_blocks_fetched = m_scanned_block_height - old_scanned_height;
@@ -1585,7 +1587,7 @@ namespace monero {
   bool monero_wallet_light::is_output_spent(std::string tx_public_key, uint64_t output_index, std::string key_image) {
     if (is_view_only()) throw std::runtime_error("Could not check if output is spent, wallet is view only");
 
-    std::string generated_key_image = generate_key_image(tx_public_key, uint64_t output_index);
+    std::string generated_key_image = generate_key_image(tx_public_key, output_index);
 
     return generated_key_image == key_image;
   }
@@ -1823,8 +1825,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/accept_requests", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
   }
 
   void monero_wallet_light::reject_requests(monero_light_reject_requests_request request) const {
@@ -1836,8 +1838,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/reject_requests", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
   }
   
   void monero_wallet_light::add_account(monero_light_add_account_request request) const {
@@ -1849,8 +1851,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/add_account", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
   }
   
   monero_light_list_accounts_response monero_wallet_light::list_accounts(monero_light_list_accounts_request request) const {
@@ -1862,8 +1864,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/list_accounts", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
 
     return *monero_light_list_accounts_response::deserialize(response->m_body);
   }
@@ -1877,8 +1879,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/list_requests", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
 
     return *monero_light_list_requests_response::deserialize(response->m_body);
   }
@@ -1892,8 +1894,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/modify_account_status", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
   }
   
   void monero_wallet_light::rescan(monero_light_rescan_request request) const {
@@ -1905,8 +1907,8 @@ namespace monero {
     const epee::net_utils::http::http_response_info *response = post("/rescan", body, true);
     int status_code = response->m_response_code;
 
-    if (m_status_code == 403) throw std::runtime_error("Not authorized");
-    if (m_status_code != 200) throw std::runtime_error("Unknown error");
+    if (status_code == 403) throw std::runtime_error("Not authorized");
+    if (status_code != 200) throw std::runtime_error("Unknown error");
   }
 
 }
