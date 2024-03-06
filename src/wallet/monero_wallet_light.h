@@ -418,7 +418,7 @@ namespace monero {
 
     // --------------------------- STATIC WALLET UTILS --------------------------
     
-    std::vector<std::string> get_seed_languages();
+    static std::vector<std::string> get_seed_languages();
     
     /**
      * Create a new wallet with the given configuration.
