@@ -464,21 +464,27 @@ namespace monero {
     void set_daemon_connection(const boost::optional<monero_lws_connection>& connection);
     void set_daemon_connection(const boost::optional<monero_lws_admin_connection>& connection);
     void set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "");
+    void set_daemon_proxy(const std::string& uri = "") override;
+    void set_admin_daemon_proxy(const std::string& uri = "");
     bool is_connected_to_daemon() const override;
     bool is_connected_to_admin_daemon() const;
     bool is_daemon_synced() const override;
+    bool is_daemon_trusted() const override { return false; };
     bool is_synced() const override;
     bool is_account_pending() const { return m_request_pending; };
     bool is_account_accepted() const { return m_request_accepted; };
 
     monero_version get_version() const override;
     monero_network_type get_network_type() const override { return m_network_type; }
+    std::string get_seed() const override { return m_seed; };
+    std::string get_seed_language() const override { return m_language; };
     std::string get_private_view_key() const override { return m_prv_view_key; }
     std::string get_primary_address() const override { return m_primary_address; }
     uint64_t get_height() const override { return m_scanned_block_height; };
     uint64_t get_restore_height() const override { return m_start_height; };
     void set_restore_height(uint64_t restore_height) override;
     uint64_t get_daemon_height() const override { return m_blockchain_height; };
+    uint64_t get_daemon_max_peer_height() const override { return m_blockchain_height; };
     monero_sync_result sync() override;
     monero_sync_result sync(uint64_t start_height) override;
     monero_sync_result sync(monero_wallet_listener& listener) override;
@@ -486,7 +492,13 @@ namespace monero {
     void stop_syncing() override { deactive_account(); };
     void rescan_blockchain() override;
     uint64_t get_balance() const override { return m_balance; };
+    uint64_t get_balance(uint32_t account_idx) const override { return account_idx == 0 ? get_balance() : 0; };
+    uint64_t get_balance(uint32_t account_idx, uint32_t subaddress_idx) const override { return account_idx == 0 && subaddress_idx == 0 ? get_balance() : 0; };
     uint64_t get_unlocked_balance() const override { return m_balance_unlocked; };
+    uint64_t get_unlocked_balance(uint32_t account_idx) const override { return account_idx == 0 ? get_balance() : 0; };
+    uint64_t get_unlocked_balance(uint32_t account_idx, uint32_t subaddress_idx) const override { return account_idx == 0 && subaddress_idx == 0 ? get_balance() : 0; };
+    std::vector<monero_account> get_accounts(bool include_subaddresses, const std::string& tag = "") const override;
+    monero_account get_account(const uint32_t account_idx = 0, bool include_subaddresses = false) const override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs(const monero_tx_query& query) const override;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers(const monero_transfer_query& query) const override;

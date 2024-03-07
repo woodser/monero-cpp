@@ -1264,6 +1264,16 @@ namespace monero {
     m_token = token;
   }
 
+  void monero_wallet_light::set_daemon_proxy(const std::string& uri = "") {
+    if (m_http_client == nullptr) throw std::runtime_error("Cannot set daemon proxy");
+    m_http_client->set_proxy(uri);
+  }
+
+  void monero_wallet_light::set_admin_daemon_proxy(const std::string& uri = "") {
+    if (m_http_admin_client == nullptr) throw std::runtime_error("Cannot set daemon proxy");
+    m_http_admin_client->set_proxy(uri);
+  }
+
   bool monero_wallet_light::is_connected_to_daemon() const {
     return m_http_client->is_connected();
   }
@@ -1622,6 +1632,28 @@ namespace monero {
     }
 
     return last_block;
+  }
+
+  monero_account monero_wallet_light::get_account(const uint32_t account_idx, bool include_subaddresses) const {
+    if (account_idx > 0) throw std::runtime_error("Can only get primary account");
+
+    monero_account account;
+    account.m_index = 0;
+    account.m_primary_address = m_primary_address;
+    account.m_balance = m_balance;;
+    account.m_unlocked_balance = m_balance_unlocked;
+
+    return account;
+  }
+
+  std::vector<monero_account> monero_wallet_light::get_accounts(bool include_subaddresses, const std::string& tag) const {
+    MTRACE("get_accounts(" << include_subaddresses << ", " << tag << ")");
+
+    std::vector<monero_account> accounts;
+
+    accounts.push_back(get_account());
+
+    return accounts;
   }
 
   void monero_wallet_light::close(bool save) {
