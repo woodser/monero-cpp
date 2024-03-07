@@ -481,12 +481,16 @@ namespace monero {
     uint64_t get_daemon_height() const override { return m_blockchain_height; };
     monero_sync_result sync() override;
     monero_sync_result sync(uint64_t start_height) override;
+    monero_sync_result sync(monero_wallet_listener& listener) override;
     void start_syncing(uint64_t sync_period_in_ms = 10000) override;
     void stop_syncing() override { deactive_account(); };
     void rescan_blockchain() override;
     uint64_t get_balance() const override { return m_balance; };
     uint64_t get_unlocked_balance() const override { return m_balance_unlocked; };
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
+    std::vector<std::shared_ptr<monero_tx_wallet>> get_txs(const monero_tx_query& query) const override;
+    std::vector<std::shared_ptr<monero_transfer>> get_transfers(const monero_transfer_query& query) const override;
+    std::vector<std::shared_ptr<monero_output_wallet>> get_outputs() const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
     uint64_t wait_for_next_block() override;
@@ -554,7 +558,7 @@ namespace monero {
     void calculate_balances();
     std::string generate_key_image(std::string tx_public_key, uint64_t output_index);
     bool is_output_spent(std::string tx_public_key, uint64_t output_index, std::string key_image);
-    
+    monero_sync_result sync_aux();
     // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
 
     void accept_requests() { 
