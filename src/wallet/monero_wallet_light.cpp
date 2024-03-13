@@ -1422,7 +1422,7 @@ namespace light {
 
     size_t colon_position = uri.find(":");
 
-    if (colon_position != std::string::npos) {
+    if (colon_position != std::string::npos && colon_position != -1) {
       host = uri.substr(0, colon_position);
       std::string _port = uri.substr(colon_position + 1);
       std::stringstream parser(_port);
@@ -1431,7 +1431,7 @@ namespace light {
       if ( parser >> __port ) {
         port = std::to_string(__port);
       } else {
-        throw std::runtime_error("Could not parse port from uri");
+        throw std::runtime_error("Could not parse port from uri: " + uri);
       }
 
     } else {
