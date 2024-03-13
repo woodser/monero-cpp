@@ -1389,7 +1389,9 @@ namespace light {
     wallet->m_http_admin_client = http_client_factory != nullptr ? http_client_factory->create() : net::http::client_factory().create();
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
-
+    
+    if (config_normalized.m_server != boost::none) wallet->set_daemon_connection(config_normalized.m_server.get());
+    
     wallet->init_common();
 
     return wallet;
