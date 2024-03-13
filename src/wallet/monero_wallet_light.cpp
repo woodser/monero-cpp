@@ -1420,7 +1420,7 @@ namespace light {
     std::string host = "";
     std::string port = "";
 
-    size_t colon_position = uri.find(":");
+    size_t colon_position = boost::replace_all_copy(uri, "http://", "").find(":");
 
     if (colon_position != std::string::npos && colon_position != -1) {
       host = uri.substr(0, colon_position);
