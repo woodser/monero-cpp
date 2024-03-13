@@ -430,20 +430,6 @@ namespace monero {
     static monero_wallet_light* create_wallet(const monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory = nullptr);
 
     /**
-     * Create a new wallet with a randomly generated seed.
-     *
-     * @param config is the wallet configuration (network type and language)
-     */
-    static monero_wallet_light* create_wallet_random(const monero_wallet_config& config);
-
-    /**
-     * Create a wallet from an existing mnemonic phrase or seed.
-     *
-     * @param config is the wallet configuration (network type, seed, seed offset, isMultisig)
-     */
-    static monero_wallet_light* create_wallet_from_seed(const monero_wallet_config& config);
-
-    /**
      * Create a wallet from an address, view key, and private view key.
      * 
      * @param config is the wallet configuration (network type, address, view key, private view key)
@@ -460,56 +446,111 @@ namespace monero {
     /**
      * Supported wallet methods.
      */
-    bool is_view_only() const override { return m_is_view_only; }
-    void set_daemon_connection(const boost::optional<monero_lws_connection>& connection);
-    void set_daemon_connection(const boost::optional<monero_lws_admin_connection>& connection);
+    bool is_view_only() const override { return true; }
+    void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) override;
     void set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "");
     void set_daemon_proxy(const std::string& uri = "") override;
-    void set_admin_daemon_proxy(const std::string& uri = "");
     bool is_connected_to_daemon() const override;
     bool is_connected_to_admin_daemon() const;
     bool is_daemon_synced() const override;
     bool is_daemon_trusted() const override { return false; };
     bool is_synced() const override;
-    bool is_account_pending() const { return m_request_pending; };
-    bool is_account_accepted() const { return m_request_accepted; };
 
     monero_version get_version() const override;
     monero_network_type get_network_type() const override { return m_network_type; }
-    std::string get_seed() const override { return m_seed; };
-    std::string get_seed_language() const override { return m_language; };
     std::string get_private_view_key() const override { return m_prv_view_key; }
     std::string get_primary_address() const override { return m_primary_address; }
+    
     uint64_t get_height() const override { return m_scanned_block_height; };
     uint64_t get_restore_height() const override { return m_start_height; };
     void set_restore_height(uint64_t restore_height) override;
     uint64_t get_daemon_height() const override { return m_blockchain_height; };
     uint64_t get_daemon_max_peer_height() const override { return m_blockchain_height; };
+    
     monero_sync_result sync() override;
     monero_sync_result sync(uint64_t start_height) override;
     monero_sync_result sync(monero_wallet_listener& listener) override;
+
     void start_syncing(uint64_t sync_period_in_ms = 10000) override;
     void stop_syncing() override { deactive_account(); };
     void rescan_blockchain() override;
+    
     uint64_t get_balance() const override { return m_balance; };
     uint64_t get_balance(uint32_t account_idx) const override { return account_idx == 0 ? get_balance() : 0; };
     uint64_t get_balance(uint32_t account_idx, uint32_t subaddress_idx) const override { return account_idx == 0 && subaddress_idx == 0 ? get_balance() : 0; };
     uint64_t get_unlocked_balance() const override { return m_balance_unlocked; };
     uint64_t get_unlocked_balance(uint32_t account_idx) const override { return account_idx == 0 ? get_balance() : 0; };
     uint64_t get_unlocked_balance(uint32_t account_idx, uint32_t subaddress_idx) const override { return account_idx == 0 && subaddress_idx == 0 ? get_balance() : 0; };
+    
     std::vector<monero_account> get_accounts(bool include_subaddresses, const std::string& tag = "") const override;
     monero_account get_account(const uint32_t account_idx = 0, bool include_subaddresses = false) const override;
+    
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs(const monero_tx_query& query) const override;
+    
     std::vector<std::shared_ptr<monero_transfer>> get_transfers(const monero_transfer_query& query) const override;
+    
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs() const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const override;
+    std::string export_outputs(bool all = false) const override;
+
+    std::vector<std::shared_ptr<monero_key_image>> export_key_images(bool all = false) const override;
+    std::shared_ptr<monero_key_image_import_result> import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) override;
+
+    std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& config) override;    
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
+    
     uint64_t wait_for_next_block() override;
     bool is_multisig_import_needed() const override { return false; }
     bool is_multisig() const override { return false; }
 
     void close(bool save = false) override;
+
+    // --------------------------------- PROTECTED ------------------------------------------
+
+  protected:
+    std::unique_ptr<tools::wallet2> m_w2;
+    cryptonote::account_base m_account;
+    monero_network_type m_network_type;
+    std::string m_prv_view_key;
+    std::string m_pub_spend_key;
+    std::string m_primary_address;
+    std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
+    std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_admin_client;
+    std::chrono::milliseconds m_timeout = std::chrono::milliseconds(120000);
+    std::string m_host;
+    std::string m_port;
+    std::string m_admin_uri;
+    std::string m_admin_port;
+    std::string m_token;
+
+    bool m_request_pending;
+    bool m_request_accepted;
+    
+    uint64_t m_mixin = 15;
+    uint64_t m_start_height = 0;
+    uint64_t m_scanned_block_height = 0;
+    uint64_t m_blockchain_height = 0;
+
+    uint64_t m_balance = 0;
+    uint64_t m_balance_pending = 0;
+    uint64_t m_balance_unlocked = 0;
+    
+    std::vector<monero_light_transaction> m_raw_transactions;
+    std::vector<monero_light_transaction> m_transactions;
+
+    std::vector<std::shared_ptr<monero_output_wallet>> m_exported_outputs;
+
+    std::vector<std::shared_ptr<monero_key_image>> m_imported_key_images;
+    std::vector<std::shared_ptr<monero_key_image>> m_exported_key_images;
+
+    void init_common();
+    void calculate_balances();
+    bool is_output_spent(std::string key_image) const;
+    monero_sync_result sync_aux();
+
+    // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
+    // --------------------------------- LIGHT WALLET CLIENT METHODS ------------------------------------------
 
     monero_light_get_address_info_response get_address_info() const {
       return get_address_info(m_primary_address, m_prv_view_key);
@@ -530,117 +571,6 @@ namespace monero {
     monero_light_login_response login(bool create_account = false, bool generated_locally = false) {
       return login(m_primary_address, m_prv_view_key, create_account, generated_locally);
     }
-
-    // --------------------------------- PROTECTED ------------------------------------------
-
-  protected:
-    cryptonote::account_base m_account;
-    monero_network_type m_network_type;
-    bool m_is_view_only;
-    std::string m_seed;
-    std::string m_language;
-    std::string m_prv_spend_key;
-    std::string m_prv_view_key;
-    std::string m_pub_spend_key;
-    std::string m_primary_address;
-    std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
-    std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_admin_client;
-    std::chrono::milliseconds m_timeout = std::chrono::milliseconds(120000);
-    std::string m_host;
-    std::string m_port;
-    std::string m_admin_uri;
-    std::string m_admin_port;
-    std::string m_token;
-    bool m_request_pending;
-    bool m_request_accepted;
-    uint64_t m_mixin = 15;
-
-    uint64_t m_start_height = 0;
-    uint64_t m_scanned_block_height = 0;
-    uint64_t m_blockchain_height = 0;
-    std::vector<monero_light_transaction> m_raw_transactions;
-
-    uint64_t m_balance = 0;
-    uint64_t m_balance_pending = 0;
-    uint64_t m_balance_unlocked = 0;
-
-    std::vector<monero_light_transaction> m_transactions;
-
-    void init_common();
-    void calculate_balances();
-    std::string generate_key_image(std::string tx_public_key, uint64_t output_index);
-    bool is_output_spent(std::string tx_public_key, uint64_t output_index, std::string key_image);
-    monero_sync_result sync_aux();
-    // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
-
-    void accept_requests() { 
-      monero_light_accept_requests_request request; 
-      return accept_requests(request); 
-    }
-
-    void add_account(std::string address, std::string view_key) const {
-      monero_light_add_account_request request;
-      request.m_address = address;
-      request.m_key = view_key;
-
-      add_account(request);
-    }
-
-    void active_account() {
-      modify_account_status("active");
-    }
-
-    void deactive_account() {
-      modify_account_status("deactive");
-    }
-
-    void hide_account() {
-      modify_account_status("hidden");
-    }
-
-    void modify_account_status(std::string type) {
-      modify_account_status(type, m_primary_address);
-    }
-
-    void modify_account_status(std::string type, std::string address) {
-      std::vector<std::string> addresses = std::vector<std::string>();
-      addresses.push_back(address);
-
-      modify_account_status(type, addresses);
-    }
-
-    void modify_account_status(std::string type, std::vector<std::string> addresses) {
-      monero_light_modify_account_status_request request(type, addresses);
-
-      modify_account_status(request);
-    }
-
-    void rescan() const {
-      rescan(m_primary_address);
-    }
-
-    void rescan(uint64_t start_height) {
-      rescan(start_height, m_primary_address);
-    }
-
-    void rescan(std::string address) const {
-      rescan(0, address);
-    }
-
-    void rescan(uint64_t height, std::string address) const {
-      std::vector<std::string> addresses = std::vector<std::string>();
-      addresses.push_back(address);
-
-      rescan(height, addresses);
-    }
-
-    void rescan(uint64_t height, std::vector<std::string> addresses) const {
-      monero_light_rescan_request request(height, addresses);
-
-      rescan(request);
-    }
-
-    // --------------------------------- LIGHT WALLET CLIENT METHODS ------------------------------------------
 
     monero_light_get_address_txs_response get_address_txs(std::string address, std::string view_key) const {
       monero_light_get_address_txs_request request;
@@ -755,6 +685,77 @@ namespace monero {
     monero_light_login_response login(monero_light_login_request request);
 
     // --------------------------------- LIGHT WALLET ADMIN METHODS ------------------------------------------
+
+    void accept_requests() { 
+      monero_light_accept_requests_request request; 
+      return accept_requests(request); 
+    }
+
+    void add_account() const {
+      add_account(m_primary_address, m_prv_view_key);
+    }
+
+    void add_account(std::string address, std::string view_key) const {
+      monero_light_add_account_request request;
+      request.m_address = address;
+      request.m_key = view_key;
+
+      add_account(request);
+    }
+
+    void active_account() {
+      modify_account_status("active");
+    }
+
+    void deactive_account() {
+      modify_account_status("deactive");
+    }
+
+    void hide_account() {
+      modify_account_status("hidden");
+    }
+
+    void modify_account_status(std::string type) {
+      modify_account_status(type, m_primary_address);
+    }
+
+    void modify_account_status(std::string type, std::string address) {
+      std::vector<std::string> addresses = std::vector<std::string>();
+      addresses.push_back(address);
+
+      modify_account_status(type, addresses);
+    }
+
+    void modify_account_status(std::string type, std::vector<std::string> addresses) {
+      monero_light_modify_account_status_request request(type, addresses);
+
+      modify_account_status(request);
+    }
+
+    void rescan() const {
+      rescan(m_primary_address);
+    }
+
+    void rescan(uint64_t start_height) {
+      rescan(start_height, m_primary_address);
+    }
+
+    void rescan(std::string address) const {
+      rescan(0, address);
+    }
+
+    void rescan(uint64_t height, std::string address) const {
+      std::vector<std::string> addresses = std::vector<std::string>();
+      addresses.push_back(address);
+
+      rescan(height, addresses);
+    }
+
+    void rescan(uint64_t height, std::vector<std::string> addresses) const {
+      monero_light_rescan_request request(height, addresses);
+
+      rescan(request);
+    }
 
     void accept_requests(monero_light_accept_requests_request request) const;
     void reject_requests(monero_light_reject_requests_request request) const;
