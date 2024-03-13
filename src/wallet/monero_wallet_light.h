@@ -517,7 +517,7 @@ namespace monero {
     std::string m_primary_address;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
     std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_admin_client;
-    std::chrono::milliseconds m_timeout = std::chrono::milliseconds(120000);
+    std::chrono::milliseconds m_timeout = std::chrono::milliseconds(3000);
     std::string m_host;
     std::string m_port;
     std::string m_lws_uri;
