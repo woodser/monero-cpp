@@ -1408,6 +1408,37 @@ namespace light {
     close();
   }
 
+  void monero_wallet_light::set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
+    if (connection == boost::none) {
+      set_daemon_connection("");
+      return;
+    }
+
+    std::string uri = connection.get().m_uri.get();
+    std::string host = "";
+    std::string port = "";
+
+    size_t colon_position = uri.find(":");
+
+    if (colon_position != std::string::npos) {
+      host = uri.substr(0, colon_position);
+      std::string _port = uri.substr(colon_position + 1);
+      std::stringstream parser(_port);
+      int __port = 0;
+
+      if ( parser >> __port ) {
+        port = std::to_string(__port);
+      } else {
+        throw std::runtime_error("Could not parse port from uri");
+      }
+
+    } else {
+      host = uri;
+    }
+
+    set_daemon_connection(host, port);
+  }
+
   void monero_wallet_light::set_daemon_connection(std::string host, std::string port, std::string admin_uri, std::string admin_port, std::string token) {
     m_host = host;
     m_port = port;
@@ -1423,7 +1454,14 @@ namespace light {
   }
 
   bool monero_wallet_light::is_connected_to_daemon() const {
+    if (m_http_client == nullptr) return false;
+
     return m_http_client->is_connected();
+  }
+
+  bool monero_wallet_light::is_connected_to_admin_daemon() const {
+    if (m_http_admin_client == nullptr) return false;
+    return m_http_admin_client->is_connected();
   }
 
   bool monero_wallet_light::is_synced() const {
@@ -1751,6 +1789,43 @@ namespace light {
     }
 
     return outputs;
+  }
+
+  std::string monero_wallet_light::export_outputs(bool all) const {
+    std::string result = "";
+    
+    return result;
+  }
+
+  std::vector<std::shared_ptr<monero_key_image>> monero_wallet_light::export_key_images(bool all) const {
+    if (all) {
+      //m_exported_key_images = m_imported_key_images;
+      return m_imported_key_images;
+    }
+
+    std::vector<std::shared_ptr<monero_key_image>> result = std::vector<std::shared_ptr<monero_key_image>>();
+
+    for(std::shared_ptr<monero_key_image> imported_key_image : m_imported_key_images) {
+      bool append = true;
+
+      for (std::shared_ptr<monero_key_image> exported_key_image : m_exported_key_images) {
+        if (imported_key_image->m_hex == exported_key_image->m_hex) {
+          append = false;
+          break;
+        }
+      }
+
+      if (append) {
+        result.push_back(imported_key_image);
+      }
+    }
+
+    //for (std::shared_ptr<monero_key_image> exported_key_image : result) {
+      
+      //m_exported_key_images.push_back(exported_key_image);
+    //}
+
+    return result;
   }
 
   std::shared_ptr<monero_key_image_import_result> monero_wallet_light::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) {

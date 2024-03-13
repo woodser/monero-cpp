@@ -457,9 +457,9 @@ namespace monero {
     bool is_synced() const override;
 
     monero_version get_version() const override;
-    monero_network_type get_network_type() const override { return m_network_type; }
-    std::string get_private_view_key() const override { return m_prv_view_key; }
-    std::string get_primary_address() const override { return m_primary_address; }
+    monero_network_type get_network_type() const override { return m_network_type; };
+    std::string get_private_view_key() const override { return m_prv_view_key; };
+    std::string get_primary_address() const override { return m_primary_address; };
     
     uint64_t get_height() const override { return m_scanned_block_height; };
     uint64_t get_restore_height() const override { return m_start_height; };
