@@ -52,7 +52,6 @@
 
 #include "wallet/wallet_rpc_server_commands_defs.h"
 #include "monero_wallet_light.h"
-
 #include "utils/monero_utils.h"
 #include <thread>
 #include <chrono>
@@ -1413,7 +1412,7 @@ namespace monero {
     m_token = token;
   }
 
-  void monero_wallet_light::set_daemon_proxy(const std::string& uri = "") {
+  void monero_wallet_light::set_daemon_proxy(const std::string& uri) {
     if (m_http_client == nullptr) throw std::runtime_error("Cannot set daemon proxy");
     m_http_client->set_proxy(uri);
     m_http_admin_client->set_proxy(uri);
