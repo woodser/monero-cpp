@@ -1614,6 +1614,10 @@ namespace light {
     return result;
   }
 
+  void monero_wallet_light::start_syncing(uint64_t sync_period_in_ms) {
+    sync();
+  }
+
   void monero_wallet_light::rescan_blockchain() {       
     if (is_connected_to_admin_daemon())
     {
@@ -1793,7 +1797,7 @@ namespace light {
 
   std::string monero_wallet_light::export_outputs(bool all) const {
     std::string result = "";
-    
+
     return result;
   }
 
