@@ -1664,7 +1664,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_transfer>> transfers = std::vector<std::shared_ptr<monero_transfer>>();
 
     for (monero_light_transaction light_tx : m_transactions) {
-      std::shared_ptr<monero_transfer> transfer = std::make_shared<monero_transfer>();
+      std::shared_ptr<monero_transfer> transfer;
 
       if (is_view_only()) {
         transfer = std::make_shared<monero_incoming_transfer>();
