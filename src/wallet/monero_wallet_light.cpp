@@ -180,6 +180,48 @@ namespace monero {
   }
   
   //------------------------------------------------------------------------------------------------------------------------------
+  static std::string ptx_to_string(const tools::wallet2::pending_tx &ptx)
+  {
+    std::ostringstream oss;
+    boost::archive::portable_binary_oarchive ar(oss);
+    try
+    {
+      ar << ptx;
+    }
+    catch (...)
+    {
+      return "";
+    }
+    return epee::string_tools::buff_to_hex_nodelimer(oss.str());
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  template<typename T> static bool is_error_value(const T &val) { return false; }
+  static bool is_error_value(const std::string &s) { return s.empty(); }
+  //------------------------------------------------------------------------------------------------------------------------------
+  template<typename T, typename V>
+  static bool fill(T &where, V s)
+  {
+    if (is_error_value(s)) return false;
+    where = std::move(s);
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  template<typename T, typename V>
+  static bool fill(std::list<T> &where, V s)
+  {
+    if (is_error_value(s)) return false;
+    where.emplace_back(std::move(s));
+    return true;
+  }
+  //------------------------------------------------------------------------------------------------------------------------------
+  static uint64_t total_amount(const tools::wallet2::pending_tx &ptx)
+  {
+    uint64_t amount = 0;
+    for (const auto &dest: ptx.dests) amount += dest.amount;
+    return amount;
+  }
+  
+  //------------------------------------------------------------------------------------------------------------------------------
   template<typename Ts, typename Tu, typename Tk, typename Ta>
   bool fill_response(wallet2* m_w2, std::vector<tools::wallet2::pending_tx> &ptx_vector,
       bool get_tx_key, Ts& tx_key, Tu &amount, Ta &amounts_by_dest, Tu &fee, Tu &weight, std::string &multisig_txset, std::string &unsigned_txset, bool do_not_relay,
