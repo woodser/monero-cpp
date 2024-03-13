@@ -520,8 +520,10 @@ namespace monero {
     std::chrono::milliseconds m_timeout = std::chrono::milliseconds(120000);
     std::string m_host;
     std::string m_port;
+    std::string m_lws_uri;
     std::string m_admin_uri;
     std::string m_admin_port;
+    std::string m_lws_admin_uri;
     std::string m_token;
 
     bool m_request_pending;

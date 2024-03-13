@@ -1416,37 +1416,24 @@ namespace light {
       return;
     }
 
-    std::string uri = connection.get().m_uri.get();
-    std::string host = "";
-    std::string port = "";
-
-    size_t colon_position = boost::replace_all_copy(uri, "http://", "").find(":");
-
-    if (colon_position != std::string::npos && colon_position != -1) {
-      host = uri.substr(0, colon_position);
-      std::string _port = uri.substr(colon_position + 1);
-      std::stringstream parser(_port);
-      int __port = 0;
-
-      if ( parser >> __port ) {
-        port = std::to_string(__port);
-      } else {
-        throw std::runtime_error("Could not parse port from uri: " + uri);
-      }
-
-    } else {
-      host = uri;
-    }
-
-    set_daemon_connection(host, port);
+    m_lws_uri = connection.get().m_uri.get();
   }
 
   void monero_wallet_light::set_daemon_connection(std::string host, std::string port, std::string admin_uri, std::string admin_port, std::string token) {
     m_host = host;
     m_port = port;
+    m_lws_uri = host + ":" + port;
     m_admin_uri = admin_uri;
     m_admin_port = admin_port;
+    m_lws_admin_uri = admin_uri + ":" + admin_port;
     m_token = token;
+
+    if (m_http_client != nullptr) {
+      if (m_http_client->is_connected()) m_http_client->disconnect();
+
+      if (!m_http_client->set_server(m_lws_uri, boost::none)) throw std::runtime_error("Could not server: " + host);
+      if (!m_http_client->connect(m_timeout)) throw std::runtime_error("Could not connect to server: " + host);
+    }
   }
 
   void monero_wallet_light::set_daemon_proxy(const std::string& uri) {
@@ -2108,31 +2095,19 @@ namespace light {
     m_request_pending = false;
     m_request_accepted = false;
 
-    if (m_host != "") {
-      std::string address = m_host;
+    if (m_lws_uri != "") {
+      epee::net_utils::ssl_support_t ssl = m_lws_uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
 
-      if (m_port != "") {
-        address = address + ":" + m_port;
-      }
-      
-      epee::net_utils::ssl_support_t ssl = address.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
-
-      if(!m_http_client->set_server(address, boost::none)) throw std::runtime_error("Invalid lws address");
+      if(!m_http_client->set_server(m_lws_uri, boost::none)) throw std::runtime_error("Invalid lws address");
       if(!m_http_client->connect(m_timeout)) throw std::runtime_error("Could not connect to lws");
-      if(!m_w2->init(address, boost::none, {}, 0, false, ssl)) throw std::runtime_error("Failed to initialize light wallet with daemon connection");
+      if(!m_w2->init(m_lws_uri, boost::none, {}, 0, false, ssl)) throw std::runtime_error("Failed to initialize light wallet with daemon connection");
       login();
     } else {
       throw std::runtime_error("Must provide a lws address");
     }
 
-    if (m_admin_uri != "") {
-      std::string address = m_admin_uri;
-
-      if (m_admin_port != "") {
-        address = address + ":" + m_admin_port;
-      }
-
-      if (!m_http_admin_client->set_server(address, boost::none)) throw std::runtime_error("Invalid admin lws address");
+    if (m_lws_admin_uri != "") {
+      if (!m_http_admin_client->set_server(m_lws_admin_uri, boost::none)) throw std::runtime_error("Invalid admin lws address");
       if (!m_http_admin_client->connect(m_timeout)) throw std::runtime_error("Could not connect to admin lws");
     } else {
       m_http_admin_client = nullptr;
