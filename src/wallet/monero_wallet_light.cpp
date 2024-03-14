@@ -481,15 +481,16 @@ namespace light {
         else if (key == std::string("unlock_time")) transaction->m_unlock_time = it->second.get_value<uint64_t>();
         else if (key == std::string("height")) transaction->m_height = it->second.get_value<uint64_t>();
         else if (key == std::string("spent_outputs")) {
-            // deserialize monero_light_spend
-            
-            transaction->m_spent_outputs = std::vector<monero_light_spend>();
+          // deserialize monero_light_spend
+          
+          transaction->m_spent_outputs = std::vector<monero_light_spend>();
 
-            for(auto& output : it->second.get_child("spent_outputs")) {
-                std::shared_ptr<monero_light_spend> spend = std::make_shared<monero_light_spend>();
-                monero_light_spend::from_property_tree(output.second, spend);
-                transaction->m_spent_outputs->push_back(*spend);
-            }
+          boost::property_tree::ptree outs_node = it->second;
+          for (boost::property_tree::ptree::const_iterator it2 = outs_node.begin(); it2 != outs_node.end(); ++it2) {
+            std::shared_ptr<monero_light_spend> out = std::make_shared<monero_light_spend>();
+            monero_light_spend::from_property_tree(it2->second, out);
+            transaction->m_spent_outputs->push_back(*out);
+          }
         }
         else if (key == std::string("payment_id")) transaction->m_payment_id = it->second.data();
         else if (key == std::string("coinbase")) transaction->m_coinbase = it->second.get_value<bool>();
@@ -536,10 +537,11 @@ namespace light {
         else if (key == std::string("outputs")) {
             random_outputs->m_outputs = std::vector<monero_light_random_output>();
 
-            for(auto& output : it->second.get_child("outputs")) {
-                std::shared_ptr<monero_light_random_output> random_output = std::make_shared<monero_light_random_output>();
-                monero_light_random_output::from_property_tree(output.second, random_output);
-                random_outputs->m_outputs->push_back(*random_output);
+            boost::property_tree::ptree outs_node = it->second;
+            for (boost::property_tree::ptree::const_iterator it2 = outs_node.begin(); it2 != outs_node.end(); ++it2) {
+              std::shared_ptr<monero_light_random_output> out = std::make_shared<monero_light_random_output>();
+              monero_light_random_output::from_property_tree(it2->second, out);
+              random_outputs->m_outputs->push_back(*out);
             }
         }
     }
@@ -569,15 +571,13 @@ namespace light {
         else if (key == std::string("transaction_height")) address_info->m_transaction_height = it->second.get_value<uint64_t>();
         else if (key == std::string("blockchain_height")) address_info->m_blockchain_height = it->second.get_value<uint64_t>();
         else if (key == std::string("spent_outputs")) {
-            address_info->m_spent_outputs = std::vector<monero_light_spend>();
-            MINFO("monero_light_get_address_info_response::deserialize(): found spent outputs");
-            for(auto& output : it->second.get_child("spent_outputs")) {
-                std::shared_ptr<monero_light_spend> spent_output;
-                monero_light_spend::from_property_tree(output.second, spent_output);
-                address_info->m_spent_outputs->push_back(*spent_output);
-            }
-            MINFO("monero_light_get_address_info_response::deserialize(): end cicle");
-
+          address_info->m_spent_outputs = std::vector<monero_light_spend>();
+          boost::property_tree::ptree spent_outputs_node = it->second;
+          for (boost::property_tree::ptree::const_iterator it2 = spent_outputs_node.begin(); it2 != spent_outputs_node.end(); ++it2) {
+            std::shared_ptr<monero_light_spend> spent_output = std::make_shared<monero_light_spend>();
+            monero_light_spend::from_property_tree(it2->second, spent_output);
+            address_info->m_spent_outputs->push_back(*spent_output);
+          }
         } else if (key == std::string("rates")) {
             std::shared_ptr<monero_light_rates> rates = std::make_shared<monero_light_rates>();
             monero_light_rates::from_property_tree(it->second, rates);
@@ -606,13 +606,14 @@ namespace light {
         else if (key == std::string("start_height")) address_txs->m_start_height = it->second.get_value<uint64_t>();
         else if (key == std::string("blockchain_height")) address_txs->m_blockchain_height = it->second.get_value<uint64_t>();
         else if (key == std::string("transactions")) {
-            address_txs->m_transactions = std::vector<monero_light_transaction>();
+          address_txs->m_transactions = std::vector<monero_light_transaction>();
 
-            for(auto& output : it->second.get_child("transactions")) {
-                std::shared_ptr<monero_light_transaction> transaction;
-                monero_light_transaction::from_property_tree(output.second, transaction);
-                address_txs->m_transactions->push_back(*transaction);
-            }
+          boost::property_tree::ptree transactions_node = it->second;
+          for (boost::property_tree::ptree::const_iterator it2 = transactions_node.begin(); it2 != transactions_node.end(); ++it2) {
+            std::shared_ptr<monero_light_transaction> transaction = std::make_shared<monero_light_transaction>();
+            monero_light_transaction::from_property_tree(it2->second, transaction);
+            address_txs->m_transactions->push_back(*transaction);
+          }
         }
     }
 
@@ -632,13 +633,13 @@ namespace light {
         std::string key = it->first;
 
         if (key == std::string("amount_outs")) {
-            random_outs->m_amount_outs = std::vector<monero_light_random_output>();
-
-            for(auto& output : it->second.get_child("transactions")) {
-                std::shared_ptr<monero_light_random_output> out;
-                monero_light_random_output::from_property_tree(output.second, out);
-                random_outs->m_amount_outs->push_back(*out);
-            }
+          random_outs->m_amount_outs = std::vector<monero_light_random_output>();
+          boost::property_tree::ptree outs_node = it->second;
+          for (boost::property_tree::ptree::const_iterator it2 = outs_node.begin(); it2 != outs_node.end(); ++it2) {
+            std::shared_ptr<monero_light_random_output> out = std::make_shared<monero_light_random_output>();
+            monero_light_random_output::from_property_tree(it2->second, out);
+            random_outs->m_amount_outs->push_back(*out);
+          }
         }
     }
 
@@ -663,10 +664,11 @@ namespace light {
         else if (key == std::string("outputs")) {
             unspent_outs->m_outputs = std::vector<monero_light_output>();
 
-            for(auto& out : it->second.get_child("outputs")) {
-                std::shared_ptr<monero_light_output> output = std::make_shared<monero_light_output>();
-                monero_light_output::from_property_tree(out.second, output);
-                unspent_outs->m_outputs->push_back(*output);
+            boost::property_tree::ptree outs_node = it->second;
+            for (boost::property_tree::ptree::const_iterator it2 = outs_node.begin(); it2 != outs_node.end(); ++it2) {
+              std::shared_ptr<monero_light_output> out = std::make_shared<monero_light_output>();
+              monero_light_output::from_property_tree(it2->second, out);
+              unspent_outs->m_outputs->push_back(*out);
             }
         }
     }
@@ -769,29 +771,32 @@ namespace light {
 
         if (key == std::string("active")) {
             accounts->m_active = std::vector<monero_light_account>();
-
-            for (auto& active_account : it->second.get_child("active")) {
-                std::shared_ptr<monero_light_account> account = std::make_shared<monero_light_account>();
-                monero_light_account::from_property_tree(active_account.second, account);
-                accounts->m_active->push_back(*account);
+            
+            boost::property_tree::ptree accounts_node = it->second;
+            for (boost::property_tree::ptree::const_iterator it2 = accounts_node.begin(); it2 != accounts_node.end(); ++it2) {
+              std::shared_ptr<monero_light_account> account = std::make_shared<monero_light_account>();
+              monero_light_account::from_property_tree(it2->second, account);
+              accounts->m_active->push_back(*account);
             }
         }
         else if (key == std::string("inactive")) {
             accounts->m_inactive = std::vector<monero_light_account>();
 
-            for (auto& inactive_account : it->second.get_child("inactive")) {
-                std::shared_ptr<monero_light_account> account = std::make_shared<monero_light_account>();
-                monero_light_account::from_property_tree(inactive_account.second, account);
-                accounts->m_inactive->push_back(*account);
+            boost::property_tree::ptree accounts_node = it->second;
+            for (boost::property_tree::ptree::const_iterator it2 = accounts_node.begin(); it2 != accounts_node.end(); ++it2) {
+              std::shared_ptr<monero_light_account> account = std::make_shared<monero_light_account>();
+              monero_light_account::from_property_tree(it2->second, account);
+              accounts->m_inactive->push_back(*account);
             }
         }
         else if (key == std::string("hidden")) {
             accounts->m_hidden = std::vector<monero_light_account>();
 
-            for (auto& hidden_account : it->second.get_child("hidden")) {
-                std::shared_ptr<monero_light_account> account = std::make_shared<monero_light_account>();
-                monero_light_account::from_property_tree(hidden_account.second, account);
-                accounts->m_hidden->push_back(*account);
+            boost::property_tree::ptree accounts_node = it->second;
+            for (boost::property_tree::ptree::const_iterator it2 = accounts_node.begin(); it2 != accounts_node.end(); ++it2) {
+              std::shared_ptr<monero_light_account> account = std::make_shared<monero_light_account>();
+              monero_light_account::from_property_tree(it2->second, account);
+              accounts->m_hidden->push_back(*account);
             }
         }
     }
@@ -932,11 +937,12 @@ namespace light {
             // deserialize monero_light_spend
             
             transaction->m_spent_outputs = std::vector<monero_light_spend>();
-
-            for(auto& output : it->second.get_child("spent_outputs")) {
-                std::shared_ptr<monero_light_spend> spend = std::make_shared<monero_light_spend>();
-                monero_light_spend::from_property_tree(output.second, spend);
-                transaction->m_spent_outputs->push_back(*spend);
+            
+            boost::property_tree::ptree outs = it->second;
+            for (boost::property_tree::ptree::const_iterator it2 = outs.begin(); it2 != outs.end(); ++it2) {
+              std::shared_ptr<monero_light_spend> out = std::make_shared<monero_light_spend>();
+              monero_light_spend::from_property_tree(it2->second, out);
+              transaction->m_spent_outputs->push_back(*out);
             }
         }
         else if (key == std::string("payment_id")) transaction->m_payment_id = it->second.data();
