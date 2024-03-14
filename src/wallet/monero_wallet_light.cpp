@@ -1098,10 +1098,12 @@ namespace light {
 
     // set string values
     rapidjson::Value value_str(rapidjson::kStringType);
+    rapidjson::Value value_false(rapidjson::kFalseType);
+    rapidjson::Value value_true(rapidjson::kTrueType);
     if (m_address != boost::none) monero_utils::add_json_member("address", m_address.get(), allocator, root, value_str);
     if (m_view_key != boost::none) monero_utils::add_json_member("view_key", m_view_key.get(), allocator, root, value_str);
-    if (m_create_account != boost::none) monero_utils::add_json_member("create_account", m_create_account.get(), allocator, root, value_str);
-    if (m_generated_locally != boost::none) monero_utils::add_json_member("generated_locally", m_generated_locally.get(), allocator, root, value_str);
+    if (m_create_account != boost::none) monero_utils::add_json_member("create_account", m_create_account.get(), allocator, root, m_create_account.get() ? value_true : value_false);
+    if (m_generated_locally != boost::none) monero_utils::add_json_member("generated_locally", m_generated_locally.get(), allocator, root, m_generated_locally.get() ? value_true : value_false);
 
     // return root
     return root;
