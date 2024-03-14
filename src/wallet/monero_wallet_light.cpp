@@ -2305,12 +2305,16 @@ namespace light {
   }
 
   monero_light_login_response monero_wallet_light::login(monero_light_login_request request) {
+    MINFO("monero_wallet_light::login()");
     rapidjson::Document document(rapidjson::Type::kObjectType);
+    MINFO("monero_wallet_light::login(): created document");
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
+    MINFO("monero_wallet_light::login(): created request");
     std::string body = req.GetString();
-
+    MINFO("monero_wallet_light::login(): created body");
+    MINFO("monero_wallet_light::login(): post login");
     const epee::net_utils::http::http_response_info *response = post("/login", body);
+    MINFO("monero_wallet_light::login(): got response");
     int status_code = response->m_response_code;
 
     if (status_code == 501) {
