@@ -51,7 +51,7 @@ int main(int argc, const char* argv[]) {
   // get balance, account, subaddresses
   string restored_primary = wallet_restored->get_primary_address();
   uint64_t balance = wallet_restored->get_balance(); // can specify account and subaddress indices
-  monero_account account = wallet_restored->get_account(1, true); // get account with subaddresses
+  monero_account account = wallet_restored->get_account(0, false); // get account without subaddresses
   uint64_t unlocked_account_balance = account.m_unlocked_balance.get(); // get boost::optional value
 
   // query a transaction by hash
