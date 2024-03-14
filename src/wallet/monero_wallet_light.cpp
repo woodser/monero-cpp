@@ -549,6 +549,7 @@ namespace light {
 
   std::shared_ptr<monero_light_get_address_info_response> monero_light_get_address_info_response::deserialize(const std::string& config_json) {
     // deserialize monero output json to property node
+    MINFO("monero_light_get_address_info_response::deserialize()");
     std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
     boost::property_tree::ptree node;
     boost::property_tree::read_json(iss, node);
@@ -569,12 +570,13 @@ namespace light {
         else if (key == std::string("blockchain_height")) address_info->m_blockchain_height = it->second.get_value<uint64_t>();
         else if (key == std::string("spent_outputs")) {
             address_info->m_spent_outputs = std::vector<monero_light_spend>();
-
+            MINFO("monero_light_get_address_info_response::deserialize(): found spent outputs");
             for(auto& output : it->second.get_child("spent_outputs")) {
                 std::shared_ptr<monero_light_spend> spent_output;
                 monero_light_spend::from_property_tree(output.second, spent_output);
                 address_info->m_spent_outputs->push_back(*spent_output);
             }
+            MINFO("monero_light_get_address_info_response::deserialize(): end cicle");
 
         } else if (key == std::string("rates")) {
             std::shared_ptr<monero_light_rates> rates = std::make_shared<monero_light_rates>();
