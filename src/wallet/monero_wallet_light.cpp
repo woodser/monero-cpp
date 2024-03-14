@@ -2187,10 +2187,11 @@ namespace light {
 
   monero_light_get_address_info_response monero_wallet_light::get_address_info(monero_light_get_address_info_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
-
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_address_info", body);
     int status_code = response->m_response_code;
@@ -2213,8 +2214,10 @@ namespace light {
   monero_light_get_address_txs_response monero_wallet_light::get_address_txs(monero_light_get_address_txs_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_address_txs", body);
     int status_code = response->m_response_code;
@@ -2237,8 +2240,10 @@ namespace light {
   monero_light_get_random_outs_response monero_wallet_light::get_random_outs(monero_light_get_random_outs_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_random_outs", body);
     int status_code = response->m_response_code;
@@ -2252,8 +2257,10 @@ namespace light {
   monero_light_get_unspent_outs_response monero_wallet_light::get_unspent_outs(monero_light_get_unspent_outs_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/get_unspent_outs", body);
     int status_code = response->m_response_code;
@@ -2277,8 +2284,10 @@ namespace light {
   monero_light_import_request_response monero_wallet_light::import_request(monero_light_import_request_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/import_request", body);
     int status_code = response->m_response_code;
@@ -2293,8 +2302,10 @@ namespace light {
   monero_light_submit_raw_tx_response monero_wallet_light::submit_raw_tx(monero_light_submit_raw_tx_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/submit_raw_tx", body);
     int status_code = response->m_response_code;
@@ -2308,18 +2319,14 @@ namespace light {
 
   monero_light_login_response monero_wallet_light::login(monero_light_login_request request) {
     MINFO("monero_wallet_light::login()");
+
     rapidjson::Document document(rapidjson::Type::kObjectType);
-    MINFO("monero_wallet_light::login(): created document");
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-    MINFO("monero_wallet_light::login(): created request");
     rapidjson::StringBuffer sb;
     rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
     req.Accept(writer);
     std::string body = sb.GetString();
-    MINFO("monero_wallet_light::login(): created body: " << body);
-    MINFO("monero_wallet_light::login(): post login");
     const epee::net_utils::http::http_response_info *response = post("/login", body);
-    MINFO("monero_wallet_light::login(): got response");
     int status_code = response->m_response_code;
 
     if (status_code == 501) {
@@ -2360,8 +2367,10 @@ namespace light {
   void monero_wallet_light::accept_requests(monero_light_accept_requests_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/accept_requests", body, true);
     int status_code = response->m_response_code;
@@ -2373,8 +2382,10 @@ namespace light {
   void monero_wallet_light::reject_requests(monero_light_reject_requests_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/reject_requests", body, true);
     int status_code = response->m_response_code;
@@ -2386,8 +2397,10 @@ namespace light {
   void monero_wallet_light::add_account(monero_light_add_account_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/add_account", body, true);
     int status_code = response->m_response_code;
@@ -2399,8 +2412,10 @@ namespace light {
   monero_light_list_accounts_response monero_wallet_light::list_accounts(monero_light_list_accounts_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/list_accounts", body, true);
     int status_code = response->m_response_code;
@@ -2414,8 +2429,10 @@ namespace light {
   monero_light_list_requests_response monero_wallet_light::list_requests(monero_light_list_requests_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/list_requests", body, true);
     int status_code = response->m_response_code;
@@ -2429,8 +2446,10 @@ namespace light {
   void monero_wallet_light::modify_account_status(monero_light_modify_account_status_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/modify_account_status", body, true);
     int status_code = response->m_response_code;
@@ -2442,8 +2461,10 @@ namespace light {
   void monero_wallet_light::rescan(monero_light_rescan_request request) const {
     rapidjson::Document document(rapidjson::Type::kObjectType);
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
-
-    std::string body = req.GetString();
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    req.Accept(writer);
+    std::string body = sb.GetString();
 
     const epee::net_utils::http::http_response_info *response = post("/rescan", body, true);
     int status_code = response->m_response_code;
