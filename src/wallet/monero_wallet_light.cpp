@@ -2312,7 +2312,7 @@ namespace light {
     MINFO("monero_wallet_light::login(): created request");
     rapidjson::StringBuffer sb;
     rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
-    document.Accept(writer);
+    req.Accept(writer);
     std::string body = sb.GetString();
     MINFO("monero_wallet_light::login(): created body: " << body);
     MINFO("monero_wallet_light::login(): post login");
