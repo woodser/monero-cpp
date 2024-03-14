@@ -1049,7 +1049,8 @@ namespace light {
 
     // set string values
     rapidjson::Value value_str(rapidjson::kStringType);
-    if (m_count != boost::none) monero_utils::add_json_member("count", m_count.get(), allocator, root, value_str);
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_count != boost::none) monero_utils::add_json_member("count", m_count.get(), allocator, root, value_num);
 
     // set sub-arrays
     if (m_amounts != boost::none) root.AddMember("amounts", monero_utils::to_rapidjson_val(allocator, m_amounts.get()), allocator);
@@ -1080,11 +1081,12 @@ namespace light {
 
     // set string values
     rapidjson::Value value_str(rapidjson::kStringType);
+    rapidjson::Value value_num(rapidjson::kNumberType);
     if (m_address != boost::none) monero_utils::add_json_member("address", m_address.get(), allocator, root, value_str);
     if (m_view_key != boost::none) monero_utils::add_json_member("view_key", m_view_key.get(), allocator, root, value_str);
     if (m_amount != boost::none) monero_utils::add_json_member("amount", m_amount.get(), allocator, root, value_str);
-    if (m_mixin != boost::none) monero_utils::add_json_member("mixin", m_mixin.get(), allocator, root, value_str);
-    if (m_use_dust != boost::none) monero_utils::add_json_member("use_dust", m_use_dust.get(), allocator, root, value_str);
+    if (m_mixin != boost::none) monero_utils::add_json_member("mixin", m_mixin.get(), allocator, root, value_num);
+    if (m_use_dust != boost::none) monero_utils::add_json_member("use_dust", m_use_dust.get(), allocator, root);
     if (m_dust_threshold != boost::none) monero_utils::add_json_member("dust_threshold", m_dust_threshold.get(), allocator, root, value_str);
 
     // return root
