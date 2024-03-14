@@ -18,9 +18,10 @@ endif()
 project(MoneroCppLibrary)
 
 set(BUILD_LIBRARY ON)
-set(BUILD_SAMPLE OFF)
-set(BUILD_SCRATCHPAD OFF)
-set(BUILD_TESTS OFF)
+set(BUILD_SAMPLE ON)
+set(BUILD_LIGHT_TESTS ON)
+set(BUILD_SCRATCHPAD ON)
+set(BUILD_TESTS ON)
 
 ###################
 # monero-project
@@ -407,6 +408,58 @@ if (BUILD_SAMPLE)
   )
   if (NOT WIN32)
     target_link_libraries(sample_code dl)
+  endif()
+endif()
+
+
+########################
+# Build C++ sample Code
+########################
+
+if (BUILD_LIGHT_TESTS)
+  set(LIGHT_TEST_SRC_FILES test/monero_light_tests.cpp)
+  
+  add_executable(monero_light_tests ${LIBRARY_SRC_FILES} ${SAMPLE_CODE_SRC_FILES})
+  
+  target_link_libraries(monero_light_tests
+      wallet
+      rpc_base
+      net
+      lmdb
+      easylogging
+      cryptonote_core
+      cryptonote_protocol
+      cryptonote_basic
+      cryptonote_format_utils_basic
+      mnemonics
+      ringct
+      ringct_basic
+      common
+      cncrypto
+      blockchain_db
+      blocks
+      checkpoints
+      device
+      device_trezor
+      multisig
+      version
+      randomx
+      epee
+      hardforks
+      cncrypto
+      ${wallet_crypto}
+
+      ${UNBOUND_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Protobuf_LIBRARY}
+      ${LibUSB_LIBRARIES}
+      ${OPENSSL_LIBRARIES}
+      ${SODIUM_LIBRARY}
+      ${HIDAPI_LIBRARIES}
+      ${EXTRA_LIBRARIES}
+  )
+  if (NOT WIN32)
+    target_link_libraries(monero_light_tests dl)
   endif()
 endif()
 
