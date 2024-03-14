@@ -1479,7 +1479,7 @@ namespace light {
 
   monero_sync_result monero_wallet_light::sync_aux() {
     MTRACE("sync_aux()");
-    if (!is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!is_connected_to_daemon()) throw std::runtime_error("sync_aux(): Wallet is not connected to daemon");
     
     monero_sync_result result(0, false);
     monero_light_get_address_txs_response response = get_address_txs();
@@ -1529,7 +1529,7 @@ namespace light {
 
   monero_sync_result monero_wallet_light::sync() {
     MTRACE("sync()");
-    if(!is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
+    if(!is_connected_to_daemon()) throw std::runtime_error("sync(): Wallet is not connected to daemon");
 
     monero_sync_result result(0, false);
     monero_sync_result last_sync(0, false);
@@ -1548,7 +1548,7 @@ namespace light {
 
   monero_sync_result monero_wallet_light::sync(uint64_t start_height) {
     MTRACE("sync(" << start_height << ")");
-    if (!is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!is_connected_to_daemon()) throw std::runtime_error("sync(uint64_t): Wallet is not connected to daemon");
     if (start_height < m_start_height) {
       if (!is_connected_to_admin_daemon()) throw std::runtime_error("Wallet is not connected to admin daemon");
       rescan(start_height, m_primary_address);
@@ -1572,7 +1572,7 @@ namespace light {
 
   monero_sync_result monero_wallet_light::sync(monero_wallet_listener& listener) {
     MTRACE("sync(listener)");
-    if (!is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!is_connected_to_daemon()) throw std::runtime_error("sync(monero_wallet_listener&): Wallet is not connected to daemon");
     uint64_t last_scanned_block_height = m_scanned_block_height;
     monero_sync_result last_sync(0, false);
     
@@ -1613,7 +1613,7 @@ namespace light {
       rescan();
       return;
     }
-    else if(!is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
+    else if(!is_connected_to_daemon()) throw std::runtime_error("rescan_blockchain(): Wallet is not connected to daemon");
     monero_light_import_request_response response = import_request();
 
     if (response.m_import_fee != boost::none) {
