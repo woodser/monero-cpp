@@ -17,8 +17,8 @@ bool FUNDS_RECEIVED = false;
 int main(int argc, const char* argv[]) {
 
 //  // configure logging
-//  mlog_configure("log_cpp_sample_code.txt", true);
-//  mlog_set_log_level(1);
+  mlog_configure("log_cpp_light_tests.txt", true);
+  mlog_set_log_level(4);
   // create a wallet from keys
   MINFO("===== Light Tests =====");
   MINFO("===== Create wallet from keys =====");

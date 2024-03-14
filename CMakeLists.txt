@@ -18,10 +18,10 @@ endif()
 project(MoneroCppLibrary)
 
 set(BUILD_LIBRARY ON)
-set(BUILD_SAMPLE ON)
+set(BUILD_SAMPLE OFF)
 set(BUILD_LIGHT_TESTS ON)
-set(BUILD_SCRATCHPAD ON)
-set(BUILD_TESTS ON)
+set(BUILD_SCRATCHPAD OFF)
+set(BUILD_TESTS OFF)
 
 ###################
 # monero-project
@@ -419,7 +419,7 @@ endif()
 if (BUILD_LIGHT_TESTS)
   set(LIGHT_TEST_SRC_FILES test/monero_light_tests.cpp)
   
-  add_executable(monero_light_tests ${LIBRARY_SRC_FILES} ${SAMPLE_CODE_SRC_FILES})
+  add_executable(monero_light_tests ${LIBRARY_SRC_FILES} ${LIGHT_TEST_SRC_FILES})
   
   target_link_libraries(monero_light_tests
       wallet
