@@ -2086,6 +2086,7 @@ namespace light {
   // ------------------------------- PROTECTED HELPERS ----------------------------
 
   void monero_wallet_light::init_common() {
+    MINFO("monero_wallet_light::init_common()");
     m_w2->set_light_wallet(true);
     m_primary_address = m_account.get_public_address_str(static_cast<cryptonote::network_type>(m_network_type));
     const cryptonote::account_keys& keys = m_account.get_keys();
@@ -2099,9 +2100,13 @@ namespace light {
       epee::net_utils::ssl_support_t ssl = m_lws_uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
 
       if(!m_http_client->set_server(m_lws_uri, boost::none)) throw std::runtime_error("Invalid lws address");
+      MINFO("successfully set lw server: " << m_lws_uri);
       if(!m_http_client->connect(m_timeout)) throw std::runtime_error("Could not connect to lws");
+      MINFO("successfully connected to lw server: " << m_lws_uri);
       if(!m_w2->init(m_lws_uri, boost::none, {}, 0, false, ssl)) throw std::runtime_error("Failed to initialize light wallet with daemon connection");
+      MINFO("successfully initialized wallet2");
       login();
+      MINFO("Done login");
     } else {
       throw std::runtime_error("Must provide a lws address");
     }
@@ -2112,6 +2117,8 @@ namespace light {
     } else {
       m_http_admin_client = nullptr;
     }
+    
+    MINFO("monero_wallet_light::init_common() end");
 
   }
 
