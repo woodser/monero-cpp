@@ -2310,8 +2310,11 @@ namespace light {
     MINFO("monero_wallet_light::login(): created document");
     rapidjson::Value req = request.to_rapidjson_val(document.GetAllocator());
     MINFO("monero_wallet_light::login(): created request");
-    std::string body = req.GetString();
-    MINFO("monero_wallet_light::login(): created body");
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    document.Accept(writer);
+    std::string body = sb.GetString();
+    MINFO("monero_wallet_light::login(): created body: " << body);
     MINFO("monero_wallet_light::login(): post login");
     const epee::net_utils::http::http_response_info *response = post("/login", body);
     MINFO("monero_wallet_light::login(): got response");
