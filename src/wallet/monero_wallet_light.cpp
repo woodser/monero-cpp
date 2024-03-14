@@ -1299,7 +1299,7 @@ namespace light {
     if (!src->m_spent_outputs.get().empty()) {
       tgt->m_spent_outputs = std::vector<monero_light_spend>();
       for (const monero_light_spend& spent_output : src->m_spent_outputs.get()) {
-        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output.copy(std::make_shared<monero_light_spend>(spent_output), std::make_shared<monero_light_spend>());
+        std::shared_ptr<monero_light_spend> spent_output_copy = spent_output.copy(std::make_shared<monero_light_spend>(spent_output), std::make_shared<monero_light_spend>(spent_output), std::make_shared<monero_light_spend>());
         tgt->m_spent_outputs.get().push_back(*spent_output_copy);
       }
     }
@@ -1503,7 +1503,7 @@ namespace light {
     m_transactions = std::vector<monero_light_transaction>();
 
     for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
-      std::shared_ptr<monero_light_transaction> transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
+      std::shared_ptr<monero_light_transaction> transaction = raw_transaction.copy(std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(raw_transaction), std::make_shared<monero_light_transaction>(),true);
       uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_received.get());
 
       if (!result.m_received_money) result.m_received_money = total_received > 0;
