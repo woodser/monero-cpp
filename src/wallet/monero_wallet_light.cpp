@@ -1588,7 +1588,7 @@ namespace light {
     MTRACE("sync(listener)");
     if (!is_connected_to_daemon()) throw std::runtime_error("sync(monero_wallet_listener&): Wallet is not connected to daemon");
     uint64_t last_scanned_block_height = m_scanned_block_height;
-    monero_sync_result last_sync(0, false);
+    monero_sync_result last_sync = sync_aux();
     
     while(!is_synced()) {
       
@@ -2113,15 +2113,27 @@ namespace light {
 
   void monero_wallet_light::close(bool save) {
     if (save) throw std::runtime_error("MoneroWalletLight does not support saving");
-    m_http_client->disconnect();
-    m_http_admin_client->disconnect();
+    if (m_http_client != nullptr && m_http_client->is_connected()) {
+      m_http_client->disconnect();
+      epee::net_utils::http::abstract_http_client *release_client = m_http_client.release();
+      delete release_client;
+    }
 
-    epee::net_utils::http::abstract_http_client *release_client = m_http_client.release();
-    delete release_client;
+    if (m_http_admin_client != nullptr && m_http_admin_client->is_connected()) {
+      m_http_admin_client->disconnect();
+      epee::net_utils::http::abstract_http_client *release_admin_client = m_http_admin_client.release();
+      delete release_admin_client;
+    }
 
-    epee::net_utils::http::abstract_http_client *release_admin_client = m_http_admin_client.release();
-    delete release_admin_client;
+    if (m_http_client != nullptr) {
+      epee::net_utils::http::abstract_http_client *release_client = m_http_client.release();
+      delete release_client;
+    }
 
+    if (m_http_admin_client != nullptr) {
+      epee::net_utils::http::abstract_http_client *release_admin_client = m_http_admin_client.release();
+      delete release_admin_client;
+    }
     // no pointers to destroy
   }
 

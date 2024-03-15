@@ -80,20 +80,41 @@ int main(int argc, const char* argv[]) {
   }
   monero_utils::free(txs);
 
-  /*
-  // offline wallet sign txs test
-  monero_wallet_config offline_config; 
-  offline_config = wallet_config.copy();
-  if (offline_config.m_server == boost::none) offline_config.m_server = monero_rpc_connection();
-  offline_config.m_server.get().m_uri = "offline_server_uri";
-  monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
-  */
   MINFO("Exporting outputs...");
   for(std::shared_ptr<monero_output> output : wallet_restored->get_outputs()) {
     MINFO("Got output amount: " << output->m_amount.get() << ", index: " << output->m_index.get());
   }
   string outputsHex = wallet_restored->export_outputs();
   MINFO("Exported outputs hex: " << outputsHex);
+
+  // offline wallet sign txs test
+  monero_wallet_config offline_config; 
+  offline_config = wallet_config.copy();
+  if (offline_config.m_server == boost::none) offline_config.m_server = monero_rpc_connection();
+  offline_config.m_server.get().m_uri = "offline_server_uri";
+  monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
+  MINFO("Importing key images"); 
+  if (offline_wallet->is_connected_to_daemon()) throw std::runtime_error("Offline wallet is connected to daemon.");
+  if (offline_wallet->is_view_only()) throw std::runtime_error("Offline wallet is view only.");
+  if (!offline_wallet->get_txs().empty()) throw std::runtime_error("Offline wallet should not have transactions at this point.");
+  if (!offline_wallet->get_outputs(monero_output_query()).empty()) throw std::runtime_error("Offline wallet should not have outputs at this point.");
+  if (offline_wallet->import_outputs(outputsHex) == 0) throw std::runtime_error("Offline wallet has not imported view only outputs.");
+  std::vector<std::shared_ptr<monero_key_image>> signed_key_images = offline_wallet->export_key_images();
+  
+  if (signed_key_images.empty()) throw std::runtime_error("Offline wallet should have signed key images at this point.");
+  wallet_restored->import_key_images(signed_key_images);
+  MINFO("Imported key images");
+  monero_tx_config tx_config;
+  tx_config.m_account_index = 0;
+  tx_config.m_address = wallet_restored->get_primary_address();
+  tx_config.m_amount = wallet_restored->get_balance();
+
+  std::shared_ptr<monero_tx_wallet> unsigned_tx = wallet_restored->create_tx(tx_config);
+  std::string unsigned_tx_hex = unsigned_tx->m_tx_set.get()->m_unsigned_tx_hex.get();
+  MINFO("Created unsigned tx hash: " << unsigned_tx_hex);
+  monero_tx_set signed_tx_set = offline_wallet->sign_txs(unsigned_tx_hex);  
+  std::string signed_tx_hex = signed_tx_set.m_signed_tx_hex.get();
+  MINFO("Create signed tx hash: " << signed_tx_hex);
   // query incoming transfers to account 1
   monero_transfer_query transfer_query;
   transfer_query.m_is_incoming = true;
@@ -109,8 +130,6 @@ int main(int argc, const char* argv[]) {
   vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
   monero_utils::free(outputs);
   MINFO("close");
-
-  monero_wallet offline_wallet;
 
   // save and close the wallets
   wallet_restored->close(false);
