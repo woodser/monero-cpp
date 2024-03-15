@@ -33,7 +33,7 @@ int main(int argc, const char* argv[]) {
   wallet_config.m_server = monero_rpc_connection("http://localhost:8443", "superuser", "abctesting123");
   wallet_config.m_restore_height = 380104;
   wallet_config.m_seed_offset = "";
-  monero_wallet* wallet_restored = monero_wallet_light::create_wallet(wallet_config);
+  monero_wallet_light* wallet_restored = monero_wallet_light::create_wallet(wallet_config);
   MINFO("===== Wallet Light created successfully =====");
   /*
   // synchronize the wallet and receive progress notifications
@@ -52,13 +52,15 @@ int main(int argc, const char* argv[]) {
   // get balance, account, subaddresses
   MINFO("Get primary address");
   string restored_primary = wallet_restored->get_primary_address();
+  MINFO("Got primary address: " << restored_primary);
   MINFO("Get balance");
   uint64_t balance = wallet_restored->get_balance(); // can specify account and subaddress indices
+  MINFO("Got balance: " << balance);
   MINFO("Get account");
   monero_account account = wallet_restored->get_account(0, false); // get account without subaddresses
-  MINFO("Got account");
+  MINFO("Got account: " << account.m_index.get());
   uint64_t unlocked_account_balance = account.m_unlocked_balance.get(); // get boost::optional value
-  MINFO("Got unlocked balance");
+  MINFO("Got unlocked balance: " << unlocked_account_balance);
   // query a transaction by hash
   monero_tx_query tx_query;
   tx_query.m_hash = "314a0f1375db31cea4dac4e0a51514a6282b43792269b3660166d4d2b46437ca";
@@ -87,6 +89,9 @@ int main(int argc, const char* argv[]) {
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
   */
   MINFO("Exporting outputs...");
+  for(std::shared_ptr<monero_output> output : wallet_restored->get_outputs()) {
+    MINFO("Got output amount: " << output->m_amount.get() << ", index: " << output->m_index.get());
+  }
   string outputsHex = wallet_restored->export_outputs();
   MINFO("Exported outputs hex: " << outputsHex);
   // query incoming transfers to account 1
