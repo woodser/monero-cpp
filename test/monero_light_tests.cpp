@@ -84,7 +84,7 @@ int main(int argc, const char* argv[]) {
   for(std::shared_ptr<monero_output> output : wallet_restored->get_outputs()) {
     MINFO("Got output amount: " << output->m_amount.get() << ", index: " << output->m_index.get());
   }
-  string outputsHex = wallet_restored->export_outputs();
+  string outputsHex = wallet_restored->export_outputs(true);
   MINFO("Exported outputs hex: " << outputsHex);
 
   // offline wallet sign txs test

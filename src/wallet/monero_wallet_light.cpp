@@ -1808,6 +1808,7 @@ namespace light {
           if(is_output_spent(light_spend_key_image)) {
             output->m_key_image.get()->m_hex = light_spend_key_image;
             output->m_is_spent = true;
+            
             break;
           }
         }
@@ -1864,10 +1865,6 @@ namespace light {
   }
 
   std::shared_ptr<monero_key_image_import_result> monero_wallet_light::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) {
-    std::shared_ptr<monero_key_image_import_result> result = std::make_shared<monero_key_image_import_result>();
-    result->m_spent_amount = 0;
-    result->m_unspent_amount = 0;
-
     bool append_key_image = true;
     bool has_changes = false;
 
@@ -1887,6 +1884,27 @@ namespace light {
       }
     }
 
+    // validate and prepare key images for wallet2
+    std::vector<std::pair<crypto::key_image, crypto::signature>> ski;
+    ski.resize(key_images.size());
+    for (uint64_t n = 0; n < ski.size(); ++n) {
+      if (!epee::string_tools::hex_to_pod(key_images[n]->m_hex.get(), ski[n].first)) {
+        throw std::runtime_error("failed to parse key image");
+      }
+      if (!epee::string_tools::hex_to_pod(key_images[n]->m_signature.get(), ski[n].second)) {
+        throw std::runtime_error("failed to parse signature");
+      }
+    }
+
+    // import key images
+    uint64_t spent = 0, unspent = 0;
+    uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, is_connected_to_daemon()); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
+
+    // translate results
+    std::shared_ptr<monero_key_image_import_result> result = std::make_shared<monero_key_image_import_result>();
+    result->m_height = height;
+    result->m_spent_amount = spent;
+    result->m_unspent_amount = unspent;
     return result;
   };
 
