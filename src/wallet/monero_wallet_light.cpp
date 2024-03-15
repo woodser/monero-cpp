@@ -1641,10 +1641,16 @@ namespace light {
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_light::get_txs(const monero_tx_query& query) const {
-    bool view_only = is_view_only();
+    MINFO("monero_wallet_light::get_txs(monero_tx_query)");
+    bool has_ki = has_imported_key_images();
     std::vector<std::shared_ptr<monero_tx_wallet>> txs = std::vector<std::shared_ptr<monero_tx_wallet>>();
 
+    if (m_transactions.empty()) {
+      MINFO("Empty txs!");
+    }
+
     for (monero_light_transaction light_tx : m_transactions) {
+      MINFO("Processing light_tx: " << light_tx.m_hash.get());
       std::shared_ptr<monero_tx_wallet> tx_wallet = std::shared_ptr<monero_tx_wallet>();
 
       tx_wallet->m_block.get()->m_height = light_tx.m_height;
@@ -1671,7 +1677,10 @@ namespace light {
         tx_wallet->m_is_outgoing = false;
       }
       
-      if(tx_wallet->m_is_outgoing && view_only) continue;
+      if(tx_wallet->m_is_outgoing && !has_ki) {
+        MINFO("Not appending light_tx: " << light_tx.m_hash.get());
+        continue;
+      }
     
       tx_wallet->m_unlock_time = light_tx.m_unlock_time;
       tx_wallet->m_payment_id = light_tx.m_payment_id;
@@ -1684,6 +1693,7 @@ namespace light {
       tx_wallet->m_fee = monero_wallet_light_utils::uint64_t_cast(light_tx.m_fee.get());
       tx_wallet->m_is_failed = false;
       
+      MINFO("Appending light_tx: " << light_tx.m_hash.get());
       txs.push_back(tx_wallet);
     }
 

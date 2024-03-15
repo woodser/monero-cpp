@@ -63,13 +63,17 @@ int main(int argc, const char* argv[]) {
   tx_query.m_hash = "314a0f1375db31cea4dac4e0a51514a6282b43792269b3660166d4d2b46437ca";
   MINFO("Get txs");
   vector<shared_ptr<monero_tx_wallet>> txs = wallet_restored->get_txs(tx_query);
-  shared_ptr<monero_tx_wallet> tx = txs[0];
-  MINFO("Got tx: " << tx->m_hash.get());
-  for (const shared_ptr<monero_transfer> transfer : tx->get_transfers()) {
-    MINFO("Got transfer tx id: " << transfer->m_tx->m_hash.get());
-    bool is_incoming = transfer->is_incoming().get();
-    uint64_t in_amount = transfer->m_amount.get();
-    int account_index = transfer->m_account_index.get();
+  if (!txs.empty()) {
+    shared_ptr<monero_tx_wallet> tx = txs[0];
+    MINFO("Got tx: " << tx->m_hash.get());
+    for (const shared_ptr<monero_transfer> transfer : tx->get_transfers()) {
+      MINFO("Got transfer tx id: " << transfer->m_tx->m_hash.get());
+      bool is_incoming = transfer->is_incoming().get();
+      uint64_t in_amount = transfer->m_amount.get();
+      int account_index = transfer->m_account_index.get();
+    }
+  } else {
+    MINFO("Txs are empty!");
   }
   monero_utils::free(txs);
 

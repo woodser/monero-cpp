@@ -548,6 +548,9 @@ namespace monero {
 
     void init_common();
     void calculate_balances();
+    bool has_imported_key_images() const {
+      return !m_imported_key_images.empty();
+    };
     bool is_output_spent(std::string key_image) const;
     monero_sync_result sync_aux();
 
