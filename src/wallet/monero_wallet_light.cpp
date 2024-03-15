@@ -1827,9 +1827,9 @@ namespace light {
   }
 
   std::string monero_wallet_light::export_outputs(bool all) const {
-    std::string result = "";
-
-    return result;
+    if (m_w2 == nullptr) throw std::runtime_error("Wallet is not initialized");
+    if (!m_w2->light_wallet()) throw std::runtime_error("Wallet light is not initiliazed");
+    return epee::string_tools::buff_to_hex_nodelimer(m_w2->export_outputs_to_str(all));
   }
 
   std::vector<std::shared_ptr<monero_key_image>> monero_wallet_light::export_key_images(bool all) const {

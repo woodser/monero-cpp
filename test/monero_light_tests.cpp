@@ -2,6 +2,7 @@
 #include <iostream>
 #include "wallet2.h"
 #include "wallet/monero_wallet_light.h"
+#include "wallet/monero_wallet_full.h"
 #include "utils/monero_utils.h"
 
 using namespace std;
@@ -77,6 +78,17 @@ int main(int argc, const char* argv[]) {
   }
   monero_utils::free(txs);
 
+  /*
+  // offline wallet sign txs test
+  monero_wallet_config offline_config; 
+  offline_config = wallet_config.copy();
+  if (offline_config.m_server == boost::none) offline_config.m_server = monero_rpc_connection();
+  offline_config.m_server.get().m_uri = "offline_server_uri";
+  monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
+  */
+  MINFO("Exporting outputs...");
+  string outputsHex = wallet_restored->export_outputs();
+  MINFO("Exported outputs hex: " << outputsHex);
   // query incoming transfers to account 1
   monero_transfer_query transfer_query;
   transfer_query.m_is_incoming = true;
@@ -92,8 +104,11 @@ int main(int argc, const char* argv[]) {
   vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
   monero_utils::free(outputs);
   MINFO("close");
+
+  monero_wallet offline_wallet;
+
   // save and close the wallets
-  wallet_restored->close(true);
+  wallet_restored->close(false);
   MINFO("after close");
   delete wallet_restored;
   MINFO("===== End Light Tests =====");
