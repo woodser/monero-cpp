@@ -94,7 +94,10 @@ int main(int argc, const char* argv[]) {
   offline_config.m_server = boost::none;
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
   
-  if (wallet_restored->get_primary_address() != offline_wallet->get_primary_address()) throw std::runtime_error("Primary address check failed");
+  if (wallet_restored->get_primary_address() != offline_wallet->get_primary_address()) {
+    MINFO("restored primary address: " << wallet_restored->get_primary_address() << ", offline primary address: " << offline_wallet->get_primary_address());
+    throw std::runtime_error("Primary address check failed");
+  }
   if (wallet_restored->get_private_view_key() != offline_wallet->get_private_view_key()) throw std::runtime_error("Private view key check failed");
   MINFO("Importing outputs"); 
   if (offline_wallet->is_connected_to_daemon()) throw std::runtime_error("Offline wallet is connected to daemon.");
