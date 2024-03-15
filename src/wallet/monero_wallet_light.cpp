@@ -1652,19 +1652,22 @@ namespace light {
     for (monero_light_transaction light_tx : m_transactions) {
       MINFO("Processing light_tx: " << light_tx.m_hash.get());
       std::shared_ptr<monero_tx_wallet> tx_wallet = std::shared_ptr<monero_tx_wallet>();
-
+      MINFO("A");
       tx_wallet->m_block.get()->m_height = light_tx.m_height;
+      MINFO("B");
       tx_wallet->m_hash = light_tx.m_hash;
+      MINFO("C");
       tx_wallet->m_is_relayed = true;
-      
+      MINFO("D");
       uint64_t total_sent;
       uint64_t total_received;
 
       std::istringstream tss(light_tx.m_total_sent.get());
       std::istringstream trs(light_tx.m_total_received.get());
-
+      MINFO("E");
       tss >> total_sent;
       trs >> total_received;
+      MINFO("F");
 
       if (total_sent == 0 && total_received > 0) {
         tx_wallet->m_is_incoming = true;
@@ -1676,11 +1679,12 @@ namespace light {
         tx_wallet->m_is_incoming = true;
         tx_wallet->m_is_outgoing = false;
       }
-      
-      if(tx_wallet->m_is_outgoing && !has_ki) {
+      MINFO("G");
+      if(tx_wallet->m_is_outgoing != boost::none && tx_wallet->m_is_outgoing.get() && !has_ki) {
         MINFO("Not appending light_tx: " << light_tx.m_hash.get());
         continue;
       }
+      MINFO("H");
     
       tx_wallet->m_unlock_time = light_tx.m_unlock_time;
       tx_wallet->m_payment_id = light_tx.m_payment_id;
@@ -1690,6 +1694,7 @@ namespace light {
       uint64_t num_confirmations = m_blockchain_height - light_tx.m_height.get();
       tx_wallet->m_num_confirmations = num_confirmations;
       tx_wallet->m_is_confirmed = num_confirmations > 0;
+      MINFO("I");
       tx_wallet->m_fee = monero_wallet_light_utils::uint64_t_cast(light_tx.m_fee.get());
       tx_wallet->m_is_failed = false;
       
