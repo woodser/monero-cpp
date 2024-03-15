@@ -96,7 +96,9 @@ int main(int argc, const char* argv[]) {
   
   MINFO("Importing outputs"); 
   if (offline_wallet->is_connected_to_daemon()) throw std::runtime_error("Offline wallet is connected to daemon.");
+  MINFO("[OK] Offline wallet is not connected to daemon");
   if (offline_wallet->is_view_only()) throw std::runtime_error("Offline wallet is view only.");
+  MINFO("[OK] Offline wallet is not view only");
   if (offline_wallet->import_outputs(outputsHex) == 0) throw std::runtime_error("Offline wallet has not imported view only outputs.");
   MINFO("Imported outputs");
   MINFO("Importing key images");
