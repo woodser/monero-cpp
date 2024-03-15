@@ -1539,6 +1539,16 @@ namespace light {
 
     result.m_num_blocks_fetched = m_scanned_block_height - old_scanned_height;
     result.m_received_money = false; // to do
+
+    // attempt to refresh wallet2 which may throw exception
+    try {
+      m_w2->refresh(m_w2->is_trusted_daemon(), m_start_height, result.m_num_blocks_fetched, result.m_received_money, true);
+      // find and save rings
+      m_w2->find_and_save_rings(false);
+    } catch (std::exception& e) {
+      MINFO("Error occurred while w2 refresh");
+    }
+    
     return result;
   }
 
