@@ -541,10 +541,10 @@ namespace monero {
     std::vector<monero_light_transaction> m_raw_transactions;
     std::vector<monero_light_transaction> m_transactions;
 
-    std::vector<std::shared_ptr<monero_output_wallet>> m_exported_outputs;
+    std::vector<std::shared_ptr<monero_output_wallet>> m_exported_outputs = std::vector<std::shared_ptr<monero_output_wallet>>();
 
-    std::vector<std::shared_ptr<monero_key_image>> m_imported_key_images;
-    std::vector<std::shared_ptr<monero_key_image>> m_exported_key_images;
+    std::vector<std::shared_ptr<monero_key_image>> m_imported_key_images = std::vector<std::shared_ptr<monero_key_image>>();
+    std::vector<std::shared_ptr<monero_key_image>> m_exported_key_images = std::vector<std::shared_ptr<monero_key_image>>();
 
     void init_common();
     void calculate_balances();

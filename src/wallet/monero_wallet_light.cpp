@@ -1777,13 +1777,20 @@ namespace light {
   }
 
   std::vector<std::shared_ptr<monero_output_wallet>> monero_wallet_light::get_outputs(const monero_output_query& query) const {
+    MINFO("monero_wallet_light::get_outputs()");
     monero_light_get_unspent_outs_response response = get_unspent_outs();
 
     std::vector<std::shared_ptr<monero_output_wallet>> outputs = std::vector<std::shared_ptr<monero_output_wallet>>();
     //bool view_only = is_view_only();
     bool has_imported_key_images =  m_imported_key_images.size() > 0;
 
+    if (response.m_outputs == boost::none || response.m_outputs.get().empty()) {
+      MINFO("monero_wallet_light::get_outputs: response outputs is empty");
+      return outputs;
+    }
+
     for(monero_light_output light_output : response.m_outputs.get()) {
+      MINFO("Processing output: " << light_output.m_public_key.get());
       std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
       output->m_account_index = 0;
       output->m_index = light_output.m_index;
