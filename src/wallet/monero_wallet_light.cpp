@@ -1519,9 +1519,9 @@ namespace light {
       MTRACE("sync_aux(): B");
       if (!result.m_received_money) result.m_received_money = total_received > 0;
 
-      if (is_view_only()) {
-        MTRACE("sync_aux()F");
+      if (!has_imported_key_images()) {
         if (total_received == 0) continue;
+        MTRACE("sync_aux(): appending transaction: " << transaction->m_hash.get());
         m_transactions.push_back(*transaction);
         continue;
       }
@@ -1545,11 +1545,11 @@ namespace light {
     MTRACE("sync_aux(): G");
 
     calculate_balances();
-    MTRACE("sync_aux(): calculate_balances()");
+    MTRACE("sync_aux(): calculate_balances() done");
 
     result.m_num_blocks_fetched = m_scanned_block_height - old_scanned_height;
     result.m_received_money = false; // to do
-
+    MINFO("sync_aux(): before try");
     // attempt to refresh wallet2 which may throw exception
     try {
       m_w2->refresh(m_w2->is_trusted_daemon(), m_start_height, result.m_num_blocks_fetched, result.m_received_money, true);
@@ -1558,7 +1558,7 @@ namespace light {
     } catch (std::exception& e) {
       MINFO("Error occurred while w2 refresh");
     }
-    
+    MINFO("sync_aux(): end");
     return result;
   }
 
