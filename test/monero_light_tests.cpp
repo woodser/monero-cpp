@@ -93,12 +93,13 @@ int main(int argc, const char* argv[]) {
   if (offline_config.m_server == boost::none) offline_config.m_server = monero_rpc_connection();
   offline_config.m_server.get().m_uri = "offline_server_uri";
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
-  MINFO("Importing key images"); 
+  
+  MINFO("Importing outputs"); 
   if (offline_wallet->is_connected_to_daemon()) throw std::runtime_error("Offline wallet is connected to daemon.");
   if (offline_wallet->is_view_only()) throw std::runtime_error("Offline wallet is view only.");
-  if (!offline_wallet->get_txs().empty()) throw std::runtime_error("Offline wallet should not have transactions at this point.");
-  if (!offline_wallet->get_outputs(monero_output_query()).empty()) throw std::runtime_error("Offline wallet should not have outputs at this point.");
   if (offline_wallet->import_outputs(outputsHex) == 0) throw std::runtime_error("Offline wallet has not imported view only outputs.");
+  MINFO("Imported outputs");
+  MINFO("Importing key images");
   std::vector<std::shared_ptr<monero_key_image>> signed_key_images = offline_wallet->export_key_images();
   
   if (signed_key_images.empty()) throw std::runtime_error("Offline wallet should have signed key images at this point.");
