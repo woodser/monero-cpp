@@ -91,7 +91,7 @@ int main(int argc, const char* argv[]) {
   monero_wallet_config offline_config; 
   offline_config = wallet_config.copy();
   offline_config.m_path = "MyOfflineWalletRestored";
-  offline_config.m_server = monero_rpc_connection();
+  offline_config.m_server = boost::none;
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
   
   MINFO("Importing outputs"); 
