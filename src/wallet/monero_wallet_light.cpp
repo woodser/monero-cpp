@@ -1549,6 +1549,7 @@ namespace light {
 
     result.m_num_blocks_fetched = m_scanned_block_height - old_scanned_height;
     result.m_received_money = false; // to do
+
     /*
     MINFO("sync_aux(): before try");
     // attempt to refresh wallet2 which may throw exception
