@@ -1651,8 +1651,9 @@ namespace light {
 
     for (monero_light_transaction light_tx : m_transactions) {
       MINFO("Processing light_tx: " << light_tx.m_hash.get());
-      std::shared_ptr<monero_tx_wallet> tx_wallet = std::shared_ptr<monero_tx_wallet>();
+      std::shared_ptr<monero_tx_wallet> tx_wallet = std::make_shared<monero_tx_wallet>();
       MINFO("A");
+      if (tx_wallet->m_block == boost::none) tx_wallet->m_block = std::make_shared<monero_block>();
       tx_wallet->m_block.get()->m_height = light_tx.m_height;
       MINFO("B");
       tx_wallet->m_hash = light_tx.m_hash;
@@ -1780,7 +1781,7 @@ namespace light {
     bool has_imported_key_images =  m_imported_key_images.size() > 0;
 
     for(monero_light_output light_output : response.m_outputs.get()) {
-      std::shared_ptr<monero_output_wallet> output = std::shared_ptr<monero_output_wallet>();
+      std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
       output->m_account_index = 0;
       output->m_index = light_output.m_index;
       output->m_amount = monero_wallet_light_utils::uint64_t_cast(light_output.m_amount.get());
