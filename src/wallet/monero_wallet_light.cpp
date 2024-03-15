@@ -1723,9 +1723,11 @@ namespace light {
    * @return wallet transfers per the query (free memory using monero_utils::free)
    */
   std::vector<std::shared_ptr<monero_transfer>> monero_wallet_light::get_transfers(const monero_transfer_query& query) const {
+    MINFO("monero_wallet_light::get_transfers(monero_transfer_query&)");
     std::vector<std::shared_ptr<monero_transfer>> transfers = std::vector<std::shared_ptr<monero_transfer>>();
 
     for (monero_light_transaction light_tx : m_transactions) {
+      MINFO("monero_wallet_light::get_transfers(): processing light_tx " << light_tx.m_hash.get());
       std::shared_ptr<monero_transfer> transfer;
 
       if (is_view_only()) {
@@ -1747,6 +1749,7 @@ namespace light {
       transfer->m_account_index = 0;
       transfer->m_tx = std::make_shared<monero_tx_wallet>();
       transfer->m_tx->m_is_incoming = true;
+      if (transfer->m_tx->m_block == boost::none) transfer->m_tx->m_block = std::make_shared<monero_block>();
       transfer->m_tx->m_block.get()->m_height = light_tx.m_height;
       transfer->m_tx->m_hash = light_tx.m_hash;
       transfer->m_tx->m_is_relayed = true;
