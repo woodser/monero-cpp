@@ -1779,7 +1779,7 @@ namespace light {
   std::vector<std::shared_ptr<monero_output_wallet>> monero_wallet_light::get_outputs(const monero_output_query& query) const {
     monero_light_get_unspent_outs_response response = get_unspent_outs();
 
-    std::vector<std::shared_ptr<monero_output_wallet>> outputs;
+    std::vector<std::shared_ptr<monero_output_wallet>> outputs = std::vector<std::shared_ptr<monero_output_wallet>>();
     //bool view_only = is_view_only();
     bool has_imported_key_images =  m_imported_key_images.size() > 0;
 
