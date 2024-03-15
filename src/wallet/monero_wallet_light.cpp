@@ -1499,7 +1499,9 @@ namespace light {
     if (!is_connected_to_daemon()) throw std::runtime_error("sync_aux(): Wallet is not connected to daemon");
     
     monero_sync_result result(0, false);
+    MTRACE("sync_aux(): get_address_txs()");
     monero_light_get_address_txs_response response = get_address_txs();
+    MTRACE("sync_aux(): txs " << response.m_transactions.get().size());
     uint64_t old_scanned_height = m_scanned_block_height;
 
     m_start_height = response.m_start_height.get();
@@ -1508,21 +1510,22 @@ namespace light {
 
     m_raw_transactions = response.m_transactions.get();
     m_transactions = std::vector<monero_light_transaction>();
-
+    MTRACE("sync_aux(): before for");
     for (const monero_light_transaction& raw_transaction : m_raw_transactions) {
+      MTRACE("sync_aux(): processing raw_transaction: " << raw_transaction.m_id.get());
       std::shared_ptr<monero_light_transaction> transaction_ptr = std::make_shared<monero_light_transaction>(raw_transaction);
       std::shared_ptr<monero_light_transaction> transaction = transaction_ptr->copy(transaction_ptr, std::make_shared<monero_light_transaction>(),true);
       uint64_t total_received = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_received.get());
-
+      MTRACE("sync_aux(): B");
       if (!result.m_received_money) result.m_received_money = total_received > 0;
 
       if (is_view_only()) {
+        MTRACE("sync_aux()F");
         if (total_received == 0) continue;
-
         m_transactions.push_back(*transaction);
         continue;
       }
-
+      MTRACE("sync_aux(): C");
       for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
         bool is_spent = is_output_spent(spent_output.m_key_image.get());
         if (is_spent) transaction->m_spent_outputs.get().push_back(spent_output);
@@ -1536,9 +1539,13 @@ namespace light {
         uint64_t final_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
         m_transactions.push_back(*transaction);
       }
+      MTRACE("sync_aux(): E");
     }
   
+    MTRACE("sync_aux(): G");
+
     calculate_balances();
+    MTRACE("sync_aux(): calculate_balances()");
 
     result.m_num_blocks_fetched = m_scanned_block_height - old_scanned_height;
     result.m_received_money = false; // to do
