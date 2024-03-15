@@ -27,7 +27,7 @@ int main(int argc, const char* argv[]) {
   wallet_config.m_seed = "hefty value later extra artistic firm radar yodel talent future fungal nutshell because sanity awesome nail unjustly rage unafraid cedar delayed thumbs comb custom sanity";
   wallet_config.m_primary_address = "A1y9sbVt8nqhZAVm3me1U18rUVXcjeNKuBd1oE2cTs8biA9cozPMeyYLhe77nPv12JA3ejJN3qprmREriit2fi6tJDi99RR";
   wallet_config.m_private_view_key = "198820da9166ee114203eb38c29e00b0e8fc7df508aa632d56ead849093d3808";
-  wallet_config.m_path = "MyWalletRestored";
+  wallet_config.m_path = "MyLightWalletRestored";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::TESTNET;
   wallet_config.m_server = monero_rpc_connection("http://localhost:8443", "superuser", "abctesting123");
@@ -90,8 +90,8 @@ int main(int argc, const char* argv[]) {
   // offline wallet sign txs test
   monero_wallet_config offline_config; 
   offline_config = wallet_config.copy();
-  if (offline_config.m_server == boost::none) offline_config.m_server = monero_rpc_connection();
-  offline_config.m_server.get().m_uri = "offline_server_uri";
+  offline_config.m_path = "MyOfflineWalletRestored";
+  offline_config.m_server = monero_rpc_connection();
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
   
   MINFO("Importing outputs"); 
