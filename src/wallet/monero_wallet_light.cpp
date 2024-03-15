@@ -1814,6 +1814,8 @@ namespace light {
       }
 
       output->m_tx = std::make_shared<monero_tx>();
+      output->m_tx->m_block = std::make_shared<monero_block>();
+      output->m_tx->m_block.get()->m_height = light_output.m_height.get();
       output->m_tx->m_hash = light_output.m_tx_hash;
       output->m_tx->m_key = light_output.m_tx_pub_key;
       output->m_tx->m_rct_signatures = light_output.m_rct;
