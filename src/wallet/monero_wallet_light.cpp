@@ -1543,7 +1543,7 @@ namespace light {
     MTRACE("sync()");
     if(!is_connected_to_daemon()) throw std::runtime_error("sync(): Wallet is not connected to daemon");
 
-    monero_sync_result result(0, false);
+    monero_sync_result result = sync_aux();
     monero_sync_result last_sync(0, false);
 
     uint64_t last_scanned_height = m_scanned_block_height;
@@ -1553,7 +1553,6 @@ namespace light {
       result.m_num_blocks_fetched += last_sync.m_num_blocks_fetched;
       if (last_sync.m_received_money) result.m_received_money = true;
     }
-
     
     return result;
   }

@@ -49,17 +49,24 @@ int main(int argc, const char* argv[]) {
   MINFO("===== Wallet synced =====");
 
   // get balance, account, subaddresses
+  MINFO("Get primary address");
   string restored_primary = wallet_restored->get_primary_address();
+  MINFO("Get balance");
   uint64_t balance = wallet_restored->get_balance(); // can specify account and subaddress indices
+  MINFO("Get account");
   monero_account account = wallet_restored->get_account(0, false); // get account without subaddresses
+  MINFO("Got account");
   uint64_t unlocked_account_balance = account.m_unlocked_balance.get(); // get boost::optional value
-
+  MINFO("Got unlocked balance");
   // query a transaction by hash
   monero_tx_query tx_query;
   tx_query.m_hash = "314a0f1375db31cea4dac4e0a51514a6282b43792269b3660166d4d2b46437ca";
+  MINFO("Get txs");
   vector<shared_ptr<monero_tx_wallet>> txs = wallet_restored->get_txs(tx_query);
   shared_ptr<monero_tx_wallet> tx = txs[0];
+  MINFO("Got tx: " << tx->m_hash.get());
   for (const shared_ptr<monero_transfer> transfer : tx->get_transfers()) {
+    MINFO("Got transfer tx id: " << transfer->m_tx->m_hash.get());
     bool is_incoming = transfer->is_incoming().get();
     uint64_t in_amount = transfer->m_amount.get();
     int account_index = transfer->m_account_index.get();
@@ -70,17 +77,20 @@ int main(int argc, const char* argv[]) {
   monero_transfer_query transfer_query;
   transfer_query.m_is_incoming = true;
   transfer_query.m_account_index = 1;
+  MINFO("Get transfers");
   vector<shared_ptr<monero_transfer>> transfers = wallet_restored->get_transfers(transfer_query);
   monero_utils::free(transfers);
 
   // query unspent outputs
   monero_output_query output_query;
   output_query.m_is_spent = false;
+  MINFO("Get outputs");
   vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
   monero_utils::free(outputs);
-
+  MINFO("close");
   // save and close the wallets
   wallet_restored->close(true);
+  MINFO("after close");
   delete wallet_restored;
   MINFO("===== End Light Tests =====");
 }
