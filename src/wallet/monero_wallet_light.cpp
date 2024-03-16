@@ -2648,9 +2648,11 @@ namespace light {
     std::vector<cryptonote::tx_destination_entry> dsts;
     std::vector<uint8_t> extra;
     epee::json_rpc::error err;
+    MTRACE("monero_wallet_light::create_txs before validate transfer");
     if (!light::validate_transfer(m_w2.get(), tr_destinations, payment_id, dsts, extra, true, err)) {
       throw std::runtime_error(err.message);
     }
+    MTRACE("monero_wallet_light::create_txs after validate transfer");
 
     // prepare parameters for wallet2's create_transactions_2()
     uint64_t mixin = m_w2->adjust_mixin(0); // get mixin for call to 'create_transactions_2'
@@ -2661,9 +2663,11 @@ namespace light {
     for (const uint32_t& subaddress_idx : config.m_subaddress_indices) subaddress_indices.insert(subaddress_idx);
     std::set<uint32_t> subtract_fee_from;
     for (const uint32_t& subtract_fee_from_idx : config.m_subtract_fee_from) subtract_fee_from.insert(subtract_fee_from_idx);
-    m_w2->set_light_wallet(false);
+    m_w2->set_light_wallet(true);
     // prepare transactions
+    MTRACE("monero_wallet_light::create_txs before create transactions 2");
     std::vector<wallet2::pending_tx> ptx_vector = m_w2->create_transactions_2(dsts, mixin, unlock_time, priority, extra, account_index, subaddress_indices, subtract_fee_from);
+    MTRACE("monero_wallet_light::create_txs after create transactions 2");
     if (ptx_vector.empty()) throw std::runtime_error("No transaction created");
 
     // check if request cannot be fulfilled due to splitting
@@ -2675,7 +2679,6 @@ namespace light {
         throw std::runtime_error("subtractfeefrom transfers cannot be split over multiple transactions yet");
       }
     }
-    m_w2->set_light_wallet(true);
     // config for fill_response()
     bool get_tx_keys = true;
     bool get_tx_hex = true;
@@ -2695,10 +2698,11 @@ namespace light {
     std::list<std::string> tx_blobs;
     std::list<std::string> tx_metadatas;
     std::list<light::key_image_list> input_key_images_list;
+    MTRACE("monero_wallet_light::create_txs before fill response");
     if (!light::fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
       throw std::runtime_error("need to handle error filling response!");  // TODO
     }
-
+    MTRACE("monero_wallet_light::create_txs after fill response");
     // build sent txs from results  // TODO: break this into separate utility function
     std::vector<std::shared_ptr<monero_tx_wallet>> txs;
     auto tx_hashes_iter = tx_hashes.begin();
