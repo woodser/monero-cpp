@@ -561,8 +561,8 @@ namespace monero {
       crypto::public_key c_tx_public_key;
       crypto::key_image c_key_image;
 
-      string_tools::hex_to_pod(tx_public_key, c_tx_public_key);
-      string_tools::hex_to_pod(key_image, c_key_image);
+      epee::string_tools::hex_to_pod(tx_public_key, c_tx_public_key);
+      epee::string_tools::hex_to_pod(key_image, c_key_image);
 
       return key_image_is_ours(c_key_image, c_tx_public_key, out_index);
     }
