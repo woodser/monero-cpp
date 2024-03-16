@@ -2307,9 +2307,10 @@ namespace light {
       const monero_light_output &td = unspent_outs[n];
       crypto::public_key tx_pub_key;
       crypto::public_key public_key;
-      THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, td.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
+      
+      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, td.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
       string_tools::hex_to_pod(td.m_tx_pub_key.get(), tx_pub_key);
-      THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, td.m_public_key.get()), error::wallet_internal_error, "Invalid public_key field");
+      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, td.m_public_key.get()), error::wallet_internal_error, "Invalid public_key field");
       string_tools::hex_to_pod(td.m_public_key.get(), public_key);
       bool spent = is_output_spent(td);
       tools::wallet2::exported_transfer_details etd;
