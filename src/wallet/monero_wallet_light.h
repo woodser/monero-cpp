@@ -557,7 +557,7 @@ namespace monero {
     bool has_imported_key_images() const {
       return !m_imported_key_images.empty();
     };
-    bool key_image_is_ours(const std::string& key_image, const std::string& tx_public_key, uint64_t out_index) {
+    bool key_image_is_ours(const std::string& key_image, const std::string& tx_public_key, uint64_t out_index) const {
       crypto::public_key c_tx_public_key;
       crypto::key_image c_key_image;
 
@@ -566,7 +566,7 @@ namespace monero {
 
       return key_image_is_ours(c_key_image, c_tx_public_key, out_index);
     }
-    bool key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index);
+    bool key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index) const;
     bool is_output_spent(std::string key_image) const;
     bool is_output_spent(monero_light_output output) const;
     bool is_mined_output(monero_light_output output) const;

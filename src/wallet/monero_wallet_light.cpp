@@ -2012,7 +2012,7 @@ namespace light {
     return true;
   }
 
-  bool monero_wallet_light::key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index)
+  bool monero_wallet_light::key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index) const
   {
     // Lookup key image from cache
     serializable_map<uint64_t, crypto::key_image> index_keyimage_map;
@@ -2788,6 +2788,24 @@ namespace light {
     } 
 
     return false;
+  }
+
+  bool monero_wallet_light::is_output_spent(monero_light_output output) const {
+    if (output.m_spend_key_images == boost::none || output.m_spend_key_images.get().empty()) return false;
+
+    for (std::string spend_key_image : output.m_spend_key_images.get()) {
+      if (key_image_is_ours(spend_key_image, output.m_tx_pub_key.get(), monero_wallet_light_utils::uint64_t_cast(output.m_global_index.get()))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool monero_wallet_light::is_mined_output(monero_light_output output) const {
+    bool is_mined = false;
+    // to do
+    return is_mined;
   }
 
   // ------------------------------- PROTECTED LWS HELPERS ----------------------------
