@@ -537,6 +537,9 @@ namespace monero {
     uint64_t m_balance = 0;
     uint64_t m_balance_pending = 0;
     uint64_t m_balance_unlocked = 0;
+
+    uint64_t m_per_byte_fee = 0;
+    uint64_t m_fee_mask = 0;
     
     std::vector<monero_light_transaction> m_raw_transactions;
     std::vector<monero_light_transaction> m_transactions;
@@ -553,7 +556,11 @@ namespace monero {
     serializable_unordered_map<crypto::public_key, serializable_map<uint64_t, crypto::key_image> > m_key_image_cache;
 
     void init_common();
+    std::vector<tools::wallet2::pending_tx> create_transactions(std::vector<cryptonote::tx_destination_entry> dsts, const size_t fake_outs_count, const uint64_t unlock_time, uint32_t priority, const std::vector<uint8_t>& extra, const tools::wallet2::unique_index_container& subtract_fee_from_outputs = {});
     void calculate_balances();
+    uint64_t get_base_fee();
+    uint64_t get_base_fee(uint32_t priority);
+    uint64_t get_fee_multiplier(uint32_t priority, int fee_algorithm);
     bool has_imported_key_images() const {
       return !m_imported_key_images.empty();
     };
@@ -572,9 +579,9 @@ namespace monero {
     bool is_mined_output(monero_light_output output) const;
     void set_unspent(size_t idx);
     std::string export_outputs_to_str(bool all = false, uint32_t start = 0, uint32_t count = 0xffffffff) const;
-    std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> export_outputs(bool all, uint32_t start, uint32_t count) const;
+    std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> export_outputs(bool all, uint32_t start, uint32_t count = 0xffffffff) const;
     bool parse_rct_str(const std::string& rct_string, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key& decrypted_mask, rct::key& rct_commit, bool decrypt) const;
-
+    std::string dump_tx_to_str(const std::vector<tools::wallet2::pending_tx> &ptx_vector) const;
     monero_sync_result sync_aux();
 
     // --------------------------------- LIGHT WALLET METHODS ------------------------------------------

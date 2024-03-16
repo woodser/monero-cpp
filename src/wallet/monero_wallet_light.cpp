@@ -68,6 +68,9 @@
 #define MULTISIG_EXPORT_FILE_MAGIC "Monero multisig export\001"
 
 #define OUTPUT_EXPORT_FILE_MAGIC "Monero output export\004"
+
+#define UNSIGNED_TX_PREFIX "Monero unsigned tx set\005"
+
 using namespace epee;
 using namespace tools;
 using namespace crypto;
@@ -78,6 +81,92 @@ using namespace crypto;
 namespace monero {
 
 namespace light {
+
+  size_t estimate_rct_tx_size(int n_inputs, int mixin, int n_outputs, size_t extra_size, bool bulletproof, bool clsag, bool bulletproof_plus, bool use_view_tags)
+  {
+    size_t size = 0;
+
+    // tx prefix
+
+    // first few bytes
+    size += 1 + 6;
+
+    // vin
+    size += n_inputs * (1+6+(mixin+1)*2+32);
+
+    // vout
+    size += n_outputs * (6+32);
+
+    // extra
+    size += extra_size;
+
+    // rct signatures
+
+    // type
+    size += 1;
+
+    // rangeSigs
+    if (bulletproof || bulletproof_plus)
+    {
+      size_t log_padded_outputs = 0;
+      while ((1<<log_padded_outputs) < n_outputs)
+        ++log_padded_outputs;
+      size += (2 * (6 + log_padded_outputs) + (bulletproof_plus ? 6 : (4 + 5))) * 32 + 3;
+    }
+    else
+      size += (2*64*32+32+64*32) * n_outputs;
+
+    // MGs/CLSAGs
+    if (clsag)
+      size += n_inputs * (32 * (mixin+1) + 64);
+    else
+      size += n_inputs * (64 * (mixin+1) + 32);
+
+    if (use_view_tags)
+      size += n_outputs * sizeof(crypto::view_tag);
+
+    // mixRing - not serialized, can be reconstructed
+    /* size += 2 * 32 * (mixin+1) * n_inputs; */
+
+    // pseudoOuts
+    size += 32 * n_inputs;
+    // ecdhInfo
+    size += 8 * n_outputs;
+    // outPk - only commitment is saved
+    size += 32 * n_outputs;
+    // txnFee
+    size += 4;
+
+    LOG_PRINT_L2("estimated " << (bulletproof_plus ? "bulletproof plus" : bulletproof ? "bulletproof" : "borromean") << " rct tx size for " << n_inputs << " inputs with ring size " << (mixin+1) << " and " << n_outputs << " outputs: " << size << " (" << ((32 * n_inputs/*+1*/) + 2 * 32 * (mixin+1) * n_inputs + 32 * n_outputs) << " saved)");
+    return size;
+  }
+
+  size_t estimate_tx_size(bool use_rct, int n_inputs, int mixin, int n_outputs, size_t extra_size, bool bulletproof, bool clsag, bool bulletproof_plus, bool use_view_tags)
+  {
+    if (use_rct)
+      return estimate_rct_tx_size(n_inputs, mixin, n_outputs, extra_size, bulletproof, clsag, bulletproof_plus, use_view_tags);
+    else
+      return n_inputs * (mixin+1) * 80 + extra_size + (use_view_tags ? (n_outputs * sizeof(crypto::view_tag)) : 0);
+  }
+
+  uint64_t estimate_tx_weight(bool use_rct, int n_inputs, int mixin, int n_outputs, size_t extra_size, bool bulletproof, bool clsag, bool bulletproof_plus, bool use_view_tags)
+  {
+    size_t size = estimate_tx_size(use_rct, n_inputs, mixin, n_outputs, extra_size, bulletproof, clsag, bulletproof_plus, use_view_tags);
+    if (use_rct && (bulletproof || bulletproof_plus) && n_outputs > 2)
+    {
+      const uint64_t bp_base = (32 * ((bulletproof_plus ? 6 : 9) + 7 * 2)) / 2; // notional size of a 2 output proof, normalized to 1 proof (ie, divided by 2)
+      size_t log_padded_outputs = 2;
+      while ((1<<log_padded_outputs) < n_outputs)
+        ++log_padded_outputs;
+      uint64_t nlr = 2 * (6 + log_padded_outputs);
+      const uint64_t bp_size = 32 * ((bulletproof_plus ? 6 : 9) + nlr);
+      const uint64_t bp_clawback = (bp_base * (1<<log_padded_outputs) - bp_size) * 4 / 5;
+      MDEBUG("clawback on size " << size << ": " << bp_clawback);
+      size += bp_clawback;
+    }
+    return size;
+  }
+
     // ----------------------- INTERNAL PRIVATE HELPERS -----------------------
 
   struct key_image_list
@@ -2153,6 +2242,75 @@ namespace light {
     return txs;
   }
 
+  bool get_payment_id(crypto::hash8 &payment_id8, const tools::wallet2::pending_tx &ptx, hw::device &hwdev)
+  {
+    std::vector<cryptonote::tx_extra_field> tx_extra_fields;
+    cryptonote::parse_tx_extra(ptx.tx.extra, tx_extra_fields); // ok if partially parsed
+    cryptonote::tx_extra_nonce extra_nonce;
+    if (cryptonote::find_tx_extra_field_by_type(tx_extra_fields, extra_nonce))
+    {
+      if(cryptonote::get_encrypted_payment_id_from_tx_extra_nonce(extra_nonce.nonce, payment_id8))
+      {
+        if (ptx.dests.empty())
+        {
+          MWARNING("Encrypted payment id found, but no destinations public key, cannot decrypt");
+          return false;
+        }
+        return hwdev.decrypt_payment_id(payment_id8, ptx.dests[0].addr.m_view_public_key, ptx.tx_key);
+      }
+    }
+    return false;
+  }
+
+  tools::wallet2::tx_construction_data get_construction_data(const tools::wallet2::pending_tx &ptx, hw::device &hwdev)
+  {
+    tools::wallet2::tx_construction_data construction_data = ptx.construction_data;
+    crypto::hash8 payment_id = null_hash8;
+    if (get_payment_id(payment_id, ptx, hwdev))
+    {
+      // Remove encrypted
+      cryptonote::remove_field_from_tx_extra(construction_data.extra, typeid(cryptonote::tx_extra_nonce));
+      // Add decrypted
+      std::string extra_nonce;
+      cryptonote::set_encrypted_payment_id_to_tx_extra_nonce(extra_nonce, payment_id);
+      THROW_WALLET_EXCEPTION_IF(!cryptonote::add_extra_nonce_to_tx_extra(construction_data.extra, extra_nonce),
+          tools::error::wallet_internal_error, "Failed to add decrypted payment id to tx extra");
+      LOG_PRINT_L1("Decrypted payment ID: " << payment_id);
+    }
+    return construction_data;
+  }
+
+  //----------------------------------------------------------------------------------------------------
+  std::string monero_wallet_light::dump_tx_to_str(const std::vector<tools::wallet2::pending_tx> &ptx_vector) const
+  {
+    LOG_PRINT_L0("saving " << ptx_vector.size() << " transactions");
+    tools::wallet2::unsigned_tx_set txs;
+    for (auto &tx: ptx_vector)
+    {
+      // Short payment id is encrypted with tx_key. 
+      // Since sign_tx() generates new tx_keys and encrypts the payment id, we need to save the decrypted payment ID
+      // Save tx construction_data to unsigned_tx_set
+      txs.txes.push_back(get_construction_data(tx, m_account.get_device()));
+    }
+    
+    txs.new_transfers = export_outputs(false, 0);
+    // save as binary
+    std::ostringstream oss;
+    binary_archive<true> ar(oss);
+    try
+    {
+      if (!::serialization::serialize(ar, txs))
+        return std::string();
+    }
+    catch (...)
+    {
+      return std::string();
+    }
+    LOG_PRINT_L2("Saving unsigned tx data: " << oss.str());
+    std::string ciphertext = m_w2->encrypt_with_view_secret_key(oss.str());
+    return std::string(UNSIGNED_TX_PREFIX) + ciphertext;
+  }
+
   /**
    * Get incoming and outgoing transfers to and from this wallet.  An outgoing
    * transfer represents a total amount sent from primary address to
@@ -2470,6 +2628,7 @@ namespace light {
     //std::cout << "monero_tx_config: " << config.serialize()  << std::endl;
 
     // validate config
+    if (config.m_relay != boost::none && config.m_relay.get() && is_view_only()) throw std::runtime_error("Cannot relay tx in view wallet");
     if (config.m_account_index == boost::none) throw std::runtime_error("Must specify account index to send from");
     if (config.m_account_index.get() != 0) throw std::runtime_error("Must specify exactly account index 0 to send from");
 
@@ -2502,7 +2661,7 @@ namespace light {
     for (const uint32_t& subaddress_idx : config.m_subaddress_indices) subaddress_indices.insert(subaddress_idx);
     std::set<uint32_t> subtract_fee_from;
     for (const uint32_t& subtract_fee_from_idx : config.m_subtract_fee_from) subtract_fee_from.insert(subtract_fee_from_idx);
-
+    m_w2->set_light_wallet(false);
     // prepare transactions
     std::vector<wallet2::pending_tx> ptx_vector = m_w2->create_transactions_2(dsts, mixin, unlock_time, priority, extra, account_index, subaddress_indices, subtract_fee_from);
     if (ptx_vector.empty()) throw std::runtime_error("No transaction created");
@@ -2516,7 +2675,7 @@ namespace light {
         throw std::runtime_error("subtractfeefrom transfers cannot be split over multiple transactions yet");
       }
     }
-
+    m_w2->set_light_wallet(true);
     // config for fill_response()
     bool get_tx_keys = true;
     bool get_tx_hex = true;
