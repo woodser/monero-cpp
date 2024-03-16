@@ -2296,12 +2296,13 @@ namespace light {
 
     size_t offset = 0;
     if (!all)
-      while (offset < unspent_outs.size() && (m_transfer_container[offset].m_key_image_known && !m_transfer_container[offset].m_key_image_request))
+      //while (offset < unspent_outs.size() && (m_transfer_container[offset].m_key_image_known && !m_transfer_container[offset].m_key_image_request))
+      while(offset < unspent_outs.size())
         ++offset;
     else
       offset = start;
 
-    outs.reserve(m_transfer_container.size() - offset);
+    outs.reserve(unspent_outs.size() - offset);
     for (size_t n = offset; n < unspent_outs.size() && n - offset < count; ++n)
     {
       const monero_light_output &td = unspent_outs[n];
@@ -2362,6 +2363,8 @@ namespace light {
         mask = rct::identity();
         etd.m_flags.m_rct = false;
       }
+
+      MINFO("PUSHING OUTPUT: " << td.m_public_key.get());
 
       outs.push_back(etd);
     }
