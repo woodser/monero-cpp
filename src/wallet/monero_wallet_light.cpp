@@ -63,7 +63,11 @@
 #include "string_tools.h"
 #include "device/device.hpp"
 #include "common/threadpool.h"
+#define KEY_IMAGE_EXPORT_FILE_MAGIC "Monero key image export\003"
 
+#define MULTISIG_EXPORT_FILE_MAGIC "Monero multisig export\001"
+
+#define OUTPUT_EXPORT_FILE_MAGIC "Monero output export\004"
 using namespace epee;
 using namespace tools;
 using namespace crypto;
@@ -645,7 +649,6 @@ namespace light {
       }
     }
   };
-
 }
 
   // ------------------------------- UTILS -------------------------------
@@ -1872,7 +1875,7 @@ namespace light {
       }
       MTRACE("sync_aux(): C");
       for(monero_light_spend spent_output : raw_transaction.m_spent_outputs.get()) {
-        bool is_spent = is_output_spent(spent_output.m_key_image.get());
+        bool is_spent = key_image_is_ours(spent_output.m_key_image.get(), spent_output.m_tx_pub_key.get(), spent_output.m_out_index.get());
         if (is_spent) transaction->m_spent_outputs.get().push_back(spent_output);
         else {
           uint64_t total_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
@@ -1883,6 +1886,27 @@ namespace light {
       
         uint64_t final_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
         m_transactions.push_back(*transaction);
+        uint64_t total_sent = monero_wallet_light_utils::uint64_t_cast(transaction->m_total_sent.get());
+        bool incoming = (total_received > total_sent);
+        crypto::hash payment_id = null_hash;
+        crypto::hash tx_hash;
+        
+        //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, transaction->m_payment_id.get()), error::wallet_internal_error, "Invalid payment_id field");
+        //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, transaction->m_hash.get()), error::wallet_internal_error, "Invalid hash field");
+        string_tools::hex_to_pod(transaction->m_payment_id.get(), payment_id);
+        string_tools::hex_to_pod(transaction->m_hash.get(), tx_hash);
+
+        tools::wallet2::address_tx address_tx;
+        address_tx.m_tx_hash = tx_hash;
+        address_tx.m_incoming = incoming;
+        address_tx.m_amount  =  incoming ? total_received - total_sent : total_sent - total_received;
+        address_tx.m_fee = 0;                 // TODO
+        address_tx.m_block_height = transaction->m_height.get();
+        address_tx.m_unlock_time  = transaction->m_unlock_time.get();
+        //address_tx.m_timestamp = transaction->m_timestamp.get();
+        address_tx.m_coinbase  = transaction->m_coinbase.get();
+        address_tx.m_mempool  = transaction->m_mempool.get();
+        m_light_wallet_address_txs.emplace(transaction->m_hash.get(),address_tx);
       }
       MTRACE("sync_aux(): E");
     }
@@ -1907,9 +1931,142 @@ namespace light {
     } catch (...) {
       MINFO("Error occurred while w2 refresh");
     }
+
+    monero_light_get_unspent_outs_response uo_response = get_unspent_outs();
     
+    MDEBUG("sync_aux(): FOUND " << uo_response.m_outputs.get().size() << " OUTPUTS");
+
+    if (uo_response.m_outputs.get().empty()) {
+      return result;
+    }
+
+    m_transfer_container.clear();
+    for (const auto &o: uo_response.m_outputs.get()) {
+      bool spent = false;
+      bool add_transfer = true;
+      crypto::key_image unspent_key_image;
+      crypto::public_key tx_public_key = AUTO_VAL_INIT(tx_public_key);
+      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
+      string_tools::hex_to_pod(o.m_tx_pub_key.get(), tx_public_key);
+      
+      for (const std::string &ski: o.m_spend_key_images.get()) {
+        spent = false;
+
+        // Check if key image is ours
+        //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, ski), error::wallet_internal_error, "Invalid key image");
+        string_tools::hex_to_pod(ski, unspent_key_image);
+        if(key_image_is_ours(unspent_key_image, tx_public_key, o.m_index.get())){
+          MTRACE("Output " << o.m_public_key.get() << " is spent. Key image: " <<  ski);
+          spent = true;
+          break;
+        } {
+          MTRACE("Unspent output found. " << o.m_public_key.get());
+        }
+      }
+
+      // Check if tx already exists in m_transfers. 
+      crypto::hash txid;
+      crypto::public_key tx_pub_key;
+      crypto::public_key public_key;
+      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_tx_hash.get()), error::wallet_internal_error, "Invalid tx_hash field");
+      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_public_key.get()), error::wallet_internal_error, "Invalid public_key field");
+      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
+      string_tools::hex_to_pod(o.m_tx_hash.get(), txid);
+      string_tools::hex_to_pod(o.m_public_key.get(), public_key);
+      string_tools::hex_to_pod(o.m_tx_pub_key.get(), tx_pub_key);
+      
+      for(auto &t: m_transfer_container){
+        if(t.get_public_key() == public_key) {
+          t.m_spent = spent;
+          add_transfer = false;
+          break;
+        }
+      }
+      
+      if(!add_transfer)
+        continue;
+      
+      m_transfer_container.push_back(tools::wallet2::transfer_details{});
+      tools::wallet2::transfer_details& td = m_transfer_container.back();
+      
+      td.m_block_height = o.m_height.get();
+      td.m_global_output_index = monero_wallet_light_utils::uint64_t_cast(o.m_global_index.get());
+      td.m_txid = txid;
+      
+      // Add to extra
+      //add_tx_pub_key_to_extra(td.m_tx, tx_pub_key);
+      
+      td.m_key_image = unspent_key_image;
+      td.m_key_image_known = false;
+      td.m_key_image_request = false;
+      td.m_key_image_partial = false;
+      td.m_amount = monero_wallet_light_utils::uint64_t_cast(o.m_amount.get());
+      td.m_pk_index = 0;
+      td.m_internal_output_index = o.m_index.get();
+      td.m_spent = spent;
+      td.m_frozen = false;
+
+      cryptonote::tx_out txout;
+      txout.target = cryptonote::txout_to_key(public_key);
+      txout.amount = td.m_amount;
+      
+      td.m_tx.vout.resize(td.m_internal_output_index + 1);
+      td.m_tx.vout[td.m_internal_output_index] = txout;
+      
+      // Add unlock time and coinbase bool got from get_address_txs api call
+      std::unordered_map<crypto::hash,tools::wallet2::address_tx>::const_iterator found = m_light_wallet_address_txs.find(txid);
+      //THROW_WALLET_EXCEPTION_IF(found == m_light_wallet_address_txs.end(), error::wallet_internal_error, "Lightwallet: tx not found in m_light_wallet_address_txs");
+      bool miner_tx = found->second.m_coinbase;
+      td.m_tx.unlock_time = found->second.m_unlock_time;
+
+      if (o.m_rct != boost::none && !o.m_rct.get().empty())
+      {
+        // Coinbase tx's
+        if(miner_tx)
+        {
+          td.m_mask = rct::identity();
+        }
+        else
+        {
+          // rct txs
+          // decrypt rct mask, calculate commit hash and compare against blockchain commit hash
+          rct::key rct_commit;
+          parse_rct_str(o.m_rct.get(), tx_pub_key, td.m_internal_output_index, td.m_mask, rct_commit, true);
+          bool valid_commit = (rct_commit == rct::commit(td.amount(), td.m_mask));
+          if(!valid_commit)
+          {
+            MDEBUG("output index: " << o.m_global_index.get());
+            MDEBUG("mask: " + string_tools::pod_to_hex(td.m_mask));
+            MDEBUG("calculated commit: " + string_tools::pod_to_hex(rct::commit(td.amount(), td.m_mask)));
+            MDEBUG("expected commit: " + string_tools::pod_to_hex(rct_commit));
+            MDEBUG("amount: " << td.amount());
+          }
+          THROW_WALLET_EXCEPTION_IF(!valid_commit, error::wallet_internal_error, "Lightwallet: rct commit hash mismatch!");
+        }
+        td.m_rct = true;
+      }
+      else
+      {
+        td.m_mask = rct::identity();
+        td.m_rct = false;
+      }
+      if(!spent)
+        set_unspent(m_transfer_container.size()-1);
+      m_key_images[td.m_key_image] = m_transfer_container.size()-1;
+      m_pub_keys[td.get_public_key()] = m_transfer_container.size()-1;
+    }
+
     MINFO("sync_aux(): end");
     return result;
+  }
+
+  void monero_wallet_light::set_unspent(size_t idx)
+  {
+    CHECK_AND_ASSERT_THROW_MES(idx < m_transfer_container.size(), "Invalid index");
+    tools::wallet2::transfer_details &td = m_transfer_container[idx];
+    LOG_PRINT_L2("Setting UNSPENT: ki " << td.m_key_image << ", amount ");
+    td.m_spent = false;
+    td.m_spent_height = 0;
   }
 
   monero_sync_result monero_wallet_light::sync() {
@@ -1952,6 +2109,74 @@ namespace light {
     result.m_received_money = last_sync.m_received_money;
 
     return result;
+  }
+
+  bool monero_wallet_light::parse_rct_str(const std::string& rct_string, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key& decrypted_mask, rct::key& rct_commit, bool decrypt) const
+  {
+    // rct string is empty if output is non RCT
+    if (rct_string.empty())
+      return false;
+    // rct_string is a string with length 64+64+64 (<rct commit> + <encrypted mask> + <rct amount>)
+    rct::key encrypted_mask;
+    std::string rct_commit_str = rct_string.substr(0,64);
+    std::string encrypted_mask_str = rct_string.substr(64,64);
+    THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, rct_commit_str), error::wallet_internal_error, "Invalid rct commit hash: " + rct_commit_str);
+    THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, encrypted_mask_str), error::wallet_internal_error, "Invalid rct mask: " + encrypted_mask_str);
+    string_tools::hex_to_pod(rct_commit_str, rct_commit);
+    string_tools::hex_to_pod(encrypted_mask_str, encrypted_mask);
+    if (decrypt) {
+      // Decrypt the mask
+      crypto::key_derivation derivation;
+      bool r = generate_key_derivation(tx_pub_key, m_account.get_keys().m_view_secret_key, derivation);
+      THROW_WALLET_EXCEPTION_IF(!r, error::wallet_internal_error, "Failed to generate key derivation");
+      crypto::secret_key scalar;
+      crypto::derivation_to_scalar(derivation, internal_output_index, scalar);
+      sc_sub(decrypted_mask.bytes,encrypted_mask.bytes,rct::hash_to_scalar(rct::sk2rct(scalar)).bytes);
+    }
+    return true;
+  }
+
+  bool monero_wallet_light::key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index)
+  {
+    // Lookup key image from cache
+    serializable_map<uint64_t, crypto::key_image> index_keyimage_map;
+    serializable_unordered_map<crypto::public_key, serializable_map<uint64_t, crypto::key_image> >::const_iterator found_pub_key = m_key_image_cache.find(tx_public_key);
+    if(found_pub_key != m_key_image_cache.end()) {
+      // pub key found. key image for index cached?
+      index_keyimage_map = found_pub_key->second;
+      std::map<uint64_t,crypto::key_image>::const_iterator index_found = index_keyimage_map.find(out_index);
+      if(index_found != index_keyimage_map.end())
+        return key_image == index_found->second;
+    }
+
+    // Not in cache - calculate key image
+    crypto::key_image calculated_key_image;
+    cryptonote::keypair in_ephemeral;
+    
+    // Subaddresses aren't supported in mymonero/openmonero yet. Roll out the original scheme:
+    //   compute D = a*R
+    //   compute P = Hs(D || i)*G + B
+    //   compute x = Hs(D || i) + b      (and check if P==x*G)
+    //   compute I = x*Hp(P)
+    const cryptonote::account_keys& ack = m_account.get_keys();
+    crypto::key_derivation derivation;
+    bool r = crypto::generate_key_derivation(tx_public_key, ack.m_view_secret_key, derivation);
+    CHECK_AND_ASSERT_MES(r, false, "failed to generate_key_derivation(" << tx_public_key << ", " << ack.m_view_secret_key << ")");
+
+    r = crypto::derive_public_key(derivation, out_index, ack.m_account_address.m_spend_public_key, in_ephemeral.pub);
+    CHECK_AND_ASSERT_MES(r, false, "failed to derive_public_key (" << derivation << ", " << out_index << ", " << ack.m_account_address.m_spend_public_key << ")");
+
+    crypto::derive_secret_key(derivation, out_index, ack.m_spend_secret_key, in_ephemeral.sec);
+    crypto::public_key out_pkey_test;
+    r = crypto::secret_key_to_public_key(in_ephemeral.sec, out_pkey_test);
+    CHECK_AND_ASSERT_MES(r, false, "failed to secret_key_to_public_key(" << in_ephemeral.sec << ")");
+    CHECK_AND_ASSERT_MES(in_ephemeral.pub == out_pkey_test, false, "derived secret key doesn't match derived public key");
+
+    crypto::generate_key_image(in_ephemeral.pub, in_ephemeral.sec, calculated_key_image);
+
+    index_keyimage_map.emplace(out_index, calculated_key_image);
+    m_key_image_cache.emplace(tx_public_key, index_keyimage_map);
+    return key_image == calculated_key_image;
   }
 
   monero_sync_result monero_wallet_light::sync(monero_wallet_listener& listener) {
@@ -2200,7 +2425,74 @@ namespace light {
   std::string monero_wallet_light::export_outputs(bool all) const {
     if (m_w2 == nullptr) throw std::runtime_error("Wallet is not initialized");
     if (!m_w2->light_wallet()) throw std::runtime_error("Wallet light is not initiliazed");
-    return epee::string_tools::buff_to_hex_nodelimer(m_w2->export_outputs_to_str(all));
+    return epee::string_tools::buff_to_hex_nodelimer(export_outputs_to_str(all));
+  }
+
+  //----------------------------------------------------------------------------------------------------
+  std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> monero_wallet_light::export_outputs(bool all, uint32_t start, uint32_t count) const
+  {
+    //PERF_TIMER(export_outputs);
+    std::vector<tools::wallet2::exported_transfer_details> outs;
+
+    // invalid cases
+    THROW_WALLET_EXCEPTION_IF(count == 0, error::wallet_internal_error, "Nothing requested");
+    THROW_WALLET_EXCEPTION_IF(!all && start > 0, error::wallet_internal_error, "Incremental mode is incompatible with non-zero start");
+
+    // valid cases:
+    // all: all outputs, subject to start/count
+    // !all: incremental, subject to count
+    // for convenience, start/count are allowed to go past the valid range, then nothing is returned
+
+    size_t offset = 0;
+    if (!all)
+      while (offset < m_transfer_container.size() && (m_transfer_container[offset].m_key_image_known && !m_transfer_container[offset].m_key_image_request))
+        ++offset;
+    else
+      offset = start;
+
+    outs.reserve(m_transfer_container.size() - offset);
+    for (size_t n = offset; n < m_transfer_container.size() && n - offset < count; ++n)
+    {
+      const tools::wallet2::transfer_details &td = m_transfer_container[n];
+
+      tools::wallet2::exported_transfer_details etd;
+      etd.m_pubkey = td.get_public_key();
+      etd.m_tx_pubkey = get_tx_pub_key_from_extra(td.m_tx, td.m_pk_index);
+      etd.m_internal_output_index = td.m_internal_output_index;
+      etd.m_global_output_index = td.m_global_output_index;
+      etd.m_flags.flags = 0;
+      etd.m_flags.m_spent = td.m_spent;
+      etd.m_flags.m_frozen = td.m_frozen;
+      etd.m_flags.m_rct = td.m_rct;
+      etd.m_flags.m_key_image_known = td.m_key_image_known;
+      etd.m_flags.m_key_image_request = td.m_key_image_request;
+      etd.m_flags.m_key_image_partial = td.m_key_image_partial;
+      etd.m_amount = td.m_amount;
+      etd.m_additional_tx_keys = get_additional_tx_pub_keys_from_extra(td.m_tx);
+      etd.m_subaddr_index_major = td.m_subaddr_index.major;
+      etd.m_subaddr_index_minor = td.m_subaddr_index.minor;
+
+      outs.push_back(etd);
+    }
+
+    return std::make_tuple(offset, m_transfer_container.size(), outs);
+  }
+
+  //----------------------------------------------------------------------------------------------------
+  std::string monero_wallet_light::export_outputs_to_str(bool all, uint32_t start, uint32_t count) const
+  {
+    std::stringstream oss;
+    binary_archive<true> ar(oss);
+    auto outputs = export_outputs(all, start, count);
+    THROW_WALLET_EXCEPTION_IF(!::serialization::serialize(ar, outputs), error::wallet_internal_error, "Failed to serialize output data");
+
+    std::string magic(OUTPUT_EXPORT_FILE_MAGIC, strlen(OUTPUT_EXPORT_FILE_MAGIC));
+    const cryptonote::account_public_address &keys = m_account.get_keys().m_account_address;
+    std::string header;
+    header += std::string((const char *)&keys.m_spend_public_key, sizeof(crypto::public_key));
+    header += std::string((const char *)&keys.m_view_public_key, sizeof(crypto::public_key));
+    std::string ciphertext = m_w2->encrypt_with_view_secret_key(header + oss.str());
+    return magic + ciphertext;
   }
 
   std::vector<std::shared_ptr<monero_key_image>> monero_wallet_light::export_key_images(bool all) const {

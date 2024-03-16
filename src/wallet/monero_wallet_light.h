@@ -540,18 +540,39 @@ namespace monero {
     
     std::vector<monero_light_transaction> m_raw_transactions;
     std::vector<monero_light_transaction> m_transactions;
-
+    tools::wallet2::transfer_container m_transfer_container;
+    serializable_unordered_map<crypto::key_image, size_t> m_key_images;
+    serializable_unordered_map<crypto::public_key, size_t> m_pub_keys;
     std::vector<std::shared_ptr<monero_output_wallet>> m_exported_outputs = std::vector<std::shared_ptr<monero_output_wallet>>();
 
     std::vector<std::shared_ptr<monero_key_image>> m_imported_key_images = std::vector<std::shared_ptr<monero_key_image>>();
     std::vector<std::shared_ptr<monero_key_image>> m_exported_key_images = std::vector<std::shared_ptr<monero_key_image>>();
+
+    std::unordered_map<crypto::hash, tools::wallet2::address_tx> m_light_wallet_address_txs;
+    // store calculated key image for faster lookup
+    serializable_unordered_map<crypto::public_key, serializable_map<uint64_t, crypto::key_image> > m_key_image_cache;
 
     void init_common();
     void calculate_balances();
     bool has_imported_key_images() const {
       return !m_imported_key_images.empty();
     };
+    bool key_image_is_ours(const std::string& key_image, const std::string& tx_public_key, uint64_t out_index) {
+      crypto::public_key c_tx_public_key;
+      crypto::key_image c_key_image;
+
+      string_tools::hex_to_pod(tx_public_key, c_tx_public_key);
+      string_tools::hex_to_pod(key_image, c_key_image);
+
+      return key_image_is_ours(c_key_image, c_tx_public_key, out_index);
+    }
+    bool key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index);
     bool is_output_spent(std::string key_image) const;
+    void set_unspent(size_t idx);
+    std::string export_outputs_to_str(bool all = false, uint32_t start = 0, uint32_t count = 0xffffffff) const;
+    std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> export_outputs(bool all, uint32_t start, uint32_t count) const;
+    bool parse_rct_str(const std::string& rct_string, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key& decrypted_mask, rct::key& rct_commit, bool decrypt) const;
+
     monero_sync_result sync_aux();
 
     // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
