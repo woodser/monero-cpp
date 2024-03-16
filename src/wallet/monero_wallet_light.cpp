@@ -2369,7 +2369,7 @@ namespace light {
       outs.push_back(etd);
     }
 
-    return std::make_tuple(offset, unspent_outputs.size(), outs);
+    return std::make_tuple(offset, unspent_outs.size(), outs);
   }
 
   //----------------------------------------------------------------------------------------------------
