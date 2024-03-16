@@ -568,6 +568,8 @@ namespace monero {
     }
     bool key_image_is_ours(const crypto::key_image& key_image, const crypto::public_key& tx_public_key, uint64_t out_index);
     bool is_output_spent(std::string key_image) const;
+    bool is_output_spent(monero_light_output output) const;
+    bool is_mined_output(monero_light_output output) const;
     void set_unspent(size_t idx);
     std::string export_outputs_to_str(bool all = false, uint32_t start = 0, uint32_t count = 0xffffffff) const;
     std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> export_outputs(bool all, uint32_t start, uint32_t count) const;

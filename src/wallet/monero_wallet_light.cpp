@@ -1932,130 +1932,6 @@ namespace light {
       MINFO("Error occurred while w2 refresh");
     }
 
-    monero_light_get_unspent_outs_response uo_response = get_unspent_outs();
-    
-    MDEBUG("sync_aux(): FOUND " << uo_response.m_outputs.get().size() << " OUTPUTS");
-
-    if (uo_response.m_outputs.get().empty()) {
-      return result;
-    }
-
-    m_transfer_container.clear();
-    for (const auto &o: uo_response.m_outputs.get()) {
-      bool spent = false;
-      bool add_transfer = true;
-      crypto::key_image unspent_key_image;
-      crypto::public_key tx_public_key = AUTO_VAL_INIT(tx_public_key);
-      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
-      string_tools::hex_to_pod(o.m_tx_pub_key.get(), tx_public_key);
-      
-      for (const std::string &ski: o.m_spend_key_images.get()) {
-        spent = false;
-
-        // Check if key image is ours
-        //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, ski), error::wallet_internal_error, "Invalid key image");
-        string_tools::hex_to_pod(ski, unspent_key_image);
-        if(key_image_is_ours(unspent_key_image, tx_public_key, o.m_index.get())){
-          MTRACE("Output " << o.m_public_key.get() << " is spent. Key image: " <<  ski);
-          spent = true;
-          break;
-        } {
-          MTRACE("Unspent output found. " << o.m_public_key.get());
-        }
-      }
-
-      // Check if tx already exists in m_transfers. 
-      crypto::hash txid;
-      crypto::public_key tx_pub_key;
-      crypto::public_key public_key;
-      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_tx_hash.get()), error::wallet_internal_error, "Invalid tx_hash field");
-      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_public_key.get()), error::wallet_internal_error, "Invalid public_key field");
-      //THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, o.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
-      string_tools::hex_to_pod(o.m_tx_hash.get(), txid);
-      string_tools::hex_to_pod(o.m_public_key.get(), public_key);
-      string_tools::hex_to_pod(o.m_tx_pub_key.get(), tx_pub_key);
-      
-      for(auto &t: m_transfer_container){
-        if(t.get_public_key() == public_key) {
-          t.m_spent = spent;
-          add_transfer = false;
-          break;
-        }
-      }
-      
-      if(!add_transfer)
-        continue;
-      
-      m_transfer_container.push_back(tools::wallet2::transfer_details{});
-      tools::wallet2::transfer_details& td = m_transfer_container.back();
-      
-      td.m_block_height = o.m_height.get();
-      td.m_global_output_index = monero_wallet_light_utils::uint64_t_cast(o.m_global_index.get());
-      td.m_txid = txid;
-      
-      // Add to extra
-      //add_tx_pub_key_to_extra(td.m_tx, tx_pub_key);
-      
-      td.m_key_image = unspent_key_image;
-      td.m_key_image_known = false;
-      td.m_key_image_request = false;
-      td.m_key_image_partial = false;
-      td.m_amount = monero_wallet_light_utils::uint64_t_cast(o.m_amount.get());
-      td.m_pk_index = 0;
-      td.m_internal_output_index = o.m_index.get();
-      td.m_spent = spent;
-      td.m_frozen = false;
-
-      cryptonote::tx_out txout;
-      txout.target = cryptonote::txout_to_key(public_key);
-      txout.amount = td.m_amount;
-      
-      td.m_tx.vout.resize(td.m_internal_output_index + 1);
-      td.m_tx.vout[td.m_internal_output_index] = txout;
-      
-      // Add unlock time and coinbase bool got from get_address_txs api call
-      std::unordered_map<crypto::hash,tools::wallet2::address_tx>::const_iterator found = m_light_wallet_address_txs.find(txid);
-      //THROW_WALLET_EXCEPTION_IF(found == m_light_wallet_address_txs.end(), error::wallet_internal_error, "Lightwallet: tx not found in m_light_wallet_address_txs");
-      bool miner_tx = found->second.m_coinbase;
-      td.m_tx.unlock_time = found->second.m_unlock_time;
-
-      if (o.m_rct != boost::none && !o.m_rct.get().empty())
-      {
-        // Coinbase tx's
-        if(miner_tx)
-        {
-          td.m_mask = rct::identity();
-        }
-        else
-        {
-          // rct txs
-          // decrypt rct mask, calculate commit hash and compare against blockchain commit hash
-          rct::key rct_commit;
-          parse_rct_str(o.m_rct.get(), tx_pub_key, td.m_internal_output_index, td.m_mask, rct_commit, true);
-          bool valid_commit = (rct_commit == rct::commit(td.amount(), td.m_mask));
-          if(!valid_commit)
-          {
-            MDEBUG("output index: " << o.m_global_index.get());
-            MDEBUG("mask: " + string_tools::pod_to_hex(td.m_mask));
-            MDEBUG("calculated commit: " + string_tools::pod_to_hex(rct::commit(td.amount(), td.m_mask)));
-            MDEBUG("expected commit: " + string_tools::pod_to_hex(rct_commit));
-            MDEBUG("amount: " << td.amount());
-          }
-          THROW_WALLET_EXCEPTION_IF(!valid_commit, error::wallet_internal_error, "Lightwallet: rct commit hash mismatch!");
-        }
-        td.m_rct = true;
-      }
-      else
-      {
-        td.m_mask = rct::identity();
-        td.m_rct = false;
-      }
-      if(!spent)
-        set_unspent(m_transfer_container.size()-1);
-      m_key_images[td.m_key_image] = m_transfer_container.size()-1;
-      m_pub_keys[td.get_public_key()] = m_transfer_container.size()-1;
-    }
-
     MINFO("sync_aux(): end");
     return result;
   }
@@ -2406,6 +2282,8 @@ namespace light {
   {
     //PERF_TIMER(export_outputs);
     std::vector<tools::wallet2::exported_transfer_details> outs;
+    auto unspent_outs_response = get_unspent_outs();
+    auto unspent_outs = unspent_outs_response.m_outputs != boost:: none ? unspent_outs_response.m_outputs.get() : std::vector<monero_light_output>();
 
     // invalid cases
     THROW_WALLET_EXCEPTION_IF(count == 0, error::wallet_internal_error, "Nothing requested");
@@ -2418,32 +2296,71 @@ namespace light {
 
     size_t offset = 0;
     if (!all)
-      while (offset < m_transfer_container.size() && (m_transfer_container[offset].m_key_image_known && !m_transfer_container[offset].m_key_image_request))
+      while (offset < unspent_outs.size() && (m_transfer_container[offset].m_key_image_known && !m_transfer_container[offset].m_key_image_request))
         ++offset;
     else
       offset = start;
 
     outs.reserve(m_transfer_container.size() - offset);
-    for (size_t n = offset; n < m_transfer_container.size() && n - offset < count; ++n)
+    for (size_t n = offset; n < unspent_outs.size() && n - offset < count; ++n)
     {
-      const tools::wallet2::transfer_details &td = m_transfer_container[n];
-
+      const monero_light_output &td = unspent_outs[n];
+      crypto::public_key tx_pub_key;
+      crypto::public_key public_key;
+      THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, td.m_tx_pub_key.get()), error::wallet_internal_error, "Invalid tx_pub_key field");
+      string_tools::hex_to_pod(td.m_tx_pub_key.get(), tx_pub_key);
+      THROW_WALLET_EXCEPTION_IF(string_tools::validate_hex(64, td.m_public_key.get()), error::wallet_internal_error, "Invalid public_key field");
+      string_tools::hex_to_pod(td.m_public_key.get(), public_key);
+      bool spent = is_output_spent(td);
       tools::wallet2::exported_transfer_details etd;
-      etd.m_pubkey = td.get_public_key();
-      etd.m_tx_pubkey = get_tx_pub_key_from_extra(td.m_tx, td.m_pk_index);
-      etd.m_internal_output_index = td.m_internal_output_index;
-      etd.m_global_output_index = td.m_global_output_index;
+      etd.m_pubkey = public_key;
+      etd.m_tx_pubkey = tx_pub_key;
+      etd.m_internal_output_index = td.m_index.get();
+      etd.m_global_output_index = monero_wallet_light_utils::uint64_t_cast(td.m_global_index.get());
       etd.m_flags.flags = 0;
-      etd.m_flags.m_spent = td.m_spent;
-      etd.m_flags.m_frozen = td.m_frozen;
-      etd.m_flags.m_rct = td.m_rct;
-      etd.m_flags.m_key_image_known = td.m_key_image_known;
-      etd.m_flags.m_key_image_request = td.m_key_image_request;
-      etd.m_flags.m_key_image_partial = td.m_key_image_partial;
-      etd.m_amount = td.m_amount;
-      etd.m_additional_tx_keys = get_additional_tx_pub_keys_from_extra(td.m_tx);
-      etd.m_subaddr_index_major = td.m_subaddr_index.major;
-      etd.m_subaddr_index_minor = td.m_subaddr_index.minor;
+      etd.m_flags.m_spent = is_output_spent(td);
+      etd.m_flags.m_frozen = false;
+      //etd.m_flags.m_rct = td.m_rct;
+      etd.m_flags.m_key_image_known = false;
+      etd.m_flags.m_key_image_request = false;
+      etd.m_flags.m_key_image_partial = false;
+      etd.m_amount = monero_wallet_light_utils::uint64_t_cast(td.m_amount.get());
+      //etd.m_additional_tx_keys = cryptonote::get_additional_tx_pub_keys_from_extra(td.m_tx);
+      etd.m_subaddr_index_major = 0;
+      etd.m_subaddr_index_minor = 0;
+      rct::key mask;
+
+      if (td.m_rct != boost::none && td.m_rct.get().empty())
+      {
+        // Coinbase tx's
+        if(is_mined_output(td))
+        {
+          mask = rct::identity();
+        }
+        else
+        {
+          // rct txs
+          // decrypt rct mask, calculate commit hash and compare against blockchain commit hash
+          rct::key rct_commit;
+          parse_rct_str(td.m_rct.get(), tx_pub_key, td.m_index.get(), mask, rct_commit, true);
+          bool valid_commit = (rct_commit == rct::commit(monero_wallet_light_utils::uint64_t_cast(td.m_amount.get()), mask));
+          if(!valid_commit)
+          {
+            MDEBUG("output index: " << td.m_global_index);
+            MDEBUG("mask: " + string_tools::pod_to_hex(mask));
+            MDEBUG("calculated commit: " + string_tools::pod_to_hex(rct::commit(monero_wallet_light_utils::uint64_t_cast(td.m_amount.get()), mask)););
+            MDEBUG("expected commit: " + string_tools::pod_to_hex(rct_commit));
+            MDEBUG("amount: " << td.m_amount.get());
+          }
+          THROW_WALLET_EXCEPTION_IF(!valid_commit, error::wallet_internal_error, "Lightwallet: rct commit hash mismatch!");
+        }
+        etd.m_flags.m_rct = true;
+      }
+      else
+      {
+        mask = rct::identity();
+        etd.m_flags.m_rct = false;
+      }
 
       outs.push_back(etd);
     }
