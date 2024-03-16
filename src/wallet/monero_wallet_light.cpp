@@ -1906,7 +1906,7 @@ namespace light {
         //address_tx.m_timestamp = transaction->m_timestamp.get();
         address_tx.m_coinbase  = transaction->m_coinbase.get();
         address_tx.m_mempool  = transaction->m_mempool.get();
-        m_light_wallet_address_txs.emplace(transaction->m_hash.get(),address_tx);
+        m_light_wallet_address_txs.emplace(tx_hash,address_tx);
       }
       MTRACE("sync_aux(): E");
     }
