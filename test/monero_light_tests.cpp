@@ -25,16 +25,17 @@ int main(int argc, const char* argv[]) {
   MINFO("===== Create wallet from keys =====");
   monero_wallet_config wallet_config;
   //wallet_config.m_seed = "hefty value later extra artistic firm radar yodel talent future fungal nutshell because sanity awesome nail unjustly rage unafraid cedar delayed thumbs comb custom sanity";
-  wallet_config.m_seed = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist long tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
+  //wallet_config.m_seed = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist long tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
   wallet_config.m_primary_address = "A1y9sbVt8nqhZAVm3me1U18rUVXcjeNKuBd1oE2cTs8biA9cozPMeyYLhe77nPv12JA3ejJN3qprmREriit2fi6tJDi99RR";
   wallet_config.m_private_view_key = "198820da9166ee114203eb38c29e00b0e8fc7df508aa632d56ead849093d3808";
   wallet_config.m_path = "MyLightWalletRestored";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::TESTNET;
-  wallet_config.m_server = monero_rpc_connection("http://localhost:8443", "superuser", "abctesting123");
+  //wallet_config.m_server = monero_rpc_connection("http://localhost:8443", "superuser", "abctesting123");
+  wallet_config.m_server = monero_rpc_connection("http://localhost:28082");
   wallet_config.m_restore_height = 2367336;
   wallet_config.m_seed_offset = "";
-  monero_wallet_light* wallet_restored = monero_wallet_light::create_wallet(wallet_config);
+  monero_wallet_full* wallet_restored = monero_wallet_full::create_wallet(wallet_config);
   MINFO("===== Wallet Light created successfully =====");
   /*
   // synchronize the wallet and receive progress notifications
@@ -82,7 +83,7 @@ int main(int argc, const char* argv[]) {
   monero_utils::free(txs);
 
   MINFO("Exporting outputs...");
-  for(std::shared_ptr<monero_output> output : wallet_restored->get_outputs()) {
+  for(std::shared_ptr<monero_output> output : wallet_restored->get_outputs(monero_output_query())) {
     MINFO("Got output amount: " << output->m_amount.get() << ", index: " << output->m_index.get());
   }
   string outputsHex = wallet_restored->export_outputs(true);
@@ -91,6 +92,7 @@ int main(int argc, const char* argv[]) {
   // offline wallet sign txs test
   monero_wallet_config offline_config; 
   offline_config = wallet_config.copy();
+  offline_config.m_seed = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist long tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
   offline_config.m_path = "MyOfflineWalletRestored";
   offline_config.m_server = boost::none;
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
