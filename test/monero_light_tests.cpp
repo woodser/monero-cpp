@@ -35,7 +35,7 @@ int main(int argc, const char* argv[]) {
   wallet_config.m_server = monero_rpc_connection("http://localhost:28081");
   wallet_config.m_restore_height = 2367336;
   wallet_config.m_seed_offset = "";
-  monero_wallet_full* wallet_restored = monero_wallet_full::create_wallet(wallet_config);
+  monero_wallet_light* wallet_restored = monero_wallet_light::create_wallet(wallet_config);
   MINFO("===== Wallet Light created successfully =====");
   /*
   // synchronize the wallet and receive progress notifications
@@ -88,7 +88,9 @@ int main(int argc, const char* argv[]) {
   }
   string outputsHex = wallet_restored->export_outputs(true);
   MINFO("Exported outputs hex: " << outputsHex);
-
+  /*
+  4d6f6e65726f206f7574707574206578706f7274049d2ffcd27ae4d279484b4e48188874438deb5787c52fd0349438a908c90a599bae57350361fdd101564245de656c92ad16af02ae9c6404772dbf84f1a0a22310454f3cf596743a8aac0d5b335590a7860bb9669e214f980da951a0d09da3be14923a50b24f8c4afee4e568dddbef3231e7a144c06c6463aa9aa0542c1c1cf61307e82605c04be875319afec957d1cbcf1bd6681c0c905e033a1f5ed84abf7b6f71a279e0a3478beb507209fd21af8d893475cd1d61e8b1e8480fd5d42cb468b24bf50cf9836e7f751a1064b52cb57a3c5185ecfd93c0a72de103
+  */
   // offline wallet sign txs test
   monero_wallet_config offline_config; 
   offline_config = wallet_config.copy();
