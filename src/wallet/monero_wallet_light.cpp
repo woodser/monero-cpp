@@ -2793,23 +2793,79 @@ namespace light {
     return txs;
   }
 
-  std::vector<std::string> monero_wallet_light::relay_txs(const std::vector<std::string>& tx_metadatas) {
-    std::vector<std::string> result = std::vector<std::string>();
-    
-    for (std::string tx_metadata : tx_metadatas) {
-      monero_light_submit_raw_tx_response response = submit_raw_tx(tx_metadata);
+  // implementation based on monero-project wallet_rpc_server.cpp::on_submit_transfer()
+  std::vector<std::string> monero_wallet_light::submit_txs(const std::string& signed_tx_hex) {
+    if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
 
-      std::string status = response.m_status.get();
+    cryptonote::blobdata blob;
+    if (!epee::string_tools::parse_hexstr_to_binbuff(signed_tx_hex, blob)) throw std::runtime_error("Failed to parse hex.");
 
-      if (status != std::string("success")) {
-        throw std::runtime_error("Invalid tx metadata.");
-      }
-
-      std::string tx_hash = monero_wallet_light_utils::tx_hex_to_hash(tx_metadata);
-      result.push_back(tx_hash);
+    std::vector<tools::wallet2::pending_tx> ptx_vector;
+    try {
+      if (!m_w2->parse_tx_from_str(blob, ptx_vector, NULL)) throw std::runtime_error("Failed to parse signed tx data.");
+    } catch (const std::exception &e) {
+      throw std::runtime_error(std::string("Failed to parse signed tx: ") + e.what());
     }
 
-    return result;
+    try {
+      std::vector<std::string> tx_hashes;
+      for (auto &ptx: ptx_vector) {
+        m_w2->commit_tx(ptx);
+        tx_hashes.push_back(epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx)));
+      }
+      //m_w2_listener->on_spend_tx_hashes(tx_hashes); // notify listeners of spent funds
+      return tx_hashes;
+    } catch (const std::exception &e) {
+      throw std::runtime_error(std::string("Failed to submit signed tx: ") + e.what());
+    }
+  }
+
+  std::vector<std::string> monero_wallet_light::relay_txs(const std::vector<std::string>& tx_metadatas) {
+    MTRACE("monero_wallet_light::relay_txs()");
+
+    // relay each metadata as a tx
+    std::vector<std::string> tx_hashes;
+    for (const auto& txMetadata : tx_metadatas) {
+
+      // parse tx metadata hex
+      cryptonote::blobdata blob;
+      if (!epee::string_tools::parse_hexstr_to_binbuff(txMetadata, blob)) {
+        throw std::runtime_error("Failed to parse hex");
+      }
+
+      // deserialize tx
+      bool loaded = false;
+      tools::wallet2::pending_tx ptx;
+      try {
+        binary_archive<false> ar{epee::strspan<std::uint8_t>(blob)};
+        if (::serialization::serialize(ar, ptx)) loaded = true;
+      } catch (...) {}
+      if (!loaded) {
+        try {
+          std::istringstream iss(blob);
+          boost::archive::portable_binary_iarchive ar(iss);
+          ar >> ptx;
+          loaded = true;
+        } catch (...) {}
+      }
+      if (!loaded) throw std::runtime_error("Failed to parse tx metadata");
+
+      // commit tx
+      try {
+        m_w2->commit_tx(ptx);
+      } catch (const std::exception& e) {
+        throw std::runtime_error("Failed to commit tx");
+      }
+
+      // collect resulting hash
+      tx_hashes.push_back(epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx)));
+    }
+
+    // notify listeners of spent funds
+    // m_w2_listener->on_spend_tx_hashes(tx_hashes);
+
+    // return relayed tx hashes
+    return tx_hashes;
   }
 
   uint64_t monero_wallet_light::wait_for_next_block() {

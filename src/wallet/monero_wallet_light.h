@@ -499,6 +499,7 @@ namespace monero {
     std::shared_ptr<monero_key_image_import_result> import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) override;
 
     std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& config) override;    
+    std::vector<std::string> submit_txs(const std::string& signed_tx_hex) override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
     
     uint64_t wait_for_next_block() override;
