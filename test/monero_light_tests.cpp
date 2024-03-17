@@ -120,7 +120,7 @@ int main(int argc, const char* argv[]) {
   monero_tx_config tx_config;
   tx_config.m_account_index = 0;
   tx_config.m_address = wallet_restored->get_primary_address();
-  tx_config.m_amount = wallet_restored->get_balance();
+  tx_config.m_amount = 50000000;
   tx_config.m_relay = false;
 
   std::shared_ptr<monero_tx_wallet> unsigned_tx = wallet_restored->create_tx(tx_config);
