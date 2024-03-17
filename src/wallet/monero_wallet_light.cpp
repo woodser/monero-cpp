@@ -2399,7 +2399,7 @@ namespace light {
       MINFO("monero_wallet_light::get_outputs processing output: " << light_output.m_public_key.get() << ", index: " << light_output.m_global_index.get() << ", valid_tx_hex: " << valid_tx_hex ? "true" : "false");
       std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
       output->m_account_index = 0;
-      output->m_index = light_output.m_global_index;
+      output->m_index = monero_wallet_light_utils::uint64_t_cast(light_output.m_global_index.get());
       output->m_subaddress_index = 0;
       output->m_amount = monero_wallet_light_utils::uint64_t_cast(light_output.m_amount.get());
       output->m_stealth_public_key = light_output.m_public_key;
