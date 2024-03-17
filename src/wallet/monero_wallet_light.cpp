@@ -2810,6 +2810,9 @@ namespace light {
     try {
       std::vector<std::string> tx_hashes;
       for (auto &ptx: ptx_vector) {
+        std::string ptx_hash = epee::string_tools::buff_to_hex_nodelimer(tx_to_blob(ptx.tx));
+        MINFO("monero_wallet_light::submit_txs submitting tx hex: " << ptx_hash);
+        MINFO("monero_wallet_light:: ptx dests: " << ptx.dests.size() << ", ");
         m_w2->commit_tx(ptx);
         tx_hashes.push_back(epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx)));
       }
