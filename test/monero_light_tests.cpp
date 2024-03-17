@@ -88,7 +88,7 @@ int main(int argc, const char* argv[]) {
   }
   string outputsHex = wallet_restored->export_outputs(true);
   MINFO("Exported outputs hex: " << outputsHex);
-  /*
+  
 
   // offline wallet sign txs test
   monero_wallet_config offline_config; 
@@ -144,7 +144,7 @@ int main(int argc, const char* argv[]) {
   vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
   monero_utils::free(outputs);
   MINFO("close");
-*/
+
   // save and close the wallets
   wallet_restored->close(false);
   MINFO("after close");
