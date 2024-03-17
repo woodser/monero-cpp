@@ -2595,6 +2595,7 @@ namespace light {
       }
 
       if (append_key_image) {
+        MINFO("monero_wallet_light::import_key_images importing key image: " << key_image->m_hex.get());
         m_imported_key_images.push_back(key_image);
         has_changes = true;
       }
