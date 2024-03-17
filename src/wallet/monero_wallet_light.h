@@ -487,6 +487,7 @@ namespace monero {
     
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs(const monero_tx_query& query) const override;
+    std::string dump_tx_to_str(const std::vector<tools::wallet2::pending_tx> &ptx_vector) const;
     
     std::vector<std::shared_ptr<monero_transfer>> get_transfers(const monero_transfer_query& query) const override;
     
@@ -581,7 +582,6 @@ namespace monero {
     std::string export_outputs_to_str(bool all = false, uint32_t start = 0, uint32_t count = 0xffffffff) const;
     std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> export_outputs(bool all, uint32_t start, uint32_t count = 0xffffffff) const;
     bool parse_rct_str(const std::string& rct_string, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key& decrypted_mask, rct::key& rct_commit, bool decrypt) const;
-    std::string dump_tx_to_str(const std::vector<tools::wallet2::pending_tx> &ptx_vector) const;
     monero_sync_result sync_aux();
 
     // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
