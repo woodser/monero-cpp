@@ -367,7 +367,7 @@ namespace light {
     else
     {
       if (m_w2->watch_only()){
-        unsigned_txset = epee::string_tools::buff_to_hex_nodelimer(m_w2->dump_tx_to_str(ptx_vector));
+        unsigned_txset = epee::string_tools::buff_to_hex_nodelimer(dump_tx_to_str(ptx_vector));
         if (unsigned_txset.empty())
         {
           er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
@@ -2382,7 +2382,7 @@ namespace light {
   }
 
   std::vector<std::shared_ptr<monero_output_wallet>> monero_wallet_light::get_outputs(const monero_output_query& query) const {
-    MINFO("monero_wallet_light::get_outputs()");
+    MINFO("monero_wallet_light::get_outputs(monero_output_query&)");
     monero_light_get_unspent_outs_response response = get_unspent_outs();
 
     std::vector<std::shared_ptr<monero_output_wallet>> outputs = std::vector<std::shared_ptr<monero_output_wallet>>();
@@ -2395,10 +2395,12 @@ namespace light {
     }
 
     for(monero_light_output light_output : response.m_outputs.get()) {
-      MINFO("Processing output: " << light_output.m_public_key.get());
+      bool valid_tx_hex = string_tools::validate_hex(64, light_output.m_tx_pub_key.get());
+      MINFO("monero_wallet_light::get_outputs processing output: " << light_output.m_public_key.get() << ", index: " << light_output.m_global_index.get() << ", valid_tx_hex: " << valid_tx_hex ? "true" : "false");
       std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
       output->m_account_index = 0;
-      output->m_index = light_output.m_index;
+      output->m_index = light_output.m_global_index;
+      output->m_subaddress_index = 0;
       output->m_amount = monero_wallet_light_utils::uint64_t_cast(light_output.m_amount.get());
       output->m_stealth_public_key = light_output.m_public_key;
       output->m_key_image = std::make_shared<monero_key_image>();
