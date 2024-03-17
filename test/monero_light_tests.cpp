@@ -115,8 +115,9 @@ int main(int argc, const char* argv[]) {
   MINFO("[OK] Offline wallet is not view only");
   int imported_outputs = offline_wallet->import_outputs(outputsHex);
   //if (imported_outputs == 0) throw std::runtime_error("Offline wallet has not imported view only outputs.");
-  MINFO("Imported outputs: " << imported_outputs);
-  MINFO("Importing key images");
+  MINFO("Imported outputs: " << imported_outputs << ", balance: " <<   offline_wallet->get_balance());
+
+  MINFO("Importing signed key images in view only");
   std::vector<std::shared_ptr<monero_key_image>> signed_key_images = offline_wallet->export_key_images();
   
   //if (signed_key_images.empty()) throw std::runtime_error("Offline wallet should have signed key images at this point.");
