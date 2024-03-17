@@ -318,7 +318,7 @@ namespace light {
   
   //------------------------------------------------------------------------------------------------------------------------------
   template<typename Ts, typename Tu, typename Tk, typename Ta>
-  bool fill_response(wallet2* m_w2, std::vector<tools::wallet2::pending_tx> &ptx_vector,
+  bool fill_response(wallet2* m_w2, monero_wallet_light* m_wallet_light, std::vector<tools::wallet2::pending_tx> &ptx_vector,
       bool get_tx_key, Ts& tx_key, Tu &amount, Ta &amounts_by_dest, Tu &fee, Tu &weight, std::string &multisig_txset, std::string &unsigned_txset, bool do_not_relay,
       Ts &tx_hash, bool get_tx_hex, Ts &tx_blob, bool get_tx_metadata, Ts &tx_metadata, Tk &spent_key_images, epee::json_rpc::error &er)
   {
@@ -367,7 +367,7 @@ namespace light {
     else
     {
       if (m_w2->watch_only()){
-        unsigned_txset = epee::string_tools::buff_to_hex_nodelimer(dump_tx_to_str(ptx_vector));
+        unsigned_txset = epee::string_tools::buff_to_hex_nodelimer(m_wallet_light->dump_tx_to_str(ptx_vector));
         if (unsigned_txset.empty())
         {
           er.code = WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR;
@@ -2701,7 +2701,7 @@ namespace light {
     std::list<std::string> tx_metadatas;
     std::list<light::key_image_list> input_key_images_list;
     MTRACE("monero_wallet_light::create_txs before fill response");
-    if (!light::fill_response(m_w2.get(), ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
+    if (!light::fill_response(m_w2.get(), this, ptx_vector, get_tx_keys, tx_keys, tx_amounts, tx_amounts_by_dest, tx_fees, tx_weights, multisig_tx_hex, unsigned_tx_hex, !relay, tx_hashes, get_tx_hex, tx_blobs, get_tx_metadata, tx_metadatas, input_key_images_list, err)) {
       throw std::runtime_error("need to handle error filling response!");  // TODO
     }
     MTRACE("monero_wallet_light::create_txs after fill response");
