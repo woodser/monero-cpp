@@ -34,8 +34,8 @@ int main(int argc, const char* argv[]) {
   wallet_config.m_path = "MyLightWalletRestored";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::TESTNET;
-  wallet_config.m_server = monero_rpc_connection("http://localhost:8443", "superuser", "abctesting123");
-  //wallet_config.m_server = monero_rpc_connection("http://localhost:28081");
+  //wallet_config.m_server = monero_rpc_connection("http://localhost:8443", "superuser", "abctesting123");
+  wallet_config.m_server = monero_rpc_connection("http://localhost:28081");
   wallet_config.m_restore_height = 2367336;
   wallet_config.m_seed_offset = "";
   monero_wallet* wallet_restored = monero_wallet_full::create_wallet(wallet_config);
