@@ -26,8 +26,11 @@ int main(int argc, const char* argv[]) {
   monero_wallet_config wallet_config;
   //wallet_config.m_seed = "hefty value later extra artistic firm radar yodel talent future fungal nutshell because sanity awesome nail unjustly rage unafraid cedar delayed thumbs comb custom sanity";
   //wallet_config.m_seed = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist long tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
-  wallet_config.m_primary_address = "A1y9sbVt8nqhZAVm3me1U18rUVXcjeNKuBd1oE2cTs8biA9cozPMeyYLhe77nPv12JA3ejJN3qprmREriit2fi6tJDi99RR";
-  wallet_config.m_private_view_key = "198820da9166ee114203eb38c29e00b0e8fc7df508aa632d56ead849093d3808";
+  //wallet_config.m_seed = "akin mobile observant polar farming abducts casket regular jeers sickness cuffs decay video exotic blip dove towel vapidly viking greater reinvest jackets jaws lesson video";
+  //wallet_config.m_primary_address = "A1y9sbVt8nqhZAVm3me1U18rUVXcjeNKuBd1oE2cTs8biA9cozPMeyYLhe77nPv12JA3ejJN3qprmREriit2fi6tJDi99RR";
+  //wallet_config.m_private_view_key = "198820da9166ee114203eb38c29e00b0e8fc7df508aa632d56ead849093d3808";
+  wallet_config.m_primary_address = "9yEdYhU2ZAeGTgj9VdjvVk4vvnusdRpegJd98nCbsLh2Jj9xjbiRGFf6ZidwmNaXv5j2yYPZBzrDB9uoP88aJcVkMKHmbqZ";
+  wallet_config.m_private_view_key = "4d0090d149e808beac0a46ee93e0a9a9aeb15d241b5953fde26a821866621d0f";
   wallet_config.m_path = "MyLightWalletRestored";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::TESTNET;
@@ -93,7 +96,9 @@ int main(int argc, const char* argv[]) {
   // offline wallet sign txs test
   monero_wallet_config offline_config; 
   offline_config = wallet_config.copy();
-  offline_config.m_seed = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist long tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
+  offline_config.m_seed = "akin mobile observant polar farming abducts casket regular jeers sickness cuffs decay video exotic blip dove towel vapidly viking greater reinvest jackets jaws lesson video";
+
+  //offline_config.m_seed = "silk mocked cucumber lettuce hope adrenalin aching lush roles fuel revamp baptism wrist long tender teardrop midst pastry pigment equip frying inbound pinched ravine frying";
   offline_config.m_path = "MyOfflineWalletRestored";
   offline_config.m_server = boost::none;
   monero_wallet *offline_wallet = monero_wallet_full::create_wallet(offline_config);
