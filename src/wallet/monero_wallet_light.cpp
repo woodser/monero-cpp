@@ -2618,7 +2618,7 @@ namespace light {
     MINFO("ski.size(): " << ski.size());
     MINFO("w2->light_wallet_get_unspent_outs().size(): ");
     m_w2->light_wallet_get_unspent_outs();
-    uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, false); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
+    uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, true); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
     //uint64_t height = 0;
     // to do
     // translate results
