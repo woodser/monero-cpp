@@ -124,8 +124,8 @@ int main(int argc, const char* argv[]) {
   MINFO("Imported key images");
   monero_tx_config tx_config;
   tx_config.m_account_index = 0;
-  tx_config.m_address = wallet_restored->get_primary_address();
-  tx_config.m_amount = 50000000;
+  tx_config.m_address = "9xb4UHX1UEKZ1L6KnPXhQKQaC1pmBCtLHah8qBnbwm3yBwZKkSU21cZNgpEwJVwZmzPv7rsdG8Xcd2gGkRorf78NRQrLTfM"; // test receiver wallet
+  tx_config.m_amount = 500000000;
   tx_config.m_relay = false;
 
   std::shared_ptr<monero_tx_wallet> unsigned_tx = wallet_restored->create_tx(tx_config);
@@ -134,6 +134,17 @@ int main(int argc, const char* argv[]) {
   monero_tx_set signed_tx_set = offline_wallet->sign_txs(unsigned_tx_hex);  
   std::string signed_tx_hex = signed_tx_set.m_signed_tx_hex.get();
   MINFO("Create signed tx hash: " << signed_tx_hex);
+  MINFO("Relaying tx...");
+  std::vector<std::string> tx_hashes = wallet_restored->submit_txs(signed_tx_hex);
+  
+  if (tx_hashes.empty()) {
+    MINFO("No tx relayed!");
+  } else {
+    for(std::string tx_hash : tx_hashes) {
+      MINFO("Relayed tx: " << tx_hash);
+    }
+  }
+  /*
   // query incoming transfers to account 1
   monero_transfer_query transfer_query;
   transfer_query.m_is_incoming = true;
@@ -149,7 +160,7 @@ int main(int argc, const char* argv[]) {
   vector<shared_ptr<monero_output_wallet>> outputs = wallet_restored->get_outputs(output_query);
   monero_utils::free(outputs);
   MINFO("close");
-
+  */
   // save and close the wallets
   wallet_restored->close(false);
   MINFO("after close");
