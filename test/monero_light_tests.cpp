@@ -38,7 +38,7 @@ int main(int argc, const char* argv[]) {
   //wallet_config.m_server = monero_rpc_connection("http://localhost:28081");
   wallet_config.m_restore_height = 2367336;
   wallet_config.m_seed_offset = "";
-  monero_wallet_light* wallet_restored = monero_wallet_light::create_wallet(wallet_config);
+  monero_wallet* wallet_restored = monero_wallet_full::create_wallet(wallet_config);
   MINFO("===== Wallet Light created successfully =====");
   /*
   // synchronize the wallet and receive progress notifications
