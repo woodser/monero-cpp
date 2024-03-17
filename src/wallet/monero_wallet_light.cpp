@@ -2615,7 +2615,7 @@ namespace light {
     // import key images
     uint64_t spent = 0, unspent = 0;
     uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, is_connected_to_daemon()); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
-    uint64_t height = 0;
+    //uint64_t height = 0;
     // to do
     // translate results
     std::shared_ptr<monero_key_image_import_result> result = std::make_shared<monero_key_image_import_result>();
