@@ -1828,9 +1828,11 @@ namespace light {
     monero_wallet_light* wallet = new monero_wallet_light();
     if (has_spend_key) {
       wallet->m_account.create_from_keys(address_info.address, spend_key_sk, view_key_sk);
+      wallet->m_view_only = false;
     }
     else {
       wallet->m_account.create_from_viewkey(address_info.address, view_key_sk);
+      wallet->m_view_only = true;
     }
 
     // initialize remaining wallet

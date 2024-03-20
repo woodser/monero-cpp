@@ -31,6 +31,7 @@ int main(int argc, const char* argv[]) {
   //wallet_config.m_private_view_key = "198820da9166ee114203eb38c29e00b0e8fc7df508aa632d56ead849093d3808";
   wallet_config.m_primary_address = "9yEdYhU2ZAeGTgj9VdjvVk4vvnusdRpegJd98nCbsLh2Jj9xjbiRGFf6ZidwmNaXv5j2yYPZBzrDB9uoP88aJcVkMKHmbqZ";
   wallet_config.m_private_view_key = "4d0090d149e808beac0a46ee93e0a9a9aeb15d241b5953fde26a821866621d0f";
+  wallet_config.m_private_spend_key = "18fe0c0f6920f2b854329ebb0a3dd8039137cad7c0ff990ed898265b279f9b0c";
   wallet_config.m_path = "MyLightWalletRestored";
   wallet_config.m_password = "supersecretpassword123";
   wallet_config.m_network_type = monero_network_type::TESTNET;
