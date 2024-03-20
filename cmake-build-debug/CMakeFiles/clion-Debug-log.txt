@@ -1,0 +1,38 @@
+/snap/clion/265/bin/cmake/linux/x64/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/snap/clion/265/bin/ninja/linux/x64/ninja -G Ninja -S /home/sidney/monero-cpp -B /home/sidney/monero-cpp/cmake-build-debug
+CMake Deprecation Warning at CMakeLists.txt:3 (cmake_minimum_required):
+  Compatibility with CMake < 3.5 will be removed from a future version of
+  CMake.
+
+  Update the VERSION argument <min> value or use a ...<max> suffix to tell
+  CMake that the project does not need compatibility with older versions.
+
+
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- EXTERNAL_LIBS_DIR:/home/sidney/monero-cpp/external-libs
+-- EXTRA_LIBRARIES:
+-- Found Protobuf: /usr/lib/x86_64-linux-gnu/libprotobuf.so (found version "3.12.4") 
+-- Protobuf lib: /usr/lib/x86_64-linux-gnu/libprotobuf.so, inc: /usr/include, protoc: /usr/bin/protoc
+-- Using Boost include dir at /usr/include
+-- Found OpenSSL: /usr/lib/x86_64-linux-gnu/libcrypto.so (found version "3.0.2")  
+-- Using OpenSSL include dir at /usr/include
+-- Using libsodium library at /usr/lib/x86_64-linux-gnu/libsodium.so
+-- Found HIDAPI: /usr/lib/x86_64-linux-gnu/libhidapi-libusb.so  
+-- Using HIDAPI include dir at /usr/include/hidapi
+-- Using monero-project build:/home/sidney/monero-cpp/external/monero-project/build/release
+-- Looking for libunbound
+-- Found libunbound include (unbound.h) in /usr/local/include
+-- Found libunbound library
+-- Configuring done (1.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /home/sidney/monero-cpp/cmake-build-debug

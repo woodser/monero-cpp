@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/external/monero-project/external/boost/**",
-                "/usr/include/x86_64-linux-gnu/c++/11"
+                "/usr/include/x86_64-linux-gnu/c++/11",
+                "/usr/include/x86_64-linux-gnu/qt5/QtCore"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++-11",

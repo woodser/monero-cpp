@@ -1828,9 +1828,11 @@ namespace light {
     monero_wallet_light* wallet = new monero_wallet_light();
     if (has_spend_key) {
       wallet->m_account.create_from_keys(address_info.address, spend_key_sk, view_key_sk);
+      wallet->m_view_only = false;
     }
     else {
       wallet->m_account.create_from_viewkey(address_info.address, view_key_sk);
+      wallet->m_view_only = true;
     }
 
     // initialize remaining wallet
@@ -1871,6 +1873,17 @@ namespace light {
     }
 
     m_lws_uri = connection.get().m_uri.get();
+
+    if (m_http_client == nullptr) return;
+
+    if (m_http_client->is_connected()) {
+      m_http_client->disconnect();
+    }
+
+    if (m_lws_uri == "") return;
+
+    if(!m_http_client->set_server(m_lws_uri, boost::none)) throw std::runtime_error("Wallet could not set daemon uri.");
+    if(!m_http_client->connect(m_timeout)) throw std::runtime_error("Wallet could not connect to daemon.");
   }
 
   void monero_wallet_light::set_daemon_connection(std::string host, std::string port, std::string admin_uri, std::string admin_port, std::string token) {
@@ -2617,7 +2630,7 @@ namespace light {
     uint64_t spent = 0, unspent = 0;
     MINFO("ski.size(): " << ski.size());
     MINFO("w2->light_wallet_get_unspent_outs().size(): ");
-    m_w2->light_wallet_get_unspent_outs();
+    //m_w2->light_wallet_get_unspent_outs();
     uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, false); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
     //uint64_t height = 0;
     // to do
