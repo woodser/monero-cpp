@@ -140,9 +140,20 @@ int main(int argc, const char* argv[]) {
   }
   if (unsigned_tx->m_tx_set.get()->m_unsigned_tx_hex == boost::none) {
     MERROR("Unsigned transaction hex not created");
-    throw std::runtime_error("Unsigned transaction hex not created");
+    //throw std::runtime_error("Unsigned transaction hex not created");
   }
-  std::string unsigned_tx_hex = unsigned_tx->m_tx_set.get()->m_unsigned_tx_hex.get();
+  if (unsigned_tx->m_metadata == boost::none) 
+  {
+    throw std::runtime_error("No transaction metadata created");
+  }
+  else 
+  {
+    MINFO("Created tx metadata: " << unsigned_tx->m_metadata.get());
+  }
+
+  MINFO("Relaying tx...");
+  wallet_restored->relay_tx(*unsigned_tx);
+  /*std::string unsigned_tx_hex = unsigned_tx->m_tx_set.get()->m_unsigned_tx_hex.get();
   MINFO("Created unsigned tx hash: " << unsigned_tx_hex);
   monero_tx_set signed_tx_set = offline_wallet->sign_txs(unsigned_tx_hex);  
   std::string signed_tx_hex = signed_tx_set.m_signed_tx_hex.get();
