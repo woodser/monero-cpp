@@ -78,7 +78,6 @@
         "thread": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp",
-        "qobject": "cpp"
+        "variant": "cpp"
     }
 }

@@ -446,7 +446,7 @@ namespace monero {
     /**
      * Supported wallet methods.
      */
-    bool is_view_only() const override { return m_view_only; }
+    bool is_view_only() const override { return true; }
     void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) override;
     void set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "");
     void set_daemon_proxy(const std::string& uri = "") override;
@@ -511,7 +511,6 @@ namespace monero {
     // --------------------------------- PROTECTED ------------------------------------------
 
   protected:
-    bool m_view_only;
     std::unique_ptr<tools::wallet2> m_w2;
     cryptonote::account_base m_account;
     monero_network_type m_network_type;
