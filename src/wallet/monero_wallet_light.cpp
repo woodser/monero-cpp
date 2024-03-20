@@ -2724,8 +2724,9 @@ namespace light {
     auto input_key_images_list_iter = input_key_images_list.begin();
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
     auto destinations_iter = destinations.begin();
+    MINFO("monero_wallet_light::create_txs before fees iter");
     while (tx_fees_iter != tx_fees.end()) {
-
+      MINFO("monero_wallet_light::create_txs processing tx hash: " << *tx_hashes_iter);
       // init tx with outgoing transfer from filled values
       std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
       txs.push_back(tx);
@@ -2786,6 +2787,7 @@ namespace light {
       tx_metadatas_iter++;
       input_key_images_list_iter++;
     }
+    MINFO("monero_wallet_light::create_txs after fees iter");
 
     // build tx set
     std::shared_ptr<monero_tx_set> tx_set = std::make_shared<monero_tx_set>();
@@ -2796,6 +2798,8 @@ namespace light {
 
     // notify listeners of spent funds
     //if (relay) m_w2_listener->on_spend_txs(txs);
+    MINFO("monero_wallet_light::create_txs END");
+
     return txs;
   }
 
