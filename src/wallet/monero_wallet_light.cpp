@@ -2794,7 +2794,11 @@ namespace light {
     tx_set->m_txs = txs;
     for (int i = 0; i < txs.size(); i++) txs[i]->m_tx_set = tx_set;
     if (!multisig_tx_hex.empty()) tx_set->m_multisig_tx_hex = multisig_tx_hex;
-    if (!unsigned_tx_hex.empty()) tx_set->m_unsigned_tx_hex = unsigned_tx_hex;
+    if (!unsigned_tx_hex.empty()) 
+    {
+      MINFO("monero_wallet_light::create_txs appending unsigned tx hex: " << unsigned_tx_hex);
+      tx_set->m_unsigned_tx_hex = unsigned_tx_hex;
+    }
 
     // notify listeners of spent funds
     //if (relay) m_w2_listener->on_spend_txs(txs);

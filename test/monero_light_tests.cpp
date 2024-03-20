@@ -131,6 +131,17 @@ int main(int argc, const char* argv[]) {
   tx_config.m_relay = false;
 
   std::shared_ptr<monero_tx_wallet> unsigned_tx = wallet_restored->create_tx(tx_config);
+  if (unsigned_tx->m_tx_set == boost::none) {
+    MERROR("Transaction set not created");
+    throw std::runtime_error("Transaction set not created");
+  }
+  if (unsigned_tx->m_tx_set.get()->m_signed_tx_hex != boost::none) {
+    MWARNING("Unsigned tx has signed tx hex !!!");
+  }
+  if (unsigned_tx->m_tx_set.get()->m_unsigned_tx_hex == boost::none) {
+    MERROR("Unsigned transaction hex not created");
+    throw std::runtime_error("Unsigned transaction hex not created");
+  }
   std::string unsigned_tx_hex = unsigned_tx->m_tx_set.get()->m_unsigned_tx_hex.get();
   MINFO("Created unsigned tx hash: " << unsigned_tx_hex);
   monero_tx_set signed_tx_set = offline_wallet->sign_txs(unsigned_tx_hex);  
