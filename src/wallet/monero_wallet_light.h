@@ -450,6 +450,7 @@ namespace monero {
     void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) override;
     void set_daemon_connection(std::string host, std::string port = "", std::string admin_uri = "", std::string admin_port = "", std::string token = "");
     void set_daemon_proxy(const std::string& uri = "") override;
+    boost::optional<monero_rpc_connection> get_daemon_connection() const override;
     bool is_connected_to_daemon() const override;
     bool is_connected_to_admin_daemon() const;
     bool is_daemon_synced() const override;
@@ -457,10 +458,20 @@ namespace monero {
     bool is_synced() const override;
 
     monero_version get_version() const override;
+    std::string get_path() const override;
+    std::string get_seed() const override;
+    std::string get_seed_language() const override;
     monero_network_type get_network_type() const override { return m_network_type; };
+    std::string get_public_view_key() const override;
     std::string get_private_view_key() const override { return m_prv_view_key; };
+    std::string get_public_spend_key() const override;
+    std::string get_private_spend_key() const override;
     std::string get_primary_address() const override { return m_primary_address; };
-    
+    std::string get_address(const uint32_t account_idx, const uint32_t subaddress_idx) const override;
+    monero_subaddress get_address_index(const std::string& address) const override;
+    monero_integrated_address get_integrated_address(const std::string& standard_address = "", const std::string& payment_id = "") const override;
+    monero_integrated_address decode_integrated_address(const std::string& integrated_address) const override;
+
     uint64_t get_height() const override { return m_scanned_block_height; };
     uint64_t get_restore_height() const override { return m_start_height; };
     void set_restore_height(uint64_t restore_height) override;
@@ -500,12 +511,24 @@ namespace monero {
 
     std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& config) override;    
     std::vector<std::string> submit_txs(const std::string& signed_tx_hex) override;
+    monero_tx_set sign_txs(const std::string& unsigned_tx_hex) override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
     
+    std::string sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx = 0, uint32_t subaddress_idx = 0) const override;
+    monero_message_signature_result verify_message(const std::string& msg, const std::string& address, const std::string& signature) const override;
+    
+    std::string get_payment_uri(const monero_tx_config& config) const override;
+    std::shared_ptr<monero_tx_config> parse_payment_uri(const std::string& uri) const override;
+    bool get_attribute(const std::string& key, std::string& value) const override;
+    void set_attribute(const std::string& key, const std::string& val) override;
+
     uint64_t wait_for_next_block() override;
     bool is_multisig_import_needed() const override { return false; }
     bool is_multisig() const override { return false; }
 
+    void change_password(const std::string& old_password, const std::string& new_password);
+    void move_to(const std::string& path, const std::string& password);
+    void save() override;
     void close(bool save = false) override;
 
     // --------------------------------- PROTECTED ------------------------------------------
@@ -528,6 +551,18 @@ namespace monero {
     std::string m_admin_port;
     std::string m_lws_admin_uri;
     std::string m_token;
+
+    // blockchain sync management
+    mutable std::atomic<bool> m_is_synced;       // whether or not wallet is synced
+    mutable std::atomic<bool> m_is_connected;    // cache connection status to avoid unecessary RPC calls
+    boost::condition_variable m_sync_cv;         // to make sync threads woke
+    boost::mutex m_sync_mutex;                   // synchronize sync() and syncAsync() requests
+    std::atomic<bool> m_rescan_on_sync;          // whether or not to rescan on sync
+    std::atomic<bool> m_syncing_enabled;         // whether or not auto sync is enabled
+    std::atomic<bool> m_sync_loop_running;       // whether or not the syncing thread is shut down
+    std::atomic<int> m_syncing_interval;         // auto sync loop interval in milliseconds
+    boost::thread m_syncing_thread;              // thread for auto sync loop
+    boost::mutex m_syncing_mutex;                // synchronize auto sync loop
 
     bool m_request_pending;
     bool m_request_accepted;
@@ -584,7 +619,11 @@ namespace monero {
     std::string export_outputs_to_str(bool all = false, uint32_t start = 0, uint32_t count = 0xffffffff) const;
     std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> export_outputs(bool all, uint32_t start, uint32_t count = 0xffffffff) const;
     bool parse_rct_str(const std::string& rct_string, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key& decrypted_mask, rct::key& rct_commit, bool decrypt) const;
+    
     monero_sync_result sync_aux();
+    void run_sync_loop();
+    monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none);  // internal function to synchronize request to sync and rescan
+
 
     // --------------------------------- LIGHT WALLET METHODS ------------------------------------------
     // --------------------------------- LIGHT WALLET CLIENT METHODS ------------------------------------------

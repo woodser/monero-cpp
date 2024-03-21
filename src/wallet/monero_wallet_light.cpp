@@ -1892,6 +1892,20 @@ namespace light {
     }
   }
 
+  boost::optional<monero_rpc_connection> monero_wallet_light::get_daemon_connection() const {
+    MTRACE("monero_wallet_light::get_daemon_connection()");
+    if (m_w2->get_daemon_address().empty()) return boost::none;
+    boost::optional<monero_rpc_connection> connection = monero_rpc_connection();
+    connection->m_uri = m_w2->get_daemon_address();
+    if (m_w2->get_daemon_login()) {
+      if (!m_w2->get_daemon_login()->username.empty()) connection->m_username = m_w2->get_daemon_login()->username;
+      epee::wipeable_string wipeablePassword = m_w2->get_daemon_login()->password;
+      std::string password = std::string(wipeablePassword.data(), wipeablePassword.size());
+      if (!password.empty()) connection->m_password = password;
+    }
+    return connection;
+  }
+
   void monero_wallet_light::set_daemon_proxy(const std::string& uri) {
     if (m_http_client == nullptr) throw std::runtime_error("Cannot set daemon proxy");
     m_http_client->set_proxy(uri);
@@ -1926,6 +1940,118 @@ namespace light {
     version.m_number = 65552; // same as monero-wallet-rpc v0.15.0.1 release
     version.m_is_release = false; // TODO: could pull from MONERO_VERSION_IS_RELEASE in version.cpp
     return version;
+  }
+
+  std::string monero_wallet_light::get_path() const {
+    return m_w2->path();
+  }
+
+  std::string monero_wallet_light::get_seed() const {
+    epee::wipeable_string seed;
+    bool ready;
+    if (m_w2->multisig(&ready)) {
+      if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
+      if (!m_w2->get_multisig_seed(seed)) throw std::runtime_error("Failed to get multisig seed.");
+    } else {
+      if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed.");
+      if (!m_w2->is_deterministic()) throw std::runtime_error("The wallet is non-deterministic. Cannot display seed.");
+      if (!m_w2->get_seed(seed)) throw std::runtime_error("Failed to get seed.");
+    }
+    return std::string(seed.data(), seed.size());
+  }
+
+  std::string monero_wallet_light::get_seed_language() const {
+    if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed language.");
+    return m_w2->get_seed_language();
+  }
+
+  std::string monero_wallet_light::get_public_view_key() const {
+    MTRACE("get_private_view_key()");
+    return epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_account_address.m_view_public_key);
+  }
+
+  std::string monero_wallet_light::get_public_spend_key() const {
+    MTRACE("get_public_spend_key()");
+    return epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_account_address.m_spend_public_key);
+  }
+
+  std::string monero_wallet_light::get_private_spend_key() const {
+    MTRACE("get_private_spend_key()");
+    if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve spend key.");
+    std::string spend_key = epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_spend_secret_key);
+    if (spend_key == "0000000000000000000000000000000000000000000000000000000000000000") spend_key = "";
+    return spend_key;
+  }
+
+  std::string monero_wallet_light::get_address(uint32_t account_idx, uint32_t subaddress_idx) const {
+    return m_w2->get_subaddress_as_str({account_idx, subaddress_idx});
+  }
+
+  monero_subaddress monero_wallet_light::get_address_index(const std::string& address) const {
+    MTRACE("get_address_index(" << address << ")");
+
+    // validate address
+    cryptonote::address_parse_info info;
+    if (!get_account_address_from_str(info, m_w2->nettype(), address)) {
+      throw std::runtime_error("Invalid address");
+    }
+
+    // get index of address in wallet
+    auto index = m_w2->get_subaddress_index(info.address);
+    if (!index) throw std::runtime_error("Address doesn't belong to the wallet");
+
+    // return indices in subaddress
+    monero_subaddress subaddress;
+    cryptonote::subaddress_index cn_index = *index;
+    subaddress.m_account_index = cn_index.major;
+    subaddress.m_index = cn_index.minor;
+    return subaddress;
+  }
+
+  monero_integrated_address monero_wallet_light::get_integrated_address(const std::string& standard_address, const std::string& payment_id) const {
+    MTRACE("get_integrated_address(" << standard_address << ", " << payment_id << ")");
+
+    // TODO monero-project: this logic is based on wallet_rpc_server::on_make_integrated_address() and should be moved to wallet so this is unecessary for api users
+
+    // randomly generate payment id if not given, else validate
+    crypto::hash8 payment_id_h8;
+    if (payment_id.empty()) {
+      payment_id_h8 = crypto::rand<crypto::hash8>();
+    } else {
+      if (!tools::wallet2::parse_short_payment_id(payment_id, payment_id_h8)) throw std::runtime_error("Invalid payment ID: " + payment_id);
+    }
+
+    // use primary address if standard address not given, else validate
+    if (standard_address.empty()) {
+      return decode_integrated_address(m_w2->get_integrated_address_as_str(payment_id_h8));
+    } else {
+
+      // validate standard address
+      cryptonote::address_parse_info info;
+      if (!cryptonote::get_account_address_from_str(info, m_w2->nettype(), standard_address)) throw std::runtime_error("Invalid address");
+      if (info.is_subaddress) throw std::runtime_error("Subaddress shouldn't be used");
+      if (info.has_payment_id) throw std::runtime_error("Already integrated address");
+      if (payment_id.empty()) throw std::runtime_error("Payment ID shouldn't be left unspecified");
+
+      // create integrated address from given standard address
+      return decode_integrated_address(cryptonote::get_account_integrated_address_as_str(m_w2->nettype(), info.address, payment_id_h8));
+    }
+  }
+
+  monero_integrated_address monero_wallet_light::decode_integrated_address(const std::string& integrated_address) const {
+    MTRACE("decode_integrated_address(" << integrated_address << ")");
+
+    // validate integrated address
+    cryptonote::address_parse_info info;
+    if (!cryptonote::get_account_address_from_str(info, m_w2->nettype(), integrated_address)) throw std::runtime_error("Invalid address");
+    if (!info.has_payment_id) throw std::runtime_error("Address is not an integrated address");
+
+    // initialize and return result
+    monero_integrated_address result;
+    result.m_standard_address = cryptonote::get_account_address_as_str(m_w2->nettype(), info.is_subaddress, info.address);
+    result.m_payment_id = epee::string_tools::pod_to_hex(info.payment_id);
+    result.m_integrated_address = integrated_address;
+    return result;
   }
 
   void monero_wallet_light::set_restore_height(uint64_t restore_height) {
@@ -2153,7 +2279,61 @@ namespace light {
   }
 
   void monero_wallet_light::start_syncing(uint64_t sync_period_in_ms) {
-    sync();
+    if (!is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
+    m_syncing_interval = sync_period_in_ms;
+    if (!m_syncing_enabled) {
+      m_syncing_enabled = true;
+      run_sync_loop(); // sync wallet on loop in background
+    }
+  }
+
+  void monero_wallet_light::run_sync_loop() {
+    if (m_sync_loop_running) return;  // only run one loop at a time
+    m_sync_loop_running = true;
+
+    // start sync loop thread
+    // TODO: use global threadpool, background sync wasm wallet in c++ thread
+    m_syncing_thread = boost::thread([this]() {
+
+      // sync while enabled
+      while (m_syncing_enabled) {
+        auto start = std::chrono::system_clock::now();
+        try { lock_and_sync(); }
+        catch (std::exception const& e) { std::cout << "monero_wallet_full failed to background synchronize: " << e.what() << std::endl; }
+        catch (...) { std::cout << "monero_wallet_full failed to background synchronize" << std::endl; }
+
+        // only wait if syncing still enabled
+        if (m_syncing_enabled) {
+          boost::mutex::scoped_lock lock(m_syncing_mutex);
+          boost::posix_time::milliseconds wait_for_ms(m_syncing_interval.load());
+          boost::posix_time::milliseconds elapsed_time = boost::posix_time::milliseconds(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start).count());
+          m_sync_cv.timed_wait(lock, elapsed_time > wait_for_ms ? boost::posix_time::milliseconds(0) : wait_for_ms - elapsed_time); // target regular sync period by accounting for sync time
+        }
+      }
+
+      m_sync_loop_running = false;
+    });
+  }
+
+  monero_sync_result monero_wallet_light::lock_and_sync(boost::optional<uint64_t> start_height) {
+    bool rescan = m_rescan_on_sync.exchange(false);
+    boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize sync() and syncAsync()
+    monero_sync_result result;
+    result.m_num_blocks_fetched = 0;
+    result.m_received_money = false;
+    do {
+      // skip if daemon is not connected or synced
+      if (m_is_connected && is_daemon_synced()) {
+
+        // rescan blockchain if requested
+        if (rescan) m_w2->rescan_blockchain(false);
+
+        // sync wallet
+        //result = sync_aux(start_height);
+        result = sync_aux();
+      }
+    } while (!rescan && (rescan = m_rescan_on_sync.exchange(false))); // repeat if not rescanned and rescan was requested
+    return result;
   }
 
   void monero_wallet_light::rescan_blockchain() {       
@@ -2807,6 +2987,45 @@ namespace light {
     return txs;
   }
 
+  // implementation based on monero-project wallet_rpc_server.cpp::on_sign_transfer()
+  monero_tx_set monero_wallet_light::sign_txs(const std::string& unsigned_tx_hex) {
+    if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
+    if (m_w2->watch_only()) throw std::runtime_error("command not supported by view-only wallet");
+
+    cryptonote::blobdata blob;
+    if (!epee::string_tools::parse_hexstr_to_binbuff(unsigned_tx_hex, blob)) throw std::runtime_error("Failed to parse hex.");
+
+    tools::wallet2::unsigned_tx_set exported_txs;
+    if(!m_w2->parse_unsigned_tx_from_str(blob, exported_txs)) throw std::runtime_error("cannot load unsigned_txset");
+
+    std::vector<tools::wallet2::pending_tx> ptxs;
+    std::vector<std::shared_ptr<monero_tx_wallet>> txs;
+    try {
+      tools::wallet2::signed_tx_set signed_txs;
+      std::string ciphertext = m_w2->sign_tx_dump_to_str(exported_txs, ptxs, signed_txs);
+      if (ciphertext.empty()) throw std::runtime_error("Failed to sign unsigned tx");
+
+      // init tx set
+      monero_tx_set tx_set;
+      tx_set.m_signed_tx_hex = epee::string_tools::buff_to_hex_nodelimer(ciphertext);
+      for (auto &ptx : ptxs) {
+
+        // init tx
+        std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
+        tx->m_is_outgoing = true;
+        tx->m_hash = epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx));
+        tx->m_key = epee::string_tools::pod_to_hex(ptx.tx_key);
+        for (const crypto::secret_key& additional_tx_key : ptx.additional_tx_keys) {
+            tx->m_key = tx->m_key.get() += epee::string_tools::pod_to_hex(additional_tx_key);
+        }
+        tx_set.m_txs.push_back(tx);
+      }
+      return tx_set;
+    } catch (const std::exception &e) {
+      throw std::runtime_error(std::string("Failed to sign unsigned tx: ") + e.what());
+    }
+  }
+
   // implementation based on monero-project wallet_rpc_server.cpp::on_submit_transfer()
   std::vector<std::string> monero_wallet_light::submit_txs(const std::string& signed_tx_hex) {
     if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
@@ -2915,7 +3134,7 @@ namespace light {
   }
 
   std::vector<monero_account> monero_wallet_light::get_accounts(bool include_subaddresses, const std::string& tag) const {
-    MTRACE("get_accounts(" << include_subaddresses << ", " << tag << ")");
+    MTRACE("monero_wallet_light::get_accounts(" << include_subaddresses << ", " << tag << ")");
 
     std::vector<monero_account> accounts;
 
@@ -2924,8 +3143,126 @@ namespace light {
     return accounts;
   }
 
+  std::string monero_wallet_light::sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx, uint32_t subaddress_idx) const {
+    cryptonote::subaddress_index index = {account_idx, subaddress_idx};
+    tools::wallet2::message_signature_type_t signature_type_w2 = signature_type == monero_message_signature_type::SIGN_WITH_SPEND_KEY ? tools::wallet2::message_signature_type_t::sign_with_spend_key : tools::wallet2::message_signature_type_t::sign_with_view_key;
+    return m_w2->sign(msg, signature_type_w2, index);
+  }
+
+  monero_message_signature_result monero_wallet_light::verify_message(const std::string& msg, const std::string& address, const std::string& signature) const {
+
+    // validate and parse address or url
+    cryptonote::address_parse_info info;
+    std::string err = "Invalid address";
+    if (!get_account_address_from_str_or_url(info, m_w2->nettype(), address,
+      [&err](const std::string &url, const std::vector<std::string> &addresses, bool dnssec_valid)->std::string {
+        if (!dnssec_valid) {
+          err = std::string("Invalid DNSSEC for ") + url;
+          return {};
+        }
+        if (addresses.empty()) {
+          err = std::string("No Monero address found at ") + url;
+          return {};
+        }
+        return addresses[0];
+      }))
+    {
+      throw std::runtime_error(err);
+    }
+
+    // verify message
+    tools:wallet2::message_signature_result_t result_w2 = m_w2->verify(msg, info.address, signature);
+
+    // translate result
+    monero_message_signature_result result;
+    result.m_is_good = result_w2.valid;
+    result.m_is_old = result_w2.old;
+    result.m_signature_type = result_w2.type == tools::wallet2::message_signature_type_t::sign_with_spend_key ? monero_message_signature_type::SIGN_WITH_SPEND_KEY : monero_message_signature_type::SIGN_WITH_VIEW_KEY;
+    result.m_version = result_w2.version;
+    return result;
+  }
+
+  std::string monero_wallet_light::get_payment_uri(const monero_tx_config& config) const {
+    MTRACE("get_payment_uri()");
+
+    // validate config
+    std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
+    if (destinations.size() != 1) throw std::runtime_error("Cannot make URI from supplied parameters: must provide exactly one destination to send funds");
+    if (destinations.at(0)->m_address == boost::none) throw std::runtime_error("Cannot make URI from supplied parameters: must provide destination address");
+    if (destinations.at(0)->m_amount == boost::none) throw std::runtime_error("Cannot make URI from supplied parameters: must provide destination amount");
+
+    // prepare wallet2 params
+    std::string address = destinations.at(0)->m_address.get();
+    std::string payment_id = config.m_payment_id == boost::none ? "" : config.m_payment_id.get();
+    uint64_t amount = destinations.at(0)->m_amount.get();
+    std::string note = config.m_note == boost::none ? "" : config.m_note.get();
+    std::string m_recipient_name = config.m_recipient_name == boost::none ? "" : config.m_recipient_name.get();
+
+    // make uri using wallet2
+    std::string error;
+    std::string uri = m_w2->make_uri(address, payment_id, amount, note, m_recipient_name, error);
+    if (uri.empty()) throw std::runtime_error("Cannot make URI from supplied parameters: " + error);
+    return uri;
+  }
+
+  std::shared_ptr<monero_tx_config> monero_wallet_light::parse_payment_uri(const std::string& uri) const {
+    MTRACE("parse_payment_uri(" << uri << ")");
+
+    // decode uri to parameters
+    std::string address;
+    std::string payment_id;
+    uint64_t amount = 0;
+    std::string note;
+    std::string m_recipient_name;
+    std::vector<std::string> unknown_parameters;
+    std::string error;
+    if (!m_w2->parse_uri(uri, address, payment_id, amount, note, m_recipient_name, unknown_parameters, error)) {
+      throw std::runtime_error("Error parsing URI: " + error);
+    }
+
+    // initialize config
+    std::shared_ptr<monero_tx_config> config = std::make_shared<monero_tx_config>();
+    std::shared_ptr<monero_destination> destination = std::make_shared<monero_destination>();
+    config->m_destinations.push_back(destination);
+    if (!address.empty()) destination->m_address = address;
+    destination->m_amount = amount;
+    if (!payment_id.empty()) config->m_payment_id = payment_id;
+    if (!note.empty()) config->m_note = note;
+    if (!m_recipient_name.empty()) config->m_recipient_name = m_recipient_name;
+    if (!unknown_parameters.empty()) MWARNING("WARNING in monero_wallet_full::parse_payment_uri: URI contains unknown parameters which are discarded"); // TODO: return unknown parameters?
+    return config;
+  }
+
+  bool monero_wallet_light::get_attribute(const std::string& key, std::string& value) const {
+    return m_w2->get_attribute(key, value);
+  }
+
+  void monero_wallet_light::set_attribute(const std::string& key, const std::string& val) {
+    m_w2->set_attribute(key, val);
+  }
+
+  void monero_wallet_light::change_password(const std::string& old_password, const std::string& new_password) {
+    MTRACE("monero_wallet_light::change_password(" << "***" << ", ***)");
+    if (!get_path().empty()) { // TODO: skipping password verification of in-memory wallet
+      if (!m_w2->verify_password(old_password)) throw std::runtime_error("Invalid original password.");
+    }
+    m_w2->change_password(m_w2->get_wallet_file(), old_password, new_password);
+  }
+
+  void monero_wallet_light::move_to(const std::string& path, const std::string& password) {
+    MTRACE("monero_wallet_light::move_to(" << path << ", ***)");
+    m_w2->store_to(path, password);
+  }
+
+  void monero_wallet_light::save() {
+    MTRACE("monero_wallet_light::save()");
+    m_w2->store();
+  }
+
   void monero_wallet_light::close(bool save) {
-    if (save) throw std::runtime_error("MoneroWalletLight does not support saving");
+    MTRACE("monero_wallet_light::close()");
+    stop_syncing();
+    if (save) this->save();
     if (m_http_client != nullptr && m_http_client->is_connected()) {
       m_http_client->disconnect();
       epee::net_utils::http::abstract_http_client *release_client = m_http_client.release();
@@ -2947,6 +3284,11 @@ namespace light {
       epee::net_utils::http::abstract_http_client *release_admin_client = m_http_admin_client.release();
       delete release_admin_client;
     }
+
+    m_w2->stop();
+    m_w2->deinit();
+    m_w2->callback(nullptr);
+
     // no pointers to destroy
   }
 
