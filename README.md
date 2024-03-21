@@ -1,6 +1,6 @@
 # Monero C++ Library
 
-A C++ library for creating Monero applications using native bindings to [monero v0.18.3.1 'Fluorine Fermi'](https://github.com/monero-project/monero/tree/v0.18.3.1).
+A C++ library for creating Monero applications using native bindings to [monero v0.18.3.3 'Fluorine Fermi'](https://github.com/monero-project/monero/tree/v0.18.3.3).
 
 * Supports fully client-side wallets by wrapping [wallet2.h](https://github.com/monero-project/monero/blob/master/src/wallet/wallet2.h).
 * Supports multisig, view-only, and offline wallets.
@@ -158,7 +158,7 @@ delete wallet_random;
 
 ## Documentation
 
-* [API documentation](https://woodser.github.io/monero-cpp/annotated.html)
+* [API documentation](https://woodser.github.io/monero-cpp/doxygen/annotated.html)
 * [API and model overview with visual diagrams](https://woodser.github.io/monero-java/monero-spec.pdf)
 * [monero-ts documentation](https://github.com/woodser/monero-ts#documentation) provides additional documentation which translates to monero-cpp
 
@@ -192,15 +192,15 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     For example, install unbound:
     ```
     cd ~
-    wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.17.0.tar.gz
-    tar xzf unbound-1.17.0.tar.gz
+    wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.19.0.tar.gz
+    tar xzf unbound-1.19.0.tar.gz
     sudo apt update
     sudo apt install -y build-essential
     sudo apt install -y libssl-dev
     sudo apt install -y libexpat1-dev
     sudo apt-get install -y bison
     sudo apt-get install -y flex
-    cd unbound-1.17.0
+    cd unbound-1.19.0
     ./configure --with-libexpat=/usr --with-ssl=/usr
     make
     sudo make install
@@ -214,6 +214,17 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
 1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
 2. Update submodules: `cd monero-cpp && ./bin/update_submodules.sh`
 3. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for macOS to your home directory (e.g. `~/unbound-1.19.0`).
+
+    For example:
+    ```
+    cd ~
+    wget https://nlnetlabs.nl/downloads/unbound/unbound-1.19.0.tar.gz
+    tar xzf unbound-1.19.0.tar.gz
+    cd ~/unbound-1.19.0
+    ./configure --with-ssl=/opt/homebrew/Cellar/openssl@3/3.2.1/ --with-libexpat=/opt/homebrew/Cellar/expat/2.5.0
+    make
+    sudo make install
+    ```
 4. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with: `make release-static -j8`
 5. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh`
 
