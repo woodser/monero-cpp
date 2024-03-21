@@ -79,6 +79,14 @@ namespace monero_utils
   bool is_valid_address(const std::string& address, monero_network_type network_type);
   bool is_valid_private_view_key(const std::string& private_view_key);
   bool is_valid_private_spend_key(const std::string& private_spend_key);
+  bool generate_key_image(
+    const crypto::public_key& account_pub_spend_key, 
+    const crypto::secret_key& account_sec_spend_key, 
+    const crypto::secret_key& account_sec_view_key,
+		const crypto::public_key& tx_public_key,
+		uint64_t out_index,
+		crypto::key_image &key_image
+  );
   void validate_address(const std::string& address, monero_network_type network_type);
   void validate_private_view_key(const std::string& private_view_key);
   void validate_private_spend_key(const std::string& private_spend_key);
