@@ -29,18 +29,6 @@ set(BUILD_TESTS OFF)
 set(MONERO_PROJECT "${CMAKE_SOURCE_DIR}/external/monero-project" CACHE STRING "Monero project source directory")
 set(MONERO_PROJECT_SRC "${MONERO_PROJECT}/src")
 
-# header includes
-include_directories(src/)
-include_directories("${MONERO_PROJECT}/contrib/epee/include")
-include_directories("${MONERO_PROJECT}/external/")
-include_directories("${MONERO_PROJECT}/external/easylogging++")
-include_directories("${MONERO_PROJECT}/external/rapidjson/include")
-include_directories("${MONERO_PROJECT_SRC}/")
-include_directories("${MONERO_PROJECT_SRC}/wallet")
-include_directories("${MONERO_PROJECT_SRC}/wallet/api")
-include_directories("${MONERO_PROJECT_SRC}/hardforks")
-include_directories("${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/")
-
 set(EXTERNAL_LIBS_DIR ${CMAKE_SOURCE_DIR}/external-libs)
 message(STATUS EXTERNAL_LIBS_DIR : ${EXTERNAL_LIBS_DIR})
 
@@ -74,7 +62,6 @@ if (NOT APPLE)
   include(FindProtobuf)
   find_package(Protobuf)
   message(STATUS "Protobuf lib: ${Protobuf_LIBRARY}, inc: ${Protobuf_INCLUDE_DIR}, protoc: ${Protobuf_PROTOC_EXECUTABLE}")
-  include_directories(${Protobuf_INCLUDE_DIR})
 endif()
 
 ############
@@ -92,7 +79,6 @@ set(Boost_NO_BOOST_CMAKE 1)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.58 QUIET REQUIRED COMPONENTS chrono date_time filesystem program_options regex serialization wserialization system thread)
 message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIR}")
-include_directories(${Boost_INCLUDE_DIR})
 
 ############
 # OpenSSL
@@ -110,7 +96,6 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
-include_directories(${OPENSSL_INCLUDE_DIR})
 
 if(STATIC AND NOT IOS)
   if(UNIX)
@@ -126,7 +111,6 @@ endif()
 # libsodium
 ############
 
-include_directories(external/libsodium/include/sodium)
 find_library(SODIUM_LIBRARY sodium REQUIRED)
 message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
 
@@ -144,7 +128,6 @@ endif()
 find_package(HIDAPI REQUIRED)
 message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
 add_definitions(-DHAVE_HIDAPI)
-include_directories(${HIDAPI_INCLUDE_DIR})
 
 #############
 # Monero
@@ -186,7 +169,6 @@ else()
   message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
   if(UNBOUND_LIBRARIES)
     message(STATUS "Found libunbound library")
-    include_directories(${UNBOUND_INCLUDE_DIR})
     if (WIN32)
       add_library(unbound STATIC IMPORTED)
     else()
@@ -299,6 +281,28 @@ set(
 
 if (BUILD_LIBRARY)
   add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+
+  target_include_directories(monero-cpp PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${MONERO_PROJECT}/contrib/epee/include"
+      "${MONERO_PROJECT}/external/"
+      "${MONERO_PROJECT}/external/easylogging++"
+      "${MONERO_PROJECT}/external/rapidjson/include"
+      "${MONERO_PROJECT_SRC}/"
+      "${MONERO_PROJECT_SRC}/wallet"
+      "${MONERO_PROJECT_SRC}/wallet/api"
+      "${MONERO_PROJECT_SRC}/hardforks"
+      "${MONERO_PROJECT_SRC}/crypto"
+      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(monero-cpp
       wallet
@@ -367,6 +371,28 @@ if (BUILD_SAMPLE)
   set(SAMPLE_CODE_SRC_FILES test/sample_code.cpp)
   
   add_executable(sample_code ${LIBRARY_SRC_FILES} ${SAMPLE_CODE_SRC_FILES})
+
+  target_include_directories(sample_code PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${MONERO_PROJECT}/contrib/epee/include"
+      "${MONERO_PROJECT}/external/"
+      "${MONERO_PROJECT}/external/easylogging++"
+      "${MONERO_PROJECT}/external/rapidjson/include"
+      "${MONERO_PROJECT_SRC}/"
+      "${MONERO_PROJECT_SRC}/wallet"
+      "${MONERO_PROJECT_SRC}/wallet/api"
+      "${MONERO_PROJECT_SRC}/hardforks"
+      "${MONERO_PROJECT_SRC}/crypto"
+      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(sample_code
       wallet
@@ -417,6 +443,28 @@ if (BUILD_SCRATCHPAD)
   set(SCRATCHPAD_SRC_FILES test/scratchpad.cpp)
   
   add_executable(scratchpad ${LIBRARY_SRC_FILES} ${SCRATCHPAD_SRC_FILES})
+
+  target_include_directories(scratchpad PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${MONERO_PROJECT}/contrib/epee/include"
+      "${MONERO_PROJECT}/external/"
+      "${MONERO_PROJECT}/external/easylogging++"
+      "${MONERO_PROJECT}/external/rapidjson/include"
+      "${MONERO_PROJECT_SRC}/"
+      "${MONERO_PROJECT_SRC}/wallet"
+      "${MONERO_PROJECT_SRC}/wallet/api"
+      "${MONERO_PROJECT_SRC}/hardforks"
+      "${MONERO_PROJECT_SRC}/crypto"
+      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(scratchpad
       wallet
@@ -467,6 +515,28 @@ if (BUILD_TESTS)
   set(TEST_SRC_FILES test/monero_tests.cpp)
   
   add_executable(monero_tests ${LIBRARY_SRC_FILES} ${TEST_SRC_FILES})
+
+  target_include_directories(monero_tests PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${MONERO_PROJECT}/contrib/epee/include"
+      "${MONERO_PROJECT}/external/"
+      "${MONERO_PROJECT}/external/easylogging++"
+      "${MONERO_PROJECT}/external/rapidjson/include"
+      "${MONERO_PROJECT_SRC}/"
+      "${MONERO_PROJECT_SRC}/wallet"
+      "${MONERO_PROJECT_SRC}/wallet/api"
+      "${MONERO_PROJECT_SRC}/hardforks"
+      "${MONERO_PROJECT_SRC}/crypto"
+      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
   
   target_link_libraries(monero_tests
       wallet
