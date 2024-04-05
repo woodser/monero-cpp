@@ -2047,12 +2047,12 @@ namespace monero {
       // init tx with outgoing transfer from filled values
       std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
       txs.push_back(tx);
-      tx->m_hash = *tx_hashes_iter;
+      if (tx_hashes_iter != tx_hashes.end()) tx->m_hash = *tx_hashes_iter; // empty if multisig
       tx->m_key = *tx_keys_iter;
       tx->m_fee = *tx_fees_iter;
       tx->m_weight = *tx_weights_iter;
-      tx->m_full_hex = *tx_blobs_iter;
-      tx->m_metadata = *tx_metadatas_iter;
+      if (tx_blobs_iter != tx_blobs.end()) tx->m_full_hex = *tx_blobs_iter;
+      if (tx_metadatas_iter != tx_metadatas.end()) tx->m_metadata = *tx_metadatas_iter;
       std::shared_ptr<monero_outgoing_transfer> out_transfer = std::make_shared<monero_outgoing_transfer>();
       tx->m_outgoing_transfer = out_transfer;
       out_transfer->m_amount = *tx_amounts_iter;
@@ -2260,14 +2260,14 @@ namespace monero {
       // init tx with outgoing transfer from filled values
       std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
       txs.push_back(tx);
-      tx->m_hash = *tx_hashes_iter;
+      if (tx_hashes_iter != tx_hashes.end()) tx->m_hash = *tx_hashes_iter; // empty if multisig
       tx->m_is_locked = true;
       tx->m_is_outgoing = true;
       tx->m_key = *tx_keys_iter;
       tx->m_fee = *tx_fees_iter;
       tx->m_weight = *tx_weights_iter;
-      tx->m_full_hex = *tx_blobs_iter;
-      tx->m_metadata = *tx_metadatas_iter;
+      if (tx_blobs_iter != tx_blobs.end()) tx->m_full_hex = *tx_blobs_iter;
+      if (tx_metadatas_iter != tx_metadatas.end()) tx->m_metadata = *tx_metadatas_iter;
       std::shared_ptr<monero_outgoing_transfer> out_transfer = std::make_shared<monero_outgoing_transfer>();
       tx->m_outgoing_transfer = out_transfer;
       out_transfer->m_amount = *tx_amounts_iter;
@@ -2398,13 +2398,13 @@ namespace monero {
       // init tx with outgoing transfer from filled values
       std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
       txs.push_back(tx);
-      tx->m_hash = *tx_hashes_iter;
+      if (tx_hashes_iter != tx_hashes.end()) tx->m_hash = *tx_hashes_iter; // empty if multisig
       tx->m_is_outgoing = true;
       tx->m_key = *tx_keys_iter;
       tx->m_fee = *tx_fees_iter;
       tx->m_weight = *tx_weights_iter;
-      tx->m_full_hex = *tx_blobs_iter;
-      tx->m_metadata = *tx_metadatas_iter;
+      if (tx_blobs_iter != tx_blobs.end()) tx->m_full_hex = *tx_blobs_iter;
+      if (tx_metadatas_iter != tx_metadatas.end()) tx->m_metadata = *tx_metadatas_iter;
       std::shared_ptr<monero_outgoing_transfer> out_transfer = std::make_shared<monero_outgoing_transfer>();
       tx->m_outgoing_transfer = out_transfer;
       out_transfer->m_amount = *tx_amounts_iter;
@@ -2506,13 +2506,13 @@ namespace monero {
       // init tx with outgoing transfer from filled values
       std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
       txs.push_back(tx);
-      tx->m_hash = *tx_hashes_iter;
+      if (tx_hashes_iter != tx_hashes.end()) tx->m_hash = *tx_hashes_iter; // empty if multisig
       tx->m_is_outgoing = true;
       tx->m_key = *tx_keys_iter;
       tx->m_fee = *tx_fees_iter;
       tx->m_weight = *tx_weights_iter;
-      tx->m_full_hex = *tx_blobs_iter;
-      tx->m_metadata = *tx_metadatas_iter;
+      if (tx_blobs_iter != tx_blobs.end()) tx->m_full_hex = *tx_blobs_iter;
+      if (tx_metadatas_iter != tx_metadatas.end()) tx->m_metadata = *tx_metadatas_iter;
       std::shared_ptr<monero_outgoing_transfer> out_transfer = std::make_shared<monero_outgoing_transfer>();
       tx->m_outgoing_transfer = out_transfer;
       out_transfer->m_amount = *tx_amounts_iter;
