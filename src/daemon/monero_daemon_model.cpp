@@ -134,6 +134,35 @@ namespace monero {
     return connection;
   }
 
+  monero_lws_connection monero_lws_connection::from_property_tree(const boost::property_tree::ptree& node) {
+    monero_lws_connection *connection = new monero_lws_connection();
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+        std::string key = it->first;
+
+        if (key == std::string("uri")) connection->m_uri = it->second.data();
+        else if (key == std::string("port")) connection->m_port = it->second.data();
+    }
+
+    return *connection;
+  }
+
+  monero_lws_admin_connection monero_lws_admin_connection::from_property_tree(const boost::property_tree::ptree& node) {
+    monero_lws_admin_connection *connection = new monero_lws_admin_connection();
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+        std::string key = it->first;
+
+        if (key == std::string("uri")) connection->m_uri = it->second.data();
+        else if (key == std::string("port")) connection->m_port = it->second.data();
+        else if (key == std::string("admin_uri")) connection->m_admin_uri = it->second.data();
+        else if (key == std::string("admin_port")) connection->m_admin_port = it->second.data();
+        else if (key == std::string("token")) connection->m_token = it->second.data();
+    }
+
+    return *connection;
+  }
+
   // ------------------------- MONERO BLOCK HEADER ----------------------------
 
   rapidjson::Value monero_block_header::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -460,12 +489,15 @@ namespace monero {
 
   boost::optional<uint64_t> monero_tx::get_height() const {
     if (m_block == boost::none) return boost::none;
-    return *((*m_block)->m_height);
+    std::shared_ptr<monero_block> block = m_block.get();
+    if (block == nullptr) return boost::none;
+    return block->m_height;
   }
 
   void monero_tx::merge(const std::shared_ptr<monero_tx>& self, const std::shared_ptr<monero_tx>& other) {
     if (this != self.get()) throw std::runtime_error("this != self");
     if (self == other) return;
+    MDEBUG("monero_tx::merge() self: " << self->m_hash.get() << ", other: " << other->m_hash.get());
 
     // merge blocks if they're different
     if (m_block != other->m_block) {

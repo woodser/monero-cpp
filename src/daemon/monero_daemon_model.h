@@ -116,6 +116,37 @@ namespace monero {
     static monero_rpc_connection from_property_tree(const boost::property_tree::ptree& node);
   };
 
+  /**
+   * Models a connection to a light wallet server.
+   */
+  struct monero_lws_connection : public serializable_struct {
+    boost::optional<std::string> m_uri;
+    boost::optional<std::string> m_port;
+
+    monero_lws_connection(const std::string& uri = "", const std::string& port = "") : m_uri(uri), m_port(port) {}
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static monero_lws_connection from_property_tree(const boost::property_tree::ptree& node);
+  };
+
+  /**
+   * Models a connection to a light wallet administration server.
+   */
+  struct monero_lws_admin_connection : public monero_lws_connection {
+    boost::optional<std::string> m_uri;
+    boost::optional<std::string> m_port;
+    boost::optional<std::string> m_admin_uri;
+    boost::optional<std::string> m_admin_port;
+    boost::optional<std::string> m_token;
+
+    monero_lws_admin_connection(
+        const std::string& uri = "", const std::string& port = "",
+        const std::string& admin_uri = "", const std::string& admin_port = "",
+        const std::string& token = "") : m_uri(uri), m_port(port), m_admin_uri(admin_uri), m_admin_port(admin_port), m_token(token) {}
+
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static monero_lws_admin_connection from_property_tree(const boost::property_tree::ptree& node);
+  };
+
   // forward declarations
   struct monero_tx;
   struct monero_output;
