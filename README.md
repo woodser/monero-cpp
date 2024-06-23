@@ -201,7 +201,7 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     sudo apt-get install -y bison
     sudo apt-get install -y flex
     cd unbound-1.19.0
-    ./configure --with-libexpat=/usr --with-ssl=/usr
+    ./configure --with-libexpat=/usr --with-ssl=/usr --enable-static-exe
     make
     sudo make install
     cd ../
@@ -225,7 +225,7 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     make
     sudo make install
     ```
-4. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with: `make release-static -j8`
+4. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with e.g.: `make release-static -j6`
 5. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh`
 
 ### Windows
