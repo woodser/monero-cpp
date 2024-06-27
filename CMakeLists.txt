@@ -280,7 +280,9 @@ set(
 )
 
 if (BUILD_LIBRARY)
-  add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+
+  option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+  add_library(monero-cpp ${LIBRARY_SRC_FILES})
 
   target_include_directories(monero-cpp PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
