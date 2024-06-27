@@ -23,6 +23,6 @@ cd ../../
 # build libmonero-cpp shared library
 mkdir -p build && 
 cd build && 
-cmake .. && 
+cmake $@ .. &&
 cmake --build . && 
 make .
