@@ -9,15 +9,6 @@ A C++ library for creating Monero applications using native bindings to [monero 
 * Receive notifications when wallets sync, send, or receive.
 * Tested by over 100 tests in [monero-java](https://github.com/woodser/monero-java) and [monero-ts](https://github.com/woodser/monero-ts) using JNI and WebAssembly bindings.
 
-## Table of contents
-
-* [Sample code](#sample-code)
-* [Documentation](#documentation)
-* [Using monero-cpp in your project](#using-monero-cpp-in-your-project)
-* [Related projects](#related-projects)
-* [License](#license)
-* [Donations](#donations)
-
 ## Sample code
 
 ```c++
@@ -169,7 +160,6 @@ This project may be compiled as part of another application or built as a shared
 For example, [monero-java](https://github.com/woodser/monero-java) compiles this project to a shared library to support Java JNI bindings, while [monero-ts](https://github.com/woodser/monero-ts) compiles this project to WebAssembly binaries.
 
 ### Linux
-
 
 1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
 2. Update submodules: `cd monero-cpp && ./bin/update_submodules.sh`
