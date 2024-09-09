@@ -726,6 +726,10 @@ namespace monero {
       throw std::runtime_error("get_txs(query) not supported");
     }
 
+    virtual std::vector<std::shared_ptr<monero_transfer>> get_transfers() const {
+      return get_transfers(monero_transfer_query());
+    }
+
     /**
      * Get incoming and outgoing transfers to and from this wallet.  An outgoing
      * transfer represents a total amount sent from one or more subaddresses
