@@ -1374,7 +1374,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_private_view_key() const {
     MTRACE("get_private_view_key()");
-    return epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_view_secret_key);
+    return epee::string_tools::pod_to_hex(unwrap(unwrap(m_w2->get_account().get_keys().m_view_secret_key)));
   }
 
   std::string monero_wallet_full::get_public_spend_key() const {
@@ -1385,7 +1385,7 @@ namespace monero {
   std::string monero_wallet_full::get_private_spend_key() const {
     MTRACE("get_private_spend_key()");
     if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve spend key.");
-    std::string spend_key = epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_spend_secret_key);
+    std::string spend_key = epee::string_tools::pod_to_hex(unwrap(unwrap(m_w2->get_account().get_keys().m_spend_secret_key)));
     if (spend_key == "0000000000000000000000000000000000000000000000000000000000000000") spend_key = "";
     return spend_key;
   }
@@ -2793,9 +2793,9 @@ namespace monero {
         std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
         tx->m_is_outgoing = true;
         tx->m_hash = epee::string_tools::pod_to_hex(cryptonote::get_transaction_hash(ptx.tx));
-        tx->m_key = epee::string_tools::pod_to_hex(ptx.tx_key);
+        tx->m_key = epee::string_tools::pod_to_hex(unwrap(unwrap(ptx.tx_key)));
         for (const crypto::secret_key& additional_tx_key : ptx.additional_tx_keys) {
-            tx->m_key = tx->m_key.get() += epee::string_tools::pod_to_hex(additional_tx_key);
+            tx->m_key = tx->m_key.get() += epee::string_tools::pod_to_hex(unwrap(unwrap(additional_tx_key)));
         }
         tx_set.m_txs.push_back(tx);
       }
