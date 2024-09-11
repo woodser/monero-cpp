@@ -312,9 +312,9 @@ namespace monero {
     m_primary_address = m_account.get_public_address_str(static_cast<cryptonote::network_type>(m_network_type));
     const cryptonote::account_keys& keys = m_account.get_keys();
     m_pub_view_key = epee::string_tools::pod_to_hex(keys.m_account_address.m_view_public_key);
-    m_prv_view_key = epee::string_tools::pod_to_hex(keys.m_view_secret_key);
+    m_prv_view_key = epee::string_tools::pod_to_hex(unwrap(unwrap(keys.m_view_secret_key)));
     m_pub_spend_key = epee::string_tools::pod_to_hex(keys.m_account_address.m_spend_public_key);
-    m_prv_spend_key = epee::string_tools::pod_to_hex(keys.m_spend_secret_key);
+    m_prv_spend_key = epee::string_tools::pod_to_hex(unwrap(unwrap(keys.m_spend_secret_key)));
     if (m_prv_spend_key == "0000000000000000000000000000000000000000000000000000000000000000") m_prv_spend_key = "";
   }
 }
