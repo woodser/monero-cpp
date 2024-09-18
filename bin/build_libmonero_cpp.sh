@@ -5,9 +5,11 @@ BUILD_DIR="$(pwd)/build"
 INSTALL_DIR="$BUILD_DIR/install"
 export CMAKE_PREFIX_PATH=$INSTALL_DIR${CMAKE_PREFIX_PATH+:$CMAKE_PREFIX_PATH}
 export OPENSSL_ROOT_DIR=$INSTALL_DIR
+USE_DEVICE_TREZOR=${USE_DEVICE_TREZOR-ON}
 echo "HOST_NCORES=$HOST_NCORES in $0"
 echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH in $0"
 echo "OPENSSL_ROOT_DIR=$OPENSSL_ROOT_DIR in $0"
+echo "USE_DEVICE_TREZOR=$USE_DEVICE_TREZOR in $0"
 
 [ -d $INSTALL_DIR ] || mkdir -p $INSTALL_DIR
 
@@ -55,7 +57,7 @@ else
     (cd $MONERO_BUILD_DIR && \
      cmake -D STATIC=ON -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release \
            -D OPENSSL_ROOT_DIR=$OPENSSL_ROOT_DIR \
-           -D USE_DEVICE_TREZOR=OFF \
+           -D USE_DEVICE_TREZOR=${USE_DEVICE_TREZOR} \
      ../.. && make -j$HOST_NCORES wallet) || exit 1
 fi
 cd ../../
@@ -63,6 +65,6 @@ cd ../../
 # build libmonero-cpp shared library
 mkdir -p build && 
 cd build && 
-cmake $@ .. &&
+cmake -D USE_DEVICE_TREZOR=${USE_DEVICE_TREZOR} $@ .. &&
 cmake --build . && 
 make -j$HOST_NCORES .

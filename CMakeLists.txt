@@ -130,22 +130,34 @@ endif()
 ############
 
 find_library(SODIUM_LIBRARY sodium REQUIRED)
-message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
+if(SODIUM_LIBRARY)
+  message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
+  find_path(SODIUM_INCLUDE_PATH sodium/crypto_verify_32.h)
+  if (SODIUM_INCLUDE_PATH)
+    message(STATUS "SODIUM_INCLUDE_PATH: ${SODIUM_INCLUDE_PATH}")
+  else()
+    message(FATAL_ERROR "Could not find required sodium/crypto_verify_32.h")
+  endif()
+endif()
+
 
 ############
 # HIDAPI
 ############
 
-if(APPLE)
-  include_directories(SYSTEM /usr/include/malloc)
-  if(POLICY CMP0042)
-    cmake_policy(SET CMP0042 NEW)
+option(USE_DEVICE_TREZOR "Trezor hardware wallet suport" ON)
+if (USE_DEVICE_TREZOR)
+  if(APPLE)
+    include_directories(SYSTEM /usr/include/malloc)
+    if(POLICY CMP0042)
+      cmake_policy(SET CMP0042 NEW)
+    endif()
   endif()
-endif()
 
-find_package(HIDAPI REQUIRED)
-message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
-add_definitions(-DHAVE_HIDAPI)
+  find_package(HIDAPI REQUIRED)
+  message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
+  add_definitions(-DHAVE_HIDAPI)
+endif()
 
 #############
 # Monero
@@ -315,12 +327,10 @@ if (BUILD_LIBRARY)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -408,12 +418,10 @@ if (BUILD_SAMPLE)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -479,12 +487,10 @@ if (BUILD_SCRATCHPAD)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -550,12 +556,10 @@ if (BUILD_TESTS)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
