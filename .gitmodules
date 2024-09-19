@@ -11,3 +11,9 @@
 [submodule "external/libsodium"]
 	path = external/libsodium
 	url = https://github.com/jedisct1/libsodium.git
+[submodule "external/libexpat"]
+	path = external/libexpat
+	url = https://github.com/libexpat/libexpat.git
+[submodule "external/unbound"]
+	path = external/unbound
+	url = https://github.com/NLnetLabs/unbound.git

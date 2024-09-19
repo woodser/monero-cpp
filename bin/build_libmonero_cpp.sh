@@ -36,6 +36,14 @@ make -j$HOST_NCORES && make install) && \
 ./configure --enable-shared=no --with-pic=yes --prefix=$INSTALL_DIR && \
 make -j$HOST_NCORES && make check && make install) && \
 
+(cd external/libexpat/expat && \
+./buildconf.sh && ./configure --prefix=$INSTALL_DIR --enable-static --disable-shared --with-pic=yes && \
+make -j$HOST_NCORES install) && \
+
+(cd external/unbound && \
+./configure --with-ssl=$INSTALL_DIR --prefix=$INSTALL_DIR --with-libexpat=$INSTALL_DIR --enable-static-exe --enable-static --disable-shared --with-pic=yes && \
+make -j$HOST_NCORES install) && \
+
 # build monero-project dependencies
 cd ./external/monero-project/ || exit 1
 git submodule update --init --force || exit 1
