@@ -162,41 +162,9 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
 ### Linux
 
 1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
-2. Update dependencies: `sudo apt update && sudo apt install build-essential cmake pkg-config libssl-dev libzmq3-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libexpat1-dev libpgm-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev python3 ccache doxygen graphviz nettle-dev libevent-dev`
-3. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for Linux to your home directory (e.g. `~/unbound-1.19.0`).
-
-    For example, install expat:
-    ```
-    cd ~
-    wget https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2
-    tar -xf expat-2.4.8.tar.bz2
-    sudo rm expat-2.4.8.tar.bz2
-    cd expat-2.4.8
-    ./configure --enable-static --disable-shared
-    make
-    sudo make install
-    cd ../
-    ```
-
-    For example, install unbound:
-    ```
-    cd ~
-    wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.19.0.tar.gz
-    tar xzf unbound-1.19.0.tar.gz
-    sudo apt update
-    sudo apt install -y build-essential
-    sudo apt install -y libssl-dev
-    sudo apt install -y libexpat1-dev
-    sudo apt-get install -y bison
-    sudo apt-get install -y flex
-    cd unbound-1.19.0
-    ./configure --with-libexpat=/usr --with-ssl=/usr --enable-static-exe
-    make
-    sudo make install
-    cd ../
-    ```
-4. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with: `make release-static -j8`
-5. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh`
+2. Update dependencies: `sudo apt update && sudo apt install build-essential autoconf libtool cmake pkg-config libzmq3-dev libunwind8-dev liblzma-dev libreadline6-dev libpgm-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev python3 ccache doxygen graphviz nettle-dev libevent-dev bison flex`
+3. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with: `make release-static -j8`
+4. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh`
 
 ### macOS
 

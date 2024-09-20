@@ -1,3 +1,19 @@
 [submodule "external/monero-project"]
 	path = external/monero-project
-	url = https://github.com/woodser/monero
+	url = https://github.com/nsec1/monero.git
+	branch = fixIncludePaths
+[submodule "external/boost"]
+	path = external/boost
+	url = https://github.com/boostorg/boost.git
+[submodule "external/openssl"]
+	path = external/openssl
+	url = https://github.com/openssl/openssl
+[submodule "external/libsodium"]
+	path = external/libsodium
+	url = https://github.com/jedisct1/libsodium.git
+[submodule "external/libexpat"]
+	path = external/libexpat
+	url = https://github.com/libexpat/libexpat.git
+[submodule "external/unbound"]
+	path = external/unbound
+	url = https://github.com/NLnetLabs/unbound.git

@@ -22,6 +22,17 @@ set(BUILD_SAMPLE OFF)
 set(BUILD_SCRATCHPAD OFF)
 set(BUILD_TESTS OFF)
 
+option(STATIC "Build using static libraries")
+if(STATIC)
+  if(WIN32)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .dll.a .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+  else()
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+  endif()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DZMQ_STATIC")
+endif()
+
+
 ###################
 # monero-project
 ###################
@@ -78,7 +89,11 @@ set(LibUSB_LIBRARIES ${usb_LIBRARY})
 set(Boost_NO_BOOST_CMAKE 1)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.58 QUIET REQUIRED COMPONENTS chrono date_time filesystem program_options regex serialization wserialization system thread)
-message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIR}")
+if(Boost_FOUND)
+  message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIR}")
+  message(STATUS "Using Boost lib version: ${Boost_LIB_VERSION}")
+  message(STATUS "Using Boost libs: ${Boost_LIBRARIES}")
+endif()
 
 ############
 # OpenSSL
@@ -95,7 +110,10 @@ if (APPLE AND NOT IOS)
 endif()
 
 find_package(OpenSSL REQUIRED)
-message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
+if(OPENSSL_FOUND)
+  message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
+  message(STATUS "Using OpenSSL libs: ${OPENSSL_LIBRARIES}")
+endif()
 
 if(STATIC AND NOT IOS)
   if(UNIX)
@@ -112,22 +130,34 @@ endif()
 ############
 
 find_library(SODIUM_LIBRARY sodium REQUIRED)
-message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
+if(SODIUM_LIBRARY)
+  message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
+  find_path(SODIUM_INCLUDE_PATH sodium/crypto_verify_32.h)
+  if (SODIUM_INCLUDE_PATH)
+    message(STATUS "SODIUM_INCLUDE_PATH: ${SODIUM_INCLUDE_PATH}")
+  else()
+    message(FATAL_ERROR "Could not find required sodium/crypto_verify_32.h")
+  endif()
+endif()
+
 
 ############
 # HIDAPI
 ############
 
-if(APPLE)
-  include_directories(SYSTEM /usr/include/malloc)
-  if(POLICY CMP0042)
-    cmake_policy(SET CMP0042 NEW)
+option(USE_DEVICE_TREZOR "Trezor hardware wallet suport" ON)
+if (USE_DEVICE_TREZOR)
+  if(APPLE)
+    include_directories(SYSTEM /usr/include/malloc)
+    if(POLICY CMP0042)
+      cmake_policy(SET CMP0042 NEW)
+    endif()
   endif()
-endif()
 
-find_package(HIDAPI REQUIRED)
-message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
-add_definitions(-DHAVE_HIDAPI)
+  find_package(HIDAPI REQUIRED)
+  message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
+  add_definitions(-DHAVE_HIDAPI)
+endif()
 
 #############
 # Monero
@@ -199,10 +229,6 @@ set_target_properties(easylogging PROPERTIES IMPORTED_LOCATION
 add_library(cryptonote_core STATIC IMPORTED)
 set_target_properties(cryptonote_core PROPERTIES IMPORTED_LOCATION
     ${MONERO_PROJECT_BUILD}/src/cryptonote_core/libcryptonote_core.a)
-
-add_library(cryptonote_protocol STATIC IMPORTED)
-set_target_properties(cryptonote_protocol PROPERTIES IMPORTED_LOCATION
-    ${MONERO_PROJECT_BUILD}/src/cryptonote_protocol/libcryptonote_protocol.a)
 
 add_library(cryptonote_basic STATIC IMPORTED)
 set_target_properties(cryptonote_basic PROPERTIES IMPORTED_LOCATION
@@ -280,7 +306,14 @@ set(
 )
 
 if (BUILD_LIBRARY)
-  add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+
+  if(STATIC)
+      set(BUILD_SHARED_LIBS OFF)
+  else()
+      set(BUILD_SHARED_LIBS ON)
+  endif()
+
+  add_library(monero-cpp ${LIBRARY_SRC_FILES})
 
   target_include_directories(monero-cpp PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -294,12 +327,10 @@ if (BUILD_LIBRARY)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -312,7 +343,6 @@ if (BUILD_LIBRARY)
       unbound
       easylogging
       cryptonote_core
-      cryptonote_protocol
       cryptonote_basic
       cryptonote_format_utils_basic
       mnemonics
@@ -388,12 +418,10 @@ if (BUILD_SAMPLE)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -405,7 +433,6 @@ if (BUILD_SAMPLE)
       lmdb
       easylogging
       cryptonote_core
-      cryptonote_protocol
       cryptonote_basic
       cryptonote_format_utils_basic
       mnemonics
@@ -460,12 +487,10 @@ if (BUILD_SCRATCHPAD)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -477,7 +502,6 @@ if (BUILD_SCRATCHPAD)
       lmdb
       easylogging
       cryptonote_core
-      cryptonote_protocol
       cryptonote_basic
       cryptonote_format_utils_basic
       mnemonics
@@ -532,12 +556,10 @@ if (BUILD_TESTS)
       "${MONERO_PROJECT_SRC}/wallet/api"
       "${MONERO_PROJECT_SRC}/hardforks"
       "${MONERO_PROJECT_SRC}/crypto"
-      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${SODIUM_INCLUDE_PATH}
       ${Protobuf_INCLUDE_DIR}
       ${Boost_INCLUDE_DIR}
       ${OPENSSL_INCLUDE_DIR}
-      external/libsodium/include/sodium
-      external/openssl-sdk/include
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
@@ -549,7 +571,6 @@ if (BUILD_TESTS)
       lmdb
       easylogging
       cryptonote_core
-      cryptonote_protocol
       cryptonote_basic
       cryptonote_format_utils_basic
       mnemonics
