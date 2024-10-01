@@ -55,6 +55,7 @@
 #include "monero_wallet.h"
 #include "wallet/wallet2.h"
 
+#include "common/threadpool.h"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -64,10 +65,10 @@
  */
 namespace monero {
 
-  // -------------------------------- LISTENERS -------------------------------
+  // ------------------------- INITIALIZE CONSTANTS ---------------------------
 
-  // forward declaration of internal wallet2 listener
-  struct wallet2_listener;
+  static const int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 1000 * 30; // default connection timeout 30 sec
+  static const bool STRICT_ = false; // relies exclusively on blockchain data if true, includes local wallet data if false TODO: good use case to expose externally? (note: cannot use `STRICT` due to namespace collision on Windows)
 
   // --------------------------- STATIC WALLET UTILS --------------------------
 
@@ -257,11 +258,10 @@ namespace monero {
   protected:
     std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
 
-    void init_common();
+    virtual void init_common();
 
   // ---------------------------------- PRIVATE ---------------------------------
 
-  private:
     friend struct wallet2_listener;
     std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
     std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
@@ -270,7 +270,7 @@ namespace monero {
     static monero_wallet_full* create_wallet_from_keys(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
     static monero_wallet_full* create_wallet_random(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
 
-    std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
+    virtual std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config& config);  // sweeps unlocked funds within an account; private helper to sweep_unlocked()
@@ -279,7 +279,7 @@ namespace monero {
     mutable std::atomic<bool> m_is_synced;       // whether or not wallet is synced
     mutable std::atomic<bool> m_is_connected;    // cache connection status to avoid unecessary RPC calls
     boost::condition_variable m_sync_cv;         // to make sync threads woke
-    boost::mutex m_sync_mutex;                   // synchronize sync() and syncAsync() requests
+    mutable boost::recursive_mutex m_sync_mutex;           // synchronize sync() and syncAsync() requests
     std::atomic<bool> m_rescan_on_sync;          // whether or not to rescan on sync
     std::atomic<bool> m_syncing_enabled;         // whether or not auto sync is enabled
     std::atomic<bool> m_sync_loop_running;       // whether or not the syncing thread is shut down
@@ -287,7 +287,72 @@ namespace monero {
     boost::thread m_syncing_thread;              // thread for auto sync loop
     boost::mutex m_syncing_mutex;                // synchronize auto sync loop
     void run_sync_loop();                        // run the sync loop in a thread
-    monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none);  // internal function to synchronize request to sync and rescan
-    monero_sync_result sync_aux(boost::optional<uint64_t> start_height = boost::none);       // internal function to immediately block, sync, and report progress
+    virtual monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none);  // internal function to synchronize request to sync and rescan
+    virtual monero_sync_result sync_aux(boost::optional<uint64_t> start_height = boost::none);       // internal function to immediately block, sync, and report progress
   };
+
+
+  // -------------------------------- LISTENERS -------------------------------
+
+  /**
+   * Listens to wallet2 notifications in order to notify external wallet listeners.
+   */
+  struct wallet2_listener : public tools::i_wallet2_callback {
+
+    public:
+
+      /**
+      * Constructs the listener.
+      *
+      * @param wallet provides context to notify external listeners
+      * @param wallet2 provides source notifications which this listener propagates to external listeners
+      */
+      wallet2_listener(monero_wallet_full& wallet, tools::wallet2& wallet2) : m_wallet(wallet), m_w2(wallet2) {
+        this->m_sync_start_height = boost::none;
+        this->m_sync_end_height = boost::none;
+        m_prev_balance = wallet.get_balance();
+        m_prev_unlocked_balance = wallet.get_unlocked_balance();
+        m_notification_pool = std::unique_ptr<tools::threadpool>(tools::threadpool::getNewForUnitTests(1));  // TODO (monero-project): utility can be for general use
+      }
+
+      ~wallet2_listener();
+
+      void update_listening();
+
+      void on_sync_start(uint64_t start_height);
+
+      void on_sync_end();
+
+      void on_new_block(uint64_t height, const cryptonote::block& cn_block) override;
+
+      void on_unconfirmed_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& cn_tx, uint64_t amount, const cryptonote::subaddress_index& subaddr_index) override;
+
+      void on_money_received(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& cn_tx, uint64_t amount, uint64_t burnt, const cryptonote::subaddress_index& subaddr_index, bool is_change, uint64_t unlock_time) override;
+
+      void on_money_spent(uint64_t height, const crypto::hash &txid, const cryptonote::transaction& cn_tx_in, uint64_t amount, const cryptonote::transaction& cn_tx_out, const cryptonote::subaddress_index& subaddr_index) override;
+      
+      void on_spend_tx_hashes(const std::vector<std::string>& tx_hashes);
+
+      void on_spend_txs(const std::vector<std::shared_ptr<monero_tx_wallet>>& txs);
+
+    private:
+      monero_wallet_full& m_wallet; // wallet to provide context for notifications
+      tools::wallet2& m_w2;         // internal wallet implementation to listen to
+      boost::optional<uint64_t> m_sync_start_height;
+      boost::optional<uint64_t> m_sync_end_height;
+      boost::mutex m_listener_mutex;
+      uint64_t m_prev_balance;
+      uint64_t m_prev_unlocked_balance;
+      std::set<std::string> m_prev_locked_tx_hashes;
+      std::unique_ptr<tools::threadpool> m_notification_pool;  // threadpool of size 1 to queue notifications for external announcement
+
+      bool check_for_changed_balances();
+
+      // TODO: this can probably be optimized using e.g. wallet2.get_num_rct_outputs() or wallet2.get_num_transfer_details(), or by retaining confirmed block height and only checking on or after unlock height, etc
+      void check_for_changed_unlocked_txs();
+
+      void notify_outputs(const std::shared_ptr<monero_tx_wallet>& tx);
+
+  };
+
 }

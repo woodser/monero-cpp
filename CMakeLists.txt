@@ -19,6 +19,7 @@ project(MoneroCppLibrary)
 
 set(BUILD_LIBRARY ON)
 set(BUILD_SAMPLE OFF)
+set(BUILD_LIGHT_TESTS OFF)
 set(BUILD_SCRATCHPAD OFF)
 set(BUILD_TESTS OFF)
 
@@ -277,6 +278,7 @@ set(
     src/wallet/monero_wallet_model.cpp
     src/wallet/monero_wallet_keys.cpp
     src/wallet/monero_wallet_full.cpp
+    src/wallet/monero_wallet_light.cpp
 )
 
 if (BUILD_LIBRARY)
@@ -357,6 +359,7 @@ endif()
           src/utils/monero_utils.h
           DESTINATION include/utils)
   INSTALL(FILES src/wallet/monero_wallet_full.h
+          src/wallet/monero_wallet_light.h
           src/wallet/monero_wallet.h
           src/wallet/monero_wallet_keys.h
           src/wallet/monero_wallet_model.h
@@ -436,6 +439,80 @@ if (BUILD_SAMPLE)
   )
   if (NOT WIN32)
     target_link_libraries(sample_code dl)
+  endif()
+endif()
+
+
+########################
+# Build C++ Light wallet test
+########################
+
+if (BUILD_LIGHT_TESTS)
+  set(LIGHT_TEST_SRC_FILES test/monero_light_tests.cpp)
+  
+  add_executable(monero_light_tests ${LIBRARY_SRC_FILES} ${LIGHT_TEST_SRC_FILES})
+  
+  target_include_directories(monero_light_tests PUBLIC
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+      src
+      "${MONERO_PROJECT}/contrib/epee/include"
+      "${MONERO_PROJECT}/external/"
+      "${MONERO_PROJECT}/external/easylogging++"
+      "${MONERO_PROJECT}/external/rapidjson/include"
+      "${MONERO_PROJECT_SRC}/"
+      "${MONERO_PROJECT_SRC}/wallet"
+      "${MONERO_PROJECT_SRC}/wallet/api"
+      "${MONERO_PROJECT_SRC}/hardforks"
+      "${MONERO_PROJECT_SRC}/crypto"
+      "${MONERO_PROJECT_SRC}/crypto/crypto_ops_builder/include/"
+      ${Protobuf_INCLUDE_DIR}
+      ${Boost_INCLUDE_DIR}
+      ${OPENSSL_INCLUDE_DIR}
+      external/libsodium/include/sodium
+      external/openssl-sdk/include
+      ${HIDAPI_INCLUDE_DIR}
+      ${UNBOUND_INCLUDE_DIR}
+  )
+
+  target_link_libraries(monero_light_tests
+      wallet
+      rpc_base
+      net
+      lmdb
+      easylogging
+      cryptonote_core
+      cryptonote_protocol
+      cryptonote_basic
+      cryptonote_format_utils_basic
+      mnemonics
+      ringct
+      ringct_basic
+      common
+      cncrypto
+      blockchain_db
+      blocks
+      checkpoints
+      device
+      device_trezor
+      multisig
+      version
+      randomx
+      epee
+      hardforks
+      cncrypto
+      ${wallet_crypto}
+
+      ${UNBOUND_LIBRARIES}
+      ${Boost_LIBRARIES}
+      ${Protobuf_LIBRARY}
+      ${LibUSB_LIBRARIES}
+      ${OPENSSL_LIBRARIES}
+      ${SODIUM_LIBRARY}
+      ${HIDAPI_LIBRARIES}
+      ${EXTRA_LIBRARIES}
+  )
+  if (NOT WIN32)
+    target_link_libraries(monero_light_tests dl)
   endif()
 endif()
 
