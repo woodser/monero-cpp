@@ -1363,12 +1363,6 @@ namespace monero {
   }
 
   bool monero_wallet_light::is_address_upsert(const uint32_t account_index, const uint32_t subaddress_index) const {
-
-    for(auto kv : m_subaddrs) {
-      if (!kv.first == account_index) continue;
-      
-    }
-
     return m_subaddrs.contains(account_index, subaddress_index);
   }
 
