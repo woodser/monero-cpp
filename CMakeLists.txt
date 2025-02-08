@@ -412,7 +412,6 @@ if (BUILD_SAMPLE)
       ringct
       ringct_basic
       common
-      cncrypto
       blockchain_db
       blocks
       checkpoints
@@ -420,6 +419,7 @@ if (BUILD_SAMPLE)
       device_trezor
       multisig
       version
+      cncrypto
       randomx
       epee
       hardforks
