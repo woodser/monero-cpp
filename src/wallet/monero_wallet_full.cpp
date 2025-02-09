@@ -91,60 +91,12 @@ namespace monero {
     END_KV_SERIALIZE_MAP()
   };
 
-  /**
-   * Remove query criteria which require looking up other transfers/outputs to
-   * fulfill query.
-   *
-   * @param query the query to decontextualize
-   * @return a reference to the query for convenience
-   */
-  std::shared_ptr<monero_tx_query> decontextualize(std::shared_ptr<monero_tx_query> query) {
-    query->m_is_incoming = boost::none;
-    query->m_is_outgoing = boost::none;
-    query->m_transfer_query = boost::none;
-    query->m_input_query = boost::none;
-    query->m_output_query = boost::none;
-    return query;
-  }
-
-  bool is_contextual(const monero_transfer_query& query) {
-    if (query.m_tx_query == boost::none) return false;
-    if (query.m_tx_query.get()->m_is_incoming != boost::none) return true;    // requires context of all transfers
-    if (query.m_tx_query.get()->m_is_outgoing != boost::none) return true;
-    if (query.m_tx_query.get()->m_input_query != boost::none) return true;    // requires context of inputs
-    if (query.m_tx_query.get()->m_output_query != boost::none) return true;   // requires context of outputs
-    return false;
-  }
-
-  bool is_contextual(const monero_output_query& query) {
-    if (query.m_tx_query == boost::none) return false;
-    if (query.m_tx_query.get()->m_is_incoming != boost::none) return true;    // requires context of all transfers
-    if (query.m_tx_query.get()->m_is_outgoing != boost::none) return true;
-    if (query.m_tx_query.get()->m_transfer_query != boost::none) return true; // requires context of transfers
-    return false;
-  }
-
-  bool bool_equals(bool val, const boost::optional<bool>& opt_val) {
-    return opt_val == boost::none ? false : val == *opt_val;
-  }
 
   // compute m_num_confirmations TODO monero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
   void set_num_confirmations(std::shared_ptr<monero_tx_wallet>& tx, uint64_t blockchain_height) {
     std::shared_ptr<monero_block>& block = tx->m_block.get();
     if (block->m_height.get() >= blockchain_height || (block->m_height.get() == 0 && !tx->m_in_tx_pool.get())) tx->m_num_confirmations = 0;
     else tx->m_num_confirmations = blockchain_height - block->m_height.get();
-  }
-
-  // compute m_num_suggested_confirmations  TODO monero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
-  void set_num_suggested_confirmations(std::shared_ptr<monero_incoming_transfer>& incoming_transfer, uint64_t blockchain_height, uint64_t block_reward, uint64_t unlock_time) {
-    if (block_reward == 0) incoming_transfer->m_num_suggested_confirmations = 0;
-    else incoming_transfer->m_num_suggested_confirmations = (incoming_transfer->m_amount.get() + block_reward - 1) / block_reward;
-    if (unlock_time < CRYPTONOTE_MAX_BLOCK_NUMBER) {
-      if (unlock_time > blockchain_height) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), unlock_time - blockchain_height);
-    } else {
-      const uint64_t now = time(NULL);
-      if (unlock_time > now) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), (unlock_time - now + DIFFICULTY_TARGET_V2 - 1) / DIFFICULTY_TARGET_V2);
-    }
   }
 
   std::shared_ptr<monero_tx_wallet> build_tx_with_incoming_transfer(tools::wallet2& m_w2, uint64_t height, const crypto::hash &payment_id, const tools::wallet2::payment_details &pd) {
@@ -185,7 +137,7 @@ namespace monero {
     incoming_transfer->m_account_index = pd.m_subaddr_index.major;
     incoming_transfer->m_subaddress_index = pd.m_subaddr_index.minor;
     incoming_transfer->m_address = m_w2.get_subaddress_as_str(pd.m_subaddr_index);
-    set_num_suggested_confirmations(incoming_transfer, height, m_w2.get_last_block_reward(), pd.m_unlock_time);
+    monero_utils::set_num_suggested_confirmations(incoming_transfer, height, m_w2.get_last_block_reward(), pd.m_unlock_time);
 
     // return pointer to new tx
     return tx;
@@ -289,7 +241,7 @@ namespace monero {
     incoming_transfer->m_account_index = pd.m_subaddr_index.major;
     incoming_transfer->m_subaddress_index = pd.m_subaddr_index.minor;
     incoming_transfer->m_address = m_w2.get_subaddress_as_str(pd.m_subaddr_index);
-    set_num_suggested_confirmations(incoming_transfer, height, m_w2.get_last_block_reward(), pd.m_unlock_time);
+    monero_utils::set_num_suggested_confirmations(incoming_transfer, height, m_w2.get_last_block_reward(), pd.m_unlock_time);
 
     // return pointer to new tx
     return tx;
@@ -392,82 +344,6 @@ namespace monero {
     return tx;
   }
 
-  /**
-   * Merges a transaction into a unique set of transactions.
-   *
-   * @param tx is the transaction to merge into the existing txs
-   * @param tx_map maps tx hashes to txs
-   * @param block_map maps block heights to blocks
-   */
-  void merge_tx(const std::shared_ptr<monero_tx_wallet>& tx, std::map<std::string, std::shared_ptr<monero_tx_wallet>>& tx_map, std::map<uint64_t, std::shared_ptr<monero_block>>& block_map) {
-    if (tx->m_hash == boost::none) throw std::runtime_error("Tx hash is not initialized");
-
-    // merge tx
-    std::map<std::string, std::shared_ptr<monero_tx_wallet>>::const_iterator tx_iter = tx_map.find(*tx->m_hash);
-    if (tx_iter == tx_map.end()) {
-      tx_map[*tx->m_hash] = tx; // cache new tx
-    } else {
-      std::shared_ptr<monero_tx_wallet>& a_tx = tx_map[*tx->m_hash];
-      a_tx->merge(a_tx, tx); // merge with existing tx
-    }
-
-    // merge tx's block if confirmed
-    if (tx->get_height() != boost::none) {
-      std::map<uint64_t, std::shared_ptr<monero_block>>::const_iterator block_iter = block_map.find(tx->get_height().get());
-      if (block_iter == block_map.end()) {
-        block_map[tx->get_height().get()] = tx->m_block.get(); // cache new block
-      } else {
-        std::shared_ptr<monero_block>& a_block = block_map[tx->get_height().get()];
-        a_block->merge(a_block, tx->m_block.get()); // merge with existing block
-      }
-    }
-  }
-
-  /**
-   * Returns true iff tx1's height is known to be less than tx2's height for sorting.
-   */
-  bool tx_height_less_than(const std::shared_ptr<monero_tx>& tx1, const std::shared_ptr<monero_tx>& tx2) {
-    if (tx1->m_block != boost::none && tx2->m_block != boost::none) return tx1->get_height() < tx2->get_height();
-    else if (tx1->m_block == boost::none) return false;
-    else return true;
-  }
-
-  /**
-   * Returns true iff transfer1 is ordered before transfer2 by ascending account and subaddress indices.
-   */
-  bool incoming_transfer_before(const std::shared_ptr<monero_incoming_transfer>& transfer1, const std::shared_ptr<monero_incoming_transfer>& transfer2) {
-
-    // compare by height
-    if (tx_height_less_than(transfer1->m_tx, transfer2->m_tx)) return true;
-
-    // compare by account and subaddress index
-    if (transfer1->m_account_index.get() < transfer2->m_account_index.get()) return true;
-    else if (transfer1->m_account_index.get() == transfer2->m_account_index.get()) return transfer1->m_subaddress_index.get() < transfer2->m_subaddress_index.get();
-    else return false;
-  }
-
-  /**
-   * Returns true iff wallet vout1 is ordered before vout2 by ascending account and subaddress indices then index.
-   */
-  bool vout_before(const std::shared_ptr<monero_output>& o1, const std::shared_ptr<monero_output>& o2) {
-    if (o1 == o2) return false; // ignore equal references
-    std::shared_ptr<monero_output_wallet> ow1 = std::static_pointer_cast<monero_output_wallet>(o1);
-    std::shared_ptr<monero_output_wallet> ow2 = std::static_pointer_cast<monero_output_wallet>(o2);
-
-    // compare by height
-    if (tx_height_less_than(ow1->m_tx, ow2->m_tx)) return true;
-
-    // compare by account index, subaddress index, output index, then key image hex
-    if (ow1->m_account_index.get() < ow2->m_account_index.get()) return true;
-    if (ow1->m_account_index.get() == ow2->m_account_index.get()) {
-      if (ow1->m_subaddress_index.get() < ow2->m_subaddress_index.get()) return true;
-      if (ow1->m_subaddress_index.get() == ow2->m_subaddress_index.get()) {
-        if (ow1->m_index.get() < ow2->m_index.get()) return true;
-        if (ow1->m_index.get() == ow2->m_index.get()) throw std::runtime_error("Should never sort outputs with duplicate indices");
-      }
-    }
-    return false;
-  }
 
   std::string get_default_ringdb_path(cryptonote::network_type nettype)
   {
@@ -1746,7 +1622,7 @@ namespace monero {
 
     // fetch all transfers that meet tx query
     std::shared_ptr<monero_transfer_query> temp_transfer_query = std::make_shared<monero_transfer_query>();
-    temp_transfer_query->m_tx_query = decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
+    temp_transfer_query->m_tx_query = monero_utils::decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
     temp_transfer_query->m_tx_query.get()->m_transfer_query = temp_transfer_query;
     std::vector<std::shared_ptr<monero_transfer>> transfers = get_transfers_aux(*temp_transfer_query);
     monero_utils::free(temp_transfer_query->m_tx_query.get());
@@ -1765,13 +1641,13 @@ namespace monero {
     std::map<std::string, std::shared_ptr<monero_tx_wallet>> tx_map;
     std::map<uint64_t, std::shared_ptr<monero_block>> block_map;
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
-      merge_tx(tx, tx_map, block_map);
+      monero_utils::merge_tx(tx, tx_map, block_map);
     }
 
     // fetch and merge outputs if requested
     if ((_query->m_include_outputs != boost::none && *_query->m_include_outputs) || output_query != boost::none) {
       std::shared_ptr<monero_output_query> temp_output_query = std::make_shared<monero_output_query>();
-      temp_output_query->m_tx_query = decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
+      temp_output_query->m_tx_query = monero_utils::decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
       temp_output_query->m_tx_query.get()->m_output_query = temp_output_query;
       std::vector<std::shared_ptr<monero_output_wallet>> outputs = get_outputs_aux(*temp_output_query);
       monero_utils::free(temp_output_query->m_tx_query.get());
@@ -1781,7 +1657,7 @@ namespace monero {
       for (const std::shared_ptr<monero_output_wallet>& output : outputs) {
         std::shared_ptr<monero_tx_wallet> tx = std::static_pointer_cast<monero_tx_wallet>(output->m_tx);
         if (output_txs.find(tx) == output_txs.end()) {
-          merge_tx(tx, tx_map, block_map);
+          monero_utils::merge_tx(tx, tx_map, block_map);
           output_txs.insert(tx);
         }
       }
@@ -1843,7 +1719,7 @@ namespace monero {
 //    } else std::cout << "Transfer query: " << query.serialize() << std::endl;
 
     // get transfers directly if query does not require tx context (e.g. other transfers, outputs)
-    if (!is_contextual(query)) return get_transfers_aux(query);
+    if (!monero_utils::is_contextual(query)) return get_transfers_aux(query);
 
     // otherwise get txs with full models to fulfill query
     std::vector<std::shared_ptr<monero_transfer>> transfers;
@@ -1864,7 +1740,7 @@ namespace monero {
 //    } else std::cout << "Output query: " << query.serialize() << std::endl;
 
     // get outputs directly if query does not require tx context (e.g. other outputs, transfers)
-    if (!is_contextual(query)) return get_outputs_aux(query);
+    if (!monero_utils::is_contextual(query)) return get_outputs_aux(query);
 
     // otherwise get txs with full models to fulfill query
     std::vector<std::shared_ptr<monero_output_wallet>> outputs;
@@ -3585,15 +3461,15 @@ namespace monero {
     }
 
     // translate from monero_tx_query to in, out, pending, pool, failed terminology used by monero-wallet-rpc
-    bool can_be_confirmed = !bool_equals(false, tx_query->m_is_confirmed) && !bool_equals(true, tx_query->m_in_tx_pool) && !bool_equals(true, tx_query->m_is_failed) && !bool_equals(false, tx_query->m_is_relayed);
-    bool can_be_in_tx_pool = !bool_equals(true, tx_query->m_is_confirmed) && !bool_equals(false, tx_query->m_in_tx_pool) && !bool_equals(true, tx_query->m_is_failed) && tx_query->get_height() == boost::none && tx_query->m_min_height == boost::none && !bool_equals(false, tx_query->m_is_locked);
-    bool can_be_incoming = !bool_equals(false, _query->m_is_incoming) && !bool_equals(true, _query->is_outgoing()) && !bool_equals(true, _query->m_has_destinations);
-    bool can_be_outgoing = !bool_equals(false, _query->is_outgoing()) && !bool_equals(true, _query->m_is_incoming);
+    bool can_be_confirmed = !monero_utils::bool_equals(false, tx_query->m_is_confirmed) && !monero_utils::bool_equals(true, tx_query->m_in_tx_pool) && !monero_utils::bool_equals(true, tx_query->m_is_failed) && !monero_utils::bool_equals(false, tx_query->m_is_relayed);
+    bool can_be_in_tx_pool = !monero_utils::bool_equals(true, tx_query->m_is_confirmed) && !monero_utils::bool_equals(false, tx_query->m_in_tx_pool) && !monero_utils::bool_equals(true, tx_query->m_is_failed) && tx_query->get_height() == boost::none && tx_query->m_min_height == boost::none && !monero_utils::bool_equals(false, tx_query->m_is_locked);
+    bool can_be_incoming = !monero_utils::bool_equals(false, _query->m_is_incoming) && !monero_utils::bool_equals(true, _query->is_outgoing()) && !monero_utils::bool_equals(true, _query->m_has_destinations);
+    bool can_be_outgoing = !monero_utils::bool_equals(false, _query->is_outgoing()) && !monero_utils::bool_equals(true, _query->m_is_incoming);
     bool is_in = can_be_incoming && can_be_confirmed;
     bool is_out = can_be_outgoing && can_be_confirmed;
     bool is_pending = can_be_outgoing && can_be_in_tx_pool;
     bool is_pool = can_be_incoming && can_be_in_tx_pool;
-    bool is_failed = !bool_equals(false, tx_query->m_is_failed) && !bool_equals(true, tx_query->m_is_confirmed) && !bool_equals(true, tx_query->m_in_tx_pool) && !bool_equals(false, tx_query->m_is_locked);
+    bool is_failed = !monero_utils::bool_equals(false, tx_query->m_is_failed) && !monero_utils::bool_equals(true, tx_query->m_is_confirmed) && !monero_utils::bool_equals(true, tx_query->m_in_tx_pool) && !monero_utils::bool_equals(false, tx_query->m_is_locked);
 
     // check if fetching pool txs contradicted by configuration
     if (tx_query->m_in_tx_pool != boost::none && tx_query->m_in_tx_pool.get() && !can_be_in_tx_pool) {
@@ -3614,7 +3490,7 @@ namespace monero {
         if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->first)) == tx_query->m_hashes.end()) continue; // skip if hash filtered
         std::shared_ptr<monero_tx_wallet> tx = build_tx_with_outgoing_transfer_unconfirmed(*m_w2, i->first, i->second);
         if (tx_query->m_is_failed != boost::none && tx_query->m_is_failed.get() != tx->m_is_failed.get()) continue; // skip if failure filtered
-        merge_tx(tx, tx_map, block_map);
+        monero_utils::merge_tx(tx, tx_map, block_map);
       }
     }
 
@@ -3631,7 +3507,7 @@ namespace monero {
       for (std::list<std::pair<crypto::hash, tools::wallet2::pool_payment_details>>::const_iterator i = payments.begin(); i != payments.end(); ++i) {
         if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->second.m_pd.m_tx_hash)) == tx_query->m_hashes.end()) continue; // skip if hash filtered
         std::shared_ptr<monero_tx_wallet> tx = build_tx_with_incoming_transfer_unconfirmed(*m_w2, height, i->first, i->second);
-        merge_tx(tx, tx_map, block_map);
+        monero_utils::merge_tx(tx, tx_map, block_map);
       }
     }
 
@@ -3642,7 +3518,7 @@ namespace monero {
       for (std::list<std::pair<crypto::hash, tools::wallet2::payment_details>>::const_iterator i = payments.begin(); i != payments.end(); ++i) {
         if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->second.m_tx_hash)) == tx_query->m_hashes.end()) continue; // skip if hash filtered
         std::shared_ptr<monero_tx_wallet> tx = build_tx_with_incoming_transfer(*m_w2, height, i->first, i->second);
-        merge_tx(tx, tx_map, block_map);
+        monero_utils::merge_tx(tx, tx_map, block_map);
       }
     }
 
@@ -3653,7 +3529,7 @@ namespace monero {
       for (std::list<std::pair<crypto::hash, tools::wallet2::confirmed_transfer_details>>::const_iterator i = payments.begin(); i != payments.end(); ++i) {
         if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->first)) == tx_query->m_hashes.end()) continue; // skip if hash filtered
         std::shared_ptr<monero_tx_wallet> tx = build_tx_with_outgoing_transfer(*m_w2, height, i->first, i->second);
-        merge_tx(tx, tx_map, block_map);
+        monero_utils::merge_tx(tx, tx_map, block_map);
       }
     }
 
@@ -3662,7 +3538,7 @@ namespace monero {
     for (std::map<std::string, std::shared_ptr<monero_tx_wallet>>::const_iterator tx_iter = tx_map.begin(); tx_iter != tx_map.end(); tx_iter++) {
       txs.push_back(tx_iter->second);
     }
-    sort(txs.begin(), txs.end(), tx_height_less_than);
+    sort(txs.begin(), txs.end(), monero_utils::tx_height_less_than);
 
     // filter transfers
     std::vector<std::shared_ptr<monero_transfer>> transfers;
@@ -3673,7 +3549,7 @@ namespace monero {
       if (tx->m_is_outgoing == boost::none) tx->m_is_outgoing = false;
 
       // sort incoming transfers
-      sort(tx->m_incoming_transfers.begin(), tx->m_incoming_transfers.end(), incoming_transfer_before);
+      sort(tx->m_incoming_transfers.begin(), tx->m_incoming_transfers.end(), monero_utils::incoming_transfer_before);
 
       // collect queried transfers, erase if excluded
       for (const std::shared_ptr<monero_transfer>& transfer : tx->filter_transfers(*_query)) transfers.push_back(transfer);
@@ -3728,7 +3604,7 @@ namespace monero {
     for (const auto& output_w2 : outputs_w2) {
       // TODO: skip tx building if m_w2 output excluded by indices, etc
       std::shared_ptr<monero_tx_wallet> tx = build_tx_with_vout(*m_w2, output_w2);
-      merge_tx(tx, tx_map, block_map);
+      monero_utils::merge_tx(tx, tx_map, block_map);
     }
 
     // sort txs by block height
@@ -3736,14 +3612,14 @@ namespace monero {
     for (std::map<std::string, std::shared_ptr<monero_tx_wallet>>::const_iterator tx_iter = tx_map.begin(); tx_iter != tx_map.end(); tx_iter++) {
       txs.push_back(tx_iter->second);
     }
-    sort(txs.begin(), txs.end(), tx_height_less_than);
+    sort(txs.begin(), txs.end(), monero_utils::tx_height_less_than);
 
     // filter and return outputs
     std::vector<std::shared_ptr<monero_output_wallet>> outputs;
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
 
       // sort outputs
-      sort(tx->m_outputs.begin(), tx->m_outputs.end(), vout_before);
+      sort(tx->m_outputs.begin(), tx->m_outputs.end(), monero_utils::vout_before);
 
       // collect queried outputs, erase if excluded
       for (const std::shared_ptr<monero_output_wallet>& output : tx->filter_outputs_wallet(*_query)) outputs.push_back(output);
