@@ -65,13 +65,6 @@ if (NOT APPLE)
 endif()
 
 ############
-# LibUSB
-############
-
-find_library(usb_LIBRARY NAMES usb-1.0 libusb usb)
-set(LibUSB_LIBRARIES ${usb_LIBRARY})
-
-############
 # Boost
 ############
 
@@ -113,21 +106,6 @@ endif()
 
 find_library(SODIUM_LIBRARY sodium REQUIRED)
 message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
-
-############
-# HIDAPI
-############
-
-if(APPLE)
-  include_directories(SYSTEM /usr/include/malloc)
-  if(POLICY CMP0042)
-    cmake_policy(SET CMP0042 NEW)
-  endif()
-endif()
-
-find_package(HIDAPI REQUIRED)
-message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
-add_definitions(-DHAVE_HIDAPI)
 
 #############
 # Monero
@@ -300,7 +278,6 @@ if (BUILD_LIBRARY)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
   
@@ -335,10 +312,8 @@ if (BUILD_LIBRARY)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
 
@@ -394,7 +369,6 @@ if (BUILD_SAMPLE)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
   
@@ -428,10 +402,8 @@ if (BUILD_SAMPLE)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
   if (NOT WIN32)
@@ -466,7 +438,6 @@ if (BUILD_SCRATCHPAD)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
   
@@ -500,10 +471,8 @@ if (BUILD_SCRATCHPAD)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
   if (NOT WIN32)
@@ -538,7 +507,6 @@ if (BUILD_TESTS)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
   
@@ -572,10 +540,8 @@ if (BUILD_TESTS)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
   if (NOT WIN32)
