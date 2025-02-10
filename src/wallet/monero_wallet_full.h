@@ -198,6 +198,7 @@ namespace monero {
     void freeze_output(const std::string& key_image) override;
     void thaw_output(const std::string& key_image) override;
     bool is_output_frozen(const std::string& key_image) override;
+    monero_tx_priority get_default_fee_priority() const override;
     std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& config) override;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_unlocked(const monero_tx_config& config) override;
     std::shared_ptr<monero_tx_wallet> sweep_output(const monero_tx_config& config) override;

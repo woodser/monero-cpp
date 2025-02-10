@@ -1955,6 +1955,10 @@ namespace monero {
     return m_w2->frozen(ki);
   }
 
+  monero_tx_priority monero_wallet_full::get_default_fee_priority() const {
+    return static_cast<monero_tx_priority>(m_w2->adjust_priority(0));
+  }
+
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::create_txs(const monero_tx_config& config) {
     MTRACE("monero_wallet_full::create_txs");
     //std::cout << "monero_tx_config: " << config.serialize()  << std::endl;
