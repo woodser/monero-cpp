@@ -831,6 +831,15 @@ namespace monero {
     }
 
     /**
+     * Get the current default fee priority (unimportant, normal, elevated, etc).
+     *
+     * @return the current fee priority
+     */
+    virtual monero_tx_priority get_default_fee_priority() const {
+      throw std::runtime_error("get_default_fee_priority() not supported");
+    }
+
+    /**
      * Create a transaction to transfer funds from this wallet.
      *
      * @param config configures the transaction to create
