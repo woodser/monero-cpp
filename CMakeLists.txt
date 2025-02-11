@@ -68,8 +68,10 @@ endif()
 # LibUSB
 ############
 
-find_library(usb_LIBRARY NAMES usb-1.0 libusb usb)
-set(LibUSB_LIBRARIES ${usb_LIBRARY})
+if (WIN32)
+  find_library(usb_LIBRARY NAMES usb-1.0 libusb usb)
+  list(APPEND EXTRA_LIBRARIES ${usb_LIBRARY})
+endif()
 
 ############
 # Boost
@@ -125,9 +127,12 @@ if(APPLE)
   endif()
 endif()
 
-find_package(HIDAPI REQUIRED)
-message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
-add_definitions(-DHAVE_HIDAPI)
+if (WIN32)
+  find_package(HIDAPI REQUIRED)
+  message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
+  add_definitions(-DHAVE_HIDAPI)
+  list(APPEND EXTRA_LIBRARIES ${HIDAPI_LIBRARIES})
+endif()
 
 #############
 # Monero
@@ -300,9 +305,11 @@ if (BUILD_LIBRARY)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
+  if (WIN32)
+      target_include_directories(monero-cpp PUBLIC ${HIDAPI_INCLUDE_DIR})
+  endif()
   
   target_link_libraries(monero-cpp
       wallet
@@ -335,10 +342,8 @@ if (BUILD_LIBRARY)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
 
@@ -394,9 +399,11 @@ if (BUILD_SAMPLE)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
+  if (WIN32)
+      target_include_directories(sample_code PUBLIC ${HIDAPI_INCLUDE_DIR})
+  endif()
   
   target_link_libraries(sample_code
       wallet
@@ -428,10 +435,8 @@ if (BUILD_SAMPLE)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
   if (NOT WIN32)
@@ -466,9 +471,11 @@ if (BUILD_SCRATCHPAD)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
+  if (WIN32)
+    target_include_directories(scratchpad PUBLIC ${HIDAPI_INCLUDE_DIR})
+  endif()
   
   target_link_libraries(scratchpad
       wallet
@@ -500,10 +507,8 @@ if (BUILD_SCRATCHPAD)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
   if (NOT WIN32)
@@ -538,9 +543,11 @@ if (BUILD_TESTS)
       ${OPENSSL_INCLUDE_DIR}
       external/libsodium/include/sodium
       external/openssl-sdk/include
-      ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
+  if (WIN32)
+      target_include_directories(monero_tests PUBLIC ${HIDAPI_INCLUDE_DIR})
+  endif()
   
   target_link_libraries(monero_tests
       wallet
@@ -572,10 +579,8 @@ if (BUILD_TESTS)
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
-      ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
       ${SODIUM_LIBRARY}
-      ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
   if (NOT WIN32)

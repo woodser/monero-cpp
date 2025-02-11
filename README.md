@@ -181,15 +181,15 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     For example, install unbound:
     ```
     cd ~
-    wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.19.0.tar.gz
-    tar xzf unbound-1.19.0.tar.gz
+    wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz
+    tar xzf unbound-1.22.0.tar.gz
     sudo apt update
     sudo apt install -y build-essential
     sudo apt install -y libssl-dev
     sudo apt install -y libexpat1-dev
     sudo apt-get install -y bison
     sudo apt-get install -y flex
-    cd unbound-1.19.0
+    cd unbound-1.22.0
     ./configure --with-libexpat=/usr --with-ssl=/usr --enable-static-exe
     make
     sudo make install
@@ -201,15 +201,15 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
 ### macOS
 
 1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
-2. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for macOS to your home directory (e.g. `~/unbound-1.19.0`).
+2. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for macOS to your home directory (e.g. `~/unbound-1.22.0`).
 
     For example:
     ```
     cd ~
-    wget https://nlnetlabs.nl/downloads/unbound/unbound-1.19.0.tar.gz
-    tar xzf unbound-1.19.0.tar.gz
-    cd ~/unbound-1.19.0
-    ./configure --with-ssl=/opt/homebrew/Cellar/openssl@3/3.2.1/ --with-libexpat=/opt/homebrew/Cellar/expat/2.5.0
+    wget https://nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz
+    tar xzf unbound-1.22.0.tar.gz
+    cd ~/unbound-1.22.0
+    ./configure --with-ssl=/opt/homebrew/Cellar/openssl@3/3.4.0/ --with-libexpat=/opt/homebrew/Cellar/expat/2.6.4
     make
     sudo make install
     ```
@@ -226,7 +226,11 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     For 64 bit:
 
      ```
-     pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-boost mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb gettext base-devel mingw-w64-x86_64-icu
+     pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb gettext base-devel
+     wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-icu-75.1-1-any.pkg.tar.zst
+     pacman -U mingw-w64-x86_64-icu-75.1-1-any.pkg.tar.zst
+     wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-boost-1.85.0-4-any.pkg.tar.zst
+     pacman -U mingw-w64-x86_64-boost-1.85.0-4-any.pkg.tar.zst
      ```
 
      For 32 bit:
