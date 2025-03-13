@@ -359,13 +359,13 @@ if (BUILD_LIBRARY)
       ${EXTRA_LIBRARIES}
   )
 
-if (WIN32)
-    target_link_options(monero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
-endif()
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_options(monero-cpp PRIVATE "-z" "noexecstack")
-endif()
+  if (WIN32)
+      target_link_options(monero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
+  endif()
+  
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      target_link_options(monero-cpp PRIVATE "-z" "noexecstack")
+  endif()
 
   INSTALL(FILES src/daemon/monero_daemon.h
           src/daemon/monero_daemon_model.h
