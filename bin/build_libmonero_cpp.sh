@@ -183,7 +183,7 @@ else
         rm -rf build/$VERSION/release && 
         mkdir -p build/$VERSION/release && 
         cd build/$VERSION/release && 
-        cmake -D MON_VERSION=$VERSION ../../.. && 
+        cmake -D STATIC=$STATIC -D MON_VERSION=$VERSION ../../.. && 
         cmake --build . && 
         make -j$HOST_NCORES .
 
@@ -222,7 +222,7 @@ else
         rm -rf ../../build/$VERSION/release &&
         mkdir -p ../../build/$VERSION/release && 
         cd ../../build/$VERSION/release &&
-        cmake -j$HOST_NCORES -D MON_VERSION=$VERSION -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/contrib/depends/$VERSION/share/toolchain.cmake ../../.. && 
+        cmake -j$HOST_NCORES -D STATIC=$STATIC -D MON_VERSION=$VERSION -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/contrib/depends/$VERSION/share/toolchain.cmake ../../.. && 
         make -j$HOST_NCORES
     fi 
 fi
