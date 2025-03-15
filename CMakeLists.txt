@@ -297,7 +297,12 @@ set(
 
 
 if (BUILD_LIBRARY)
-  add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+  set(BUILD_TYPE "SHARED")
+  if (STATIC)
+    set(BUILD_TYPE "STATIC")
+  endif()
+  message(STATUS "The build type is: ${BUILD_TYPE}")
+  add_library(monero-cpp ${BUILD_TYPE} ${LIBRARY_SRC_FILES})
 
   target_include_directories(monero-cpp PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include

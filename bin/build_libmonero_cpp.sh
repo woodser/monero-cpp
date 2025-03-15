@@ -53,7 +53,7 @@ elif [ $CURRENT_OS == "Darwin" ]; then
     rm -rf build/$VERSION/release && 
     mkdir -p build/$VERSION/release && 
     cd build/$VERSION/release && 
-    cmake -D MON_VERSION=$VERSION ../../.. && 
+    cmake -DSTATIC=$STATIC -D MON_VERSION=$VERSION ../../.. && 
     cmake --build . 
 
 else
@@ -146,18 +146,22 @@ else
         mkdir -p build/darwin/release
         
         cd build/x86_64-apple-darwin11/release && 
-        cmake -j$HOST_NCORES -D MON_VERSION=x86_64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$X86_64_TOOLCHAIN ../../.. &&
+        cmake -j$HOST_NCORES -D STATIC=$STATIC -D MON_VERSION=x86_64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$X86_64_TOOLCHAIN ../../.. &&
         make -j$HOST_NCORES
         
         # Build monero-cpp arm64
         printf "\nBuilding aarch64 monero-cpp for Darwin\n"
         cd ../../aarch64-apple-darwin11/release && 
-        cmake -j$HOST_NCORES -D MON_VERSION=aarch64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$ARM64_TOOLCHAIN ../../.. &&
+        cmake -j$HOST_NCORES -D STATIC=$STATIC -D MON_VERSION=aarch64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$ARM64_TOOLCHAIN ../../.. &&
         make -j$HOST_NCORES
         
         # lipo the two builds together
         cd ../../..
-        ./external/monero-project/contrib/depends/${CURRENT_ARCH}-apple-darwin11/native/bin/${CURRENT_ARCH}-apple-darwin11-lipo -create -output build/darwin/release/libmonero-cpp.dylib build/x86_64-apple-darwin11/release/libmonero-cpp.dylib build/aarch64-apple-darwin11/release/libmonero-cpp.dylib
+        SUFFIX="dylib"
+        if [ -n STATIC ]; then
+            SUFFIX="a"
+        fi
+        ./external/monero-project/contrib/depends/${CURRENT_ARCH}-apple-darwin11/native/bin/${CURRENT_ARCH}-apple-darwin11-lipo -create -output build/darwin/release/libmonero-cpp.${SUFFIX} build/x86_64-apple-darwin11/release/libmonero-cpp.${SUFFIX} build/aarch64-apple-darwin11/release/libmonero-cpp.${SUFFIX}
 
     elif [ $CPU == $CURRENT_ARCH ] && [ $VENDOR == "linux" ]; then
         # Fast native build / No Depends
