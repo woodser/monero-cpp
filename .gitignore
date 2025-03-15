@@ -5,3 +5,6 @@
 
 /external-libs/
 /log_cpp_scratchpad.txt
+*.swp
+*.log
+
