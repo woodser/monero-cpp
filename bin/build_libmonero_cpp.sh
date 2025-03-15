@@ -10,17 +10,22 @@ if [[ $CURRENT_OS == "MINGW64_NT"* || $CURRENT_OS == "MSYS"* ]]; then
     VERSION="${CURRENT_ARCH}-W${bit}-${CURRENT_OS}"
 
     # monero-project 
-    bit=$(getconf LONG_BIT)
-    mkdir -p build/release
-    if [ "$bit" == "64" ]; then
-        make release-static-win64 -j$HOST_NCORES || exit 1
-    else
-        make release-static-win32 -j$HOST_NCORES || exit 1
+    if [ -z $SKIP_MP ]; then
+        bit=$(getconf LONG_BIT)
+        rm -rf build/release
+        rm -rf ../../external-libs/$VERSION/monero-project/
+        mkdir ../../external-libs/$VERSION/monero-project/
+        if [ "$bit" == "64" ]; then
+            make release-static-win64 -j$HOST_NCORES || exit 1
+        else
+            make release-static-win32 -j$HOST_NCORES || exit 1
+        fi
+        mv build/release ../../external-libs/$VERSION/monero-project/
     fi
-    mv build/release ../../external-libs/$VERSION/monero-project/
 
     # monero-cpp
     cd ../../
+    rm -rf build/$CURRENT_ARCH/release 
     mkdir -p build/$CURRENT_ARCH/release &&
     cd build/$CURRENT_ARCH/release &&
     cmake -DMON_VERSION=$VERSION ../../.. &&
@@ -33,21 +38,23 @@ elif [ $CURRENT_OS == "Darwin" ]; then
 
     # Build current architecture only.
     # monero-project
-    printf "\nBuilding native release static version of monero-project for ${VERSION}\n"
-    make release-static -j$HOST_NCORES || exit 1
-    rm -rf ../../external-libs/$VERSION/monero-project
-    mkdir -p ../../external-libs/$VERSION/monero-project/ &&
-    mv build/release ../../external-libs/$VERSION/monero-project/
-    cd ../..
+    if [ -z $SKIP_MP ]; then
+        printf "\nBuilding native release static version of monero-project for ${VERSION}\n"
+        rm -rf build/release 
+        make release-static -j$HOST_NCORES || exit 1
+        rm -rf ../../external-libs/$VERSION/monero-project
+        mkdir -p ../../external-libs/$VERSION/monero-project/ &&
+        mv build/release ../../external-libs/$VERSION/monero-project/
+    fi
 
     # monero-cpp
+    cd ../..
     printf "\nBuilding native Monero-cpp for ${VERSION}\n"
     rm -rf build/$VERSION/release && 
     mkdir -p build/$VERSION/release && 
     cd build/$VERSION/release && 
     cmake -D MON_VERSION=$VERSION ../../.. && 
-    cmake --build . && 
-    make -j$HOST_NCORES .
+    cmake --build . 
 
 else
     # Running on Linux
@@ -90,6 +97,7 @@ else
             printf "\nBuilding compilation dependencies for aarch64 Darwin\n"
             CUR_VERSION="aarch64-apple-darwin11" 
             cd contrib/depends &&
+            rm -rf "${CUR_VERSION}"
             make HOST=$CUR_VERSION -j$HOST_NCORES &&
             echo \
             "set(FRAMEWORK_DIR \"contrib/depends/$CUR_VERSION/native/SDK/System/Library/Frameworks\")" \
@@ -110,6 +118,7 @@ else
             printf "\nBuilding compilation dependencies for x86_64 Darwin\n"
             CUR_VERSION="x86_64-apple-darwin11" 
             cd contrib/depends &&
+            rm -rf "${CUR_VERSION}"
             make HOST=$CUR_VERSION -j$HOST_NCORES &&
             echo \
             "set(FRAMEWORK_DIR \"contrib/depends/$CUR_VERSION/native/SDK/System/Library/Frameworks\")" \
@@ -118,7 +127,7 @@ else
 
             # build monero-project
             printf "\nBuilding monero-project for x86_64 Darwin\n"
-            mkdir -p build/release && cd build/release &&
+            rm -rf build/release && mkdir -p build/release && cd build/release &&
             cmake -j$HOST_NCORES -D STATIC=ON -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=../../$X86_64_TOOLCHAIN ../.. &&
             make -j$HOST_NCORES &&
             rm -rf ../../../../external-libs/$CUR_VERSION/monero-project
@@ -158,6 +167,7 @@ else
         # Build current architecture only.
         # monero-project
         printf "\nBuilding native release static version of monero-project for ${VERSION}\n"
+        rm -rf build/release 
         make release-static USE_SINGLE_BUILDDIR=1 -j$HOST_NCORES || exit 1
         rm -rf ../../external-libs/$VERSION/monero-project
         mkdir -p ../../external-libs/$VERSION/monero-project/ &&
@@ -184,6 +194,7 @@ else
         if [ -z $SKIP_MP ]; then
             printf "\nBuilding compilation dependencies\n"
             cd contrib/depends &&
+            rm -rf "${VERSION}"
             make HOST=$VERSION -j$HOST_NCORES &&
             if [ $OS == "darwin11" ]; then
                 echo \
@@ -194,7 +205,7 @@ else
 
             # Build monero-project
             printf "\nBuilding monero-project for ${VERSION}\n"
-            mkdir -p build/release && cd build/release &&
+            rm -rf build/release && mkdir -p build/release && cd build/release &&
             cmake -j$HOST_NCORES -D STATIC=ON -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=../../contrib/depends/$VERSION/share/toolchain.cmake ../.. &&
             make -j$HOST_NCORES &&
             rm -rf ../../../../external-libs/$VERSION/monero-project
