@@ -28,7 +28,7 @@ if [[ $CURRENT_OS == "MINGW64_NT"* || $CURRENT_OS == "MSYS"* ]]; then
     rm -rf build/$CURRENT_ARCH/release 
     mkdir -p build/$CURRENT_ARCH/release &&
     cd build/$CURRENT_ARCH/release &&
-    cmake -DMON_VERSION=$VERSION ../../.. &&
+    cmake -DARCHIVE=$STATIC -DMON_VERSION=$VERSION ../../.. &&
     cmake --build . &&
     make -j$HOST_NCORES .
 
@@ -53,7 +53,7 @@ elif [ $CURRENT_OS == "Darwin" ]; then
     rm -rf build/$VERSION/release && 
     mkdir -p build/$VERSION/release && 
     cd build/$VERSION/release && 
-    cmake -DSTATIC=$STATIC -D MON_VERSION=$VERSION ../../.. && 
+    cmake -DARCHIVE=$STATIC -D MON_VERSION=$VERSION ../../.. && 
     cmake --build . 
 
 else
@@ -146,19 +146,19 @@ else
         mkdir -p build/darwin/release
         
         cd build/x86_64-apple-darwin11/release && 
-        cmake -j$HOST_NCORES -D STATIC=$STATIC -D MON_VERSION=x86_64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$X86_64_TOOLCHAIN ../../.. &&
+        cmake -j$HOST_NCORES -D ARCHIVE=$STATIC -D MON_VERSION=x86_64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$X86_64_TOOLCHAIN ../../.. &&
         make -j$HOST_NCORES
         
         # Build monero-cpp arm64
         printf "\nBuilding aarch64 monero-cpp for Darwin\n"
         cd ../../aarch64-apple-darwin11/release && 
-        cmake -j$HOST_NCORES -D STATIC=$STATIC -D MON_VERSION=aarch64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$ARM64_TOOLCHAIN ../../.. &&
+        cmake -j$HOST_NCORES -D ARCHIVE=$STATIC -D MON_VERSION=aarch64-apple-darwin11 -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/$ARM64_TOOLCHAIN ../../.. &&
         make -j$HOST_NCORES
         
         # lipo the two builds together
         cd ../../..
         SUFFIX="dylib"
-        if [ -n STATIC ]; then
+        if [ -n "$STATIC" ]; then
             SUFFIX="a"
         fi
         ./external/monero-project/contrib/depends/${CURRENT_ARCH}-apple-darwin11/native/bin/${CURRENT_ARCH}-apple-darwin11-lipo -create -output build/darwin/release/libmonero-cpp.${SUFFIX} build/x86_64-apple-darwin11/release/libmonero-cpp.${SUFFIX} build/aarch64-apple-darwin11/release/libmonero-cpp.${SUFFIX}
@@ -183,7 +183,7 @@ else
         rm -rf build/$VERSION/release && 
         mkdir -p build/$VERSION/release && 
         cd build/$VERSION/release && 
-        cmake -D STATIC=$STATIC -D MON_VERSION=$VERSION ../../.. && 
+        cmake -D ARCHIVE=$STATIC -D MON_VERSION=$VERSION ../../.. && 
         cmake --build . && 
         make -j$HOST_NCORES .
 
@@ -222,7 +222,7 @@ else
         rm -rf ../../build/$VERSION/release &&
         mkdir -p ../../build/$VERSION/release && 
         cd ../../build/$VERSION/release &&
-        cmake -j$HOST_NCORES -D STATIC=$STATIC -D MON_VERSION=$VERSION -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/contrib/depends/$VERSION/share/toolchain.cmake ../../.. && 
+        cmake -j$HOST_NCORES -D ARCHIVE=$STATIC -D MON_VERSION=$VERSION -D CMAKE_TOOLCHAIN_FILE=../../../external/monero-project/contrib/depends/$VERSION/share/toolchain.cmake ../../.. && 
         make -j$HOST_NCORES
     fi 
 fi

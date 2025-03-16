@@ -298,7 +298,7 @@ set(
 
 if (BUILD_LIBRARY)
   set(BUILD_TYPE "SHARED")
-  if (STATIC)
+  if (ARCHIVE)
     set(BUILD_TYPE "STATIC")
   endif()
   message(STATUS "The build type is: ${BUILD_TYPE}")
