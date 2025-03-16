@@ -60,7 +60,6 @@ else
     # Running on Linux
     # "OS" will be used as if it is called "WRAPPER"
 
-    rm -rf build
     BUILD_BOTH_ARCHS=0
     OS=""
     VENDOR=""
@@ -113,7 +112,7 @@ else
             mkdir -p ../../../../external-libs/$CUR_VERSION/monero-project/ &&
             cd ../.. && mv build/release ../../external-libs/$CUR_VERSION/monero-project/
     
-            # build monero-x64_64
+            # build monero-x86_64
             # Make dependencies
             printf "\nBuilding compilation dependencies for x86_64 Darwin\n"
             CUR_VERSION="x86_64-apple-darwin11" 
