@@ -7,14 +7,14 @@ cd ./external/monero-project/ || exit 1
 git submodule update --init --force || exit 1
 HOST_NCORES=$(nproc 2>/dev/null || shell nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 1)
 if [[ $CURRENT_OS == "MINGW64_NT"* || $CURRENT_OS == "MSYS"* ]]; then
-    VERSION="${CURRENT_ARCH}-W${bit}-${CURRENT_OS}"
+    bit=$(getconf LONG_BIT)
+    VERSION="${CURRENT_ARCH}-W${bit}-mingw32"
 
     # monero-project 
     if [ -z $SKIP_MP ]; then
-        bit=$(getconf LONG_BIT)
         rm -rf build/release
         rm -rf ../../external-libs/$VERSION/monero-project/
-        mkdir ../../external-libs/$VERSION/monero-project/
+        mkdir -p ../../external-libs/$VERSION/monero-project/
         if [ "$bit" == "64" ]; then
             make release-static-win64 -j$HOST_NCORES || exit 1
         else
@@ -25,12 +25,11 @@ if [[ $CURRENT_OS == "MINGW64_NT"* || $CURRENT_OS == "MSYS"* ]]; then
 
     # monero-cpp
     cd ../../
-    rm -rf build/$CURRENT_ARCH/release 
-    mkdir -p build/$CURRENT_ARCH/release &&
-    cd build/$CURRENT_ARCH/release &&
+    rm -rf build/$VERSION/release 
+    mkdir -p build/$VERSION/release &&
+    cd build/$VERSION/release &&
     cmake -DARCHIVE=$STATIC -DMON_VERSION=$VERSION ../../.. &&
-    cmake --build . &&
-    make -j$HOST_NCORES .
+    cmake --build .
 
 elif [ $CURRENT_OS == "Darwin" ]; then
 
@@ -70,9 +69,10 @@ else
         if [ -z "${ARCH}" ]; then
             BUILD_BOTH_ARCHS=1
         fi
-    elif [ "${TARGET}" == "MSYS" ] || [ "${TARGET}" == "MINGW64_NT" ]; then
+    elif [ "${TARGET}" == "MSYS"* ] || [ "${TARGET}" == "MINGW64_NT"* ]; then
+    	bit=$(getconf LONG_BIT)
         OS="mingw32"
-        VENDOR="w64"
+        VENDOR="W${bit}"
     else
         OS="gnu"
         VENDOR="linux"
