@@ -2,20 +2,36 @@ list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 cmake_minimum_required(VERSION 3.4.1)
 
+# if (NOT (${TARGET} STREQUAL CMAKE_HOST_SYSTEM_NAME))
+  # set(DEPENDS TRUE)
+# endif()
+
+project(MoneroCppLibrary)
+
 if (WIN32)
   add_definitions( "-D_GLIBCXX_USE_NANOSLEEP=1" ) # "'sleep_for' is not a member of 'std::this_thread'" in gcc 4.7/4.8
   add_definitions( "-DWIN32_LEAN_AND_MEAN" )
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wa,-mbig-obj -O2 -fPIC -std=c++14 -F/Library/Frameworks -pthread -lcrypto -lcrypt32 -lbcrypt") 
 else()
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread")
+  if (NOT (${MON_VERSION} MATCHES "linux") AND DEPENDS)
+    set(CMAKE_CXX_COMPILER_FORCED True)
+  endif()
+  message(STATUS "Target inside of cpp cmakelists is ${MON_VERSION}")
+  if (${MON_VERSION} MATCHES "darwin" AND CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "Cross compiling from Linux to MacOS")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F${CMAKE_SOURCE_DIR}/external/monero-project/contrib/depends/${FRAMEWORK_DIR} -pthread")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread")
+    message(STATUS "Setting default CFLAGS=${CMAKE_CXX_FLAGS}")
+  endif()
 endif()
+
 
 #SET(CMAKE_C_COMPILER /path/to/c/compiler)
 #SET(CMAKE_CXX_COMPILER /path/to/cpp/compiler)
 #SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=address")
 #SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC -std=c++14 -F/Library/Frameworks -pthread -fsanitize=address")    # TODO: way to enable sanitize?  get runtime error with this on
 
-project(MoneroCppLibrary)
 
 set(BUILD_LIBRARY ON)
 set(BUILD_SAMPLE OFF)
@@ -28,9 +44,6 @@ set(BUILD_TESTS OFF)
 
 set(MONERO_PROJECT "${CMAKE_SOURCE_DIR}/external/monero-project" CACHE STRING "Monero project source directory")
 set(MONERO_PROJECT_SRC "${MONERO_PROJECT}/src")
-
-set(EXTERNAL_LIBS_DIR ${CMAKE_SOURCE_DIR}/external-libs)
-message(STATUS EXTERNAL_LIBS_DIR : ${EXTERNAL_LIBS_DIR})
 
 ####################
 # Extra libraries
@@ -133,9 +146,8 @@ add_definitions(-DHAVE_HIDAPI)
 # Monero
 #############
 
-set(MONERO_PROJECT_BUILD "${MONERO_PROJECT}/build/release" CACHE STRING "Monero project build directory")
+set(MONERO_PROJECT_BUILD "${CMAKE_SOURCE_DIR}/external-libs/${MON_VERSION}/monero-project/release" CACHE STRING "Monero project build directory")
 message(STATUS "Using monero-project build: " ${MONERO_PROJECT_BUILD})
-
 list(APPEND CMAKE_MODULE_PATH "${MONERO_PROJECT}/cmake")
 
 add_library(wallet STATIC IMPORTED)
@@ -179,6 +191,10 @@ else()
     message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
   endif()
 endif()
+
+############
+# Misc Libs
+############
 
 add_library(rpc_base STATIC IMPORTED)
 set_target_properties(rpc_base PROPERTIES IMPORTED_LOCATION
@@ -279,8 +295,14 @@ set(
     src/wallet/monero_wallet_full.cpp
 )
 
+
 if (BUILD_LIBRARY)
-  add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+  set(BUILD_TYPE "SHARED")
+  if (ARCHIVE)
+    set(BUILD_TYPE "STATIC")
+  endif()
+  message(STATUS "The build type is: ${BUILD_TYPE}")
+  add_library(monero-cpp ${BUILD_TYPE} ${LIBRARY_SRC_FILES})
 
   target_include_directories(monero-cpp PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -342,13 +364,13 @@ if (BUILD_LIBRARY)
       ${EXTRA_LIBRARIES}
   )
 
-if (WIN32)
-    target_link_options(monero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
-endif()
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_link_options(monero-cpp PRIVATE "-z" "noexecstack")
-endif()
+  if (WIN32)
+      target_link_options(monero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
+  endif()
+  
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      target_link_options(monero-cpp PRIVATE "-z" "noexecstack")
+  endif()
 
   INSTALL(FILES src/daemon/monero_daemon.h
           src/daemon/monero_daemon_model.h
