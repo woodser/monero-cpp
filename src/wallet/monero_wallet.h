@@ -469,7 +469,7 @@ namespace monero {
     /**
      * Start background synchronizing with a maximum period between syncs.
      *
-     * @param syncPeriodInMs - maximum period between syncs in milliseconds
+     * @param sync_period_in_ms - maximum period between syncs in milliseconds
      */
     virtual void start_syncing(uint64_t sync_period_in_ms = 10000) {
       throw std::runtime_error("start_syncing() not supported");
@@ -485,7 +485,7 @@ namespace monero {
     /**
      * Scan transactions by their hash/id.
      *
-     * @param txHashes - tx hashes to scan
+     * @param tx_hashes - tx hashes to scan
      */
     virtual void scan_txs(const std::vector<std::string>& tx_hashes) {
       throw std::runtime_error("scan_txs() not supported");
@@ -895,7 +895,7 @@ namespace monero {
     /**
      * Relay a transaction previously created without relaying.
      *
-     * @param txMetadata is transaction metadata previously created without relaying
+     * @param tx_metadata is transaction metadata previously created without relaying
      * @return std::string is the hash of the relayed tx
      */
     virtual std::string relay_tx(const std::string& tx_metadata) {
@@ -1109,7 +1109,7 @@ namespace monero {
      * Get notes for multiple transactions.
      *
      * @param tx_hashes identify the transactions to get notes for
-     * @preturns notes for the transactions
+     * @returns notes for the transactions
      */
     virtual std::vector<std::string> get_tx_notes(const std::vector<std::string>& tx_hashes) const {
       throw std::runtime_error("get_tx_notes() not supported");
@@ -1288,7 +1288,7 @@ namespace monero {
      *
      * @param multisig_hexes are multisig hex from each participant
      * @param threshold is the number of signatures needed to sign transfers
-     * @password is the wallet password
+     * @param password is the wallet password
      * @return this wallet's multisig hex to share with participants
      */
     virtual std::string make_multisig(const std::vector<std::string>& multisig_hexes, int threshold, const std::string& password) {
@@ -1304,7 +1304,7 @@ namespace monero {
      * @param password is the wallet's password // TODO monero-project: redundant? wallet is created with password
      * @return the result which has the multisig's address xor this wallet's multisig hex to share with participants iff not done
      */
-    virtual monero_multisig_init_result exchange_multisig_keys(const std::vector<std::string>& mutisig_hexes, const std::string& password) {
+    virtual monero_multisig_init_result exchange_multisig_keys(const std::vector<std::string>& multisig_hexes, const std::string& password) {
       throw std::runtime_error("exchange_multisig_keys() not supported");
     }
 

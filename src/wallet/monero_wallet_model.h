@@ -415,7 +415,7 @@ namespace monero {
   };
 
   /**
-   * Enumerates message verification results.
+   * Models results from message verification.
    */
   struct monero_message_signature_result : public serializable_struct {
     bool m_is_good;
