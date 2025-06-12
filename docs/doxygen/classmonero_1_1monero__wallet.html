@@ -339,8 +339,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a8f9b31c8abcbb90caf1c4c00538dbf83"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04d5bd95d2c595a103186cb116c6bbd3" id="r_a04d5bd95d2c595a103186cb116c6bbd3"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a04d5bd95d2c595a103186cb116c6bbd3">make_multisig</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes, int threshold, const std::string &amp;password)</td></tr>
 <tr class="separator:a04d5bd95d2c595a103186cb116c6bbd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4beda75204b90456861a546068a8f674" id="r_a4beda75204b90456861a546068a8f674"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__multisig__init__result.html">monero_multisig_init_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4beda75204b90456861a546068a8f674">exchange_multisig_keys</a> (const std::vector&lt; std::string &gt; &amp;mutisig_hexes, const std::string &amp;password)</td></tr>
-<tr class="separator:a4beda75204b90456861a546068a8f674"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a168ce5edf0a5c6e566844c64373c3462" id="r_a168ce5edf0a5c6e566844c64373c3462"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__multisig__init__result.html">monero_multisig_init_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a168ce5edf0a5c6e566844c64373c3462">exchange_multisig_keys</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes, const std::string &amp;password)</td></tr>
+<tr class="separator:a168ce5edf0a5c6e566844c64373c3462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad512fb648e9166d0f9ee910271fcdb55" id="r_ad512fb648e9166d0f9ee910271fcdb55"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad512fb648e9166d0f9ee910271fcdb55">export_multisig_hex</a> ()</td></tr>
 <tr class="separator:ad512fb648e9166d0f9ee910271fcdb55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0a94fabc50dc0430ada729a8de07aaeb" id="r_a0a94fabc50dc0430ada729a8de07aaeb"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a94fabc50dc0430ada729a8de07aaeb">import_multisig_hex</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes)</td></tr>
@@ -1029,8 +1029,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a4beda75204b90456861a546068a8f674" name="a4beda75204b90456861a546068a8f674"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4beda75204b90456861a546068a8f674">&#9670;&#160;</a></span>exchange_multisig_keys()</h2>
+<a id="a168ce5edf0a5c6e566844c64373c3462" name="a168ce5edf0a5c6e566844c64373c3462"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a168ce5edf0a5c6e566844c64373c3462">&#9670;&#160;</a></span>exchange_multisig_keys()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1041,7 +1041,7 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual <a class="el" href="structmonero_1_1monero__multisig__init__result.html">monero_multisig_init_result</a> monero::monero_wallet::exchange_multisig_keys </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>mutisig_hexes</em></span>, </td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>multisig_hexes</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1066,7 +1066,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result which has the multisig's address xor this wallet's multisig hex to share with participants iff not done </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a81a82cf9c9b0987668b13588b8ced11b">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#abe242ba427c0d8169732129c4e1095c2">monero::monero_wallet_full</a>.</p>
 
 </div>
 </div>
@@ -2681,10 +2681,11 @@ Public Member Functions</h2></td></tr>
 <p>Get notes for multiple transactions.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tx_hashes</td><td>identify the transactions to get notes for @preturns notes for the transactions </td></tr>
+    <tr><td class="paramname">tx_hashes</td><td>identify the transactions to get notes for </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>notes for the transactions </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af0d4acb81d4931e16b6ee80aaea1e407">monero::monero_wallet_full</a>.</p>
 
@@ -3311,7 +3312,8 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">multisig_hexes</td><td>are multisig hex from each participant </td></tr>
-    <tr><td class="paramname">threshold</td><td>is the number of signatures needed to sign transfers @password is the wallet password </td></tr>
+    <tr><td class="paramname">threshold</td><td>is the number of signatures needed to sign transfers </td></tr>
+    <tr><td class="paramname">password</td><td>is the wallet password </td></tr>
   </table>
   </dd>
 </dl>
@@ -3482,7 +3484,7 @@ Public Member Functions</h2></td></tr>
 <p>Relay a transaction previously created without relaying.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">txMetadata</td><td>is transaction metadata previously created without relaying </td></tr>
+    <tr><td class="paramname">tx_metadata</td><td>is transaction metadata previously created without relaying </td></tr>
   </table>
   </dd>
 </dl>
@@ -3704,7 +3706,7 @@ Public Member Functions</h2></td></tr>
 <p>Scan transactions by their hash/id.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">txHashes</td><td>- tx hashes to scan </td></tr>
+    <tr><td class="paramname">tx_hashes</td><td>- tx hashes to scan </td></tr>
   </table>
   </dd>
 </dl>
@@ -4208,7 +4210,7 @@ Public Member Functions</h2></td></tr>
 <p>Start background synchronizing with a maximum period between syncs.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">syncPeriodInMs</td><td>- maximum period between syncs in milliseconds </td></tr>
+    <tr><td class="paramname">sync_period_in_ms</td><td>- maximum period between syncs in milliseconds </td></tr>
   </table>
   </dd>
 </dl>
