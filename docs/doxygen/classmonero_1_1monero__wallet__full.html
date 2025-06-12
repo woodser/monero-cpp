@@ -318,8 +318,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0e2e12d8e7613569197029a4b0785478"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac28b11afbadc722da14b46302a061c03" id="r_ac28b11afbadc722da14b46302a061c03"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac28b11afbadc722da14b46302a061c03">make_multisig</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes, int threshold, const std::string &amp;password) override</td></tr>
 <tr class="separator:ac28b11afbadc722da14b46302a061c03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a81a82cf9c9b0987668b13588b8ced11b" id="r_a81a82cf9c9b0987668b13588b8ced11b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmonero_1_1monero__multisig__init__result.html">monero_multisig_init_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a81a82cf9c9b0987668b13588b8ced11b">exchange_multisig_keys</a> (const std::vector&lt; std::string &gt; &amp;mutisig_hexes, const std::string &amp;password) override</td></tr>
-<tr class="separator:a81a82cf9c9b0987668b13588b8ced11b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe242ba427c0d8169732129c4e1095c2" id="r_abe242ba427c0d8169732129c4e1095c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmonero_1_1monero__multisig__init__result.html">monero_multisig_init_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abe242ba427c0d8169732129c4e1095c2">exchange_multisig_keys</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes, const std::string &amp;password) override</td></tr>
+<tr class="separator:abe242ba427c0d8169732129c4e1095c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad33f5a21522a6c17205cbcf11dd83ca4" id="r_ad33f5a21522a6c17205cbcf11dd83ca4"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad33f5a21522a6c17205cbcf11dd83ca4">export_multisig_hex</a> () override</td></tr>
 <tr class="separator:ad33f5a21522a6c17205cbcf11dd83ca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24bc88e60c6863fb8f5b526f0acdd47a" id="r_a24bc88e60c6863fb8f5b526f0acdd47a"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a24bc88e60c6863fb8f5b526f0acdd47a">import_multisig_hex</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes) override</td></tr>
@@ -1068,8 +1068,8 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 
 </div>
 </div>
-<a id="a81a82cf9c9b0987668b13588b8ced11b" name="a81a82cf9c9b0987668b13588b8ced11b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a81a82cf9c9b0987668b13588b8ced11b">&#9670;&#160;</a></span>exchange_multisig_keys()</h2>
+<a id="abe242ba427c0d8169732129c4e1095c2" name="abe242ba427c0d8169732129c4e1095c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe242ba427c0d8169732129c4e1095c2">&#9670;&#160;</a></span>exchange_multisig_keys()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1080,7 +1080,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
         <tr>
           <td class="memname"><a class="el" href="structmonero_1_1monero__multisig__init__result.html">monero_multisig_init_result</a> monero::monero_wallet_full::exchange_multisig_keys </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>mutisig_hexes</em></span>, </td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>multisig_hexes</em></span>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1105,7 +1105,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result which has the multisig's address xor this wallet's multisig hex to share with participants iff not done </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a4beda75204b90456861a546068a8f674">monero::monero_wallet</a>.</p>
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a168ce5edf0a5c6e566844c64373c3462">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
@@ -2543,10 +2543,11 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <p>Get notes for multiple transactions.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">tx_hashes</td><td>identify the transactions to get notes for @preturns notes for the transactions </td></tr>
+    <tr><td class="paramname">tx_hashes</td><td>identify the transactions to get notes for </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>notes for the transactions </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a0855313ace0bfc356f1211ada701f340">monero::monero_wallet</a>.</p>
 
@@ -3145,7 +3146,8 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">multisig_hexes</td><td>are multisig hex from each participant </td></tr>
-    <tr><td class="paramname">threshold</td><td>is the number of signatures needed to sign transfers @password is the wallet password </td></tr>
+    <tr><td class="paramname">threshold</td><td>is the number of signatures needed to sign transfers </td></tr>
+    <tr><td class="paramname">password</td><td>is the wallet password </td></tr>
   </table>
   </dd>
 </dl>
@@ -3545,7 +3547,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <p>Scan transactions by their hash/id.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">txHashes</td><td>- tx hashes to scan </td></tr>
+    <tr><td class="paramname">tx_hashes</td><td>- tx hashes to scan </td></tr>
   </table>
   </dd>
 </dl>
@@ -4049,7 +4051,7 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <p>Start background synchronizing with a maximum period between syncs.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">syncPeriodInMs</td><td>- maximum period between syncs in milliseconds </td></tr>
+    <tr><td class="paramname">sync_period_in_ms</td><td>- maximum period between syncs in milliseconds </td></tr>
   </table>
   </dd>
 </dl>
