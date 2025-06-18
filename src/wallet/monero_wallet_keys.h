@@ -54,6 +54,8 @@
 
 #include "monero_wallet.h"
 #include "cryptonote_basic/account.h"
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
 
 using namespace monero;
 
@@ -61,7 +63,24 @@ using namespace monero;
  * Public library interface.
  */
 namespace monero {
+  class monero_key_image_cache {
+  public:
+    //const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr
+    std::shared_ptr<monero_key_image> get(const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr);
+    std::shared_ptr<monero_key_image> get(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0);
 
+    void set(std::shared_ptr<monero_key_image> key_image, const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr, bool requested = false);
+    void set(std::shared_ptr<monero_key_image> key_image, const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0, bool requested = false);
+
+    bool request(const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr);
+    bool request(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx);
+    void set_request(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0, bool request = true);
+
+  private:
+    serializable_unordered_map<crypto::public_key, serializable_unordered_map<uint64_t, serializable_unordered_map<cryptonote::subaddress_index, std::pair<std::shared_ptr<monero_key_image>, bool> >>> m_cache;
+    mutable boost::mutex m_mutex;
+  };
+  
   /**
    * Implements a Monero wallet to provide basic key management.
    */
@@ -130,7 +149,7 @@ namespace monero {
 
     // --------------------------------- PRIVATE --------------------------------
 
-  private:
+  protected:
     bool m_is_view_only;
     monero_network_type m_network_type;
     cryptonote::account_base m_account;
@@ -141,7 +160,25 @@ namespace monero {
     std::string m_pub_spend_key;
     std::string m_prv_spend_key;
     std::string m_primary_address;
+    mutable monero_key_image_cache m_generated_key_images;
 
-    void init_common();
+    virtual void init_common();
+    cryptonote::network_type get_nettype() const { return m_network_type == monero_network_type::TESTNET ? cryptonote::network_type::TESTNET : m_network_type == monero_network_type::STAGENET ? cryptonote::network_type::STAGENET : cryptonote::network_type::MAINNET; };
+
+    bool key_on_device() const;
+
+    monero_key_image generate_key_image(const std::string &tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+    monero_key_image generate_key_image(const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+    std::pair<crypto::key_image, crypto::signature> generate_key_image_for_enote(const crypto::public_key &ephem_pubkey, const size_t tx_output_index, const cryptonote::subaddress_index &received_subaddr) const;
+    bool key_image_is_ours(crypto::key_image &key_image, const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+    bool key_image_is_ours(std::string &key_image, const std::string& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+
+    std::string encrypt(const char *plaintext, size_t len, const crypto::secret_key &skey, bool authenticated = true) const;
+    std::string encrypt(const std::string &plaintext, const crypto::secret_key &skey, bool authenticated = true) const;
+    std::string encrypt_with_private_view_key(const std::string &plaintext, bool authenticated = true) const;
+
+    template<typename T=std::string> T decrypt(const std::string &ciphertext, const crypto::secret_key &skey, bool authenticated = true) const;
+    std::string decrypt_with_private_view_key(const std::string &ciphertext, bool authenticated = true) const;
+
   };
 }
