@@ -274,9 +274,11 @@ set(
     src/utils/monero_utils.cpp
     src/daemon/monero_daemon_model.cpp
     src/daemon/monero_daemon.cpp
+    src/daemon/monero_daemon_rpc.cpp
     src/wallet/monero_wallet_model.cpp
     src/wallet/monero_wallet_keys.cpp
     src/wallet/monero_wallet_full.cpp
+    src/wallet/monero_wallet_rpc.cpp
 )
 
 if (BUILD_LIBRARY)
@@ -351,6 +353,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 
   INSTALL(FILES src/daemon/monero_daemon.h
+          src/daemon/monero_daemon_rpc.h
           src/daemon/monero_daemon_model.h
           DESTINATION include/daemon)
   INSTALL(FILES src/utils/gen_utils.h
@@ -359,6 +362,7 @@ endif()
   INSTALL(FILES src/wallet/monero_wallet_full.h
           src/wallet/monero_wallet.h
           src/wallet/monero_wallet_keys.h
+          src/wallet/monero_wallet_rpc.h
           src/wallet/monero_wallet_model.h
           DESTINATION include/wallet)
   INSTALL(TARGETS monero-cpp
