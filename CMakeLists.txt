@@ -1,6 +1,6 @@
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-cmake_minimum_required(VERSION 3.4.1)
+cmake_minimum_required(VERSION 3.5)
 
 if (WIN32)
   add_definitions( "-D_GLIBCXX_USE_NANOSLEEP=1" ) # "'sleep_for' is not a member of 'std::this_thread'" in gcc 4.7/4.8
@@ -18,9 +18,9 @@ endif()
 project(MoneroCppLibrary)
 
 set(BUILD_LIBRARY ON)
-set(BUILD_SAMPLE OFF)
-set(BUILD_SCRATCHPAD OFF)
-set(BUILD_TESTS OFF)
+set(BUILD_SAMPLE ON)
+set(BUILD_SCRATCHPAD ON)
+set(BUILD_TESTS ON)
 
 ###################
 # monero-project
