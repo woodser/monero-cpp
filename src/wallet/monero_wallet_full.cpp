@@ -3869,9 +3869,6 @@ namespace monero {
       throw;
     }
 
-    // find and save rings
-    m_w2->find_and_save_rings(false);
-
     // notify listeners of sync end and check for updated funds
     m_w2_listener->on_sync_end();
     return result;
