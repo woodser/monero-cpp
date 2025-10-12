@@ -118,6 +118,7 @@ namespace monero {
     if (m_uri != boost::none) monero_utils::add_json_member("uri", m_uri.get(), allocator, root, value_str);
     if (m_username != boost::none) monero_utils::add_json_member("username", m_username.get(), allocator, root, value_str);
     if (m_password != boost::none) monero_utils::add_json_member("password", m_password.get(), allocator, root, value_str);
+    if (m_proxy_uri != boost::none) monero_utils::add_json_member("proxy_uri", m_proxy_uri.get(), allocator, root, value_str);
 
     // return root
     return root;
@@ -130,6 +131,7 @@ namespace monero {
       if (key == std::string("uri")) connection.m_uri = it->second.data();
       else if (key == std::string("username")) connection.m_username = it->second.data();
       else if (key == std::string("password")) connection.m_password = it->second.data();
+      else if (key == std::string("proxy_uri")) connection.m_proxy_uri = it->second.data();
     }
     return connection;
   }

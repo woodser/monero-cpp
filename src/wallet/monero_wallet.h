@@ -145,8 +145,9 @@ namespace monero {
      * @param uri is the daemon's URI
      * @param username is the username to authenticate with the daemon (optional)
      * @param password is the password to authenticate with the daemon (optional)
+     * @param proxy_uri is the proxy to the daemon (e.g. over Tor).
      */
-    virtual void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "") {
+    virtual void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "") {
       throw std::runtime_error("set_daemon_connection() not supported");
     }
 
@@ -157,13 +158,6 @@ namespace monero {
      */
     virtual void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
       throw std::runtime_error("set_daemon_connection() not supported");
-    }
-
-    /**
-     * Set the Tor proxy to the daemon.
-     */
-    virtual void set_daemon_proxy(const std::string& uri = "") {
-      throw std::runtime_error("set_daemon_proxy() not supported");
     }
 
     /**
