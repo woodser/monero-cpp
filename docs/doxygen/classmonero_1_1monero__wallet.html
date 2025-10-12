@@ -113,12 +113,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac8a0a50f23cf2b6a611ca5ecc2a907ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93fa8c7bce2de04a771618378ebebe4f" id="r_a93fa8c7bce2de04a771618378ebebe4f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93fa8c7bce2de04a771618378ebebe4f">is_view_only</a> () const</td></tr>
 <tr class="separator:a93fa8c7bce2de04a771618378ebebe4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d048f27f904555d63db208daf88d5ca" id="r_a8d048f27f904555d63db208daf88d5ca"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8d048f27f904555d63db208daf88d5ca">set_daemon_connection</a> (const std::string &amp;uri, const std::string &amp;username=&quot;&quot;, const std::string &amp;password=&quot;&quot;)</td></tr>
-<tr class="separator:a8d048f27f904555d63db208daf88d5ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa57e732a37d70af23c24b43decc2baa0" id="r_aa57e732a37d70af23c24b43decc2baa0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa57e732a37d70af23c24b43decc2baa0">set_daemon_connection</a> (const std::string &amp;uri, const std::string &amp;username=&quot;&quot;, const std::string &amp;password=&quot;&quot;, const std::string &amp;proxy_uri=&quot;&quot;)</td></tr>
+<tr class="separator:aa57e732a37d70af23c24b43decc2baa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadd20ff644751c3f8690cf1798103886" id="r_aadd20ff644751c3f8690cf1798103886"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aadd20ff644751c3f8690cf1798103886">set_daemon_connection</a> (const boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;connection)</td></tr>
 <tr class="separator:aadd20ff644751c3f8690cf1798103886"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b87b99b509637f14d2d3516e6bef2c9" id="r_a6b87b99b509637f14d2d3516e6bef2c9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6b87b99b509637f14d2d3516e6bef2c9">set_daemon_proxy</a> (const std::string &amp;uri=&quot;&quot;)</td></tr>
-<tr class="separator:a6b87b99b509637f14d2d3516e6bef2c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf6b4b721b18a9b66e54a78deb9d7c85" id="r_aaf6b4b721b18a9b66e54a78deb9d7c85"><td class="memItemLeft" align="right" valign="top">virtual boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf6b4b721b18a9b66e54a78deb9d7c85">get_daemon_connection</a> () const</td></tr>
 <tr class="separator:aaf6b4b721b18a9b66e54a78deb9d7c85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78d5a9303854a743333d1ba226a673c1" id="r_a78d5a9303854a743333d1ba226a673c1"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78d5a9303854a743333d1ba226a673c1">is_connected_to_daemon</a> () const</td></tr>
@@ -3788,8 +3786,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a8d048f27f904555d63db208daf88d5ca" name="a8d048f27f904555d63db208daf88d5ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d048f27f904555d63db208daf88d5ca">&#9670;&#160;</a></span>set_daemon_connection() <span class="overload">[2/2]</span></h2>
+<a id="aa57e732a37d70af23c24b43decc2baa0" name="aa57e732a37d70af23c24b43decc2baa0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa57e732a37d70af23c24b43decc2baa0">&#9670;&#160;</a></span>set_daemon_connection() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3810,7 +3808,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>password</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>password</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>proxy_uri</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -3825,39 +3828,12 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">uri</td><td>is the daemon's URI </td></tr>
     <tr><td class="paramname">username</td><td>is the username to authenticate with the daemon (optional) </td></tr>
     <tr><td class="paramname">password</td><td>is the password to authenticate with the daemon (optional) </td></tr>
+    <tr><td class="paramname">proxy_uri</td><td>is the proxy to the daemon (e.g. over Tor). </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#afa2fdb0edca4f399822d5b6bf226cecc">monero::monero_wallet_full</a>.</p>
-
-</div>
-</div>
-<a id="a6b87b99b509637f14d2d3516e6bef2c9" name="a6b87b99b509637f14d2d3516e6bef2c9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b87b99b509637f14d2d3516e6bef2c9">&#9670;&#160;</a></span>set_daemon_proxy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void monero::monero_wallet::set_daemon_proxy </td>
-          <td>(</td>
-          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>uri</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Set the Tor proxy to the daemon. </p>
-
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a11cd98b9d76c0792458e27949b7cd316">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af319b4108af9469c7639dc2f99d101fc">monero::monero_wallet_full</a>.</p>
 
 </div>
 </div>
