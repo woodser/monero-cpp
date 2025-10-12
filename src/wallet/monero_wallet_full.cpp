@@ -1130,6 +1130,7 @@ namespace monero {
     monero_wallet_full* wallet = new monero_wallet_full();
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
+    wallet->m_w2->init("");
     wallet->set_daemon_connection(config.m_server);
     wallet->m_w2->set_seed_language(language);
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
@@ -1224,6 +1225,7 @@ namespace monero {
     if (has_spend_key && has_view_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, spend_key_sk, view_key_sk);
     else if (has_spend_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), spend_key_sk, true, false);
     else wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, view_key_sk);
+    wallet->m_w2->init("");
     wallet->set_daemon_connection(config.m_server);
     wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->m_w2->set_seed_language(config.m_language.get());
@@ -1242,6 +1244,7 @@ namespace monero {
     monero_wallet_full* wallet = new monero_wallet_full();
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
+    wallet->m_w2->init("");
     wallet->set_daemon_connection(config.m_server);
     wallet->m_w2->set_seed_language(config.m_language.get());
     crypto::secret_key secret_key;
@@ -1265,8 +1268,8 @@ namespace monero {
     close(false);
   }
 
-  void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password) {
-    MTRACE("set_daemon_connection(" << uri << ", " << username << ", " << "***" << ")");
+  void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri) {
+    MTRACE("set_daemon_connection(" << uri << ", " << username << ", " << "***" << ", " << proxy_uri << ")");
 
     // prepare uri, login, and is_trusted for wallet2
     boost::optional<epee::net_utils::http::login> login{};
@@ -1281,18 +1284,15 @@ namespace monero {
     // detect ssl TODO: wallet2 does not detect ssl from uri
     epee::net_utils::ssl_support_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
 
-    // init wallet2 and set daemon connection
-    if (!m_w2->init(uri, login, {}, 0, is_trusted, ssl)) throw std::runtime_error("Failed to initialize wallet with daemon connection");
+    if (!m_w2->set_daemon(uri, login, is_trusted, std::move(ssl), proxy_uri)) {
+      throw std::runtime_error("Failed to initialize wallet with daemon connection");
+    }
     is_connected_to_daemon(); // update m_is_connected cache // TODO: better naming?
-  }
-
-  void monero_wallet_full::set_daemon_proxy(const std::string& uri) {
-    m_w2->set_proxy(uri);
   }
 
   void monero_wallet_full::set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
     if (connection == boost::none) set_daemon_connection("");
-    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get());
+    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get(), connection->m_proxy_uri == boost::none ? "" : connection->m_proxy_uri.get());
   }
 
   boost::optional<monero_rpc_connection> monero_wallet_full::get_daemon_connection() const {
@@ -1300,6 +1300,7 @@ namespace monero {
     if (m_w2->get_daemon_address().empty()) return boost::none;
     boost::optional<monero_rpc_connection> connection = monero_rpc_connection();
     connection->m_uri = m_w2->get_daemon_address();
+    connection->m_proxy_uri = m_w2->get_daemon_proxy();
     if (m_w2->get_daemon_login()) {
       if (!m_w2->get_daemon_login()->username.empty()) connection->m_username = m_w2->get_daemon_login()->username;
       epee::wipeable_string wipeablePassword = m_w2->get_daemon_login()->password;
