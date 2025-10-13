@@ -52,18 +52,19 @@
 
 #pragma once
 
-#include "monero_daemon_model.h"
+#include "monero_wallet.h"
 
 /**
- * Public library interface.
+ * Implements a monero_wallet.h by wrapping monero-wallet-rpc.
  */
 namespace monero {
 
-  /**
-   * Base daemon with default implementations.
-   */
-  class monero_daemon {
-    
-  }
+  // --------------------------- STATIC WALLET UTILS --------------------------
 
+  /**
+   * Monero wallet implementation which uses monero-wallet-rpc.
+   */
+  class monero_wallet_rpc : public monero_wallet {
+
+  }
 }

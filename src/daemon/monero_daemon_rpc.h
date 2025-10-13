@@ -52,7 +52,7 @@
 
 #pragma once
 
-#include "monero_daemon_model.h"
+#include "monero_daemon.h"
 
 /**
  * Public library interface.
@@ -62,7 +62,7 @@ namespace monero {
   /**
    * Base daemon with default implementations.
    */
-  class monero_daemon {
+  class monero_daemon_rpc : public monero_daemon {
     
   }
 
