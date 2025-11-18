@@ -85,6 +85,21 @@ namespace monero_utils
   void json_to_binary(const std::string &json, std::string &bin);
   void binary_to_json(const std::string &bin, std::string &json);
   void binary_blocks_to_json(const std::string &bin, std::string &json);
+  bool parse_long_payment_id(const std::string& payment_id_str, crypto::hash& payment_id);
+  bool parse_short_payment_id(const std::string& payment_id_str, crypto::hash8& payment_id);
+
+  std::shared_ptr<monero_tx_query> decontextualize(std::shared_ptr<monero_tx_query> query);
+  bool is_contextual(const monero_transfer_query& query);
+  bool is_contextual(const monero_output_query& query);
+
+  /**
+  * Merges a transaction into a unique set of transactions.
+  *
+  * @param tx is the transaction to merge into the existing txs
+  * @param tx_map maps tx hashes to txs
+  * @param block_map maps block heights to blocks
+  */
+  void merge_tx(const std::shared_ptr<monero_tx_wallet>& tx, std::map<std::string, std::shared_ptr<monero_tx_wallet>>& tx_map, std::map<uint64_t, std::shared_ptr<monero_block>>& block_map);
 
   // ------------------------------ RAPIDJSON ---------------------------------
 
@@ -229,6 +244,67 @@ namespace monero_utils
       }
     }
     return blocks;
+  }
+
+  // compute m_num_suggested_confirmations  TODO monero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
+  static void set_num_suggested_confirmations(std::shared_ptr<monero_incoming_transfer>& incoming_transfer, uint64_t blockchain_height, uint64_t block_reward, uint64_t unlock_time) {
+    std::cout << "set_num_suggested_confirmations(): blockchain_height=" << blockchain_height << ", block_reward=" << block_reward << ", unlock_time=" << unlock_time << std::endl;
+    
+    if (block_reward == 0) incoming_transfer->m_num_suggested_confirmations = 0;
+    else incoming_transfer->m_num_suggested_confirmations = (incoming_transfer->m_amount.get() + block_reward - 1) / block_reward;
+    
+    if (unlock_time < CRYPTONOTE_MAX_BLOCK_NUMBER) {
+      if (unlock_time > blockchain_height) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), unlock_time - blockchain_height);
+    } else {
+      const uint64_t now = time(NULL);
+      if (unlock_time > now) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), (unlock_time - now + DIFFICULTY_TARGET_V2 - 1) / DIFFICULTY_TARGET_V2);
+    }
+  }
+
+  /**
+   * Returns true iff tx1's height is known to be less than tx2's height for sorting.
+   */
+  static bool tx_height_less_than(const std::shared_ptr<monero_tx>& tx1, const std::shared_ptr<monero_tx>& tx2) {
+    if (tx1->m_block != boost::none && tx2->m_block != boost::none) return tx1->get_height() < tx2->get_height();
+    else if (tx1->m_block == boost::none) return false;
+    else return true;
+  }
+
+  /**
+   * Returns true iff transfer1 is ordered before transfer2 by ascending account and subaddress indices.
+   */
+  static bool incoming_transfer_before(const std::shared_ptr<monero_incoming_transfer>& transfer1, const std::shared_ptr<monero_incoming_transfer>& transfer2) {
+
+    // compare by height
+    if (tx_height_less_than(transfer1->m_tx, transfer2->m_tx)) return true;
+
+    // compare by account and subaddress index
+    if (transfer1->m_account_index.get() < transfer2->m_account_index.get()) return true;
+    else if (transfer1->m_account_index.get() == transfer2->m_account_index.get()) return transfer1->m_subaddress_index.get() < transfer2->m_subaddress_index.get();
+    else return false;
+  }
+
+  /**
+   * Returns true iff wallet vout1 is ordered before vout2 by ascending account and subaddress indices then index.
+   */
+  static bool vout_before(const std::shared_ptr<monero_output>& o1, const std::shared_ptr<monero_output>& o2) {
+    if (o1 == o2) return false; // ignore equal references
+    std::shared_ptr<monero_output_wallet> ow1 = std::static_pointer_cast<monero_output_wallet>(o1);
+    std::shared_ptr<monero_output_wallet> ow2 = std::static_pointer_cast<monero_output_wallet>(o2);
+
+    // compare by height
+    if (tx_height_less_than(ow1->m_tx, ow2->m_tx)) return true;
+
+    // compare by account index, subaddress index, output index, then key image hex
+    if (ow1->m_account_index.get() < ow2->m_account_index.get()) return true;
+    if (ow1->m_account_index.get() == ow2->m_account_index.get()) {
+      if (ow1->m_subaddress_index.get() < ow2->m_subaddress_index.get()) return true;
+      if (ow1->m_subaddress_index.get() == ow2->m_subaddress_index.get()) {
+        if (ow1->m_index.get() < ow2->m_index.get()) return true;
+        if (ow1->m_index.get() == ow2->m_index.get()) throw std::runtime_error("Should never sort outputs with duplicate indices");
+      }
+    }
+    return false;
   }
 
   // ------------------------------ FREE MEMORY -------------------------------

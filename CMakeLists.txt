@@ -18,9 +18,10 @@ endif()
 project(MoneroCppLibrary)
 
 set(BUILD_LIBRARY ON)
-set(BUILD_SAMPLE ON)
-set(BUILD_SCRATCHPAD ON)
-set(BUILD_TESTS ON)
+set(BUILD_SAMPLE OFF)
+set(BUILD_SCRATCHPAD OFF)
+set(BUILD_TESTS OFF)
+set(BUILD_LIGHT_TESTS OFF)
 
 ###################
 # monero-project
@@ -272,11 +273,14 @@ set(
     LIBRARY_SRC_FILES
     src/utils/gen_utils.cpp
     src/utils/monero_utils.cpp
+    src/utils/monero_light_client.cpp
+    src/utils/monero_light_model.cpp
     src/daemon/monero_daemon_model.cpp
     src/daemon/monero_daemon.cpp
     src/wallet/monero_wallet_model.cpp
     src/wallet/monero_wallet_keys.cpp
     src/wallet/monero_wallet_full.cpp
+    src/wallet/monero_wallet_light.cpp
 )
 
 if (BUILD_LIBRARY)
@@ -355,8 +359,11 @@ endif()
           DESTINATION include/daemon)
   INSTALL(FILES src/utils/gen_utils.h
           src/utils/monero_utils.h
+          src/utils/monero_light_client.h
+          src/utils/monero_light_model.h
           DESTINATION include/utils)
   INSTALL(FILES src/wallet/monero_wallet_full.h
+          src/wallet/monero_wallet_light.h
           src/wallet/monero_wallet.h
           src/wallet/monero_wallet_keys.h
           src/wallet/monero_wallet_model.h

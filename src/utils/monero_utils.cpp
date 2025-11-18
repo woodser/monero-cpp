@@ -77,6 +77,7 @@ monero_integrated_address monero_utils::get_integrated_address(monero_network_ty
   // parse and validate address
   cryptonote::address_parse_info address_info;
   if (!get_account_address_from_str(address_info, static_cast<cryptonote::network_type>(network_type), standard_address)) throw std::runtime_error("Invalid address");
+  //if (address_info.is_subaddress) throw std::runtime_error("Subaddress shouldn't be used");
   if (address_info.has_payment_id) throw std::runtime_error("The given address already has a payment id");
 
   // randomly generate payment id if not given, else validate
@@ -85,7 +86,7 @@ monero_integrated_address monero_utils::get_integrated_address(monero_network_ty
     payment_id_h8 = crypto::rand<crypto::hash8>();
   } else {
     cryptonote::blobdata payment_id_data;
-    if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id, payment_id_data) || sizeof(crypto::hash8) != payment_id_data.size()) throw std::runtime_error("Invalid payment id");
+    if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id, payment_id_data) || sizeof(crypto::hash8) != payment_id_data.size()) throw std::runtime_error("Invalid payment ID: " + payment_id);
     payment_id_h8 = *reinterpret_cast<const crypto::hash8*>(payment_id_data.data());
   }
 
@@ -143,6 +144,92 @@ void monero_utils::validate_private_spend_key(const std::string& private_spend_k
   if (!epee::string_tools::parse_hexstr_to_binbuff(private_spend_key, private_spend_key_data) || private_spend_key_data.size() != sizeof(crypto::secret_key)) {
     throw std::runtime_error("private spend key expected to be 64 hex characters");
   }
+}
+
+bool monero_utils::parse_long_payment_id(const std::string& payment_id_str, crypto::hash& payment_id)
+{
+  // monero-project logic based on wallet2::parse_short_payment_id()
+  cryptonote::blobdata payment_id_data;
+  if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id_str, payment_id_data)) {
+    return false;
+  }
+  if (sizeof(crypto::hash) != payment_id_data.size()) {
+    return false;
+  }
+
+  payment_id = *reinterpret_cast<const crypto::hash*>(payment_id_data.data());
+  return true;
+}
+
+bool monero_utils::parse_short_payment_id(const std::string& payment_id_str, crypto::hash8& payment_id)
+{
+  // monero-project logic based on wallet2::parse_short_payment_id()
+  cryptonote::blobdata payment_id_data;
+  if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id_str, payment_id_data)) {
+    return false;
+  }
+  if (sizeof(crypto::hash8) != payment_id_data.size()) {
+    return false;
+  }
+  payment_id = *reinterpret_cast<const crypto::hash8*>(payment_id_data.data());
+  return true;
+}
+
+void monero_utils::merge_tx(const std::shared_ptr<monero_tx_wallet>& tx, std::map<std::string, std::shared_ptr<monero_tx_wallet>>& tx_map, std::map<uint64_t, std::shared_ptr<monero_block>>& block_map) {
+  if (tx->m_hash == boost::none) throw std::runtime_error("Tx hash is not initialized");
+
+  // merge tx
+  std::map<std::string, std::shared_ptr<monero_tx_wallet>>::const_iterator tx_iter = tx_map.find(*tx->m_hash);
+  if (tx_iter == tx_map.end()) {
+    tx_map[*tx->m_hash] = tx; // cache new tx
+  } else {
+    std::shared_ptr<monero_tx_wallet>& a_tx = tx_map[*tx->m_hash];
+    a_tx->merge(a_tx, tx); // merge with existing tx
+  }
+
+  // merge tx's block if confirmed
+  if (tx->get_height() != boost::none) {
+    std::map<uint64_t, std::shared_ptr<monero_block>>::const_iterator block_iter = block_map.find(tx->get_height().get());
+    if (block_iter == block_map.end()) {
+      block_map[tx->get_height().get()] = tx->m_block.get(); // cache new block
+    } else {
+      std::shared_ptr<monero_block>& a_block = block_map[tx->get_height().get()];
+      a_block->merge(a_block, tx->m_block.get()); // merge with existing block
+    }
+  }
+}
+
+/**
+  * Remove query criteria which require looking up other transfers/outputs to
+  * fulfill query.
+  *
+  * @param query the query to decontextualize
+  * @return a reference to the query for convenience
+  */
+std::shared_ptr<monero_tx_query> monero_utils::decontextualize(std::shared_ptr<monero_tx_query> query) {
+  query->m_is_incoming = boost::none;
+  query->m_is_outgoing = boost::none;
+  query->m_transfer_query = boost::none;
+  query->m_input_query = boost::none;
+  query->m_output_query = boost::none;
+  return query;
+}
+
+bool monero_utils::is_contextual(const monero_transfer_query& query) {
+  if (query.m_tx_query == boost::none) return false;
+  if (query.m_tx_query.get()->m_is_incoming != boost::none) return true;    // requires context of all transfers
+  if (query.m_tx_query.get()->m_is_outgoing != boost::none) return true;
+  if (query.m_tx_query.get()->m_input_query != boost::none) return true;    // requires context of inputs
+  if (query.m_tx_query.get()->m_output_query != boost::none) return true;   // requires context of outputs
+  return false;
+}
+
+bool monero_utils::is_contextual(const monero_output_query& query) {
+  if (query.m_tx_query == boost::none) return false;
+  if (query.m_tx_query.get()->m_is_incoming != boost::none) return true;    // requires context of all transfers
+  if (query.m_tx_query.get()->m_is_outgoing != boost::none) return true;
+  if (query.m_tx_query.get()->m_transfer_query != boost::none) return true; // requires context of transfers
+  return false;
 }
 
 // -------------------------- BINARY SERIALIZATION ----------------------------
