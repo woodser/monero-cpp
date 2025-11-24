@@ -17,10 +17,10 @@ endif()
 
 project(MoneroCppLibrary)
 
-set(BUILD_LIBRARY ON)
-set(BUILD_SAMPLE ON)
-set(BUILD_SCRATCHPAD ON)
-set(BUILD_TESTS ON)
+option(BUILD_LIBRARY "Build monero-cpp library" ON)
+option(BUILD_SAMPLE "Build c++ sample code" OFF)
+option(BUILD_SCRATCHPAD "Build c++ scratchpad" OFF)
+option(BUILD_TESTS "Builc c++ tests" OFF)
 
 ###################
 # monero-project
