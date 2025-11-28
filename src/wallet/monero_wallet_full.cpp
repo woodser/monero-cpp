@@ -729,11 +729,17 @@ namespace monero {
     void update_listening() {
       boost::lock_guard<boost::mutex> guarg(m_listener_mutex);
 
-      // if starting to listen, cache locked txs for later comparison
-      if (!m_wallet.get_listeners().empty() && m_w2.callback() == nullptr) check_for_changed_unlocked_txs();
-
       // update callback
       m_w2.callback(m_wallet.get_listeners().empty() ? nullptr : this);
+
+      // if starting to listen, cache locked txs for later comparison
+      if (!m_wallet.get_listeners().empty() && m_w2.callback() == nullptr) {
+        tools::threadpool::waiter waiter(*m_notification_pool);
+        m_notification_pool->submit(&waiter, [this]() {
+          check_for_changed_unlocked_txs();
+        });
+        waiter.wait();
+      }
     }
 
     void on_sync_start(uint64_t start_height) {
