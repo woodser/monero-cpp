@@ -157,7 +157,7 @@ void init_multisig_wallets(monero_wallet* funding_wallet, vector<monero_wallet*>
   }
   
   // // wait for txs to confirm and for sufficient unlocked balance
-  // TestUtils.WALLET_TX_TRACKER.waitForWalletTxsToClearPool(wallet);
+  // TestUtils.WALLET_TX_TRACKER.waitForTxsToClearPool(wallet);
   // TestUtils.WALLET_TX_TRACKER.waitForUnlockedBalance(wallet, 0, null, TestUtils.MAX_FEE.multiply(new BigInteger("20")));
   
   // send funds from the main test wallet to destinations in the first multisig wallet
