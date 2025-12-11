@@ -1944,21 +1944,21 @@ namespace monero {
   void monero_wallet_full::freeze_output(const std::string& key_image) {
     if (key_image.empty()) throw std::runtime_error("Must specify key image to freeze");
     crypto::key_image ki;
-    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw new std::runtime_error("failed to parse key imge");
+    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
     m_w2->freeze(ki);
   }
 
   void monero_wallet_full::thaw_output(const std::string& key_image) {
     if (key_image.empty()) throw std::runtime_error("Must specify key image to thaw");
     crypto::key_image ki;
-    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw new std::runtime_error("failed to parse key imge");
+    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
     m_w2->thaw(ki);
   }
 
   bool monero_wallet_full::is_output_frozen(const std::string& key_image) {
     if (key_image.empty()) throw std::runtime_error("Must specify key image to check if frozen");
     crypto::key_image ki;
-    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw new std::runtime_error("failed to parse key imge");
+    if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
     return m_w2->frozen(ki);
   }
 
