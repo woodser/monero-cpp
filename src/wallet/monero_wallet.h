@@ -112,9 +112,6 @@ namespace monero {
     virtual void on_output_spent(const monero_output_wallet& output) {};
   };
 
-  // forward declaration of internal wallet2 listener
-  struct wallet2_listener;
-
   // ----------------------------- WALLET METHODS -----------------------------
 
   /**
