@@ -54,6 +54,12 @@
 
 #include "monero_wallet.h"
 #include "cryptonote_basic/account.h"
+#include "wallet/wallet2.h"
+#include <boost/thread/mutex.hpp>
+#include <boost/thread/lock_guard.hpp>
+
+#define UNSIGNED_TX_PREFIX "Monero unsigned tx set\005"
+#define SIGNED_TX_PREFIX "Monero signed tx set\005"
 
 using namespace monero;
 
@@ -62,6 +68,25 @@ using namespace monero;
  */
 namespace monero {
 
+  typedef std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> wallet2_exported_outputs;
+
+  class monero_key_image_cache {
+  public:
+
+    std::shared_ptr<monero_key_image> get(const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr);
+    std::shared_ptr<monero_key_image> get(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0);
+    void set(const std::shared_ptr<monero_key_image>& key_image, const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0, bool requested = false);
+    void set(const std::shared_ptr<monero_key_image>& key_image, const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr, bool requested = false);
+    bool request(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx);
+    bool request(const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr);
+    void set_request(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0, bool request = true);
+
+  private:
+    mutable boost::mutex m_mutex;
+    serializable_unordered_map<crypto::public_key, serializable_unordered_map<uint64_t, serializable_unordered_map<cryptonote::subaddress_index, std::pair<std::shared_ptr<monero_key_image>, bool>>>> m_cache;
+    serializable_map<std::string, bool> m_frozen;
+  };
+  
   /**
    * Implements a Monero wallet to provide basic key management.
    */
@@ -126,11 +151,14 @@ namespace monero {
     std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const override;
     std::string sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx = 0, uint32_t subaddress_idx = 0) const override;
     monero_message_signature_result verify_message(const std::string& msg, const std::string& address, const std::string& signature) const override;
+    std::string get_payment_uri(const monero_tx_config& config) const override;
+    std::shared_ptr<monero_tx_config> parse_payment_uri(const std::string& uri) const override;
+    std::string get_tx_key(const std::string& tx_hash) const override;
     void close(bool save = false) override;
 
     // --------------------------------- PRIVATE --------------------------------
 
-  private:
+  protected:
     bool m_is_view_only;
     monero_network_type m_network_type;
     cryptonote::account_base m_account;
@@ -141,7 +169,32 @@ namespace monero {
     std::string m_pub_spend_key;
     std::string m_prv_spend_key;
     std::string m_primary_address;
+    mutable monero_key_image_cache m_generated_key_images;
+    serializable_unordered_map<crypto::public_key, cryptonote::subaddress_index> m_subaddresses;
+    serializable_unordered_map<crypto::hash, crypto::secret_key> m_tx_keys;
+    serializable_unordered_map<crypto::hash, std::vector<crypto::secret_key>> m_additional_tx_keys;
 
-    void init_common();
+    virtual void init_common();
+    cryptonote::network_type get_nettype() const { return m_network_type == monero_network_type::TESTNET ? cryptonote::network_type::TESTNET : m_network_type == monero_network_type::STAGENET ? cryptonote::network_type::STAGENET : cryptonote::network_type::MAINNET; };
+    bool key_on_device() const;
+    
+    monero_key_image generate_key_image(const std::string &tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+    monero_key_image generate_key_image(const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+    std::pair<crypto::key_image, crypto::signature> generate_key_image_for_enote(const crypto::public_key &ephem_pubkey, const size_t tx_output_index, const cryptonote::subaddress_index &received_subaddr) const;
+    bool key_image_is_ours(const crypto::key_image &key_image, const crypto::public_key& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+    bool key_image_is_ours(const std::string &key_image, const std::string& tx_public_key, uint64_t out_index, const cryptonote::subaddress_index &received_subaddr) const;
+
+    std::string encrypt_with_private_view_key(const std::string &plaintext, bool authenticated = true) const;
+    std::string decrypt_with_private_view_key(const std::string &ciphertext, bool authenticated = true) const;
+    
+    virtual wallet2_exported_outputs export_outputs(bool all, uint32_t start, uint32_t count = 0xffffffff) const;
+
+    std::vector<tools::wallet2::pending_tx> parse_signed_tx(const std::string &signed_tx_st) const;
+    tools::wallet2::unsigned_tx_set parse_unsigned_tx(const std::string &unsigned_tx_st) const;
+    std::string dump_pending_tx(tools::wallet2::tx_construction_data &construction_data, const boost::optional<std::string>& payment_id) const;
+    std::string sign_tx(tools::wallet2::unsigned_tx_set &exported_txs, std::vector<tools::wallet2::pending_tx> &txs, tools::wallet2::signed_tx_set &signed_txes, std::vector<std::string>& signed_kis);
+    bool get_tx_key_cached(const crypto::hash &txid, crypto::secret_key &tx_key, std::vector<crypto::secret_key> &additional_tx_keys) const;
+    bool get_tx_key(const crypto::hash &txid, crypto::secret_key &tx_key, std::vector<crypto::secret_key> &additional_tx_keys) const;
+    virtual std::string get_tx_prefix_hash(const std::string& tx_hash) const { return std::string(""); };
   };
 }

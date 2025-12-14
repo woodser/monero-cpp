@@ -58,6 +58,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <chrono>
 #include <thread>
 #include "include_base_utils.h"
@@ -78,6 +80,52 @@ namespace gen_utils
     boost::uuids::random_generator generator;
     boost::uuids::uuid uuid = generator();
     return boost::uuids::to_string(uuid);
+  }
+
+  static bool is_uint64_t(const std::string& str) {
+    try {
+      size_t sz;
+      std::stol(str, &sz);
+      return sz == str.size();
+    } 
+    catch (const std::invalid_argument&) {
+      // if no conversion could be performed.
+      return false;   
+    } 
+    catch (const std::out_of_range&) {
+      //  if the converted value would fall out of the range of the result type.
+      return false;
+    }
+  }
+
+  static uint64_t uint64_t_cast(const std::string& str) {
+    if (!is_uint64_t(str)) {
+      throw std::out_of_range("String provided is not a valid uint64_t");
+    }
+
+    uint64_t value;
+    
+    std::istringstream itr(str);
+
+    itr >> value;
+
+    return value;
+  }
+
+  static uint64_t timestamp_to_epoch(const std::string& iso_timestamp) {
+    // ISO 8601
+    std::string timestamp = boost::replace_all_copy(iso_timestamp, "T", " ");
+    boost::replace_all(timestamp, "Z", "");
+
+    boost::posix_time::ptime pt = boost::posix_time::time_from_string(timestamp);
+    boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
+    boost::posix_time::time_duration diff = pt - epoch;
+
+    return static_cast<uint64_t>(diff.total_seconds());
+  }
+
+  static bool bool_equals(bool val, const boost::optional<bool>& opt_val) {
+    return opt_val == boost::none ? false : val == *opt_val;
   }
 
  /**

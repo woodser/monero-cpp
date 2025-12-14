@@ -447,7 +447,7 @@ namespace monero {
     if (!src->m_output_indices.empty()) tgt->m_output_indices = std::vector<uint64_t>(src->m_output_indices);
     tgt->m_metadata = src->m_metadata;
     tgt->m_common_tx_sets = src->m_common_tx_sets;
-    if (!src->m_extra.empty()) throw std::runtime_error("extra deep copy not implemented");  // TODO: implement extra
+    if (!src->m_extra.empty()) tgt->m_extra = std::vector<uint8_t>(src->m_extra);
     tgt->m_rct_signatures = src->m_rct_signatures;
     tgt->m_rct_sig_prunable = src->m_rct_sig_prunable;
     tgt->m_is_kept_by_block = src->m_is_kept_by_block;
