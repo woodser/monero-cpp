@@ -26,10 +26,10 @@
  *
  * All rights reserved.
  *
- * 1. Redistributions of source code must retain the above copyright notice, this list of
+ * 1. Redistributions of source code must retain the above copyright notice, this std::list of
  *    conditions and the following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice, this list
+ * 2. Redistributions in binary form must reproduce the above copyright notice, this std::list
  *    of conditions and the following disclaimer in the documentation and/or other
  *    materials provided with the distribution.
  *
@@ -50,20 +50,4 @@
  * Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
  */
 
-#pragma once
-
-#include "monero_daemon_model.h"
-
-/**
- * Public library interface.
- */
-namespace monero {
-
-  /**
-   * Base daemon with default implementations.
-   */
-  class monero_daemon {
-    
-  }
-
-}
+#include "monero_daemon_rpc.h"
