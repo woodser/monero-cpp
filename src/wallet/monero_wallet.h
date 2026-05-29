@@ -1315,13 +1315,13 @@ namespace monero {
      * Import multisig info as hex from other participants.
      *
      * Note: If the daemon is not trusted, this method will not automatically
-     * update the spent status after importing peer multisig hex.  In that case,
-     * the
+     * update the spent status after importing peer multisig hex.
      *
      * @param multisig_hexes are multisig hex from each participant
+     * @param refresh_after_import specifies if the wallet should be refreshed after importing (default true)
      * @return the number of outputs signed with the given multisig hex
      */
-    virtual int import_multisig_hex(const std::vector<std::string>& multisig_hexes) {
+    virtual int import_multisig_hex(const std::vector<std::string>& multisig_hexes, bool refresh_after_import = true) {
       throw std::runtime_error("import_multisig_hex() not supported");
     }
 
@@ -1332,7 +1332,7 @@ namespace monero {
      * @return the result of signing the multisig transactions
      */
     virtual monero_multisig_sign_result sign_multisig_tx_hex(const std::string& multisig_tx_hex) {
-      throw std::runtime_error("monero_multisig_sign_result() not supported");
+      throw std::runtime_error("sign_multisig_tx_hex() not supported");
     }
 
     /**

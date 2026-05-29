@@ -238,7 +238,7 @@ namespace monero {
     std::string make_multisig(const std::vector<std::string>& multisig_hexes, int threshold, const std::string& password) override;
     monero_multisig_init_result exchange_multisig_keys(const std::vector<std::string>& multisig_hexes, const std::string& password) override;
     std::string export_multisig_hex() override;
-    int import_multisig_hex(const std::vector<std::string>& multisig_hexes) override;
+    int import_multisig_hex(const std::vector<std::string>& multisig_hexes, const bool refresh_after_import = true) override;
     monero_multisig_sign_result sign_multisig_tx_hex(const std::string& multisig_tx_hex) override;
     std::vector<std::string> submit_multisig_tx_hex(const std::string& signed_multisig_tx_hex) override;
     void change_password(const std::string& old_password, const std::string& new_password) override;

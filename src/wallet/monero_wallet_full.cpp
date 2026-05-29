@@ -3379,7 +3379,7 @@ namespace monero {
     return epee::string_tools::buff_to_hex_nodelimer(m_w2->export_multisig());
   }
 
-  int monero_wallet_full::import_multisig_hex(const std::vector<std::string>& multisig_hexes) {
+  int monero_wallet_full::import_multisig_hex(const std::vector<std::string>& multisig_hexes, const bool refresh_after_import) {
 
     // validate state and args
     bool ready;
@@ -3398,10 +3398,10 @@ namespace monero {
     }
 
     // import peer multisig hex
-    int num_outputs = m_w2->import_multisig(multisig_blobs);
+    int num_outputs = m_w2->import_multisig(multisig_blobs, refresh_after_import);
 
     // if daemon is trusted, rescan spent
-    if (is_daemon_trusted()) rescan_spent();
+    if (is_daemon_trusted() && refresh_after_import) rescan_spent();
 
     // return the number of outputs signed by the given multisig hex
     return num_outputs;
