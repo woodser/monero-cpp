@@ -1276,6 +1276,7 @@ namespace monero {
 
   void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri) {
     MTRACE("set_daemon_connection(" << uri << ", " << username << ", " << "***" << ", " << proxy_uri << ")");
+    assert_not_closed();
 
     // prepare uri, login, and is_trusted for wallet2
     boost::optional<epee::net_utils::http::login> login{};
@@ -1297,12 +1298,14 @@ namespace monero {
   }
 
   void monero_wallet_full::set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
+    assert_not_closed();
     if (connection == boost::none) set_daemon_connection("");
     else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get(), connection->m_proxy_uri == boost::none ? "" : connection->m_proxy_uri.get());
   }
 
   boost::optional<monero_rpc_connection> monero_wallet_full::get_daemon_connection() const {
     MTRACE("monero_wallet_full::get_daemon_connection()");
+    assert_not_closed();
     if (m_w2->get_daemon_address().empty()) return boost::none;
     boost::optional<monero_rpc_connection> connection = monero_rpc_connection();
     connection->m_uri = m_w2->get_daemon_address();
@@ -1318,6 +1321,7 @@ namespace monero {
 
   // TODO: could return Wallet::ConnectionStatus_Disconnected, Wallet::ConnectionStatus_WrongVersion, Wallet::ConnectionStatus_Connected like wallet.cpp::connected()
   bool monero_wallet_full::is_connected_to_daemon() const {
+    assert_not_closed();
     uint32_t version = 0;
     m_is_connected = m_w2->check_connection(&version, NULL, DEFAULT_CONNECTION_TIMEOUT_MILLIS); // TODO: should this be updated elsewhere?
     if (!m_is_connected) return false;
@@ -1326,21 +1330,25 @@ namespace monero {
   }
 
   bool monero_wallet_full::is_daemon_synced() const {
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     uint64_t daemonHeight = get_daemon_height();
     return daemonHeight >= get_daemon_max_peer_height() && daemonHeight > 1;
   }
 
   bool monero_wallet_full::is_daemon_trusted() const {
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     return m_w2->is_trusted_daemon();
   }
 
   bool monero_wallet_full::is_synced() const {
+    assert_not_closed();
     return m_is_synced;
   }
 
   monero_version monero_wallet_full::get_version() const {
+    assert_not_closed();
     monero_version version;
     version.m_number = 65552; // same as monero-wallet-rpc v0.15.0.1 release
     version.m_is_release = false;     // TODO: could pull from MONERO_VERSION_IS_RELEASE in version.cpp
@@ -1348,14 +1356,17 @@ namespace monero {
   }
 
   std::string monero_wallet_full::get_path() const {
+    assert_not_closed();
     return m_w2->path();
   }
 
   monero_network_type monero_wallet_full::get_network_type() const {
+    assert_not_closed();
     return static_cast<monero_network_type>(m_w2->nettype());
   }
 
   std::string monero_wallet_full::get_seed() const {
+    assert_not_closed();
     epee::wipeable_string seed;
     bool ready;
     if (m_w2->multisig(&ready)) {
@@ -1370,27 +1381,32 @@ namespace monero {
   }
 
   std::string monero_wallet_full::get_seed_language() const {
+    assert_not_closed();
     if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed language.");
     return m_w2->get_seed_language();
   }
 
   std::string monero_wallet_full::get_public_view_key() const {
     MTRACE("get_private_view_key()");
+    assert_not_closed();
     return epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_account_address.m_view_public_key);
   }
 
   std::string monero_wallet_full::get_private_view_key() const {
     MTRACE("get_private_view_key()");
+    assert_not_closed();
     return epee::string_tools::pod_to_hex(unwrap(unwrap(m_w2->get_account().get_keys().m_view_secret_key)));
   }
 
   std::string monero_wallet_full::get_public_spend_key() const {
     MTRACE("get_public_spend_key()");
+    assert_not_closed();
     return epee::string_tools::pod_to_hex(m_w2->get_account().get_keys().m_account_address.m_spend_public_key);
   }
 
   std::string monero_wallet_full::get_private_spend_key() const {
     MTRACE("get_private_spend_key()");
+    assert_not_closed();
     if (m_w2->watch_only()) throw std::runtime_error("The wallet is watch-only. Cannot retrieve spend key.");
     std::string spend_key = epee::string_tools::pod_to_hex(unwrap(unwrap(m_w2->get_account().get_keys().m_spend_secret_key)));
     if (spend_key == "0000000000000000000000000000000000000000000000000000000000000000") spend_key = "";
@@ -1398,11 +1414,13 @@ namespace monero {
   }
 
   std::string monero_wallet_full::get_address(uint32_t account_idx, uint32_t subaddress_idx) const {
+    assert_not_closed();
     return m_w2->get_subaddress_as_str({account_idx, subaddress_idx});
   }
 
   monero_subaddress monero_wallet_full::get_address_index(const std::string& address) const {
     MTRACE("get_address_index(" << address << ")");
+    assert_not_closed();
 
     // validate address
     cryptonote::address_parse_info info;
@@ -1424,6 +1442,7 @@ namespace monero {
 
   monero_integrated_address monero_wallet_full::get_integrated_address(const std::string& standard_address, const std::string& payment_id) const {
     MTRACE("get_integrated_address(" << standard_address << ", " << payment_id << ")");
+    assert_not_closed();
 
     // TODO monero-project: this logic is based on wallet_rpc_server::on_make_integrated_address() and should be moved to wallet so this is unecessary for api users
 
@@ -1454,6 +1473,7 @@ namespace monero {
 
   monero_integrated_address monero_wallet_full::decode_integrated_address(const std::string& integrated_address) const {
     MTRACE("decode_integrated_address(" << integrated_address << ")");
+    assert_not_closed();
 
     // validate integrated address
     cryptonote::address_parse_info info;
@@ -1469,18 +1489,22 @@ namespace monero {
   }
 
   uint64_t monero_wallet_full::get_height() const {
+    assert_not_closed();
     return m_w2->get_blockchain_current_height();
   }
 
   uint64_t monero_wallet_full::get_restore_height() const {  // TODO: rename to get_sync_from_height()
+    assert_not_closed();
     return m_w2->get_refresh_from_block_height();
   }
 
   void monero_wallet_full::set_restore_height(uint64_t restore_height) {
+    assert_not_closed();
     m_w2->set_refresh_from_block_height(restore_height);
   }
 
   uint64_t monero_wallet_full::get_daemon_height() const {
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     std::string err;
     uint64_t result = m_w2->get_daemon_blockchain_height(err);
@@ -1489,6 +1513,7 @@ namespace monero {
   }
 
   uint64_t monero_wallet_full::get_daemon_max_peer_height() const {
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     std::string err;
     uint64_t result = m_w2->get_daemon_blockchain_target_height(err);
@@ -1496,33 +1521,39 @@ namespace monero {
     if (result == 0) result = get_daemon_height(); // TODO monero-project: target height can be 0 when daemon is synced.  Use blockchain height instead
     return result;
   }
-  
+
   uint64_t monero_wallet_full::get_height_by_date(uint16_t year, uint8_t month, uint8_t day) const {
+    assert_not_closed();
     return m_w2->get_blockchain_height_by_date(year, month, day);
   }
 
   void monero_wallet_full::add_listener(monero_wallet_listener& listener) {
+    assert_not_closed();
     m_listeners.insert(&listener);
     m_w2_listener->update_listening();
   }
 
   void monero_wallet_full::remove_listener(monero_wallet_listener& listener) {
+    assert_not_closed();
     m_listeners.erase(&listener);
     if (!m_sync_loop_running) m_w2_listener->update_listening(); // listener is unregistered after sync to avoid segfault
   }
 
   std::set<monero_wallet_listener*> monero_wallet_full::get_listeners() {
+    assert_not_closed();
     return m_listeners;
   }
 
   monero_sync_result monero_wallet_full::sync() {
     MTRACE("sync()");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     return lock_and_sync();
   }
 
   monero_sync_result monero_wallet_full::sync(monero_wallet_listener& listener) {
     MTRACE("sync(listener)");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
 
     // register listener
@@ -1540,12 +1571,14 @@ namespace monero {
 
   monero_sync_result monero_wallet_full::sync(uint64_t start_height) {
     MTRACE("sync(" << start_height << ")");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     return lock_and_sync(start_height);
   }
 
   monero_sync_result monero_wallet_full::sync(uint64_t start_height, monero_wallet_listener& listener) {
     MTRACE("sync(" << start_height << ", listener)");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
 
     // wrap and register sync listener as wallet listener
@@ -1562,6 +1595,7 @@ namespace monero {
   }
 
   void monero_wallet_full::start_syncing(uint64_t sync_period_in_ms) {
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     m_syncing_interval = sync_period_in_ms;
     if (!m_syncing_enabled) {
@@ -1571,12 +1605,14 @@ namespace monero {
   }
 
   void monero_wallet_full::stop_syncing() {
+    assert_not_closed();
     m_syncing_enabled = false;
     m_w2->stop();
   }
 
   void monero_wallet_full::scan_txs(const std::vector<std::string>& tx_ids) {
     MTRACE("scan_txs()");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
 
     // convert string ids to crypto hashes
@@ -1596,6 +1632,7 @@ namespace monero {
 
   void monero_wallet_full::rescan_spent() {
     MTRACE("rescan_spent()");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     if (!is_daemon_trusted()) throw std::runtime_error("Rescan spent can only be used with a trusted daemon");
     m_w2->rescan_spent();
@@ -1604,6 +1641,7 @@ namespace monero {
   // TODO: support arguments bool hard, bool refresh = true, bool keep_key_images = false
   void monero_wallet_full::rescan_blockchain() {
     MTRACE("rescan_blockchain()");
+    assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     m_rescan_on_sync = true;
     lock_and_sync();
@@ -1612,28 +1650,34 @@ namespace monero {
   // isMultisigImportNeeded
 
   uint64_t monero_wallet_full::get_balance() const {
+    assert_not_closed();
     return m_w2->balance_all(STRICT_);
   }
 
   uint64_t monero_wallet_full::get_balance(uint32_t account_idx) const {
+    assert_not_closed();
     return m_w2->balance(account_idx, STRICT_);
   }
 
   uint64_t monero_wallet_full::get_balance(uint32_t account_idx, uint32_t subaddress_idx) const {
+    assert_not_closed();
     std::map<uint32_t, uint64_t> balance_per_subaddress = m_w2->balance_per_subaddress(account_idx, STRICT_);
     auto iter = balance_per_subaddress.find(subaddress_idx);
     return iter == balance_per_subaddress.end() ? 0 : iter->second;
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance() const {
+    assert_not_closed();
     return m_w2->unlocked_balance_all(STRICT_);
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance(uint32_t account_idx) const {
+    assert_not_closed();
     return m_w2->unlocked_balance(account_idx, STRICT_);
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance(uint32_t account_idx, uint32_t subaddress_idx) const {
+    assert_not_closed();
     std::map<uint32_t, std::pair<uint64_t, std::pair<uint64_t, uint64_t>>> unlocked_balance_per_subaddress = m_w2->unlocked_balance_per_subaddress(account_idx, STRICT_);
     auto iter = unlocked_balance_per_subaddress.find(subaddress_idx);
     return iter == unlocked_balance_per_subaddress.end() ? 0 : iter->second.first;
@@ -1641,6 +1685,7 @@ namespace monero {
 
   std::vector<monero_account> monero_wallet_full::get_accounts(bool include_subaddresses, const std::string& tag) const {
     MTRACE("get_accounts(" << include_subaddresses << ", " << tag << ")");
+    assert_not_closed();
 
     // need transfers to inform if subaddresses used
     std::vector<tools::wallet2::transfer_details> transfers;
@@ -1663,6 +1708,7 @@ namespace monero {
 
   monero_account monero_wallet_full::get_account(uint32_t account_idx, bool include_subaddresses) const {
     MTRACE("get_account(" << account_idx << ", " << include_subaddresses << ")");
+    assert_not_closed();
 
     // need transfers to inform if subaddresses used
     std::vector<tools::wallet2::transfer_details> transfers;
@@ -1680,6 +1726,7 @@ namespace monero {
 
   monero_account monero_wallet_full::create_account(const std::string& label) {
     MTRACE("create_account(" << label << ")");
+    assert_not_closed();
 
     // create account
     m_w2->add_subaddress_account(label);
@@ -1696,6 +1743,7 @@ namespace monero {
   std::vector<monero_subaddress> monero_wallet_full::get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const {
     MTRACE("get_subaddresses(" << account_idx << ", ...)");
     MTRACE("Subaddress indices size: " << subaddress_indices.size());
+    assert_not_closed();
 
     std::vector<tools::wallet2::transfer_details> transfers;
     m_w2->get_transfers(transfers);
@@ -1704,6 +1752,7 @@ namespace monero {
 
   monero_subaddress monero_wallet_full::create_subaddress(const uint32_t account_idx, const std::string& label) {
     MTRACE("create_subaddress(" << account_idx << ", " << label << ")");
+    assert_not_closed();
 
     // create subaddress
     m_w2->add_subaddress(account_idx, label);
@@ -1724,6 +1773,7 @@ namespace monero {
 
   void monero_wallet_full::set_subaddress_label(const uint32_t account_idx, const uint32_t subaddress_idx, const std::string& label) {
     MTRACE("set_subaddress_label(" << account_idx << ", " << subaddress_idx << ", " << label << ")");
+    assert_not_closed();
     cryptonote::subaddress_index index = {account_idx, subaddress_idx};
     m_w2->set_subaddress_label(index, label);
   }
@@ -1731,9 +1781,10 @@ namespace monero {
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs() const {
     return get_txs(monero_tx_query());
   }
-  
+
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs(const monero_tx_query& query) const {
     MTRACE("get_txs(query)");
+    assert_not_closed();
 
     // copy query
     std::shared_ptr<monero_tx_query> query_sp = std::make_shared<monero_tx_query>(query); // convert to shared pointer
@@ -1842,6 +1893,7 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_transfer>> monero_wallet_full::get_transfers(const monero_transfer_query& query) const {
+    assert_not_closed();
 
 //    // log query
 //    if (query.m_tx_query != boost::none) {
@@ -1863,6 +1915,7 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_output_wallet>> monero_wallet_full::get_outputs(const monero_output_query& query) const {
+    assert_not_closed();
 
 //    // log query
 //    if (query.m_tx_query != boost::none) {
@@ -1884,10 +1937,12 @@ namespace monero {
   }
 
   std::string monero_wallet_full::export_outputs(bool all) const {
+    assert_not_closed();
     return epee::string_tools::buff_to_hex_nodelimer(m_w2->export_outputs_to_str(all));
   }
 
   int monero_wallet_full::import_outputs(const std::string& outputs_hex) {
+    assert_not_closed();
 
     // validate and parse hex data
     cryptonote::blobdata blob;
@@ -1901,6 +1956,7 @@ namespace monero {
 
   std::vector<std::shared_ptr<monero_key_image>> monero_wallet_full::export_key_images(bool all) const {
     MTRACE("monero_wallet_full::export_key_images()");
+    assert_not_closed();
 
     // build key images from wallet2 types
     std::vector<std::shared_ptr<monero_key_image>> key_images;
@@ -1916,6 +1972,7 @@ namespace monero {
 
   std::shared_ptr<monero_key_image_import_result> monero_wallet_full::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) {
     MTRACE("monero_wallet_full::import_key_images()");
+    assert_not_closed();
 
     // validate and prepare key images for wallet2
     std::vector<std::pair<crypto::key_image, crypto::signature>> ski;
@@ -1942,6 +1999,7 @@ namespace monero {
   }
 
   void monero_wallet_full::freeze_output(const std::string& key_image) {
+    assert_not_closed();
     if (key_image.empty()) throw std::runtime_error("Must specify key image to freeze");
     crypto::key_image ki;
     if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
@@ -1949,6 +2007,7 @@ namespace monero {
   }
 
   void monero_wallet_full::thaw_output(const std::string& key_image) {
+    assert_not_closed();
     if (key_image.empty()) throw std::runtime_error("Must specify key image to thaw");
     crypto::key_image ki;
     if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
@@ -1956,6 +2015,7 @@ namespace monero {
   }
 
   bool monero_wallet_full::is_output_frozen(const std::string& key_image) {
+    assert_not_closed();
     if (key_image.empty()) throw std::runtime_error("Must specify key image to check if frozen");
     crypto::key_image ki;
     if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
@@ -1963,12 +2023,14 @@ namespace monero {
   }
 
   monero_tx_priority monero_wallet_full::get_default_fee_priority() const {
+    assert_not_closed();
     return static_cast<monero_tx_priority>(m_w2->adjust_priority(0));
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::create_txs(const monero_tx_config& config) {
     MTRACE("monero_wallet_full::create_txs");
     //std::cout << "monero_tx_config: " << config.serialize()  << std::endl;
+    assert_not_closed();
 
     // validate config
     if (config.m_account_index == boost::none) throw std::runtime_error("Must specify account index to send from");
@@ -2129,6 +2191,7 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::sweep_unlocked(const monero_tx_config& config) {
+    assert_not_closed();
 
     // validate config
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
@@ -2196,6 +2259,7 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::sweep_account(const monero_tx_config& config) {
+    assert_not_closed();
 
     // validate config
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
@@ -2333,6 +2397,7 @@ namespace monero {
   std::shared_ptr<monero_tx_wallet> monero_wallet_full::sweep_output(const monero_tx_config& config)  {
     MTRACE("sweep_output()");
     //MTRACE("monero_tx_config: " << config.serialize());
+    assert_not_closed();
 
     // validate input config
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
@@ -2476,6 +2541,7 @@ namespace monero {
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::sweep_dust(bool relay) {
     MTRACE("monero_wallet_full::sweep_dust()");
+    assert_not_closed();
 
     // create transaction to fill
     std::vector<wallet2::pending_tx> ptx_vector = m_w2->create_unmixable_sweep_transactions();
@@ -2577,6 +2643,7 @@ namespace monero {
 
   std::vector<std::string> monero_wallet_full::relay_txs(const std::vector<std::string>& tx_metadatas) {
     MTRACE("relay_txs()");
+    assert_not_closed();
 
     // relay each metadata as a tx
     std::vector<std::string> tx_hashes;
@@ -2624,6 +2691,7 @@ namespace monero {
   }
 
   monero_tx_set monero_wallet_full::describe_tx_set(const monero_tx_set& tx_set) {
+    assert_not_closed();
 
     // get unsigned and multisig tx sets
     std::string unsigned_tx_hex = tx_set.m_unsigned_tx_hex == boost::none ? "" : tx_set.m_unsigned_tx_hex.get();
@@ -2783,6 +2851,7 @@ namespace monero {
 
   // implementation based on monero-project wallet_rpc_server.cpp::on_sign_transfer()
   monero_tx_set monero_wallet_full::sign_txs(const std::string& unsigned_tx_hex) {
+    assert_not_closed();
     if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
     if (m_w2->watch_only()) throw std::runtime_error("command not supported by view-only wallet");
 
@@ -2822,6 +2891,7 @@ namespace monero {
 
   // implementation based on monero-project wallet_rpc_server.cpp::on_submit_transfer()
   std::vector<std::string> monero_wallet_full::submit_txs(const std::string& signed_tx_hex) {
+    assert_not_closed();
     if (m_w2->key_on_device()) throw std::runtime_error("command not supported by HW wallet");
 
     cryptonote::blobdata blob;
@@ -2848,12 +2918,14 @@ namespace monero {
   }
 
   std::string monero_wallet_full::sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx, uint32_t subaddress_idx) const {
+    assert_not_closed();
     cryptonote::subaddress_index index = {account_idx, subaddress_idx};
     tools::wallet2::message_signature_type_t signature_type_w2 = signature_type == monero_message_signature_type::SIGN_WITH_SPEND_KEY ? tools::wallet2::message_signature_type_t::sign_with_spend_key : tools::wallet2::message_signature_type_t::sign_with_view_key;
     return m_w2->sign(msg, signature_type_w2, index);
   }
 
   monero_message_signature_result monero_wallet_full::verify_message(const std::string& msg, const std::string& address, const std::string& signature) const {
+    assert_not_closed();
 
     // validate and parse address or url
     cryptonote::address_parse_info info;
@@ -2888,6 +2960,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_tx_key(const std::string& tx_hash) const {
     MTRACE("monero_wallet_full::get_tx_key()");
+    assert_not_closed();
 
     // validate and parse tx hash
     crypto::hash _tx_hash;
@@ -2913,6 +2986,7 @@ namespace monero {
 
   std::shared_ptr<monero_check_tx> monero_wallet_full::check_tx_key(const std::string& tx_hash, const std::string& tx_key, const std::string& address) const {
     MTRACE("monero_wallet_full::check_tx_key()");
+    assert_not_closed();
 
     // validate and parse tx hash
     crypto::hash _tx_hash;
@@ -2962,6 +3036,7 @@ namespace monero {
   }
 
   std::string monero_wallet_full::get_tx_proof(const std::string& tx_hash, const std::string& address, const std::string& message) const {
+    assert_not_closed();
 
     // validate and parse tx hash
     crypto::hash _tx_hash;
@@ -2981,6 +3056,7 @@ namespace monero {
 
   std::shared_ptr<monero_check_tx> monero_wallet_full::check_tx_proof(const std::string& tx_hash, const std::string& address, const std::string& message, const std::string& signature) const {
     MTRACE("monero_wallet_full::check_tx_proof()");
+    assert_not_closed();
 
     // validate and parse tx hash
     crypto::hash _tx_hash;
@@ -3013,6 +3089,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_spend_proof(const std::string& tx_hash, const std::string& message) const {
     MTRACE("monero_wallet_full::get_spend_proof()");
+    assert_not_closed();
 
     // validate and parse tx hash
     crypto::hash _tx_hash;
@@ -3026,6 +3103,7 @@ namespace monero {
 
   bool monero_wallet_full::check_spend_proof(const std::string& tx_hash, const std::string& message, const std::string& signature) const {
     MTRACE("monero_wallet_full::check_spend_proof()");
+    assert_not_closed();
 
     // validate and parse tx hash
     crypto::hash _tx_hash;
@@ -3042,12 +3120,14 @@ namespace monero {
 
   std::string monero_wallet_full::get_reserve_proof_wallet(const std::string& message) const {
     MTRACE("monero_wallet_full::get_reserve_proof_wallet()");
+    assert_not_closed();
     boost::optional<std::pair<uint32_t, uint64_t>> account_minreserve;
     return m_w2->get_reserve_proof(account_minreserve, message);
   }
 
   std::string monero_wallet_full::get_reserve_proof_account(uint32_t account_idx, uint64_t amount, const std::string& message) const {
     MTRACE("monero_wallet_full::get_reserve_proof_account()");
+    assert_not_closed();
     boost::optional<std::pair<uint32_t, uint64_t>> account_minreserve;
     if (account_idx >= m_w2->get_num_subaddress_accounts()) throw std::runtime_error("Account index is out of bound");
     account_minreserve = std::make_pair(account_idx, amount);
@@ -3056,6 +3136,7 @@ namespace monero {
 
   std::shared_ptr<monero_check_reserve> monero_wallet_full::check_reserve_proof(const std::string& address, const std::string& message, const std::string& signature) const {
     MTRACE("monero_wallet_full::check_reserve_proof()");
+    assert_not_closed();
 
     // validate and parse input
     cryptonote::address_parse_info info;
@@ -3077,6 +3158,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_tx_note(const std::string& tx_hash) const {
     MTRACE("monero_wallet_full::get_tx_note()");
+    assert_not_closed();
     cryptonote::blobdata tx_blob;
     if (!epee::string_tools::parse_hexstr_to_binbuff(tx_hash, tx_blob) || tx_blob.size() != sizeof(crypto::hash)) {
       throw std::runtime_error("TX hash has invalid format");
@@ -3087,6 +3169,7 @@ namespace monero {
 
   std::vector<std::string> monero_wallet_full::get_tx_notes(const std::vector<std::string>& tx_hashes) const {
     MTRACE("monero_wallet_full::get_tx_notes()");
+    assert_not_closed();
     std::vector<std::string> notes;
     for (const auto& tx_hash : tx_hashes) notes.push_back(get_tx_note(tx_hash));
     return notes;
@@ -3094,6 +3177,7 @@ namespace monero {
 
   void monero_wallet_full::set_tx_note(const std::string& tx_hash, const std::string& note) {
     MTRACE("monero_wallet_full::set_tx_note()");
+    assert_not_closed();
     cryptonote::blobdata tx_blob;
     if (!epee::string_tools::parse_hexstr_to_binbuff(tx_hash, tx_blob) || tx_blob.size() != sizeof(crypto::hash)) {
       throw std::runtime_error("TX hash has invalid format");
@@ -3104,6 +3188,7 @@ namespace monero {
 
   void monero_wallet_full::set_tx_notes(const std::vector<std::string>& tx_hashes, const std::vector<std::string>& notes) {
     MTRACE("monero_wallet_full::set_tx_notes()");
+    assert_not_closed();
     if (tx_hashes.size() != notes.size()) throw std::runtime_error("Different amount of txids and notes");
     for (int i = 0; i < tx_hashes.size(); i++) {
       set_tx_note(tx_hashes[i], notes[i]);
@@ -3112,6 +3197,7 @@ namespace monero {
 
   std::vector<monero_address_book_entry> monero_wallet_full::get_address_book_entries(const std::vector<uint64_t>& indices) const {
     MTRACE("monero_wallet_full::get_address_book_entries()");
+    assert_not_closed();
 
     // get wallet2 address book entries
     const auto w2_entries = m_w2->get_address_book();
@@ -3144,6 +3230,7 @@ namespace monero {
 
   uint64_t monero_wallet_full::add_address_book_entry(const std::string& address, const std::string& description) {
     MTRACE("add_address_book_entry()");
+    assert_not_closed();
     cryptonote::address_parse_info info;
     epee::json_rpc::error er;
     if(!get_account_address_from_str_or_url(info, m_w2->nettype(), address,
@@ -3161,6 +3248,7 @@ namespace monero {
 
   void monero_wallet_full::edit_address_book_entry(uint64_t index, bool set_address, const std::string& address, bool set_description, const std::string& description) {
     MTRACE("edit_address_book_entry()");
+    assert_not_closed();
 
     const auto ab = m_w2->get_address_book();
     if (index >= ab.size()) throw std::runtime_error("Index out of range: " + std::to_string(index));
@@ -3193,6 +3281,7 @@ namespace monero {
   }
 
   void monero_wallet_full::delete_address_book_entry(uint64_t index) {
+    assert_not_closed();
     const auto w2_entries = m_w2->get_address_book();
     if (index >= w2_entries.size()) throw std::runtime_error("Index out of range: " + std::to_string(index));
     if (!m_w2->delete_address_book_row(index)) throw std::runtime_error("Failed to delete address book entry");
@@ -3200,6 +3289,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_payment_uri(const monero_tx_config& config) const {
     MTRACE("get_payment_uri()");
+    assert_not_closed();
 
     // validate config
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
@@ -3223,6 +3313,7 @@ namespace monero {
 
   std::shared_ptr<monero_tx_config> monero_wallet_full::parse_payment_uri(const std::string& uri) const {
     MTRACE("parse_payment_uri(" << uri << ")");
+    assert_not_closed();
 
     // decode uri to parameters
     std::string address;
@@ -3250,15 +3341,18 @@ namespace monero {
   }
 
   bool monero_wallet_full::get_attribute(const std::string& key, std::string& value) const {
+    assert_not_closed();
     return m_w2->get_attribute(key, value);
   }
 
   void monero_wallet_full::set_attribute(const std::string& key, const std::string& val) {
+    assert_not_closed();
     m_w2->set_attribute(key, val);
   }
 
   void monero_wallet_full::start_mining(boost::optional<uint64_t> num_threads, boost::optional<bool> background_mining, boost::optional<bool> ignore_battery) {
     MTRACE("start_mining()");
+    assert_not_closed();
 
     // only mine on trusted daemon
     if (!m_w2->is_trusted_daemon()) throw std::runtime_error("This command requires a trusted daemon.");
@@ -3289,6 +3383,7 @@ namespace monero {
 
   void monero_wallet_full::stop_mining() {
     MTRACE("stop_mining()");
+    assert_not_closed();
     cryptonote::COMMAND_RPC_STOP_MINING::request daemon_req;
     cryptonote::COMMAND_RPC_STOP_MINING::response daemon_res;
     bool r = m_w2->invoke_http_json("/stop_mining", daemon_req, daemon_res);
@@ -3298,6 +3393,7 @@ namespace monero {
   }
 
   uint64_t monero_wallet_full::wait_for_next_block() {
+    assert_not_closed();
 
     // use mutex and condition variable to wait for block
     boost::mutex temp;
@@ -3330,16 +3426,19 @@ namespace monero {
   }
 
   bool monero_wallet_full::is_multisig_import_needed() const {
+    assert_not_closed();
     return m_w2->multisig() && m_w2->has_multisig_partial_key_images();
   }
 
   monero_multisig_info monero_wallet_full::get_multisig_info() const {
+    assert_not_closed();
     monero_multisig_info info;
     info.m_is_multisig = m_w2->multisig(&info.m_is_ready, &info.m_threshold, &info.m_num_participants);
     return info;
   }
 
   std::string monero_wallet_full::prepare_multisig() {
+    assert_not_closed();
     if (m_w2->multisig()) throw std::runtime_error("This wallet is already multisig");
     if (m_w2->watch_only()) throw std::runtime_error("This wallet is view-only and cannot be made multisig");
     m_w2->enable_multisig(true);
@@ -3347,6 +3446,7 @@ namespace monero {
   }
 
   std::string monero_wallet_full::make_multisig(const std::vector<std::string>& multisig_hexes, int threshold, const std::string& password) {
+    assert_not_closed();
     if (m_w2->multisig()) throw std::runtime_error("This wallet is already multisig");
     if (m_w2->watch_only()) throw std::runtime_error("This wallet is view-only and cannot be made multisig");
     boost::lock_guard<boost::mutex> guarg(m_sync_mutex);  // do not refresh while making multisig
@@ -3354,6 +3454,7 @@ namespace monero {
   }
 
   monero_multisig_init_result monero_wallet_full::exchange_multisig_keys(const std::vector<std::string>& multisig_hexes, const std::string& password) {
+    assert_not_closed();
 
     // validate state and args
     bool ready;
@@ -3377,6 +3478,7 @@ namespace monero {
   }
 
   std::string monero_wallet_full::export_multisig_hex() {
+    assert_not_closed();
     bool ready;
     if (!m_w2->multisig(&ready)) throw std::runtime_error("This wallet is not multisig");
     if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
@@ -3384,6 +3486,7 @@ namespace monero {
   }
 
   int monero_wallet_full::import_multisig_hex(const std::vector<std::string>& multisig_hexes, const bool refresh_after_import) {
+    assert_not_closed();
 
     // validate state and args
     bool ready;
@@ -3412,6 +3515,7 @@ namespace monero {
   }
 
   monero_multisig_sign_result monero_wallet_full::sign_multisig_tx_hex(const std::string& multisig_tx_hex) {
+    assert_not_closed();
 
     // validate state and args
     bool ready;
@@ -3455,6 +3559,7 @@ namespace monero {
   }
 
   std::vector<std::string> monero_wallet_full::submit_multisig_tx_hex(const std::string& signed_multisig_tx_hex) {
+    assert_not_closed();
 
     // validate state and args
     bool ready;
@@ -3497,6 +3602,7 @@ namespace monero {
 
   void monero_wallet_full::change_password(const std::string& old_password, const std::string& new_password) {
     MTRACE("change_password(" << "***" << ", ***)");
+    assert_not_closed();
     if (!get_path().empty()) { // TODO: skipping password verification of in-memory wallet
       if (!m_w2->verify_password(old_password)) throw std::runtime_error("Invalid original password.");
     }
@@ -3505,15 +3611,18 @@ namespace monero {
 
   void monero_wallet_full::move_to(const std::string& path, const std::string& password) {
     MTRACE("move_to(" << path << ", ***)");
+    assert_not_closed();
     m_w2->store_to(path, password);
   }
 
   void monero_wallet_full::save() {
     MTRACE("save()");
+    assert_not_closed();
     m_w2->store();
   }
 
   std::string monero_wallet_full::get_keys_file_buffer(const epee::wipeable_string& password, bool view_only) const {
+    assert_not_closed();
     boost::optional<wallet2::keys_file_data> keys_file_data = m_w2->get_keys_file_data(password, view_only);
     std::string buf;
     ::serialization::dump_binary(keys_file_data.get(), buf);
@@ -3521,6 +3630,7 @@ namespace monero {
   }
 
   std::string monero_wallet_full::get_cache_file_buffer() const {
+    assert_not_closed();
     boost::optional<wallet2::cache_file_data> cache_file_data = m_w2->get_cache_file_data();
     std::string buf;
     ::serialization::dump_binary(cache_file_data.get(), buf);
@@ -3529,6 +3639,7 @@ namespace monero {
 
   void monero_wallet_full::close(bool save) {
     MTRACE("close()");
+    if (m_is_closed) return; // closing a closed wallet has no effect
     stop_syncing(); // prevent sync thread from starting again
     if (save) this->save();
     if (m_sync_loop_running) {
@@ -3540,9 +3651,15 @@ namespace monero {
     m_w2->deinit();
     m_w2->callback(nullptr);  // unregister listener after sync
     m_w2_listener.reset();    // wait for queued notifications
+    m_is_connected = false;
+    m_is_closed = true;
   }
 
   // ------------------------------- PRIVATE HELPERS ----------------------------
+
+  void monero_wallet_full::assert_not_closed() const {
+    if (m_is_closed) throw std::runtime_error("Wallet is closed");
+  }
 
   void monero_wallet_full::init_common() {
     MTRACE("monero_wallet_full.cpp init_common()");
@@ -3564,6 +3681,7 @@ namespace monero {
     m_rescan_on_sync = false;
     m_syncing_enabled = false;
     m_sync_loop_running = false;
+    m_is_closed = false;
   }
 
   std::vector<std::shared_ptr<monero_transfer>> monero_wallet_full::get_transfers_aux(const monero_transfer_query& query) const {

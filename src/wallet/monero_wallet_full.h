@@ -245,6 +245,7 @@ namespace monero {
     void move_to(const std::string& path, const std::string& password) override;
     void save() override;
     void close(bool save = false) override;
+    bool is_closed() const override { return m_is_closed; }
 
     /**
      * Wallet import and export using buffers and not the file system.
@@ -265,6 +266,7 @@ namespace monero {
     friend struct wallet2_listener;
     std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
     std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
+    std::atomic<bool> m_is_closed;
 
     static monero_wallet_full* create_wallet_from_seed(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
     static monero_wallet_full* create_wallet_from_keys(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
@@ -274,6 +276,8 @@ namespace monero {
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config& config);  // sweeps unlocked funds within an account; private helper to sweep_unlocked()
+
+    void assert_not_closed() const;
 
     // blockchain sync management
     mutable std::atomic<bool> m_is_synced;       // whether or not wallet is synced

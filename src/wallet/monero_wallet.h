@@ -1380,5 +1380,12 @@ namespace monero {
     virtual void close(bool save = false) {
       throw std::runtime_error("close() not supported");
     }
+
+    /**
+    * Check if the wallet is closed.
+    */
+    virtual bool is_closed() const {
+      throw std::runtime_error("is_closed() not supported");
+    }
   };
 }
