@@ -68,6 +68,8 @@ namespace monero {
    */
   struct serializable_struct {
 
+    virtual ~serializable_struct() = default;
+
     /**
      * Serializes the struct to a json std::string.
      *
