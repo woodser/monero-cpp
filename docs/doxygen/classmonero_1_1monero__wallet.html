@@ -341,8 +341,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a168ce5edf0a5c6e566844c64373c3462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad512fb648e9166d0f9ee910271fcdb55" id="r_ad512fb648e9166d0f9ee910271fcdb55"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad512fb648e9166d0f9ee910271fcdb55">export_multisig_hex</a> ()</td></tr>
 <tr class="separator:ad512fb648e9166d0f9ee910271fcdb55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a94fabc50dc0430ada729a8de07aaeb" id="r_a0a94fabc50dc0430ada729a8de07aaeb"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a94fabc50dc0430ada729a8de07aaeb">import_multisig_hex</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes)</td></tr>
-<tr class="separator:a0a94fabc50dc0430ada729a8de07aaeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2a77ab62ff52d6fceec9db6bceec323" id="r_ad2a77ab62ff52d6fceec9db6bceec323"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad2a77ab62ff52d6fceec9db6bceec323">import_multisig_hex</a> (const std::vector&lt; std::string &gt; &amp;multisig_hexes, bool refresh_after_import=true)</td></tr>
+<tr class="separator:ad2a77ab62ff52d6fceec9db6bceec323"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dc726f96c121b28499e795a2c864134" id="r_a9dc726f96c121b28499e795a2c864134"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__multisig__sign__result.html">monero_multisig_sign_result</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9dc726f96c121b28499e795a2c864134">sign_multisig_tx_hex</a> (const std::string &amp;multisig_tx_hex)</td></tr>
 <tr class="separator:a9dc726f96c121b28499e795a2c864134"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06bbfcca05560738520bbb031d01cbbf" id="r_a06bbfcca05560738520bbb031d01cbbf"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a06bbfcca05560738520bbb031d01cbbf">submit_multisig_tx_hex</a> (const std::string &amp;signed_multisig_tx_hex)</td></tr>
@@ -355,6 +355,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a0160f23ebba72ab5be52e6509c918a5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae89a5f2984886242c841b494276d79a7" id="r_ae89a5f2984886242c841b494276d79a7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae89a5f2984886242c841b494276d79a7">close</a> (bool <a class="el" href="#a0160f23ebba72ab5be52e6509c918a5e">save</a>=false)</td></tr>
 <tr class="separator:ae89a5f2984886242c841b494276d79a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a55555b01d8beea85545ed80737778048" id="r_a55555b01d8beea85545ed80737778048"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a55555b01d8beea85545ed80737778048">is_closed</a> () const</td></tr>
+<tr class="separator:a55555b01d8beea85545ed80737778048"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base wallet with default implementations. </p>
@@ -2968,8 +2970,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a0a94fabc50dc0430ada729a8de07aaeb" name="a0a94fabc50dc0430ada729a8de07aaeb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0a94fabc50dc0430ada729a8de07aaeb">&#9670;&#160;</a></span>import_multisig_hex()</h2>
+<a id="ad2a77ab62ff52d6fceec9db6bceec323" name="ad2a77ab62ff52d6fceec9db6bceec323"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2a77ab62ff52d6fceec9db6bceec323">&#9670;&#160;</a></span>import_multisig_hex()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2980,8 +2982,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual int monero::monero_wallet::import_multisig_hex </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>multisig_hexes</em></span></td><td>)</td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>multisig_hexes</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>refresh_after_import</em></span><span class="paramdefsep"> = </span><span class="paramdefval">true</span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -2991,16 +2997,17 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Import multisig info as hex from other participants.</p>
-<p>Note: If the daemon is not trusted, this method will not automatically update the spent status after importing peer multisig hex. In that case, the</p>
+<p>Note: If the daemon is not trusted, this method will not automatically update the spent status after importing peer multisig hex.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">multisig_hexes</td><td>are multisig hex from each participant </td></tr>
+    <tr><td class="paramname">refresh_after_import</td><td>specifies if the wallet should be refreshed after importing (default true) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of outputs signed with the given multisig hex </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a24bc88e60c6863fb8f5b526f0acdd47a">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2ba229f8ae169cf498517d95d2a50ded">monero::monero_wallet_full</a>.</p>
 
 </div>
 </div>
@@ -3036,6 +3043,34 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>the number of outputs imported </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a6c9308121dbc52e409576287ada6a562">monero::monero_wallet_full</a>.</p>
+
+</div>
+</div>
+<a id="a55555b01d8beea85545ed80737778048" name="a55555b01d8beea85545ed80737778048"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a55555b01d8beea85545ed80737778048">&#9670;&#160;</a></span>is_closed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool monero::monero_wallet::is_closed </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Check if the wallet is closed. </p>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af276845716a876280a62cb92a489a292">monero::monero_wallet_full</a>.</p>
 
 </div>
 </div>
