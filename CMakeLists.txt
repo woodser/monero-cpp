@@ -77,7 +77,24 @@ set(LibUSB_LIBRARIES ${usb_LIBRARY})
 
 set(Boost_NO_BOOST_CMAKE 1)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.58 QUIET REQUIRED COMPONENTS chrono date_time filesystem program_options regex serialization wserialization system thread)
+set(BOOST_COMPONENTS chrono date_time filesystem program_options serialization wserialization thread)
+
+# Find Boost headers
+set(BOOST_MIN_VER 1.62)
+find_package(Boost ${BOOST_MIN_VER} QUIET REQUIRED)
+
+# Boost System is header-only since 1.69
+if (Boost_VERSION_STRING VERSION_LESS 1.69.0)
+  list(APPEND BOOST_COMPONENTS system)
+endif()
+
+# Boost Regex is header-only since 1.77
+if (Boost_VERSION_STRING VERSION_LESS 1.77.0)
+  list(APPEND BOOST_COMPONENTS regex)
+endif()
+
+find_package(Boost ${BOOST_MIN_VER} QUIET REQUIRED COMPONENTS ${BOOST_COMPONENTS})
+message(STATUS "Boost components: ${BOOST_COMPONENTS}")
 message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIR}")
 
 ############

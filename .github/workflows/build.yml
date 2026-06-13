@@ -1,0 +1,203 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-24.04
+    name: ubuntu-24.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake pkg-config libssl-dev libzmq3-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libexpat1-dev libpgm-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev python3 ccache doxygen graphviz git curl autoconf libtool gperf nettle-dev libevent-dev
+
+      - name: Install expat
+        run: |
+          wget https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2
+          tar -xf expat-2.4.8.tar.bz2
+          sudo rm expat-2.4.8.tar.bz2
+          cd expat-2.4.8
+          ./configure --enable-static --disable-shared
+          make
+          sudo make install
+          cd ../
+
+      - name: Install unbound
+        run: |
+          wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz
+          tar xzf unbound-1.22.0.tar.gz
+          sudo apt install -y build-essential
+          sudo apt install -y libssl-dev
+          sudo apt install -y libexpat1-dev
+          sudo apt-get install -y bison
+          sudo apt-get install -y flex
+          cd unbound-1.22.0
+          ./configure --with-libexpat=/usr --with-ssl=/usr --enable-static-exe
+          make
+          sudo make install
+          cd ../
+
+      - name: Build monero-project
+        run: |
+          cd external/monero-project
+          mkdir -p build/release
+          cd build/release
+          cmake -DSTATIC=ON -DBUILD_64=ON -DCMAKE_BUILD_TYPE=Release ../../
+          make -j3 wallet cryptonote_protocol
+          cd ../../../../
+
+      - name: Build monero-cpp
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build .
+          make -j3
+          cd ..
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: libmonero-cpp-linux-amd64
+          path: build/libmonero-cpp.so
+
+  windows:
+    name: windows
+    runs-on: windows-latest
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Setup MSYS2 MINGW64
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-zeromq
+            mingw-w64-x86_64-libsodium
+            mingw-w64-x86_64-hidapi
+            mingw-w64-x86_64-unbound
+            mingw-w64-x86_64-protobuf
+            mingw-w64-x86_64-libusb
+            mingw-w64-x86_64-ntldd
+            git
+            make
+            gettext
+            base-devel
+            wget
+
+      - name: Install ICU v75.1
+        shell: msys2 {0}
+        run: |
+          wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst
+          pacman -U --noconfirm mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst
+
+      - name: Install boost v1.87.0
+        shell: msys2 {0}
+        run: |
+          wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst
+          pacman -U --noconfirm mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst
+
+      - name: Build monero-project
+        shell: msys2 {0}
+        run: |
+          cd external/monero-project
+          mkdir -p build/release
+          cd build/release
+          cmake -G "MSYS Makefiles" \
+            -D STATIC=ON \
+            -D ARCH="x86-64" \
+            -D BUILD_64=ON \
+            -D CMAKE_BUILD_TYPE=Release \
+            -D BUILD_TAG="win-x64" \
+            -D CMAKE_TOOLCHAIN_FILE="../../cmake/64-bit-toolchain.cmake" \
+            -D MSYS2_FOLDER=$(cd $MINGW_PREFIX/.. && pwd -W) \
+            -D USE_DEVICE_TREZOR=OFF \
+            ../../
+            make wallet cryptonote_protocol
+
+      - name: Build monero-cpp
+        shell: msys2 {0}
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build .
+          cd ..
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: libmonero-cpp-win-x64
+          path: |
+            build/libmonero-cpp.dll
+            build/libmonero-cpp.dll.a
+
+  mac-os:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-14, macos-15, macos-15-intel]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install dependencies
+        run: |
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install boost@1.85 hidapi openssl zmq libpgm miniupnpc expat libunwind-headers protobuf unbound
+          brew unlink boost || true
+          brew link boost@1.85 --force
+
+      - name: Build monero-project
+        run: |
+          cd external/monero-project
+          mkdir -p build/release
+          cd build/release
+          cmake -DSTATIC=ON -DBUILD_64=ON -DCMAKE_BUILD_TYPE=Release ../../
+          make -j3 wallet cryptonote_protocol
+          cd ../../../../
+
+      - name: Build monero-cpp
+        run: |
+          mkdir -p build
+          cd build
+          cmake ..
+          cmake --build .
+          make -j3
+          cd ..
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: libmonero-cpp-${{ matrix.os }}
+          path: build/libmonero-cpp.dylib
