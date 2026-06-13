@@ -38,10 +38,10 @@ if [[ $(uname -s) == "MINGW64_NT"* || $(uname -s) == "MSYS"* ]]; then
     fi
 else
     # OS is not windows
-    mkdir -p build/release &&
-    cd build/release &&
-    cmake -DCMAKE_BUILD_TYPE=Release ../../
-    make -j$HOST_NCORES wallet cryptonote_protocol || exit 1
+    ( mkdir -p build/release &&
+      cd build/release &&
+      cmake -DCMAKE_BUILD_TYPE=Release ../../ &&
+      make -j$HOST_NCORES wallet cryptonote_protocol ) || exit 1
 fi
 cd ../../
 
