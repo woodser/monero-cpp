@@ -219,32 +219,35 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
 ### Windows
 
 1. Download and install [MSYS2](https://www.msys2.org/).
-2. Press the Windows button and launch `MSYS2 MINGW64` for 64 bit systems or `MSYS2 MINGW32` for 32 bit.
-3. Update packages: `pacman -Syu` and confirm at prompts.
+
+    Note: If the latest version cannot be installed, use a historical version: https://github.com/msys2/msys2-installer/releases/download/2024-12-08/msys2-x86_64-20241208.exe
+2. Press the Windows button and launch `MSYS2 MINGW64` for 64-bit systems or `MSYS2 MINGW32` for 32-bit.
+3. Update packages: `pacman -Syu`, confirming at the prompts.
 4. Relaunch MSYS2 (if necessary) and install dependencies:
 
-    For 64 bit:
+    For 64-bit:
 
      ```
-     pacman -S mingw-w64-x86_64-toolchain make mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf git mingw-w64-x86_64-libusb gettext base-devel
+     pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-hidapi mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf mingw-w64-x86_64-libusb mingw-w64-x86_64-ntldd git make gettext base-devel wget
      wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst
      pacman -U mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst
-     wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-boost-1.85.0-4-any.pkg.tar.zst
-     pacman -U mingw-w64-x86_64-boost-1.85.0-4-any.pkg.tar.zst
+     wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst
+     pacman -U mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst
      ```
 
-     For 32 bit:
+     For 32-bit:
 
      ```
      pacman -S  mingw-w64-i686-toolchain make mingw-w64-i686-cmake mingw-w64-i686-boost mingw-w64-i686-openssl mingw-w64-i686-zeromq mingw-w64-i686-libsodium mingw-w64-i686-hidapi mingw-w64-i686-unbound mingw-w64-i686-protobuf git mingw-w64-i686-libusb gettext base-devel mingw-w64-i686-icu
      ```
 5. Clone repo if installing standalone (skip if building as part of another repo like monero-java or monero-ts): `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
-6. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with:
+6. In ./external/monero-project/Makefile, add `-D USE_DEVICE_TREZOR=OFF` to the `release-static-win64` target (or `release-static-win32` for 32-bit).
+7. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with:
 
-    For 64 bit: `make release-static-win64`
+    For 64-bit: `make release-static-win64`
     
-    For 32 bit: `make release-static-win32`
-7. Link to this library's source files in your application, or build monero-cpp to a shared library (libmonero-cpp.dll) in ./build: `./bin/build_libmonero_cpp.sh`
+    For 32-bit: `make release-static-win32`
+8. Link to this library's source files in your application, or build monero-cpp to a shared library (libmonero-cpp.dll) in ./build: `./bin/build_libmonero_cpp.sh`
 
 ## Running sample code and tests
 
