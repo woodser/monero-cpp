@@ -18,7 +18,6 @@ endif()
 project(MoneroCppLibrary)
 
 option(BUILD_LIBRARY "Build monero-cpp library" ON)
-option(STATIC "Build monero-cpp static library" OFF)
 option(BUILD_SAMPLE "Build c++ sample code" OFF)
 option(BUILD_SCRATCHPAD "Build c++ scratchpad" OFF)
 option(BUILD_TESTS "Builc c++ tests" OFF)
@@ -114,12 +113,6 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
-
-if(STATIC AND NOT IOS)
-  if(UNIX)
-    set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_DL_LIBS};${CMAKE_THREAD_LIBS_INIT}")
-  endif()
-endif()
 
 if (WIN32)
   list(APPEND OPENSSL_LIBRARIES ws2_32 crypt32 bcrypt)
@@ -298,15 +291,11 @@ set(
 )
 
 if (BUILD_LIBRARY)
-  if (STATIC)
-    message(STATUS "Building static monero-cpp library")
-    add_library(monero-cpp STATIC ${LIBRARY_SRC_FILES})
-  else()
-    message(STATUS "Building shared monero-cpp library")
-    add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
-  endif()
+  # compile sources once, then assemble both shared and static libraries from the objects
+  add_library(monero-cpp-obj OBJECT ${LIBRARY_SRC_FILES})
+  set_target_properties(monero-cpp-obj PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-  target_include_directories(monero-cpp PUBLIC
+  target_include_directories(monero-cpp-obj PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
       src
       "${MONERO_PROJECT}/contrib/epee/include"
@@ -327,8 +316,12 @@ if (BUILD_LIBRARY)
       ${HIDAPI_INCLUDE_DIR}
       ${UNBOUND_INCLUDE_DIR}
   )
-  
-  target_link_libraries(monero-cpp
+
+  add_library(monero-cpp SHARED $<TARGET_OBJECTS:monero-cpp-obj>)
+  add_library(monero-cpp-static STATIC $<TARGET_OBJECTS:monero-cpp-obj>)
+  set_target_properties(monero-cpp-static PROPERTIES OUTPUT_NAME monero-cpp)
+
+  set(MONERO_CPP_LINK_LIBS
       wallet
       rpc_base
       net
@@ -355,7 +348,7 @@ if (BUILD_LIBRARY)
       epee
       hardforks
       ${wallet_crypto}
-      
+
       ${UNBOUND_LIBRARIES}
       ${Boost_LIBRARIES}
       ${Protobuf_LIBRARY}
@@ -365,6 +358,8 @@ if (BUILD_LIBRARY)
       ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
   )
+  target_link_libraries(monero-cpp ${MONERO_CPP_LINK_LIBS})
+  target_link_libraries(monero-cpp-static ${MONERO_CPP_LINK_LIBS})
 
 if (WIN32)
     target_link_options(monero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
@@ -385,7 +380,7 @@ endif()
           src/wallet/monero_wallet_keys.h
           src/wallet/monero_wallet_model.h
           DESTINATION include/wallet)
-  INSTALL(TARGETS monero-cpp
+  INSTALL(TARGETS monero-cpp monero-cpp-static
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Runtime
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT Development)

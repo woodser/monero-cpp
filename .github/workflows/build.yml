@@ -59,13 +59,12 @@ jobs:
           make -j3 wallet cryptonote_protocol
           cd ../../../../
 
-      - name: Build monero-cpp shared library
+      - name: Build monero-cpp libraries
         run: |
           mkdir -p build
           cd build
           cmake ..
-          cmake --build .
-          make -j3
+          cmake --build . -j3
           cd ..
 
       - name: Upload monero-cpp shared library
@@ -73,16 +72,6 @@ jobs:
         with:
           name: libmonero-cpp-linux-amd64
           path: build/libmonero-cpp.so
-
-      - name: Build monero-cpp static library
-        run: |
-          rm -rf build
-          mkdir -p build
-          cd build
-          cmake -DSTATIC=ON ..
-          cmake --build .
-          make -j3
-          cd ..
 
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
@@ -156,7 +145,7 @@ jobs:
             ../../
             make wallet cryptonote_protocol
 
-      - name: Build monero-cpp shared library
+      - name: Build monero-cpp libraries
         shell: msys2 {0}
         run: |
           mkdir -p build
@@ -172,15 +161,6 @@ jobs:
           path: |
             build/libmonero-cpp.dll
             build/libmonero-cpp.dll.a
-
-      - name: Build monero-cpp static library
-        run: |
-          rm -rf build
-          mkdir -p build
-          cd build
-          cmake -DSTATIC=ON ..
-          cmake --build .
-          cd ..
 
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
@@ -218,13 +198,12 @@ jobs:
           make -j3 wallet cryptonote_protocol
           cd ../../../../
 
-      - name: Build monero-cpp shared library
+      - name: Build monero-cpp libraries
         run: |
           mkdir -p build
           cd build
           cmake ..
-          cmake --build .
-          make -j3
+          cmake --build . -j3
           cd ..
 
       - name: Upload monero-cpp shared library
@@ -232,16 +211,6 @@ jobs:
         with:
           name: libmonero-cpp-${{ matrix.os }}
           path: build/libmonero-cpp.dylib
-
-      - name: Build monero-cpp static library
-        run: |
-          rm -rf build
-          mkdir -p build
-          cd build
-          cmake -DSTATIC=ON ..
-          cmake --build .
-          make -j3
-          cd ..
 
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
