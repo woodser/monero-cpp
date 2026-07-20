@@ -18,6 +18,7 @@ endif()
 project(MoneroCppLibrary)
 
 option(BUILD_LIBRARY "Build monero-cpp library" ON)
+option(STATIC "Build monero-cpp static library" OFF)
 option(BUILD_SAMPLE "Build c++ sample code" OFF)
 option(BUILD_SCRATCHPAD "Build c++ scratchpad" OFF)
 option(BUILD_TESTS "Builc c++ tests" OFF)
@@ -297,7 +298,13 @@ set(
 )
 
 if (BUILD_LIBRARY)
-  add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+  if (STATIC)
+    message(STATUS "Building static monero-cpp library")
+    add_library(monero-cpp STATIC ${LIBRARY_SRC_FILES})
+  else()
+    message(STATUS "Building shared monero-cpp library")
+    add_library(monero-cpp SHARED ${LIBRARY_SRC_FILES})
+  endif()
 
   target_include_directories(monero-cpp PUBLIC
       ${CMAKE_CURRENT_SOURCE_DIR}/include
