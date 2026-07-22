@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # build monero-project dependencies
 cd ./external/monero-project/ || exit 1
@@ -37,10 +37,15 @@ if [[ $(uname -s) == "MINGW64_NT"* || $(uname -s) == "MSYS"* ]]; then
           make -j$HOST_NCORES wallet cryptonote_protocol ) || exit 1
     fi
 else
-    # OS is not windows
+    # OS is not windows; explicit ARCH avoids -march=native (CPU-specific binaries)
+    case $(uname -m) in
+        x86_64) ARCH="x86-64";;
+        arm64|aarch64) ARCH="armv8-a";;
+        *) ARCH="native";;
+    esac
     ( mkdir -p build/release &&
       cd build/release &&
-      cmake -DCMAKE_BUILD_TYPE=Release ../../ &&
+      cmake -D STATIC=ON -D ARCH="$ARCH" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D USE_DEVICE_TREZOR=OFF ../../ &&
       make -j$HOST_NCORES wallet cryptonote_protocol ) || exit 1
 fi
 cd ../../
