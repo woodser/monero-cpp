@@ -3663,13 +3663,14 @@ namespace monero {
   void monero_wallet_full::close(bool save) {
     MTRACE("close()");
     if (m_is_closed) return; // closing a closed wallet has no effect
-    stop_syncing(); // prevent sync thread from starting again
-    if (save) this->save();
+    stop_syncing(); // prevent sync thread from starting again and interrupt refresh
     if (m_sync_loop_running) {
       m_sync_cv.notify_one();
       std::this_thread::sleep_for(std::chrono::milliseconds(1));  // TODO: in emscripten, m_sync_cv.notify_one() returns without waiting, so sleep; bug in emscripten upstream llvm?
-      m_syncing_thread.join();
+      m_syncing_thread.join(); // join before locking because the sync loop holds the sync mutex
     }
+    boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // wait for external sync to finish before saving or tearing down
+    if (save) this->save();
     m_w2->stop();
     m_w2->deinit();
     m_w2->callback(nullptr);  // unregister listener after sync
@@ -3983,6 +3984,7 @@ namespace monero {
   monero_sync_result monero_wallet_full::lock_and_sync(boost::optional<uint64_t> start_height) {
     bool rescan = m_rescan_on_sync.exchange(false);
     boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize sync() and syncAsync()
+    assert_not_closed(); // wallet can be closed while waiting for the lock
     monero_sync_result result;
     result.m_num_blocks_fetched = 0;
     result.m_received_money = false;
