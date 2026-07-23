@@ -2129,14 +2129,12 @@ namespace monero {
     auto tx_hashes_iter = tx_hashes.begin();
     auto tx_keys_iter = tx_keys.begin();
     auto tx_amounts_iter = tx_amounts.begin();
-    auto tx_amounts_by_dest_iter = tx_amounts_by_dest.begin();
     auto tx_fees_iter = tx_fees.begin();
     auto tx_weights_iter = tx_weights.begin();
     auto tx_blobs_iter = tx_blobs.begin();
     auto tx_metadatas_iter = tx_metadatas.begin();
     auto input_key_images_list_iter = input_key_images_list.begin();
-    std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
-    auto destinations_iter = destinations.begin();
+    auto ptx_iter = ptx_vector.begin();
     while (tx_fees_iter != tx_fees.end()) {
 
       // init tx with outgoing transfer from filled values
@@ -2163,13 +2161,12 @@ namespace monero {
         input->m_key_image.get()->m_hex = input_key_image;
       }
 
-      // init destinations
-      for (const uint64_t tx_amount_by_dest : (*tx_amounts_by_dest_iter).amounts) {
+      // init destinations from this tx's dests since a payment may be split across txs
+      for (const cryptonote::tx_destination_entry& dest : ptx_iter->dests) {
         std::shared_ptr<monero_destination> destination = std::make_shared<monero_destination>();
-        destination->m_address = (*destinations_iter)->m_address;
-        destination->m_amount = tx_amount_by_dest;
+        destination->m_address = dest.address(m_w2->nettype(), crypto::null_hash);
+        destination->m_amount = dest.amount;
         tx->m_outgoing_transfer.get()->m_destinations.push_back(destination);
-        destinations_iter++;
       }
 
       // init other known fields
@@ -2193,12 +2190,12 @@ namespace monero {
       // iterate to next element
       tx_keys_iter++;
       tx_amounts_iter++;
-      tx_amounts_by_dest_iter++;
       tx_fees_iter++;
       tx_hashes_iter++;
       tx_blobs_iter++;
       tx_metadatas_iter++;
       input_key_images_list_iter++;
+      ptx_iter++;
     }
 
     // build tx set
