@@ -281,11 +281,21 @@ namespace monero {
 
     void assert_not_closed() const;
 
+    // serializes a wallet operation with background sync: pauses the sync loop, interrupts background refresh, and locks m_sync_mutex
+    struct sync_op_lock {
+      sync_op_lock(const monero_wallet_full& wallet);
+      sync_op_lock(const sync_op_lock&) = delete;
+      ~sync_op_lock();
+      const monero_wallet_full& m_wallet;
+    };
+
     // blockchain sync management
     mutable std::atomic<bool> m_is_synced;       // whether or not wallet is synced
     mutable std::atomic<bool> m_is_connected;    // cache connection status to avoid unecessary RPC calls
     boost::condition_variable m_sync_cv;         // to make sync threads woke
-    boost::mutex m_sync_mutex;                   // synchronize sync() and syncAsync() requests
+    mutable boost::mutex m_sync_mutex;           // synchronize sync and other wallet operations
+    mutable std::atomic<uint32_t> m_num_sync_pauses; // number of operations pausing background sync
+    std::atomic<bool> m_background_syncing;      // whether or not a background sync pass is in progress
     std::atomic<bool> m_rescan_on_sync;          // whether or not to rescan on sync
     std::atomic<bool> m_syncing_enabled;         // whether or not auto sync is enabled
     std::atomic<bool> m_sync_loop_running;       // whether or not the syncing thread is shut down
@@ -293,7 +303,7 @@ namespace monero {
     boost::thread m_syncing_thread;              // thread for auto sync loop
     boost::mutex m_syncing_mutex;                // synchronize auto sync loop
     void run_sync_loop();                        // run the sync loop in a thread
-    monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none);  // internal function to synchronize request to sync and rescan
+    monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none, bool background = false);  // internal function to synchronize request to sync and rescan
     monero_sync_result sync_aux(boost::optional<uint64_t> start_height = boost::none);       // internal function to immediately block, sync, and report progress
   };
 }
