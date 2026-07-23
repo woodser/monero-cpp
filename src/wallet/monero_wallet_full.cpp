@@ -1649,7 +1649,7 @@ namespace monero {
     }
 
     // scan txs
-    boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize scanning
+    sync_op_lock op_lock(*this); // synchronize scanning
     m_w2->scan_tx(tx_hashes);
   }
 
@@ -1658,6 +1658,7 @@ namespace monero {
     assert_not_closed();
     if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     if (!is_daemon_trusted()) throw std::runtime_error("Rescan spent can only be used with a trusted daemon");
+    sync_op_lock op_lock(*this); // do not refresh while rescanning spent
     m_w2->rescan_spent();
   }
 
@@ -1752,6 +1753,7 @@ namespace monero {
     assert_not_closed();
 
     // create account
+    sync_op_lock op_lock(*this); // do not refresh while modifying accounts
     m_w2->add_subaddress_account(label);
 
     // initialize and return result
@@ -1778,6 +1780,7 @@ namespace monero {
     assert_not_closed();
 
     // create subaddress
+    sync_op_lock op_lock(*this); // do not refresh while modifying subaddresses
     m_w2->add_subaddress(account_idx, label);
 
     // initialize and return result
@@ -1798,6 +1801,7 @@ namespace monero {
     MTRACE("set_subaddress_label(" << account_idx << ", " << subaddress_idx << ", " << label << ")");
     assert_not_closed();
     cryptonote::subaddress_index index = {account_idx, subaddress_idx};
+    sync_op_lock op_lock(*this); // do not refresh while modifying subaddresses
     m_w2->set_subaddress_label(index, label);
   }
 
@@ -1961,6 +1965,7 @@ namespace monero {
 
   std::string monero_wallet_full::export_outputs(bool all) const {
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while exporting outputs
     return epee::string_tools::buff_to_hex_nodelimer(m_w2->export_outputs_to_str(all));
   }
 
@@ -1974,6 +1979,7 @@ namespace monero {
     }
 
     // import hex and return result
+    sync_op_lock op_lock(*this); // do not refresh while importing outputs
     return m_w2->import_outputs_from_str(blob);
   }
 
@@ -1983,6 +1989,7 @@ namespace monero {
 
     // build key images from wallet2 types
     std::vector<std::shared_ptr<monero_key_image>> key_images;
+    sync_op_lock op_lock(*this); // do not refresh while exporting key images
     std::pair<uint64_t, std::vector<std::pair<crypto::key_image, crypto::signature>>> ski = m_w2->export_key_images(all);
     for (uint64_t n = 0; n < ski.second.size(); ++n) {
       std::shared_ptr<monero_key_image> key_image = std::make_shared<monero_key_image>();
@@ -2011,6 +2018,7 @@ namespace monero {
 
     // import key images
     uint64_t spent = 0, unspent = 0;
+    sync_op_lock op_lock(*this); // do not refresh while importing key images
     uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, is_connected_to_daemon()); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
 
     // translate results
@@ -2026,6 +2034,7 @@ namespace monero {
     if (key_image.empty()) throw std::runtime_error("Must specify key image to freeze");
     crypto::key_image ki;
     if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
+    sync_op_lock op_lock(*this); // do not refresh while modifying outputs
     m_w2->freeze(ki);
   }
 
@@ -2034,6 +2043,7 @@ namespace monero {
     if (key_image.empty()) throw std::runtime_error("Must specify key image to thaw");
     crypto::key_image ki;
     if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
+    sync_op_lock op_lock(*this); // do not refresh while modifying outputs
     m_w2->thaw(ki);
   }
 
@@ -2042,6 +2052,7 @@ namespace monero {
     if (key_image.empty()) throw std::runtime_error("Must specify key image to check if frozen");
     crypto::key_image ki;
     if (!epee::string_tools::hex_to_pod(key_image, ki)) throw std::runtime_error("failed to parse key image");
+    sync_op_lock op_lock(*this); // do not refresh while reading outputs
     return m_w2->frozen(ki);
   }
 
@@ -2054,6 +2065,7 @@ namespace monero {
     MTRACE("monero_wallet_full::create_txs");
     //std::cout << "monero_tx_config: " << config.serialize()  << std::endl;
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while creating txs
 
     // validate config
     if (config.m_account_index == boost::none) throw std::runtime_error("Must specify account index to send from");
@@ -2280,6 +2292,7 @@ namespace monero {
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::sweep_account(const monero_tx_config& config) {
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while creating txs
 
     // validate config
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
@@ -2418,6 +2431,7 @@ namespace monero {
     MTRACE("sweep_output()");
     //MTRACE("monero_tx_config: " << config.serialize());
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while creating txs
 
     // validate input config
     std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
@@ -2564,6 +2578,7 @@ namespace monero {
     assert_not_closed();
 
     // create transaction to fill
+    sync_op_lock op_lock(*this); // do not refresh while creating txs
     std::vector<wallet2::pending_tx> ptx_vector = m_w2->create_unmixable_sweep_transactions();
 
     // config for fill_response
@@ -2664,6 +2679,7 @@ namespace monero {
   std::vector<std::string> monero_wallet_full::relay_txs(const std::vector<std::string>& tx_metadatas) {
     MTRACE("relay_txs()");
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while relaying txs
 
     // relay each metadata as a tx
     std::vector<std::string> tx_hashes;
@@ -2924,6 +2940,7 @@ namespace monero {
       throw std::runtime_error(std::string("Failed to parse signed tx: ") + e.what());
     }
 
+    sync_op_lock op_lock(*this); // do not refresh while relaying txs
     try {
       std::vector<std::string> tx_hashes;
       for (auto &ptx: ptx_vector) {
@@ -3118,6 +3135,7 @@ namespace monero {
     }
 
     // return spend proof signature
+    sync_op_lock op_lock(*this); // do not refresh while generating proof
     return m_w2->get_spend_proof(_tx_hash, message);
   }
 
@@ -3142,6 +3160,7 @@ namespace monero {
     MTRACE("monero_wallet_full::get_reserve_proof_wallet()");
     assert_not_closed();
     boost::optional<std::pair<uint32_t, uint64_t>> account_minreserve;
+    sync_op_lock op_lock(*this); // do not refresh while generating proof
     return m_w2->get_reserve_proof(account_minreserve, message);
   }
 
@@ -3151,6 +3170,7 @@ namespace monero {
     boost::optional<std::pair<uint32_t, uint64_t>> account_minreserve;
     if (account_idx >= m_w2->get_num_subaddress_accounts()) throw std::runtime_error("Account index is out of bound");
     account_minreserve = std::make_pair(account_idx, amount);
+    sync_op_lock op_lock(*this); // do not refresh while generating proof
     return m_w2->get_reserve_proof(account_minreserve, message);
   }
 
@@ -3469,7 +3489,7 @@ namespace monero {
     assert_not_closed();
     if (m_w2->multisig()) throw std::runtime_error("This wallet is already multisig");
     if (m_w2->watch_only()) throw std::runtime_error("This wallet is view-only and cannot be made multisig");
-    boost::lock_guard<boost::mutex> guarg(m_sync_mutex);  // do not refresh while making multisig
+    sync_op_lock op_lock(*this);  // do not refresh while making multisig
     return m_w2->make_multisig(epee::wipeable_string(password), multisig_hexes, threshold);
   }
 
@@ -3484,7 +3504,7 @@ namespace monero {
     if (multisig_hexes.size() + 1 < total) throw std::runtime_error("Needs multisig info from more participants");
 
     // do not refresh while exchanging multisig keys
-    boost::lock_guard<boost::mutex> guarg(m_sync_mutex);
+    sync_op_lock op_lock(*this);
 
     // import peer multisig keys and get multisig hex to be shared next round
     std::string multisig_hex = m_w2->exchange_multisig_keys(epee::wipeable_string(password), multisig_hexes);
@@ -3502,6 +3522,7 @@ namespace monero {
     bool ready;
     if (!m_w2->multisig(&ready)) throw std::runtime_error("This wallet is not multisig");
     if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
+    sync_op_lock op_lock(*this); // do not refresh while exporting multisig info
     return epee::string_tools::buff_to_hex_nodelimer(m_w2->export_multisig());
   }
 
@@ -3525,10 +3546,11 @@ namespace monero {
     }
 
     // import peer multisig hex
+    sync_op_lock op_lock(*this); // do not refresh while importing multisig info
     int num_outputs = m_w2->import_multisig(multisig_blobs, refresh_after_import);
 
-    // if daemon is trusted, rescan spent
-    if (is_daemon_trusted() && refresh_after_import) rescan_spent();
+    // if daemon is trusted, rescan spent (directly since rescan_spent() locks m_sync_mutex)
+    if (is_daemon_trusted() && refresh_after_import) m_w2->rescan_spent();
 
     // return the number of outputs signed by the given multisig hex
     return num_outputs;
@@ -3542,6 +3564,8 @@ namespace monero {
     uint32_t threshold, total;
     if (!m_w2->multisig(&ready, &threshold, &total)) throw std::runtime_error("This wallet is not multisig");
     if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
+
+    sync_op_lock op_lock(*this); // do not refresh while signing multisig txs
 
     // validate and parse multisig tx hex as blob
     cryptonote::blobdata multisig_tx_blob;
@@ -3587,6 +3611,8 @@ namespace monero {
     if (!m_w2->multisig(&ready, &threshold, &total)) throw std::runtime_error("This wallet is not multisig");
     if (!ready) throw std::runtime_error("This wallet is multisig, but not yet finalized");
 
+    sync_op_lock op_lock(*this); // do not refresh while submitting multisig txs
+
     // validate signed multisig tx hex as blob
     cryptonote::blobdata signed_multisig_tx_blob;
     if (!epee::string_tools::parse_hexstr_to_binbuff(signed_multisig_tx_hex, signed_multisig_tx_blob)) {
@@ -3626,23 +3652,27 @@ namespace monero {
     if (!get_path().empty()) { // TODO: skipping password verification of in-memory wallet
       if (!m_w2->verify_password(old_password)) throw std::runtime_error("Invalid original password.");
     }
+    sync_op_lock op_lock(*this); // do not store while syncing
     m_w2->change_password(m_w2->get_wallet_file(), old_password, new_password);
   }
 
   void monero_wallet_full::move_to(const std::string& path, const std::string& password) {
     MTRACE("move_to(" << path << ", ***)");
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not store while syncing
     m_w2->store_to(path, password);
   }
 
   void monero_wallet_full::save() {
     MTRACE("save()");
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not store while syncing
     m_w2->store();
   }
 
   std::string monero_wallet_full::get_keys_file_buffer(const epee::wipeable_string& password, bool view_only) const {
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not serialize keys while syncing
     boost::optional<wallet2::keys_file_data> keys_file_data = m_w2->get_keys_file_data(password, view_only);
     std::string buf;
     ::serialization::dump_binary(keys_file_data.get(), buf);
@@ -3651,6 +3681,7 @@ namespace monero {
 
   std::string monero_wallet_full::get_cache_file_buffer() const {
     assert_not_closed();
+    sync_op_lock op_lock(*this); // do not serialize cache while syncing
     boost::optional<wallet2::cache_file_data> cache_file_data = m_w2->get_cache_file_data();
     std::string buf;
     ::serialization::dump_binary(cache_file_data.get(), buf);
@@ -3667,7 +3698,7 @@ namespace monero {
       m_syncing_thread.join(); // join before locking because the sync loop holds the sync mutex
     }
     boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // wait for external sync to finish before saving or tearing down
-    if (save) this->save();
+    if (save) m_w2->store(); // store directly since save() locks m_sync_mutex
     m_w2->stop();
     m_w2->deinit();
     m_w2->callback(nullptr);  // unregister listener after sync
@@ -3680,6 +3711,18 @@ namespace monero {
 
   void monero_wallet_full::assert_not_closed() const {
     if (m_is_closed) throw std::runtime_error("Wallet is closed");
+  }
+
+  // serialize a wallet operation with background sync, like upstream wallet2 consumers (e.g. simplewallet's LOCK_IDLE_SCOPE)
+  monero_wallet_full::sync_op_lock::sync_op_lock(const monero_wallet_full& wallet) : m_wallet(wallet) {
+    wallet.m_num_sync_pauses++; // pause background sync
+    if (wallet.m_background_syncing) wallet.m_w2->stop(); // interrupt background refresh
+    wallet.m_sync_mutex.lock();
+  }
+
+  monero_wallet_full::sync_op_lock::~sync_op_lock() {
+    m_wallet.m_sync_mutex.unlock();
+    m_wallet.m_num_sync_pauses--; // resume background sync
   }
 
   void monero_wallet_full::init_common() {
@@ -3702,6 +3745,8 @@ namespace monero {
     m_rescan_on_sync = false;
     m_syncing_enabled = false;
     m_sync_loop_running = false;
+    m_num_sync_pauses = 0;
+    m_background_syncing = false;
     m_is_closed = false;
   }
 
@@ -3960,11 +4005,13 @@ namespace monero {
     // TODO: use global threadpool, background sync wasm wallet in c++ thread
     m_syncing_thread = boost::thread([this]() {
 
-      // sync while enabled
+      // sync while enabled and not paused by a wallet operation
       while (m_syncing_enabled) {
-        try { lock_and_sync(); }
-        catch (std::exception const& e) { std::cout << "monero_wallet_full failed to background synchronize: " << e.what() << std::endl; }
-        catch (...) { std::cout << "monero_wallet_full failed to background synchronize" << std::endl; }
+        if (m_num_sync_pauses == 0) {
+          try { lock_and_sync(boost::none, true); }
+          catch (std::exception const& e) { std::cout << "monero_wallet_full failed to background synchronize: " << e.what() << std::endl; }
+          catch (...) { std::cout << "monero_wallet_full failed to background synchronize" << std::endl; }
+        }
 
         // only wait if syncing still enabled
         if (m_syncing_enabled) {
@@ -3978,24 +4025,32 @@ namespace monero {
     });
   }
 
-  monero_sync_result monero_wallet_full::lock_and_sync(boost::optional<uint64_t> start_height) {
-    bool rescan = m_rescan_on_sync.exchange(false);
+  monero_sync_result monero_wallet_full::lock_and_sync(boost::optional<uint64_t> start_height, bool background) {
     boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize sync() and syncAsync()
     assert_not_closed(); // wallet can be closed while waiting for the lock
     monero_sync_result result;
     result.m_num_blocks_fetched = 0;
     result.m_received_money = false;
-    do {
-      // skip if daemon is not connected or synced
-      if (m_is_connected && is_daemon_synced()) {
+    if (background && m_num_sync_pauses > 0) return result; // skip background sync while a wallet operation waits
+    bool rescan = m_rescan_on_sync.exchange(false);
+    m_background_syncing = background; // set under mutex so interrupts only target background sync
+    try {
+      do {
+        // skip if daemon is not connected or synced
+        if (m_is_connected && is_daemon_synced()) {
 
-        // rescan blockchain if requested
-        if (rescan) m_w2->rescan_blockchain(false);
+          // rescan blockchain if requested
+          if (rescan) m_w2->rescan_blockchain(false);
 
-        // sync wallet
-        result = sync_aux(start_height);
-      }
-    } while (!rescan && (rescan = m_rescan_on_sync.exchange(false))); // repeat if not rescanned and rescan was requested
+          // sync wallet
+          result = sync_aux(start_height);
+        }
+      } while (!rescan && (rescan = m_rescan_on_sync.exchange(false))); // repeat if not rescanned and rescan was requested
+    } catch (...) {
+      m_background_syncing = false;
+      throw;
+    }
+    m_background_syncing = false;
     return result;
   }
 
