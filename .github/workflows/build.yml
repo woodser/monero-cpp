@@ -3,10 +3,14 @@ name: Build
 on:
   push:
     branches: [ master ]
+    tags: [ 'v*' ]
   pull_request:
     branches:
       - master
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   ubuntu:
@@ -365,3 +369,35 @@ jobs:
         with:
           name: libmonero-cpp-${{ matrix.arch }}-static
           path: build/libmonero-cpp.a
+
+  release:
+    name: release
+    runs-on: ubuntu-24.04
+    needs: [ubuntu, windows, mac-os]
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v7
+        with:
+          pattern: libmonero-cpp-*
+          path: artifacts
+
+      - name: Package platform archives
+        run: |
+          mkdir release
+          for arch in linux-x86_64 linux-arm64 mac-arm64 mac-x86_64 windows-x86_64; do
+            staging="monero-cpp-$GITHUB_REF_NAME-$arch"
+            mkdir "$staging"
+            cp "artifacts/libmonero-cpp-$arch"/* "artifacts/libmonero-cpp-$arch-static"/* "$staging"/
+            if [ "$arch" = windows-x86_64 ]; then zip -qr "release/$staging.zip" "$staging"; else tar czf "release/$staging.tar.gz" "$staging"; fi
+          done
+          ls -l release
+
+      - name: Attach archives to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          draft: true # publish manually after reviewing the notes
