@@ -10,8 +10,19 @@ on:
 
 jobs:
   ubuntu:
-    name: linux-x86_64
-    runs-on: ubuntu-24.04
+    name: ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            arch: linux-x86_64
+            march: x86-64
+          - os: ubuntu-24.04-arm
+            arch: linux-arm64
+            march: armv8-a
 
     steps:
       - name: Checkout repository
@@ -55,7 +66,7 @@ jobs:
           cd external/monero-project
           mkdir -p build/release
           cd build/release
-          cmake -DSTATIC=ON -DBUILD_64=ON -DARCH="x86-64" -DCMAKE_BUILD_TYPE=Release -DUSE_DEVICE_TREZOR=OFF ../../
+          cmake -DSTATIC=ON -DBUILD_64=ON -DARCH="${{ matrix.march }}" -DCMAKE_BUILD_TYPE=Release -DUSE_DEVICE_TREZOR=OFF ../../
           make -j3 wallet cryptonote_protocol
           cd ../../../../
 
@@ -70,13 +81,13 @@ jobs:
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-linux-x86_64
+          name: libmonero-cpp-${{ matrix.arch }}
           path: build/libmonero-cpp.so
 
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-linux-x86_64-static
+          name: libmonero-cpp-${{ matrix.arch }}-static
           path: build/libmonero-cpp.a
 
   windows:
