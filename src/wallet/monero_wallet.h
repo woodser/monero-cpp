@@ -158,7 +158,7 @@ namespace monero {
      * @param connection is the connection to set
      * @param is_trusted specifies if the daemon is trusted (default = trusted if local address)
      */
-    virtual void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted = boost::none) {
+    virtual void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, const boost::optional<bool>& is_trusted = boost::none) {
       throw std::runtime_error("set_daemon_connection() not supported");
     }
 
@@ -167,7 +167,7 @@ namespace monero {
      *
      * @return the wallet's daemon connection
      */
-    virtual boost::optional<monero_rpc_connection> get_daemon_connection() const {
+    virtual boost::optional<std::shared_ptr<monero_rpc_connection>> get_daemon_connection() const {
       throw std::runtime_error("get_daemon_connection() not supported");
     }
 
@@ -640,6 +640,44 @@ namespace monero {
      */
     virtual monero_account create_account(const std::string& label = "") {
       throw std::runtime_error("create_account() not supported");
+    }
+
+    /**
+     * Tag accounts.
+     *
+     * @param tag is the tag to apply to the specified accounts
+     * @param account_indices are the indices of the accounts to tag
+     */
+    virtual void tag_accounts(const std::string& tag, const std::vector<uint32_t>& account_indices) {
+      throw std::runtime_error("tag_accounts() not supported");
+    }
+
+    /**
+     * Untag accounts.
+     *
+     * @param account_indices are the indices of the accounts to untag
+     */
+    virtual void untag_accounts(const std::vector<uint32_t>& account_indices) {
+      throw std::runtime_error("untag_accounts() not supported");
+    }
+
+    /**
+     * Return all account tags.
+     *
+     * @return the wallet's account tags
+     */
+    virtual std::vector<std::shared_ptr<monero_account_tag>> get_account_tags() const {
+      throw std::runtime_error("get_account_tags() not supported");
+    }
+
+    /**
+     * Sets a human-readable description for a tag.
+     *
+     * @param tag is the tag to set a description for
+     * @param label is the label to set for the tag
+     */
+    virtual void set_account_tag_label(const std::string& tag, const std::string& label) {
+      throw std::runtime_error("set_account_tag_label() not supported");
     }
 
     /**
@@ -1384,8 +1422,8 @@ namespace monero {
     }
 
     /**
-    * Check if the wallet is closed.
-    */
+     * Check if the wallet is closed.
+     */
     virtual bool is_closed() const {
       throw std::runtime_error("is_closed() not supported");
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) woodser
+ * Copyright (c) everoddandeven
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -18,6 +18,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ * Parts of this file are originally copyright (c) 2025-2026 woodser
  *
  * Parts of this file are originally copyright (c) 2014-2019, The Monero Project
  *
@@ -49,106 +51,96 @@
  *
  * Parts of this file are originally copyright (c) 2012-2013 The Cryptonote developers
  */
-
 #pragma once
 
-#include <boost/optional.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/thread.hpp>
-#include <boost/thread/condition_variable.hpp>
-
 #include "monero_wallet.h"
-#include "wallet/wallet2.h"
 
 /**
- * Implements a monero_wallet.h by wrapping monero-project's wallet2.
+ * Implements a monero_wallet.h by wrapping monero-project's monero-wallet-rpc.
  */
 namespace monero {
 
-  // -------------------------------- LISTENERS -------------------------------
-
-  // forward declaration of internal wallet2 listener
-  struct wallet2_listener;
-
-  // --------------------------- STATIC WALLET UTILS --------------------------
+  // forward declaration of internal wallet poller
+  class monero_wallet_poller;
 
   /**
-   * Monero wallet implementation which uses monero-project's wallet2.
+   * Implements a Monero wallet using monero-wallet-rpc.
    */
-  class monero_wallet_full : public monero_wallet {
-
+  class monero_wallet_rpc : public monero_wallet {
   public:
 
     /**
-     * Indicates if a wallet exists at the given path.
-     *
-     * @param path is the path to check for a wallet
-     * @return true if a wallet exists at the given path, false otherwise
+     * Destruct the wallet.
      */
-    static bool wallet_exists(const std::string& path);
+    ~monero_wallet_rpc();
+    monero_wallet_rpc(const std::shared_ptr<monero_rpc_connection>& rpc_connection);
+    monero_wallet_rpc(const std::string& uri = "", const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "", const std::string& zmq_uri = "", const boost::optional<uint32_t>& timeout = boost::none);
 
     /**
-     * Open an existing wallet from disk.
+     * Set the wallet poll period.
      *
-     * @param path is the path to the wallet file to open
-     * @param password is the password of the wallet file to open
-     * @param network_type is the wallet's network type
-     * @param regtest enable regtest
-     * @return a pointer to the wallet instance
+     * @param period_ms poll period in milliseconds.
      */
-    static monero_wallet_full* open_wallet(const std::string& path, const std::string& password, const monero_network_type network_type, bool regtest = false);
+    void set_poll_period_in_ms(uint64_t period_ms);
 
     /**
-     * Open an in-memory wallet from existing data buffers.
+     * Open an existing wallet from rpc server.
      *
-     * @param password is the password of the wallet file to open
-     * @param network_type is the wallet's network type
-     * @param keys_data contains the contents of the ".keys" file
-     * @param cache_data contains the contents of the wallet cache file (no extension)
-     * @param daemon_connection is connection information to a daemon (default = an unconnected wallet)
-     * @param http_client_factory allows use of custom http clients
-     * @param regtest enable regtest
+     * @param config is the wallet configuration
      * @return a pointer to the wallet instance
      */
-    static monero_wallet_full* open_wallet_data(const std::string& password, const monero_network_type, const std::string& keys_data, const std::string& cache_data, const std::shared_ptr<monero_rpc_connection>& daemon_connection = std::make_shared<monero_rpc_connection>(), std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory = nullptr, bool regtest = false);
+    monero_wallet_rpc* open_wallet(const std::shared_ptr<monero_wallet_config> &config);
+
+    /**
+     * Open an existing wallet from rpc server.
+     *
+     * @param name is the wallet's name to open
+     * @param password is the password of the wallet file to open
+     * @return a pointer to the wallet instance
+     */
+    monero_wallet_rpc* open_wallet(const std::string& name, const std::string& password);
 
     /**
      * Create a new wallet with the given configuration.
      *
      * @param config is the wallet configuration
-     * @param http_client_factory allows use of custom http clients
      * @return a pointer to the wallet instance
      */
-    static monero_wallet_full* create_wallet(const monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory = nullptr);
+    monero_wallet_rpc* create_wallet(const std::shared_ptr<monero_wallet_config> &config);
+
+    /**
+     * Get the wallet's RPC connection.
+     *
+     * @return the wallet's rpc connection
+     */
+    std::shared_ptr<monero_rpc_connection> get_rpc_connection() const { return m_rpc; }
 
     /**
      * Get a list of available languages for the wallet's seed.
      *
      * @return the available languages for the wallet's seed
      */
-    static std::vector<std::string> get_seed_languages();
-
-    // ----------------------------- WALLET METHODS -----------------------------
+    std::vector<std::string> get_seed_languages() const;
 
     /**
-     * Destruct the wallet.
+     * Save and close the current wallet and stop the RPC server.
      */
-    ~monero_wallet_full();
+    void stop();
 
     /**
      * Supported wallet methods.
      */
-    bool is_view_only() const override { return m_w2->watch_only(); }
-    void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "", const boost::optional<bool>& is_trusted = boost::none) override;
-    void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, const boost::optional<bool>& is_trusted = boost::none) override;
+    void add_listener(monero_wallet_listener& listener) override;
+    void remove_listener(monero_wallet_listener& listener) override;
+    std::set<monero_wallet_listener*> get_listeners() override;
+    bool is_view_only() const override;
     boost::optional<std::shared_ptr<monero_rpc_connection>> get_daemon_connection() const override;
+    void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, bool is_trusted, const boost::optional<ssl_options>& ssl_options);
+    void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, const boost::optional<bool>& is_trusted = boost::none) override;
+    void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "", const boost::optional<bool>& is_trusted = boost::none) override;
     bool is_connected_to_daemon() const override;
-    bool is_daemon_synced() const override;
-    bool is_daemon_trusted() const override;
-    bool is_synced() const override;
     monero_version get_version() const override;
     std::string get_path() const override;
-    monero_network_type get_network_type() const override;
     std::string get_seed() const override;
     std::string get_seed_language() const override;
     std::string get_public_view_key() const override;
@@ -160,33 +152,32 @@ namespace monero {
     monero_integrated_address get_integrated_address(const std::string& standard_address = "", const std::string& payment_id = "") const override;
     monero_integrated_address decode_integrated_address(const std::string& integrated_address) const override;
     uint64_t get_height() const override;
-    uint64_t get_restore_height() const override;
-    void set_restore_height(uint64_t restore_height) override;
     uint64_t get_daemon_height() const override;
-    uint64_t get_daemon_max_peer_height() const override;
     uint64_t get_height_by_date(uint16_t year, uint8_t month, uint8_t day) const override;
-    void add_listener(monero_wallet_listener& listener) override;
-    void remove_listener(monero_wallet_listener& listener) override;
-    std::set<monero_wallet_listener*> get_listeners() override;
     monero_sync_result sync() override;
     monero_sync_result sync(monero_wallet_listener& listener) override;
-    monero_sync_result sync(uint64_t start_height) override;
     monero_sync_result sync(uint64_t start_height, monero_wallet_listener& listener) override;
-    void start_syncing(uint64_t sync_period_in_ms) override;
+    monero_sync_result sync(uint64_t start_height) override;
+    void start_syncing(uint64_t sync_period_in_ms = 10000) override;
     void stop_syncing() override;
     void scan_txs(const std::vector<std::string>& tx_hashes) override;
     void rescan_spent() override;
     void rescan_blockchain() override;
     uint64_t get_balance() const override;
-    uint64_t get_balance(uint32_t account_idx) const override;
+    uint64_t get_balance(uint32_t account_index) const override;
     uint64_t get_balance(uint32_t account_idx, uint32_t subaddress_idx) const override;
     uint64_t get_unlocked_balance() const override;
-    uint64_t get_unlocked_balance(uint32_t account_idx) const override;
+    uint64_t get_unlocked_balance(uint32_t account_index) const override;
     uint64_t get_unlocked_balance(uint32_t account_idx, uint32_t subaddress_idx) const override;
-    std::vector<monero_account> get_accounts(bool include_subaddresses, const std::string& tag) const override;
     monero_account get_account(const uint32_t account_idx, bool include_subaddresses) const override;
+    monero_account get_account(const uint32_t account_idx, bool include_subaddresses, bool skip_balances) const;
+    std::vector<monero_account> get_accounts(bool include_subaddresses, const std::string& tag) const override;
+    std::vector<monero_account> get_accounts(bool include_subaddresses, const std::string& tag, bool skip_balances) const;
     monero_account create_account(const std::string& label = "") override;
-    std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const override;
+    std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, bool skip_balances) const;
+    std::vector<monero_subaddress> get_subaddresses(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const override;
+    std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx) const override;
+    monero_subaddress get_subaddress(const uint32_t account_idx, const uint32_t subaddress_idx) const override;
     monero_subaddress create_subaddress(uint32_t account_idx, const std::string& label = "") override;
     void set_subaddress_label(uint32_t account_idx, uint32_t subaddress_idx, const std::string& label = "") override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
@@ -201,10 +192,10 @@ namespace monero {
     void thaw_output(const std::string& key_image) override;
     bool is_output_frozen(const std::string& key_image) override;
     monero_tx_priority get_default_fee_priority() const override;
-    std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& config) override;
-    std::vector<std::shared_ptr<monero_tx_wallet>> sweep_unlocked(const monero_tx_config& config) override;
+    std::vector<std::shared_ptr<monero_tx_wallet>> create_txs(const monero_tx_config& conf) override;
     std::shared_ptr<monero_tx_wallet> sweep_output(const monero_tx_config& config) override;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_dust(bool relay = false) override;
+    std::vector<std::shared_ptr<monero_tx_wallet>> sweep_unlocked(const monero_tx_config& config) override;
     std::vector<std::string> relay_txs(const std::vector<std::string>& tx_metadatas) override;
     monero_tx_set describe_tx_set(const monero_tx_set& tx_set) override;
     monero_tx_set sign_txs(const std::string& unsigned_tx_hex) override;
@@ -212,7 +203,7 @@ namespace monero {
     std::string sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx = 0, uint32_t subaddress_idx = 0) const override;
     monero_message_signature_result verify_message(const std::string& msg, const std::string& address, const std::string& signature) const override;
     std::string get_tx_key(const std::string& tx_hash) const override;
-    std::shared_ptr<monero_check_tx> check_tx_key(const std::string& tx_hash, const std::string& txKey, const std::string& address) const override;
+    std::shared_ptr<monero_check_tx> check_tx_key(const std::string& tx_hash, const std::string& tx_key, const std::string& address) const override;
     std::string get_tx_proof(const std::string& tx_hash, const std::string& address, const std::string& message) const override;
     std::shared_ptr<monero_check_tx> check_tx_proof(const std::string& tx_hash, const std::string& address, const std::string& message, const std::string& signature) const override;
     std::string get_spend_proof(const std::string& tx_hash, const std::string& message) const override;
@@ -222,19 +213,22 @@ namespace monero {
     std::shared_ptr<monero_check_reserve> check_reserve_proof(const std::string& address, const std::string& message, const std::string& signature) const override;
     std::string get_tx_note(const std::string& tx_hash) const override;
     std::vector<std::string> get_tx_notes(const std::vector<std::string>& tx_hashes) const override;
-    void set_tx_note(const std::string& tx_hash, const std::string& note) override;
+    void set_tx_note(const std::string& tx_hashes, const std::string& notes) override;
     void set_tx_notes(const std::vector<std::string>& tx_hashes, const std::vector<std::string>& notes) override;
     std::vector<monero_address_book_entry> get_address_book_entries(const std::vector<uint64_t>& indices) const override;
     uint64_t add_address_book_entry(const std::string& address, const std::string& description) override;
     void edit_address_book_entry(uint64_t index, bool set_address, const std::string& address, bool set_description, const std::string& description) override;
     void delete_address_book_entry(uint64_t index) override;
+    void tag_accounts(const std::string& tag, const std::vector<uint32_t>& account_indices) override;
+    void untag_accounts(const std::vector<uint32_t>& account_indices) override;
+    std::vector<std::shared_ptr<monero_account_tag>> get_account_tags() const override;
+    void set_account_tag_label(const std::string& tag, const std::string& label) override;
     std::string get_payment_uri(const monero_tx_config& config) const override;
     std::shared_ptr<monero_tx_config> parse_payment_uri(const std::string& uri) const override;
-    bool get_attribute(const std::string& key, std::string& value) const override;
     void set_attribute(const std::string& key, const std::string& val) override;
+    bool get_attribute(const std::string& key, std::string& value) const override;
     void start_mining(boost::optional<uint64_t> num_threads, boost::optional<bool> background_mining, boost::optional<bool> ignore_battery) override;
     void stop_mining() override;
-    uint64_t wait_for_next_block() override;
     bool is_multisig_import_needed() const override;
     monero_multisig_info get_multisig_info() const override;
     std::string prepare_multisig() override;
@@ -245,66 +239,44 @@ namespace monero {
     monero_multisig_sign_result sign_multisig_tx_hex(const std::string& multisig_tx_hex) override;
     std::vector<std::string> submit_multisig_tx_hex(const std::string& signed_multisig_tx_hex) override;
     void change_password(const std::string& old_password, const std::string& new_password) override;
-    void move_to(const std::string& path, const std::string& password) override;
     void save() override;
+    bool is_closed() const override;
     void close(bool save = false) override;
-    bool is_closed() const override { return m_is_closed; }
+    std::shared_ptr<monero_subaddress> get_balances(const boost::optional<uint32_t>& account_idx, const boost::optional<uint32_t>& subaddress_idx) const;
 
-    /**
-     * Wallet import and export using buffers and not the file system.
-     */
-    std::string get_keys_file_buffer(const epee::wipeable_string& password, bool view_only) const;
-    std::string get_cache_file_buffer() const;
-
-  // --------------------------------- PROTECTED --------------------------------
-
-  protected:
-    std::unique_ptr<tools::wallet2> m_w2;            // internal wallet implementation
-
-    void init_common();
-
-  // ---------------------------------- PRIVATE ---------------------------------
+  // --------------------------------- PRIVATE --------------------------------
 
   private:
-    friend struct wallet2_listener;
-    std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
-    std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
-    std::atomic<bool> m_is_closed;
+    friend class monero_wallet_poller;
+    boost::optional<uint64_t> m_sync_period_in_ms;
+    std::string m_path = "";
+    std::shared_ptr<monero_rpc_connection> m_rpc;
+    std::shared_ptr<monero_rpc_connection> m_daemon_connection;
+    mutable boost::recursive_mutex m_listeners_mutex;
+    std::set<monero_wallet_listener*> m_listeners;
 
-    static monero_wallet_full* create_wallet_from_seed(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
-    static monero_wallet_full* create_wallet_from_keys(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
-    static monero_wallet_full* create_wallet_random(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
+    mutable boost::recursive_mutex m_sync_mutex;
+    mutable boost::mutex m_address_cache_mutex;
+    mutable std::unordered_map<uint32_t, std::unordered_map<uint32_t, std::string>> m_address_cache;
+    boost::mutex m_poller_mutex;
+    std::unique_ptr<monero_wallet_poller> m_poller;
 
-    std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
-    std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
+    monero_wallet_rpc* create_wallet_random(const std::shared_ptr<monero_wallet_config> &config);
+    monero_wallet_rpc* create_wallet_from_seed(const std::shared_ptr<monero_wallet_config> &config);
+    monero_wallet_rpc* create_wallet_from_keys(const std::shared_ptr<monero_wallet_config> &config);
+
+    monero_sync_result refresh(const std::shared_ptr<serializable_struct>& params);
+
+    std::map<uint32_t, std::vector<uint32_t>> get_account_indices(bool get_subaddress_indices) const;
+    std::vector<uint32_t> get_subaddress_indices(uint32_t account_idx) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
-    std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config& config);  // sweeps unlocked funds within an account; private helper to sweep_unlocked()
-
-    void assert_not_closed() const;
-
-    // serializes a wallet operation with background sync: pauses the sync loop, interrupts background refresh, and locks m_sync_mutex
-    struct sync_op_lock {
-      sync_op_lock(const monero_wallet_full& wallet);
-      sync_op_lock(const sync_op_lock&) = delete;
-      ~sync_op_lock();
-      const monero_wallet_full& m_wallet;
-    };
-
-    // blockchain sync management
-    mutable std::atomic<bool> m_is_synced;       // whether or not wallet is synced
-    mutable std::atomic<bool> m_is_connected;    // cache connection status to avoid unecessary RPC calls
-    boost::condition_variable m_sync_cv;         // to make sync threads woke
-    mutable boost::mutex m_sync_mutex;           // synchronize sync and other wallet operations
-    mutable std::atomic<uint32_t> m_num_sync_pauses; // number of operations pausing background sync
-    std::atomic<bool> m_background_syncing;      // whether or not a background sync pass is in progress
-    std::atomic<bool> m_rescan_on_sync;          // whether or not to rescan on sync
-    std::atomic<bool> m_syncing_enabled;         // whether or not auto sync is enabled
-    std::atomic<bool> m_sync_loop_running;       // whether or not the syncing thread is shut down
-    std::atomic<int> m_syncing_interval;         // auto sync loop interval in milliseconds
-    boost::thread m_syncing_thread;              // thread for auto sync loop
-    boost::mutex m_syncing_mutex;                // synchronize auto sync loop
-    void run_sync_loop();                        // run the sync loop in a thread
-    monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none, bool background = false);  // internal function to synchronize request to sync and rescan
-    monero_sync_result sync_aux(boost::optional<uint64_t> start_height = boost::none);       // internal function to immediately block, sync, and report progress
+    std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
+    std::string query_key(const std::string& key_type) const;
+    std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config &conf);
+    void clear_address_cache();
+    void refresh_listening();
+    void wait_for_listener_callbacks_idle();
+    void poll();
+    void clear();
   };
 }

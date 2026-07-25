@@ -122,7 +122,7 @@ namespace monero {
     rapidjson::Value root(rapidjson::kObjectType);
 
     // set sub-objects
-    if (m_server != boost::none) root.AddMember("server", m_server.get().to_rapidjson_val(allocator), allocator);
+    if (m_server != nullptr) root.AddMember("server", m_server->to_rapidjson_val(allocator), allocator);
 
     // set num values
     rapidjson::Value value_num(rapidjson::kNumberType);
@@ -172,7 +172,7 @@ namespace monero {
         if (network_type_num == 0) config->m_network_type = monero_network_type::MAINNET;
         else if (network_type_num == 1) config->m_network_type = monero_network_type::TESTNET;
         else if (network_type_num == 2) config->m_network_type = monero_network_type::STAGENET;
-        else throw std::runtime_error("Invalid network type number: " + std::to_string(network_type_num));
+        else throw std::runtime_error("Invalid network type, expected 0-2: " + std::to_string(network_type_num));
       }
       else if (key == std::string("server")) config->m_server = monero_rpc_connection::from_property_tree(it->second);
       else if (key == std::string("isTrustedDaemon")) config->m_is_trusted_daemon = it->second.get_value<bool>();
@@ -213,6 +213,17 @@ namespace monero {
 
   // -------------------------- MONERO ACCOUNT -----------------------------
 
+  void monero_account::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_account>& account) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("index")) account->m_index = it->second.get_value<uint32_t>();
+      else if (key == std::string("balance")) account->m_balance = it->second.get_value<uint64_t>();
+      else if (key == std::string("unlockedBalance")) account->m_unlocked_balance = it->second.get_value<uint64_t>();
+      else if (key == std::string("primaryAddress")) account->m_primary_address = it->second.data();
+      else if (key == std::string("tag") && !it->second.data().empty()) account->m_tag = it->second.data();
+    }
+  }
+
   rapidjson::Value monero_account::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
     // create root
@@ -237,6 +248,21 @@ namespace monero {
   }
 
   // -------------------------- MONERO SUBADDRESS -----------------------------
+
+  void monero_subaddress::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_subaddress>& subaddress) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("accountIndex")) subaddress->m_account_index = it->second.get_value<uint32_t>();
+      else if (key == std::string("index")) subaddress->m_index = it->second.get_value<uint32_t>();
+      else if (key == std::string("address")) subaddress->m_address = it->second.data();
+      else if (key == std::string("balance")) subaddress->m_balance = it->second.get_value<uint64_t>();
+      else if (key == std::string("unlockedBalance")) subaddress->m_unlocked_balance = it->second.get_value<uint64_t>();
+      else if (key == std::string("label") && !it->second.data().empty()) subaddress->m_label = it->second.data();
+      else if (key == std::string("isUsed")) subaddress->m_is_used = it->second.get_value<bool>();
+      else if (key == std::string("numUnspentOutputs")) subaddress->m_num_unspent_outputs = it->second.get_value<uint64_t>();
+      else if (key == std::string("numBlocksToUnlock")) subaddress->m_num_blocks_to_unlock = it->second.get_value<uint64_t>();
+    }
+  }
 
   rapidjson::Value monero_subaddress::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
@@ -661,6 +687,15 @@ namespace monero {
     return true;
   }
 
+  std::shared_ptr<monero_tx_query> monero_tx_query::decontextualize(std::shared_ptr<monero_tx_query> query) {
+    query->m_is_incoming = boost::none;
+    query->m_is_outgoing = boost::none;
+    query->m_transfer_query = boost::none;
+    query->m_input_query = boost::none;
+    query->m_output_query = boost::none;
+    return query;
+  }
+
   // -------------------------- MONERO DESTINATION ----------------------------
 
   rapidjson::Value monero_destination::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -742,6 +777,15 @@ namespace monero {
     return tx_set;
   }
 
+  void monero_tx_set::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx_set>& set) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("multisigTxHex") && !it->second.data().empty()) set->m_multisig_tx_hex = it->second.data();
+      else if (key == std::string("unsignedTxHex") && !it->second.data().empty()) set->m_unsigned_tx_hex = it->second.data();
+      else if (key == std::string("signedTxHex") && !it->second.data().empty()) set->m_signed_tx_hex = it->second.data();
+    }
+  }
+
   // ---------------------------- MONERO TRANSFER -----------------------------
 
   rapidjson::Value monero_transfer::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -791,7 +835,7 @@ namespace monero {
 
     // TODO monero-project: failed tx in pool (after testUpdateLockedDifferentAccounts()) causes non-originating saved wallets to return duplicate incoming transfers but one has amount of 0
     if (m_amount != boost::none && other->m_amount != boost::none && *m_amount != *other->m_amount && (*m_amount == 0 || *other->m_amount == 0)) {
-      std::cout << "WARNING: monero-project returning transfers with 0 amount/numSuggestedConfirmations" << std::endl;
+      MWARNING("monero-project returning transfers with 0 amount/numSuggestedConfirmations");
       //if (*m_amount == 0) m_amount = *other->m_amount;
     } else {
       m_amount = gen_utils::reconcile(m_amount, other->m_amount, "transfer amount");
@@ -1078,6 +1122,15 @@ namespace monero {
     return true;
   }
 
+  bool monero_transfer_query::is_contextual(const monero_transfer_query& query) {
+    if (query.m_tx_query == boost::none) return false;
+    if (query.m_tx_query.get()->m_is_incoming != boost::none) return true;    // requires context of all transfers
+    if (query.m_tx_query.get()->m_is_outgoing != boost::none) return true;
+    if (query.m_tx_query.get()->m_input_query != boost::none) return true;    // requires context of inputs
+    if (query.m_tx_query.get()->m_output_query != boost::none) return true;   // requires context of outputs
+    return false;
+  }
+
   boost::optional<bool> monero_transfer_query::is_incoming() const { return m_is_incoming; }
 
   // ------------------------- MONERO OUTPUT WALLET ---------------------------
@@ -1262,6 +1315,14 @@ namespace monero {
     return true;
   }
 
+  bool monero_output_query::is_contextual(const monero_output_query& query) {
+    if (query.m_tx_query == boost::none) return false;
+    if (query.m_tx_query.get()->m_is_incoming != boost::none) return true;    // requires context of all transfers
+    if (query.m_tx_query.get()->m_is_outgoing != boost::none) return true;
+    if (query.m_tx_query.get()->m_transfer_query != boost::none) return true; // requires context of transfers
+    return false;
+  }
+
   // --------------------------- MONERO TX CONFIG -----------------------------
 
   monero_tx_config::monero_tx_config(const monero_tx_config& config) {
@@ -1401,7 +1462,25 @@ namespace monero {
     return root;
   }
 
+  void monero_integrated_address::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_integrated_address>& subaddress) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("integratedAddress")) subaddress->m_integrated_address = it->second.data();
+      else if (key == std::string("standardAddress")) subaddress->m_standard_address = it->second.data();
+      else if (key == std::string("paymentId")) subaddress->m_payment_id = it->second.data();
+    }
+  }
+
   // -------------------- MONERO KEY IMAGE IMPORT RESULT ----------------------
+
+  void monero_key_image_import_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_import_result>& result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("height")) result->m_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("spentAmount")) result->m_spent_amount = it->second.get_value<uint64_t>();
+      else if (key == std::string("unspentAmount")) result->m_unspent_amount = it->second.get_value<uint64_t>();
+    }
+  }
 
   rapidjson::Value monero_key_image_import_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
@@ -1419,6 +1498,21 @@ namespace monero {
   }
 
   // -------------------- MONERO MESSAGE SIGNATURE RESULT ---------------------
+
+  void monero_message_signature_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_message_signature_result> result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("isGood")) result->m_is_good = it->second.get_value<bool>();
+      else if (key == std::string("isOld")) result->m_is_old = it->second.get_value<bool>();
+      else if (key == std::string("signatureType")) {
+        std::string sig_type = it->second.data();
+        if (sig_type == "view") result->m_signature_type = monero_message_signature_type::SIGN_WITH_VIEW_KEY;
+        else if (sig_type == "spend") result->m_signature_type = monero_message_signature_type::SIGN_WITH_SPEND_KEY;
+        else throw std::runtime_error("Invalid message signature type: " + sig_type);
+      }
+      else if (key == std::string("version")) result->m_version = it->second.get_value<uint32_t>();
+    }
+  }
 
   rapidjson::Value monero_message_signature_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
@@ -1457,6 +1551,16 @@ namespace monero {
 
   // --------------------------- MONERO CHECK TX ------------------------------
 
+  void monero_check_tx::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_check_tx>& check) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("isGood")) check->m_is_good = it->second.get_value<bool>();
+      if (key == std::string("inTxPool")) check->m_in_tx_pool = it->second.get_value<bool>();
+      else if (key == std::string("numConfirmations")) check->m_num_confirmations = it->second.get_value<uint64_t>();
+      else if (key == std::string("receivedAmount")) check->m_received_amount = it->second.get_value<uint64_t>();
+    }
+  }
+
   rapidjson::Value monero_check_tx::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
     // serialize root from superclass
@@ -1490,7 +1594,26 @@ namespace monero {
     return root;
   }
 
+  void monero_check_reserve::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_check_reserve>& check) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("isGood")) check->m_is_good = it->second.get_value<bool>();
+      else if (key == std::string("totalAmount")) check->m_total_amount = it->second.get_value<uint64_t>();
+      else if (key == std::string("unconfirmedSpentAmount")) check->m_unconfirmed_spent_amount = it->second.get_value<uint64_t>();
+    }
+  }
+
   // --------------------------- MONERO MULTISIG ------------------------------
+
+  void monero_multisig_info::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_multisig_info>& info) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("isMultisig")) info->m_is_multisig = it->second.get_value<bool>();
+      else if (key == std::string("isReady")) info->m_is_ready = it->second.get_value<bool>();
+      else if (key == std::string("threshold")) info->m_threshold = it->second.get_value<uint32_t>();
+      else if (key == std::string("numParticipants")) info->m_num_participants = it->second.get_value<uint32_t>();
+    }
+  }
 
   rapidjson::Value monero_multisig_info::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
@@ -1510,6 +1633,14 @@ namespace monero {
     return root;
   }
 
+  void monero_multisig_init_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_multisig_init_result>& info) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("address")) info->m_address = it->second.data();
+      else if (key == std::string("multisigHex")) info->m_multisig_hex = it->second.data();
+    }
+  }
+
   rapidjson::Value monero_multisig_init_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
     // create root
@@ -1522,6 +1653,18 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_multisig_sign_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_multisig_sign_result>& res) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("signedMultisigTxHex")) res->m_signed_multisig_tx_hex = it->second.data();
+      else if (key == std::string("txHashes")) {
+        for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          res->m_tx_hashes.push_back(it2->second.data());
+        }
+      }
+    }
   }
 
   rapidjson::Value monero_multisig_sign_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1555,6 +1698,142 @@ namespace monero {
     if (m_address != boost::none) monero_utils::add_json_member("address", m_address.get(), allocator, root, value_str);
     if (m_description != boost::none) monero_utils::add_json_member("description", m_description.get(), allocator, root, value_str);
     if (m_payment_id != boost::none) monero_utils::add_json_member("paymentId", m_payment_id.get(), allocator, root, value_str);
+
+    // return root
+    return root;
+  }
+
+  void monero_address_book_entry::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_address_book_entry>& entry) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+
+      if (key == std::string("index")) entry->m_index = it->second.get_value<uint64_t>();
+      else if (key == std::string("address")) entry->m_address = it->second.data();
+      else if (key == std::string("description")) entry->m_description = it->second.data();
+      else if (key == std::string("paymentId")) entry->m_payment_id = it->second.data();
+    }
+  }
+
+  // -------------------------- MONERO COMPARATORS ---------------------------
+
+  bool monero_tx_height_comparator::operator()(const std::shared_ptr<monero_tx>& tx1, const std::shared_ptr<monero_tx>& tx2) const {
+    auto h1 = tx1->get_height();
+    auto h2 = tx2->get_height();
+
+    if (h1 == boost::none && h2 == boost::none) {
+      // both unconfirmed
+      return false;
+    }
+    else if (h1 == boost::none) {
+      // tx1 is unconfirmed
+      return false;
+    }
+    else if (h2 == boost::none) {
+      // tx2 is unconfirmed
+      return true;
+    }
+
+    if (*h1 != *h2) {
+      return *h1 < *h2;
+    }
+
+    // txs are in the same block so retain their original order
+    const auto& txs = tx1->m_block.get()->m_txs;
+    auto it1 = std::find(txs.begin(), txs.end(), tx1);
+    auto it2 = std::find(txs.begin(), txs.end(), tx2);
+
+    return std::distance(txs.begin(), it1) < std::distance(txs.begin(), it2);
+  }
+
+  bool monero_incoming_transfer_comparator::operator()(const std::shared_ptr<monero_incoming_transfer>& t1, const std::shared_ptr<monero_incoming_transfer>& t2) const {
+    return (*this)(*t1, *t2);
+  }
+
+  bool monero_incoming_transfer_comparator::operator()(const monero_incoming_transfer& t1, const monero_incoming_transfer& t2) const {
+    monero_tx_height_comparator tx_comp;
+
+    // compare by height
+    if (tx_comp(t1.m_tx, t2.m_tx)) return true;
+    if (tx_comp(t2.m_tx, t1.m_tx)) return false;
+
+    // compare by account and subaddress index
+    if (t1.m_account_index.value() != t2.m_account_index.value()) {
+      return t1.m_account_index.value() < t2.m_account_index.value();
+    }
+
+    return t1.m_subaddress_index.value() < t2.m_subaddress_index.value();
+  }
+
+  bool monero_output_comparator::operator()(const monero_output_wallet& o1, const monero_output_wallet& o2) const {
+    monero_tx_height_comparator tx_comp;
+
+    if (tx_comp(o1.m_tx, o2.m_tx)) return true;
+    if (tx_comp(o2.m_tx, o1.m_tx)) return false;
+
+    if (o1.m_account_index.value() != o2.m_account_index.value()) {
+      return o1.m_account_index.value() < o2.m_account_index.value();
+    }
+
+    if (o1.m_subaddress_index.value() != o2.m_subaddress_index.value()) {
+      return o1.m_subaddress_index.value() < o2.m_subaddress_index.value();
+    }
+
+    if (o1.m_index.value() != o2.m_index.value()) {
+      return o1.m_index.value() < o2.m_index.value();
+    }
+
+    return o1.m_key_image.get()->m_hex.value() < o2.m_key_image.get()->m_hex.value();
+  }
+
+  // --------------------------- MONERO DECODED ADDRESS ---------------------------
+
+  monero_decoded_address::monero_decoded_address(const std::string& address, monero_address_type address_type, monero_network_type network_type):
+    m_address(address),
+    m_address_type(address_type),
+    m_network_type(network_type) {
+  }
+
+  rapidjson::Value monero_decoded_address::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    monero_utils::add_json_member("address", m_address, allocator, root, value_str);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    monero_utils::add_json_member("addressType", (uint8_t)m_address_type, allocator, root, value_num);
+    monero_utils::add_json_member("networkType", (uint8_t)m_network_type, allocator, root, value_num);
+
+    // return root
+    return root;
+  }
+
+  // --------------------------- MONERO ACCOUNT TAG ---------------------------
+
+  void monero_account_tag::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_account_tag>& account_tag) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("tag")) account_tag->m_tag = it->second.data();
+      else if (key == std::string("label") && !it->second.data().empty()) account_tag->m_label = it->second.data();
+      else if (key == std::string("accountIndices")) {
+        for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          account_tag->m_account_indices.push_back(it2->second.get_value<uint32_t>());
+        }
+      }
+    }
+  }
+
+  rapidjson::Value monero_account_tag::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    if (m_tag != boost::none) monero_utils::add_json_member("tag", m_tag.get(), allocator, root, value_str);
+    if (m_label != boost::none) monero_utils::add_json_member("label", m_label.get(), allocator, root, value_str);
+    if (!m_account_indices.empty()) root.AddMember("accountIndices", monero_utils::to_rapidjson_val(allocator, m_account_indices), allocator);
 
     // return root
     return root;
