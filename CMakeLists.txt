@@ -17,6 +17,11 @@ endif()
 
 project(MoneroCppLibrary)
 
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+add_definitions(-DBOOST_UUID_DISABLE_ALIGNMENT) # match monero-project so shared struct layouts agree
+
 option(BUILD_LIBRARY "Build monero-cpp library" ON)
 option(BUILD_SAMPLE "Build c++ sample code" OFF)
 option(BUILD_SCRATCHPAD "Build c++ scratchpad" OFF)
