@@ -1152,7 +1152,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
-    wallet->set_daemon_connection(config.m_server);
+    wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_seed_language(language);
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
 
@@ -1251,7 +1251,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
-    wallet->set_daemon_connection(config.m_server);
+    wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->m_w2->set_seed_language(config.m_language.get());
     wallet->init_common();
@@ -1274,7 +1274,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
-    wallet->set_daemon_connection(config.m_server);
+    wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_seed_language(config.m_language.get());
     crypto::secret_key secret_key;
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
@@ -1297,30 +1297,33 @@ namespace monero {
     close(false);
   }
 
-  void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri) {
+  void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri, const boost::optional<bool>& is_trusted) {
     MTRACE("set_daemon_connection(" << uri << ", " << username << ", " << "***" << ", " << proxy_uri << ")");
     assert_not_closed();
 
-    // prepare uri, login, and is_trusted for wallet2
+    // prepare uri, login, and trusted for wallet2
     boost::optional<epee::net_utils::http::login> login{};
     login.emplace(username, password);
-    bool is_trusted = false;
-    try { is_trusted = tools::is_local_address(uri); }
-    catch (const std::exception& e) { }
+    bool trusted = false;
+    if (is_trusted != boost::none) trusted = is_trusted.get();
+    else {
+      try { trusted = tools::is_local_address(uri); }
+      catch (const std::exception& e) { }
+    }
 
     // detect ssl TODO: wallet2 does not detect ssl from uri
     epee::net_utils::ssl_support_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
 
-    if (!m_w2->set_daemon(uri, login, is_trusted, std::move(ssl), proxy_uri)) {
+    if (!m_w2->set_daemon(uri, login, trusted, std::move(ssl), proxy_uri)) {
       throw std::runtime_error("Failed to initialize wallet with daemon connection");
     }
     is_connected_to_daemon(); // update m_is_connected cache // TODO: better naming?
   }
 
-  void monero_wallet_full::set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
+  void monero_wallet_full::set_daemon_connection(const boost::optional<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted) {
     assert_not_closed();
-    if (connection == boost::none) set_daemon_connection("");
-    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get(), connection->m_proxy_uri == boost::none ? "" : connection->m_proxy_uri.get());
+    if (connection == boost::none) set_daemon_connection("", "", "", "", is_trusted);
+    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get(), connection->m_proxy_uri == boost::none ? "" : connection->m_proxy_uri.get(), is_trusted);
   }
 
   boost::optional<monero_rpc_connection> monero_wallet_full::get_daemon_connection() const {
