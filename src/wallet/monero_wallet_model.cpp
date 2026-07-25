@@ -97,6 +97,7 @@ namespace monero {
     m_password = config.m_password;
     m_network_type = config.m_network_type;
     m_server = config.m_server;
+    m_is_trusted_daemon = config.m_is_trusted_daemon;
     m_seed = config.m_seed;
     m_seed_offset = config.m_seed_offset;
     m_primary_address = config.m_primary_address;
@@ -144,6 +145,7 @@ namespace monero {
     if (m_subaddress_lookahead != boost::none) monero_utils::add_json_member("subaddressLookahead", m_subaddress_lookahead.get(), allocator, root, value_str);
 
     // set bool values
+    if (m_is_trusted_daemon != boost::none) monero_utils::add_json_member("isTrustedDaemon", m_is_trusted_daemon.get(), allocator, root);
     if (m_save_current != boost::none) monero_utils::add_json_member("saveCurrent", m_save_current.get(), allocator, root);
     if (m_is_multisig != boost::none) monero_utils::add_json_member("isMultisig", m_is_multisig.get(), allocator, root);
     if (m_regtest != boost::none) monero_utils::add_json_member("regtest", m_regtest.get(), allocator, root);
@@ -173,6 +175,7 @@ namespace monero {
         else throw std::runtime_error("Invalid network type number: " + std::to_string(network_type_num));
       }
       else if (key == std::string("server")) config->m_server = monero_rpc_connection::from_property_tree(it->second);
+      else if (key == std::string("isTrustedDaemon")) config->m_is_trusted_daemon = it->second.get_value<bool>();
       else if (key == std::string("seed")) config->m_seed = it->second.data();
       else if (key == std::string("seedOffset")) config->m_seed_offset = it->second.data();
       else if (key == std::string("primaryAddress")) config->m_primary_address = it->second.data();

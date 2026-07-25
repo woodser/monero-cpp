@@ -146,8 +146,9 @@ namespace monero {
      * @param username is the username to authenticate with the daemon (optional)
      * @param password is the password to authenticate with the daemon (optional)
      * @param proxy_uri is the proxy to the daemon (e.g. over Tor).
+     * @param is_trusted specifies if the daemon is trusted (default = trusted if local address)
      */
-    virtual void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "") {
+    virtual void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "", const boost::optional<bool>& is_trusted = boost::none) {
       throw std::runtime_error("set_daemon_connection() not supported");
     }
 
@@ -155,8 +156,9 @@ namespace monero {
      * Set the wallet's daemon connection.
      *
      * @param connection is the connection to set
+     * @param is_trusted specifies if the daemon is trusted (default = trusted if local address)
      */
-    virtual void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection) {
+    virtual void set_daemon_connection(const boost::optional<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted = boost::none) {
       throw std::runtime_error("set_daemon_connection() not supported");
     }
 

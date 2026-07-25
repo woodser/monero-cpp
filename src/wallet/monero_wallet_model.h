@@ -69,6 +69,7 @@ namespace monero {
     boost::optional<std::string> m_password;
     boost::optional<monero_network_type> m_network_type;
     boost::optional<monero_rpc_connection> m_server;
+    boost::optional<bool> m_is_trusted_daemon;
     boost::optional<std::string> m_seed;
     boost::optional<std::string> m_seed_offset;
     boost::optional<std::string> m_primary_address;
