@@ -1304,12 +1304,9 @@ namespace monero {
     // prepare uri, login, and is_trusted for wallet2
     boost::optional<epee::net_utils::http::login> login{};
     login.emplace(username, password);
-    bool is_trusted = true;
-
-    // TODO: is_local_address() uses common/util which requires libunbound
-//    bool is_trusted = false;
-//    try { is_trusted = tools::is_local_address(uri); }  // wallet is trusted iff local
-//    catch (const exception &e) { }
+    bool is_trusted = false;
+    try { is_trusted = tools::is_local_address(uri); }
+    catch (const std::exception& e) { }
 
     // detect ssl TODO: wallet2 does not detect ssl from uri
     epee::net_utils::ssl_support_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
