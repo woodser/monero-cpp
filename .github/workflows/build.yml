@@ -10,8 +10,8 @@ on:
 
 jobs:
   ubuntu:
+    name: linux-x86_64
     runs-on: ubuntu-24.04
-    name: ubuntu-24.04
 
     steps:
       - name: Checkout repository
@@ -55,7 +55,7 @@ jobs:
           cd external/monero-project
           mkdir -p build/release
           cd build/release
-          cmake -DSTATIC=ON -DBUILD_64=ON -DCMAKE_BUILD_TYPE=Release ../../
+          cmake -DSTATIC=ON -DBUILD_64=ON -DARCH="x86-64" -DCMAKE_BUILD_TYPE=Release -DUSE_DEVICE_TREZOR=OFF ../../
           make -j3 wallet cryptonote_protocol
           cd ../../../../
 
@@ -70,13 +70,13 @@ jobs:
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-linux-amd64
+          name: libmonero-cpp-linux-x86_64
           path: build/libmonero-cpp.so
 
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-linux-amd64-static
+          name: libmonero-cpp-linux-x86_64-static
           path: build/libmonero-cpp.a
 
   windows:
@@ -157,7 +157,7 @@ jobs:
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-win-x64
+          name: libmonero-cpp-windows-x86_64
           path: |
             build/libmonero-cpp.dll
             build/libmonero-cpp.dll.a
@@ -165,17 +165,23 @@ jobs:
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-win-x64-static
+          name: libmonero-cpp-windows-x86_64-static
           path: build/libmonero-cpp.a
 
   mac-os:
-    name: ${{ matrix.os }}
+    name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-14, macos-15, macos-15-intel]
+        include:
+          - os: macos-15
+            arch: mac-arm64
+            march: armv8-a
+          - os: macos-15-intel
+            arch: mac-x86_64
+            march: x86-64
 
     steps:
       - name: Checkout repository
@@ -194,7 +200,7 @@ jobs:
           cd external/monero-project
           mkdir -p build/release
           cd build/release
-          cmake -DSTATIC=ON -DBUILD_64=ON -DCMAKE_BUILD_TYPE=Release ../../
+          cmake -DSTATIC=ON -DBUILD_64=ON -DARCH="${{ matrix.march }}" -DCMAKE_BUILD_TYPE=Release -DUSE_DEVICE_TREZOR=OFF ../../
           make -j3 wallet cryptonote_protocol
           cd ../../../../
 
@@ -209,11 +215,11 @@ jobs:
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-${{ matrix.os }}
+          name: libmonero-cpp-${{ matrix.arch }}
           path: build/libmonero-cpp.dylib
 
       - name: Upload monero-cpp static library
         uses: actions/upload-artifact@v7
         with:
-          name: libmonero-cpp-${{ matrix.os }}-static
+          name: libmonero-cpp-${{ matrix.arch }}-static
           path: build/libmonero-cpp.a
