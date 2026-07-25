@@ -12,19 +12,34 @@ jobs:
   ubuntu:
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
+    # build in old-distro containers so the libraries run on older glibc;
+    # arm64 uses debian:12 for a binutils that can link randomx aarch64 relocations
+    container: ${{ matrix.container }}
 
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: ubuntu-24.04
+            container: debian:11
             arch: linux-x86_64
             march: x86-64
+            filearch: x86-64
+            glibc_floor: GLIBC_2.31
           - os: ubuntu-24.04-arm
+            container: debian:12
             arch: linux-arm64
             march: armv8-a
+            filearch: aarch64
+            glibc_floor: GLIBC_2.36
 
     steps:
+      - name: Install git
+        run: |
+          apt update
+          apt install -y git ca-certificates
+          git config --global --add safe.directory '*'
+
       - name: Checkout repository
         uses: actions/checkout@v5
         with:
@@ -32,34 +47,70 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt update
-          sudo apt install -y build-essential cmake pkg-config libssl-dev libzmq3-dev libunbound-dev libsodium-dev libunwind8-dev liblzma-dev libreadline6-dev libexpat1-dev libpgm-dev qttools5-dev-tools libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev libboost-chrono-dev libboost-date-time-dev libboost-filesystem-dev libboost-locale-dev libboost-program-options-dev libboost-regex-dev libboost-serialization-dev libboost-system-dev libboost-thread-dev python3 ccache doxygen graphviz git curl autoconf libtool gperf nettle-dev libevent-dev
+          apt install -y build-essential cmake pkg-config file perl wget libzmq3-dev libunbound-dev libsodium-dev libunwind-dev liblzma-dev libreadline-dev libexpat1-dev libpgm-dev libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev python3 ccache git curl autoconf libtool gperf bison flex nettle-dev libevent-dev
+          # record versions of the distro libraries that get statically linked into the shipped binary
+          dpkg -s libsodium-dev libprotobuf-dev | grep -E '^(Package|Version)'
+
+      - name: Install openssl
+        run: |
+          # distro openssl 1.1 is near end of life; build the current LTS statically (/etc/ssl matches most distros' CA layout)
+          wget https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz
+          echo "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8  openssl-3.5.7.tar.gz" | sha256sum -c
+          tar xzf openssl-3.5.7.tar.gz
+          cd openssl-3.5.7
+          ./config --prefix=/usr/local --openssldir=/etc/ssl --libdir=lib no-shared no-tests -fPIC
+          make -j3
+          make install_sw
 
       - name: Install expat
         run: |
-          wget https://github.com/libexpat/libexpat/releases/download/R_2_4_8/expat-2.4.8.tar.bz2
-          tar -xf expat-2.4.8.tar.bz2
-          sudo rm expat-2.4.8.tar.bz2
-          cd expat-2.4.8
-          ./configure --enable-static --disable-shared
+          wget https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.bz2
+          echo "45c98ae1e9b5127325d25186cf8c511fa814078e9efeae7987a574b482b79b3d  expat-2.7.1.tar.bz2" | sha256sum -c
+          tar -xf expat-2.7.1.tar.bz2
+          cd expat-2.7.1
+          ./configure --enable-static --disable-shared --with-pic
           make
-          sudo make install
-          cd ../
+          make install
 
       - name: Install unbound
         run: |
           wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz
+          echo "c5dd1bdef5d5685b2cedb749158dd152c52d44f65529a34ac15cd88d4b1b3d43  unbound-1.22.0.tar.gz" | sha256sum -c
           tar xzf unbound-1.22.0.tar.gz
-          sudo apt install -y build-essential
-          sudo apt install -y libssl-dev
-          sudo apt install -y libexpat1-dev
-          sudo apt-get install -y bison
-          sudo apt-get install -y flex
           cd unbound-1.22.0
-          ./configure --with-libexpat=/usr --with-ssl=/usr --enable-static-exe
+          ./configure --with-libexpat=/usr/local --with-ssl=/usr/local --enable-static --disable-shared --with-pic
           make
-          sudo make install
-          cd ../
+          make install
+
+      - name: Install libusb
+        run: |
+          wget https://github.com/libusb/libusb/releases/download/v1.0.27/libusb-1.0.27.tar.bz2
+          echo "ffaa41d741a8a3bee244ac8e54a72ea05bf2879663c098c82fc5757853441575  libusb-1.0.27.tar.bz2" | sha256sum -c
+          tar -xf libusb-1.0.27.tar.bz2
+          cd libusb-1.0.27
+          ./configure --disable-shared --disable-udev --with-pic
+          make
+          make install
+
+      - name: Install hidapi
+        run: |
+          wget https://github.com/libusb/hidapi/archive/refs/tags/hidapi-0.14.0.tar.gz
+          echo "a5714234abe6e1f53647dd8cba7d69f65f71c558b7896ed218864ffcf405bcbd  hidapi-0.14.0.tar.gz" | sha256sum -c
+          tar xzf hidapi-0.14.0.tar.gz
+          cd hidapi-hidapi-0.14.0
+          cmake -B build -DBUILD_SHARED_LIBS=OFF -DHIDAPI_WITH_HIDRAW=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .
+          cmake --build build
+          cmake --install build
+
+      - name: Install boost
+        run: |
+          # PIC static boost, same version on all platforms (no distro boost so headers and archives match)
+          wget https://archives.boost.io/release/1.85.0/source/boost_1_85_0.tar.bz2
+          echo "7009fe1faa1697476bdc7027703a2badb84e849b7b0baad5086b087b971f8617  boost_1_85_0.tar.bz2" | sha256sum -c
+          tar xf boost_1_85_0.tar.bz2
+          cd boost_1_85_0
+          ./bootstrap.sh --with-libraries=chrono,date_time,filesystem,locale,program_options,regex,serialization,system,thread
+          ./b2 -j3 cxxflags=-fPIC cflags=-fPIC link=static runtime-link=shared boost.locale.icu=off install
 
       - name: Build monero-project
         run: |
@@ -74,9 +125,26 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake ..
+          cmake -DSTATIC=ON -DBOOST_ROOT=/usr/local -DBoost_NO_SYSTEM_PATHS=ON ..
           cmake --build . -j3
           cd ..
+
+      - name: Verify libraries
+        run: |
+          file build/libmonero-cpp.so | grep -q '${{ matrix.filearch }}' || { echo "wrong architecture: $(file build/libmonero-cpp.so)"; exit 1; }
+          ldd build/libmonero-cpp.so
+          floor=$(objdump -T build/libmonero-cpp.so | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -1)
+          echo "glibc floor: $floor"
+          test "$(printf '%s\n${{ matrix.glibc_floor }}\n' "$floor" | sort -V | tail -1)" = "${{ matrix.glibc_floor }}" || { echo "glibc floor $floor exceeds ${{ matrix.glibc_floor }}"; exit 1; }
+          if ldd build/libmonero-cpp.so | grep -vE 'linux-vdso|ld-linux|libc\.so|libm\.so|libpthread\.so|librt\.so|libdl\.so'; then
+            echo "library is not standalone: unexpected dynamic dependencies above"; exit 1
+          fi
+          nm -D --defined-only build/libmonero-cpp.so | grep -q monero_wallet_full || { echo "missing monero-cpp api exports"; exit 1; }
+          # --exclude-libs hides the static closure; check for leaked dependency symbols
+          if nm -D --defined-only build/libmonero-cpp.so | grep -E ' (SSL_|EVP_|BN_)'; then
+            echo "static closure symbols are exported"; exit 1
+          fi
+          nm build/libmonero-cpp.a | grep -q monero_wallet_full || { echo "missing api in static library"; exit 1; }
 
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
@@ -119,6 +187,7 @@ jobs:
             mingw-w64-x86_64-unbound
             mingw-w64-x86_64-protobuf
             mingw-w64-x86_64-libusb
+            mingw-w64-x86_64-expat
             mingw-w64-x86_64-ntldd
             git
             make
@@ -130,13 +199,17 @@ jobs:
         shell: msys2 {0}
         run: |
           wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst
+          echo "bf57882d43efcdfd746463613ea982c69b64aa4ba9bed4cb24c02a81ad06c3a9  mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst" | sha256sum -c
           pacman -U --noconfirm mingw-w64-x86_64-icu-75.1-2-any.pkg.tar.zst
 
       - name: Install boost v1.87.0
         shell: msys2 {0}
         run: |
           wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst
+          echo "241919a5885a9270d0e0937e71cf5e146c2a8cabecc2714f09248350181cb1b6  mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst" | sha256sum -c
           pacman -U --noconfirm mingw-w64-x86_64-boost-1.87.0-3-any.pkg.tar.zst
+          # record versions of the msys2 libraries that get statically linked into the shipped binary
+          pacman -Q | grep mingw-w64 | sort
 
       - name: Build monero-project
         shell: msys2 {0}
@@ -161,9 +234,28 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake ..
+          cmake -DSTATIC=ON ..
           cmake --build .
           cd ..
+
+      - name: Verify libraries
+        shell: msys2 {0}
+        run: |
+          objdump -f build/libmonero-cpp.dll | grep -q "x86-64" || { echo "wrong architecture"; exit 1; }
+          ntldd build/libmonero-cpp.dll
+          if ntldd build/libmonero-cpp.dll | grep -iE "mingw|msys|not found"; then
+            echo "library is not standalone: unexpected dynamic dependencies above"; exit 1
+          fi
+          # allow-list imports by name so a dependency resolving outside msys2 paths still fails
+          if ntldd build/libmonero-cpp.dll | grep -ivE "ntdll|kernel32|kernelbase|msvcrt|ws2_32|advapi32|user32|shell32|ole32|oleaut32|rpcrt4|crypt32|bcrypt|secur32|dnsapi|iphlpapi|setupapi|cfgmgr32|gdi32|winmm|userenv|version\.dll|api-ms-win" | grep -iE "\.dll"; then
+            echo "library is not standalone: unexpected dynamic dependencies above"; exit 1
+          fi
+          objdump -p build/libmonero-cpp.dll | grep -q monero_wallet_full || { echo "missing monero-cpp api exports"; exit 1; }
+          # --exclude-libs hides the static closure; check for leaked dependency symbols
+          if objdump -p build/libmonero-cpp.dll | grep -E '\s(SSL_|EVP_|BN_)'; then
+            echo "static closure symbols are exported"; exit 1
+          fi
+          nm build/libmonero-cpp.a | grep -q monero_wallet_full || { echo "missing api in static library"; exit 1; }
 
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
@@ -183,6 +275,9 @@ jobs:
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
 
+    env:
+      MACOSX_DEPLOYMENT_TARGET: "11.0"
+
     strategy:
       fail-fast: false
       matrix:
@@ -190,9 +285,11 @@ jobs:
           - os: macos-15
             arch: mac-arm64
             march: armv8-a
+            filearch: arm64
           - os: macos-15-intel
             arch: mac-x86_64
             march: x86-64
+            filearch: x86_64
 
     steps:
       - name: Checkout repository
@@ -202,9 +299,31 @@ jobs:
 
       - name: Install dependencies
         run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install boost@1.85 hidapi openssl zmq libpgm miniupnpc expat libunwind-headers protobuf unbound
-          brew unlink boost || true
-          brew link boost@1.85 --force
+          HOMEBREW_NO_AUTO_UPDATE=1 brew install libsodium openssl zmq libpgm miniupnpc expat libunwind-headers protobuf unbound libevent libnghttp2
+          # record versions of the brew libraries that get statically linked into the shipped binary
+          brew list --versions | sort
+
+      - name: Install hidapi (static)
+        run: |
+          # brew ships no static hidapi; build from source so the library is standalone
+          curl -fsSLO https://github.com/libusb/hidapi/archive/refs/tags/hidapi-0.14.0.tar.gz
+          echo "a5714234abe6e1f53647dd8cba7d69f65f71c558b7896ed218864ffcf405bcbd  hidapi-0.14.0.tar.gz" | shasum -a 256 -c
+          tar xzf hidapi-0.14.0.tar.gz
+          cd hidapi-hidapi-0.14.0
+          cmake -B build -DBUILD_SHARED_LIBS=OFF -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 .
+          cmake --build build
+          sudo cmake --install build
+
+      - name: Install boost
+        run: |
+          # brew ships no static boost; build from source (also keeps its objects at the 11.0 deployment target)
+          curl -fsSLO https://archives.boost.io/release/1.85.0/source/boost_1_85_0.tar.bz2
+          echo "7009fe1faa1697476bdc7027703a2badb84e849b7b0baad5086b087b971f8617  boost_1_85_0.tar.bz2" | shasum -a 256 -c
+          tar xf boost_1_85_0.tar.bz2
+          cd boost_1_85_0
+          ./bootstrap.sh --with-libraries=chrono,date_time,filesystem,locale,program_options,regex,serialization,system,thread
+          ./b2 -j3 cxxflags=-fPIC cflags=-fPIC link=static runtime-link=shared boost.locale.icu=off
+          sudo -E ./b2 -j3 cxxflags=-fPIC cflags=-fPIC link=static runtime-link=shared boost.locale.icu=off install
 
       - name: Build monero-project
         run: |
@@ -219,9 +338,21 @@ jobs:
         run: |
           mkdir -p build
           cd build
-          cmake ..
+          cmake -DSTATIC=ON -DBOOST_ROOT=/usr/local -DBoost_NO_SYSTEM_PATHS=ON ..
           cmake --build . -j3
           cd ..
+
+      - name: Verify libraries
+        run: |
+          lipo -archs build/libmonero-cpp.dylib | grep -qx '${{ matrix.filearch }}' || { echo "wrong architecture: $(lipo -archs build/libmonero-cpp.dylib)"; exit 1; }
+          otool -L build/libmonero-cpp.dylib
+          otool -l build/libmonero-cpp.dylib | grep minos
+          otool -l build/libmonero-cpp.dylib | grep -q 'minos 11.0' || { echo "unexpected macOS deployment target"; exit 1; }
+          if otool -L build/libmonero-cpp.dylib | tail -n +2 | grep -vE '@rpath/libmonero-cpp\.dylib|/usr/lib/|/System/Library/'; then
+            echo "library is not standalone: unexpected dynamic dependencies above"; exit 1
+          fi
+          nm -gU build/libmonero-cpp.dylib | grep -q monero_wallet_full || { echo "missing monero-cpp api exports"; exit 1; }
+          nm build/libmonero-cpp.a | grep -q monero_wallet_full || { echo "missing api in static library"; exit 1; }
 
       - name: Upload monero-cpp shared library
         uses: actions/upload-artifact@v7
