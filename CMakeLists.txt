@@ -27,6 +27,18 @@ option(BUILD_SAMPLE "Build c++ sample code" OFF)
 option(BUILD_SCRATCHPAD "Build c++ scratchpad" OFF)
 option(BUILD_TESTS "Builc c++ tests" OFF)
 
+option(STATIC "Link dependencies statically for a standalone library" OFF)
+if (STATIC)
+  set(Boost_USE_STATIC_LIBS ON)
+  set(OPENSSL_USE_STATIC_LIBS ON)
+  # resolve remaining deps (sodium, unbound, hidapi, usb, protobuf) to static archives
+  if (APPLE)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a .dylib .tbd) # fall back to dynamic for deps without static archives
+  else()
+    set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
+  endif()
+endif()
+
 ###################
 # monero-project
 ###################
@@ -54,7 +66,7 @@ if (APPLE)
   endif()
 endif()
 if (WIN32)
-  list(APPEND EXTRA_LIBRARIES setupapi)
+  list(APPEND EXTRA_LIBRARIES setupapi iphlpapi)
 endif()
 
 message(STATUS EXTRA_LIBRARIES: ${EXTRA_LIBRARIES})
@@ -118,6 +130,10 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 message(STATUS "Using OpenSSL include dir at ${OPENSSL_INCLUDE_DIR}")
+
+if (STATIC AND UNIX AND NOT IOS)
+  set(OPENSSL_LIBRARIES "${OPENSSL_LIBRARIES};${CMAKE_DL_LIBS};${CMAKE_THREAD_LIBS_INIT}")
+endif()
 
 if (WIN32)
   list(APPEND OPENSSL_LIBRARIES ws2_32 crypt32 bcrypt)
@@ -185,12 +201,27 @@ else()
   message(STATUS "Found libunbound include (unbound.h) in ${UNBOUND_INCLUDE_DIR}")
   if(UNBOUND_LIBRARIES)
     message(STATUS "Found libunbound library")
-    if (WIN32)
+    if (WIN32 OR STATIC)
       add_library(unbound STATIC IMPORTED)
     else()
       add_library(unbound SHARED IMPORTED)
     endif()
-    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES}) 
+    set_target_properties(unbound PROPERTIES IMPORTED_LOCATION ${UNBOUND_LIBRARIES})
+    if (STATIC)
+      # static libunbound also requires expat and, when built with DoH, libevent + nghttp2
+      find_library(EXPAT_LIBRARY expat HINTS /opt/homebrew/opt/expat/lib /usr/local/opt/expat/lib)
+      if (EXPAT_LIBRARY)
+        list(APPEND UNBOUND_LIBRARIES ${EXPAT_LIBRARY})
+      endif()
+      find_library(EVENT_LIBRARY NAMES event event_core HINTS /opt/homebrew/opt/libevent/lib /usr/local/opt/libevent/lib)
+      if (EVENT_LIBRARY)
+        list(APPEND UNBOUND_LIBRARIES ${EVENT_LIBRARY})
+      endif()
+      find_library(NGHTTP2_LIBRARY nghttp2 HINTS /opt/homebrew/opt/libnghttp2/lib /usr/local/opt/libnghttp2/lib)
+      if (NGHTTP2_LIBRARY)
+        list(APPEND UNBOUND_LIBRARIES ${NGHTTP2_LIBRARY})
+      endif()
+    endif()
   else()
     message(FATAL_ERROR "Found libunbound includes, but could not find libunbound library. Please make sure you have installed libunbound or libunbound-dev or the equivalent")
   endif()
@@ -368,10 +399,26 @@ if (BUILD_LIBRARY)
 
 if (WIN32)
     target_link_options(monero-cpp PUBLIC "-Wl,--enable-auto-import,--export-all-symbols")
+    if (STATIC)
+      # statically link winpthread so the library does not depend on libwinpthread-1.dll
+      target_link_options(monero-cpp PRIVATE "-Wl,-Bstatic,--whole-archive" -lwinpthread "-Wl,--no-whole-archive,-Bdynamic")
+    endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_options(monero-cpp PRIVATE "-z" "noexecstack")
+endif()
+
+if (STATIC)
+  if (NOT APPLE)
+    # statically link the c++ runtime for a standalone library
+    target_link_options(monero-cpp PRIVATE -static-libstdc++ -static-libgcc)
+    # export only the monero-cpp api, not the static closure
+    target_link_options(monero-cpp PRIVATE "-Wl,--exclude-libs,ALL")
+  endif()
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_options(monero-cpp PRIVATE "-Wl,--no-undefined") # fail at link if static closure is incomplete
+  endif()
 endif()
 
   INSTALL(FILES src/daemon/monero_daemon.h
