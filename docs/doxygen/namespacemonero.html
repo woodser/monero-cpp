@@ -166,6 +166,10 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__fee__estimate.html">monero_fee_estimate</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__generate__blocks__params.html">monero_generate_blocks_params</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__generate__blocks__result.html">monero_generate_blocks_result</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__get__address__params.html">monero_get_address_params</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__get__balance__params.html">monero_get_balance_params</a></td></tr>
@@ -207,6 +211,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__is__key__image__spent__params.html">monero_is_key_image_spent_params</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__key__image__export__result.html">monero_key_image_export_result</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1monero__key__image__import__result.html">monero_key_image_import_result</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -452,6 +458,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_prune_res
 <tr class="memitem:ad266db5184e841d164d8945053792b4a" id="r_ad266db5184e841d164d8945053792b4a"><td class="memItemLeft" align="right" valign="top"><a id="ad266db5184e841d164d8945053792b4a" name="ad266db5184e841d164d8945053792b4a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_mining_status</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__mining__status.html">monero_mining_status</a> &gt; &amp;status)</td></tr>
 <tr class="separator:ad266db5184e841d164d8945053792b4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d943d9027584c801f6082e4b8247637" id="r_a7d943d9027584c801f6082e4b8247637"><td class="memItemLeft" align="right" valign="top"><a id="a7d943d9027584c801f6082e4b8247637" name="a7d943d9027584c801f6082e4b8247637"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_generate_blocks_result</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__generate__blocks__result.html">monero_generate_blocks_result</a> &gt; &amp;result)</td></tr>
+<tr class="separator:a7d943d9027584c801f6082e4b8247637"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13b1c7670ec429dce0c255669c57926d" id="r_a13b1c7670ec429dce0c255669c57926d"><td class="memItemLeft" align="right" valign="top"><a id="a13b1c7670ec429dce0c255669c57926d" name="a13b1c7670ec429dce0c255669c57926d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_miner_tx_sum</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__miner__tx__sum.html">monero_miner_tx_sum</a> &gt; &amp;sum)</td></tr>
 <tr class="separator:a13b1c7670ec429dce0c255669c57926d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -623,9 +632,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_integrate
 <tr class="memitem:a1011659a2049770c8cccf7b2b57c41b6" id="r_a1011659a2049770c8cccf7b2b57c41b6"><td class="memItemLeft" align="right" valign="top"><a id="a1011659a2049770c8cccf7b2b57c41b6" name="a1011659a2049770c8cccf7b2b57c41b6"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_key_image</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &amp;key_image)</td></tr>
 <tr class="separator:a1011659a2049770c8cccf7b2b57c41b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0d8ac5f21bda17852a859facb9546e0" id="r_aa0d8ac5f21bda17852a859facb9546e0"><td class="memItemLeft" align="right" valign="top"><a id="aa0d8ac5f21bda17852a859facb9546e0" name="aa0d8ac5f21bda17852a859facb9546e0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_key_images</b> (const boost::property_tree::ptree &amp;node, std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt; &amp;key_images)</td></tr>
-<tr class="separator:aa0d8ac5f21bda17852a859facb9546e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac226b0c5796eaf5b24f793ed48911c5" id="r_aac226b0c5796eaf5b24f793ed48911c5"><td class="memItemLeft" align="right" valign="top"><a id="aac226b0c5796eaf5b24f793ed48911c5" name="aac226b0c5796eaf5b24f793ed48911c5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_key_image_export_result</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__export__result.html">monero_key_image_export_result</a> &gt; &amp;result)</td></tr>
+<tr class="separator:aac226b0c5796eaf5b24f793ed48911c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6ef7cfb240c33edd2c00c13c2253787" id="r_ae6ef7cfb240c33edd2c00c13c2253787"><td class="memItemLeft" align="right" valign="top"><a id="ae6ef7cfb240c33edd2c00c13c2253787" name="ae6ef7cfb240c33edd2c00c13c2253787"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize_key_image_import_result</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__import__result.html">monero_key_image_import_result</a> &gt; &amp;result)</td></tr>
 <tr class="separator:ae6ef7cfb240c33edd2c00c13c2253787"><td class="memSeparator" colspan="2">&#160;</td></tr>
