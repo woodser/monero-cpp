@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['serializable_5fstruct_0',['serializable_struct',['../structmonero_1_1serializable__struct.html',1,'monero']]]
+  ['key_5fimage_5flist_0',['key_image_list',['../structmonero_1_1key__image__list.html',1,'monero']]],
+  ['key_5fvalue_1',['key_value',['../structmonero_1_1key__value.html',1,'monero']]]
 ];

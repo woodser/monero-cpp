@@ -1,19 +1,4 @@
 var searchData=
 [
-  ['change_5fpassword_0',['change_password',['../classmonero_1_1monero__wallet.html#a25f787c47fafa9da88335808d50dc5bc',1,'monero::monero_wallet::change_password()'],['../classmonero_1_1monero__wallet__full.html#aaf1d7828e888de5d96c2a89d603c84d2',1,'monero::monero_wallet_full::change_password()']]],
-  ['check_5freserve_5fproof_1',['check_reserve_proof',['../classmonero_1_1monero__wallet.html#a304e8f7a14965c794c3881d3cb08e8e9',1,'monero::monero_wallet::check_reserve_proof()'],['../classmonero_1_1monero__wallet__full.html#a4f70d0532ff7c772073f69dfcfaf2478',1,'monero::monero_wallet_full::check_reserve_proof()']]],
-  ['check_5fspend_5fproof_2',['check_spend_proof',['../classmonero_1_1monero__wallet.html#a0c7455cdc43839338cfc7126907d1d60',1,'monero::monero_wallet::check_spend_proof()'],['../classmonero_1_1monero__wallet__full.html#aa64cc89faed0dc301258e1d4a7a6004c',1,'monero::monero_wallet_full::check_spend_proof()']]],
-  ['check_5ftx_5fkey_3',['check_tx_key',['../classmonero_1_1monero__wallet.html#ab122bf64b86b40a312b51e7095d606be',1,'monero::monero_wallet::check_tx_key()'],['../classmonero_1_1monero__wallet__full.html#a9ed61c721f3456addf1962eb318de10a',1,'monero::monero_wallet_full::check_tx_key()']]],
-  ['check_5ftx_5fproof_4',['check_tx_proof',['../classmonero_1_1monero__wallet.html#a5c549647f82d43726130f237a314f6e3',1,'monero::monero_wallet::check_tx_proof()'],['../classmonero_1_1monero__wallet__full.html#a759d2cceeae7506f10479d8d19751aa3',1,'monero::monero_wallet_full::check_tx_proof()']]],
-  ['close_5',['close',['../classmonero_1_1monero__wallet.html#ae89a5f2984886242c841b494276d79a7',1,'monero::monero_wallet::close()'],['../classmonero_1_1monero__wallet__full.html#adac59b1d628e75ccd4d02411fe5019b4',1,'monero::monero_wallet_full::close()'],['../classmonero_1_1monero__wallet__keys.html#a2847e32abdcc6c9882297368d68c94c2',1,'monero::monero_wallet_keys::close()']]],
-  ['cn_5fblock_5fto_5fblock_6',['cn_block_to_block',['../namespacemonero__utils.html#ab2fb8889ec17d02e54541e90a3ffd47f',1,'monero_utils']]],
-  ['cn_5ftx_5fto_5ftx_7',['cn_tx_to_tx',['../namespacemonero__utils.html#ad4b5df3026350e762bfa40c6acdb6a0d',1,'monero_utils']]],
-  ['create_5faccount_8',['create_account',['../classmonero_1_1monero__wallet.html#a3b13de391246727d013e768fc64d12c1',1,'monero::monero_wallet::create_account()'],['../classmonero_1_1monero__wallet__full.html#ac6ef9acc3d1febf8a092eda28dbaccc6',1,'monero::monero_wallet_full::create_account()']]],
-  ['create_5fsubaddress_9',['create_subaddress',['../classmonero_1_1monero__wallet.html#ac1500500b3fcbd60b6c8bd9384a6c09e',1,'monero::monero_wallet::create_subaddress()'],['../classmonero_1_1monero__wallet__full.html#a2ce8da5afc25411f5dd1384543d9e6a0',1,'monero::monero_wallet_full::create_subaddress()']]],
-  ['create_5ftx_10',['create_tx',['../classmonero_1_1monero__wallet.html#a30e0dd5c7a46c10f5076845fde417fd8',1,'monero::monero_wallet']]],
-  ['create_5ftxs_11',['create_txs',['../classmonero_1_1monero__wallet.html#a142472298876d1d56f0a6d9952e0d4de',1,'monero::monero_wallet::create_txs()'],['../classmonero_1_1monero__wallet__full.html#a48e711a5d2993be5ada5f61d94c09bd1',1,'monero::monero_wallet_full::create_txs(const monero_tx_config &amp;config) override']]],
-  ['create_5fwallet_12',['create_wallet',['../classmonero_1_1monero__wallet__full.html#a402ea547ced268555feb8d19751c4788',1,'monero::monero_wallet_full']]],
-  ['create_5fwallet_5ffrom_5fkeys_13',['create_wallet_from_keys',['../classmonero_1_1monero__wallet__keys.html#a1583ae855d8db004ab2ed3cf21f1cbdf',1,'monero::monero_wallet_keys']]],
-  ['create_5fwallet_5ffrom_5fseed_14',['create_wallet_from_seed',['../classmonero_1_1monero__wallet__keys.html#ac9db87734693fdc01dc8f5606fde2914',1,'monero::monero_wallet_keys']]],
-  ['create_5fwallet_5frandom_15',['create_wallet_random',['../classmonero_1_1monero__wallet__keys.html#a35e3eff1935f822eed3672e437ae4947',1,'monero::monero_wallet_keys']]]
+  ['block_5fnotifier_0',['block_notifier',['../classmonero_1_1block__notifier.html',1,'monero']]]
 ];

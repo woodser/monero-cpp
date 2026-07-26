@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['key_5fimage_5flist_0',['key_image_list',['../structmonero_1_1key__image__list.html',1,'monero']]]
+  ['announce_5fscope_0',['announce_scope',['../classgen__utils_1_1thread__poller_1_1announce__scope.html',1,'gen_utils::thread_poller']]]
 ];

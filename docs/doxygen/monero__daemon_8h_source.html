@@ -95,12 +95,552 @@ $(function(){ initResizable(false); });
 <div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span> </div>
 <div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span><span class="preprocessor">#pragma once</span></div>
 <div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span> </div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &quot;monero_daemon_model.h&quot;</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span></div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacemonero.html">monero</a> {</div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span> </div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>}</div>
-<div class="ttc" id="anamespacemonero_html"><div class="ttname"><a href="namespacemonero.html">monero</a></div><div class="ttdef"><b>Definition</b> monero_daemon.cpp:58</div></div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="preprocessor">#include &quot;common/monero_rpc_connection.h&quot;</span></div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="preprocessor">#include &quot;monero_daemon_model.h&quot;</span></div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keyword">namespace </span><a class="code hl_namespace" href="namespacemonero.html">monero</a> {</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span></div>
+<div class="foldopen" id="foldopen00066" data-start="{" data-end="};">
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon__listener.html">   66</a></span>  <span class="keyword">class </span><a class="code hl_class" href="classmonero_1_1monero__daemon__listener.html">monero_daemon_listener</a> {</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>  <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    std::shared_ptr&lt;monero_block_header&gt; m_last_header;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span></div>
+<div class="foldopen" id="foldopen00075" data-start="{" data-end="}">
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon__listener.html#a3ee39d641741a4fe6b75ba1b1d51af41">   75</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon__listener.html#a3ee39d641741a4fe6b75ba1b1d51af41">on_block_header</a>(<span class="keyword">const</span> std::shared_ptr&lt;monero_block_header&gt;&amp; header) {</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      m_last_header = header;</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    }</div>
+</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>  };</div>
+</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span></div>
+<div class="foldopen" id="foldopen00083" data-start="{" data-end="};">
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html">   83</a></span>  <span class="keyword">class </span><a class="code hl_class" href="classmonero_1_1monero__daemon.html">monero_daemon</a> {</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>  <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ad4875df8920f66ca85cb05168699eb1c">   89</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ad4875df8920f66ca85cb05168699eb1c">~monero_daemon</a>() {}</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span></div>
+<div class="foldopen" id="foldopen00096" data-start="{" data-end="}">
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a6ab57190f279282a80736148bef75acc">   96</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a6ab57190f279282a80736148bef75acc">add_listener</a>(<a class="code hl_class" href="classmonero_1_1monero__daemon__listener.html">monero_daemon_listener</a> &amp;listener) {</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::add_listener(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    }</div>
+</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span></div>
+<div class="foldopen" id="foldopen00105" data-start="{" data-end="}">
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a7451ed15211486388d6e6e642cdaff7b">  105</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a7451ed15211486388d6e6e642cdaff7b">remove_listener</a>(<a class="code hl_class" href="classmonero_1_1monero__daemon__listener.html">monero_daemon_listener</a> &amp;listener) {</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::remove_listener(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    }</div>
+</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span></div>
+<div class="foldopen" id="foldopen00112" data-start="{" data-end="}">
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a7b1de094eb6ee4c1b566ad4d1cde23d5">  112</a></span>    <span class="keyword">virtual</span> std::set&lt;monero_daemon_listener*&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a7b1de094eb6ee4c1b566ad4d1cde23d5">get_listeners</a>() {</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_listeners(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    }</div>
+</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span></div>
+<div class="foldopen" id="foldopen00119" data-start="{" data-end="}">
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a47661ea3de573cd4147c16d85d2abc7a">  119</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a47661ea3de573cd4147c16d85d2abc7a">remove_listeners</a>() {</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::remove_listeners(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>    }</div>
+</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span></div>
+<div class="foldopen" id="foldopen00128" data-start="{" data-end="}">
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a216d9e8ed64c9f15a327858fb99f0f73">  128</a></span>    <span class="keyword">virtual</span> <a class="code hl_struct" href="structmonero_1_1monero__version.html">monero_version</a> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a216d9e8ed64c9f15a327858fb99f0f73">get_version</a>() {</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_version(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    }</div>
+</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span></div>
+<div class="foldopen" id="foldopen00137" data-start="{" data-end="}">
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a627577fd462c91888c99616d23099ec8">  137</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a627577fd462c91888c99616d23099ec8">is_trusted</a>() {</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::is_trusted(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    }</div>
+</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span></div>
+<div class="foldopen" id="foldopen00146" data-start="{" data-end="}">
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a35efa8e77c695a488b7b6b7d0f1fb399">  146</a></span>    <span class="keyword">virtual</span> uint64_t <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a35efa8e77c695a488b7b6b7d0f1fb399">get_height</a>() {</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_height(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    }</div>
+</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span></div>
+<div class="foldopen" id="foldopen00156" data-start="{" data-end="}">
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a171add741661a6c77faa654a5c18f789">  156</a></span>    <span class="keyword">virtual</span> std::string <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a171add741661a6c77faa654a5c18f789">get_block_hash</a>(uint64_t height) {</div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_hash(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>    }</div>
+</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span></div>
+<div class="foldopen" id="foldopen00167" data-start="{" data-end="}">
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a75f4d44f394601be4ae7adf67c225c0e">  167</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block_template&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a75f4d44f394601be4ae7adf67c225c0e">get_block_template</a>(<span class="keyword">const</span> std::string&amp; wallet_address, <span class="keyword">const</span> boost::optional&lt;int&gt;&amp; reserve_size = boost::none) {</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_template(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    }</div>
+</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span></div>
+<div class="foldopen" id="foldopen00176" data-start="{" data-end="}">
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a7b849ce1b5b54928bd83ac2ddf8c9043">  176</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block_header&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a7b849ce1b5b54928bd83ac2ddf8c9043">get_last_block_header</a>() {</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_last_block_header(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>    }</div>
+</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span></div>
+<div class="foldopen" id="foldopen00186" data-start="{" data-end="}">
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a65dfeffb943e4a1b48b2263f8909246b">  186</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block_header&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a65dfeffb943e4a1b48b2263f8909246b">get_block_header_by_hash</a>(<span class="keyword">const</span> std::string&amp; block_hash) {</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_header_by_hash(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    }</div>
+</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span></div>
+<div class="foldopen" id="foldopen00196" data-start="{" data-end="}">
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ae1db3eadb62ca8c55ba1811af6f2b9b2">  196</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block_header&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ae1db3eadb62ca8c55ba1811af6f2b9b2">get_block_header_by_height</a>(uint64_t height) {</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_header_by_height(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    }</div>
+</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span></div>
+<div class="foldopen" id="foldopen00207" data-start="{" data-end="}">
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a2e3e1a54cdc39eb47dcd7f5feb2fb9c4">  207</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_block_header&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a2e3e1a54cdc39eb47dcd7f5feb2fb9c4">get_block_headers_by_range</a>(uint64_t start_height, uint64_t end_height) {</div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_headers_by_range(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>    }</div>
+</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span></div>
+<div class="foldopen" id="foldopen00217" data-start="{" data-end="}">
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#afeb387e737981fd987dd033bfbc9f63e">  217</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#afeb387e737981fd987dd033bfbc9f63e">get_block_by_hash</a>(<span class="keyword">const</span> std::string&amp; block_hash) {</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_by_hash(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    }</div>
+</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span></div>
+<div class="foldopen" id="foldopen00231" data-start="{" data-end="}">
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#abf9cfa3ae94352907e1cd3afb194ad82">  231</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#abf9cfa3ae94352907e1cd3afb194ad82">get_blocks_by_hash</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; block_hashes, uint64_t start_height, <span class="keywordtype">bool</span> prune) {</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_blocks_by_hash(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    }</div>
+</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span></div>
+<div class="foldopen" id="foldopen00241" data-start="{" data-end="}">
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ab85fd79c9a2ac5b627a2450cb7b67897">  241</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ab85fd79c9a2ac5b627a2450cb7b67897">get_block_by_height</a>(uint64_t height) {</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_by_height(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    }</div>
+</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span></div>
+<div class="foldopen" id="foldopen00251" data-start="{" data-end="}">
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ab34cf2aeac561c2d47c82dfcb55a1ab2">  251</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ab34cf2aeac561c2d47c82dfcb55a1ab2">get_blocks_by_height</a>(<span class="keyword">const</span> std::vector&lt;uint64_t&gt;&amp; heights) {</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_blocks_by_height(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>    }</div>
+</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span></div>
+<div class="foldopen" id="foldopen00262" data-start="{" data-end="}">
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a35d77aee0a5715c6de969daf637f0221">  262</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a35d77aee0a5715c6de969daf637f0221">get_blocks_by_range</a>(boost::optional&lt;uint64_t&gt; start_height, boost::optional&lt;uint64_t&gt; end_height) {</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_blocks_by_range(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span>    }</div>
+</div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span></div>
+<div class="foldopen" id="foldopen00274" data-start="{" data-end="}">
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a89a5f9e32e560be27efa729ade1a40ba">  274</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_block&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a89a5f9e32e560be27efa729ade1a40ba">get_blocks_by_range_chunked</a>(boost::optional&lt;uint64_t&gt; start_height, boost::optional&lt;uint64_t&gt; end_height, boost::optional&lt;uint64_t&gt; max_chunk_size) {</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_blocks_by_range_chunked(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    }</div>
+</div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span></div>
+<div class="foldopen" id="foldopen00287" data-start="{" data-end="}">
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a9b87e9fe3ea6db4cd5faac51a4607c59">  287</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::string&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a9b87e9fe3ea6db4cd5faac51a4607c59">get_block_hashes</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; block_hashes, uint64_t start_height) {</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_block_hashes(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    }</div>
+</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span></div>
+<div class="foldopen" id="foldopen00298" data-start="{" data-end="}">
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#aca724f93d265cd8cc38f6bd322b5b95c">  298</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_tx&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#aca724f93d265cd8cc38f6bd322b5b95c">get_tx</a>(<span class="keyword">const</span> std::string&amp; tx_hash, <span class="keywordtype">bool</span> prune = <span class="keyword">false</span>) {</div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>      std::vector&lt;std::string&gt; hashes;</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>      hashes.push_back(tx_hash);</div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>      <span class="keyword">auto</span> txs = <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a73e6cacde7d1f68b219903f157ebab1f">get_txs</a>(hashes, prune);</div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>      std::shared_ptr&lt;monero_tx&gt; tx;</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span> </div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>      <span class="keywordflow">if</span> (txs.size() &gt; 0) {</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>        tx = txs[0];</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>      }</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>      <span class="keywordflow">return</span> tx;</div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    }</div>
+</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span></div>
+<div class="foldopen" id="foldopen00318" data-start="{" data-end="}">
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a73e6cacde7d1f68b219903f157ebab1f">  318</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_tx&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a73e6cacde7d1f68b219903f157ebab1f">get_txs</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; tx_hashes, <span class="keywordtype">bool</span> prune = <span class="keyword">false</span>) {</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_txs(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>    }</div>
+</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span> </div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>  </div>
+<div class="foldopen" id="foldopen00330" data-start="{" data-end="}">
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a730813c00a60a17d876b0d2c7958c7b4">  330</a></span>    <span class="keyword">virtual</span> boost::optional&lt;std::string&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a730813c00a60a17d876b0d2c7958c7b4">get_tx_hex</a>(<span class="keyword">const</span> std::string&amp; tx_hash, <span class="keywordtype">bool</span> prune = <span class="keyword">false</span>) {</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>      std::vector&lt;std::string&gt; hashes;</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>      hashes.push_back(tx_hash);</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>      <span class="keyword">auto</span> hexes = <a class="code hl_function" href="classmonero_1_1monero__daemon.html#af7bcd4bc4ae70b2a78eaf67ca7c3dd49">get_tx_hexes</a>(hashes, prune);</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>      boost::optional&lt;std::string&gt; hex;</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>      <span class="keywordflow">if</span> (hexes.size() &gt; 0) {</div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>        hex = hexes[0];</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>      }</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span> </div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>      <span class="keywordflow">return</span> hex;</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    }</div>
+</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span></div>
+<div class="foldopen" id="foldopen00349" data-start="{" data-end="}">
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#af7bcd4bc4ae70b2a78eaf67ca7c3dd49">  349</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::string&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#af7bcd4bc4ae70b2a78eaf67ca7c3dd49">get_tx_hexes</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; tx_hashes, <span class="keywordtype">bool</span> prune = <span class="keyword">false</span>) {</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_tx_hexes(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    }</div>
+</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span></div>
+<div class="foldopen" id="foldopen00360" data-start="{" data-end="}">
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a3c9c2c78389db0e948218902ebd630fb">  360</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_miner_tx_sum&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a3c9c2c78389db0e948218902ebd630fb">get_miner_tx_sum</a>(uint64_t height, uint64_t num_blocks) {</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_miner_tx_sum(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>    }</div>
+</div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span></div>
+<div class="foldopen" id="foldopen00370" data-start="{" data-end="}">
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a8b0d3a3733141f8d537348d68117c12a">  370</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_fee_estimate&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a8b0d3a3733141f8d537348d68117c12a">get_fee_estimate</a>(uint64_t grace_blocks = 0) {</div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_fee_estimate(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>    }</div>
+</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span></div>
+<div class="foldopen" id="foldopen00381" data-start="{" data-end="}">
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#add2a6948313c916102b0344e95b5b801">  381</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_submit_tx_result&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#add2a6948313c916102b0344e95b5b801">submit_tx_hex</a>(<span class="keyword">const</span> std::string&amp; tx_hex, <span class="keywordtype">bool</span> do_not_relay = <span class="keyword">false</span>) {</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::submit_tx_hex(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>    }</div>
+</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span></div>
+<div class="foldopen" id="foldopen00390" data-start="{" data-end="}">
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a92388a82c2493968ee72f96660a94cb7">  390</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a92388a82c2493968ee72f96660a94cb7">relay_tx_by_hash</a>(<span class="keyword">const</span> std::string&amp; tx_hash) {</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>      std::vector&lt;std::string&gt; tx_hashes;</div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>      tx_hashes.push_back(tx_hash);</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span>      <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a717d5eff5117db49f51c2ba2c4827794">relay_txs_by_hash</a>(tx_hashes);</div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>    }</div>
+</div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span></div>
+<div class="foldopen" id="foldopen00401" data-start="{" data-end="}">
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a717d5eff5117db49f51c2ba2c4827794">  401</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a717d5eff5117db49f51c2ba2c4827794">relay_txs_by_hash</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; tx_hashes) {</div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::relay_txs_by_hash(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>    }</div>
+</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span></div>
+<div class="foldopen" id="foldopen00411" data-start="{" data-end="}">
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a5ab62093bb560725baa955e50e6b53de">  411</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_tx&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a5ab62093bb560725baa955e50e6b53de">get_tx_pool</a>() {</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_tx_pool(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span>    }</div>
+</div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span></div>
+<div class="foldopen" id="foldopen00420" data-start="{" data-end="}">
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#aa309e1fbdf804ee9c0bd7d479ecceaef">  420</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::string&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#aa309e1fbdf804ee9c0bd7d479ecceaef">get_tx_pool_hashes</a>() {</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_tx_pool_hashes(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    }</div>
+</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span></div>
+<div class="foldopen" id="foldopen00429" data-start="{" data-end="}">
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#aa9c72e786e81c8722e6be977b823686a">  429</a></span>    <span class="keyword">virtual</span> std::vector&lt;monero_tx_backlog_entry&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#aa9c72e786e81c8722e6be977b823686a">get_tx_pool_backlog</a>() {</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_tx_pool_backlog(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>    }</div>
+</div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span></div>
+<div class="foldopen" id="foldopen00438" data-start="{" data-end="}">
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a3ac789a043ea70f0822c58e51495a6f5">  438</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_tx_pool_stats&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a3ac789a043ea70f0822c58e51495a6f5">get_tx_pool_stats</a>() {</div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_tx_pool_stats(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>    }</div>
+</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span></div>
+<div class="foldopen" id="foldopen00445" data-start="{" data-end="}">
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a6624381c1b458038cce7d856e2b095f0">  445</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a6624381c1b458038cce7d856e2b095f0">flush_tx_pool</a>() {</div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::flush_tx_pool(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>    }</div>
+</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span></div>
+<div class="foldopen" id="foldopen00454" data-start="{" data-end="}">
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#aacf854685ad321b497af8abefa2cd773">  454</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#aacf854685ad321b497af8abefa2cd773">flush_tx_pool</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt; &amp;hashes) {</div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::flush_tx_pool(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>    }</div>
+</div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span></div>
+<div class="foldopen" id="foldopen00463" data-start="{" data-end="}">
+<div class="line"><a id="l00463" name="l00463"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a4e8b4fefb23a687fba622d83b3518bab">  463</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a4e8b4fefb23a687fba622d83b3518bab">flush_tx_pool</a>(<span class="keyword">const</span> std::string &amp;hash) {</div>
+<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::flush_tx_pool(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>    }</div>
+</div>
+<div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span></div>
+<div class="foldopen" id="foldopen00473" data-start="{" data-end="}">
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a6231d9be56134645cd61e27f40cc6d28">  473</a></span>    <span class="keyword">virtual</span> <a class="code hl_enumeration" href="namespacemonero.html#a19a3f4124ff3d789de6988a285717af1">monero_key_image_spent_status</a> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a6231d9be56134645cd61e27f40cc6d28">get_key_image_spent_status</a>(<span class="keyword">const</span> std::string&amp; key_image) {</div>
+<div class="line"><a id="l00474" name="l00474"></a><span class="lineno">  474</span>      std::vector&lt;std::string&gt; key_images;</div>
+<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span>      key_images.push_back(key_image);</div>
+<div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span>      <span class="keyword">auto</span> statuses = <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a9f0032f9d9f44bc46a5000dc15011fed">get_key_image_spent_statuses</a>(key_images);</div>
+<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span>      <span class="keywordflow">if</span> (statuses.empty()) <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Could not get key image spent status&quot;</span>);</div>
+<div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span>      <span class="keywordflow">return</span> statuses[0];</div>
+<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>    }</div>
+</div>
+<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span></div>
+<div class="foldopen" id="foldopen00487" data-start="{" data-end="}">
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a9f0032f9d9f44bc46a5000dc15011fed">  487</a></span>    <span class="keyword">virtual</span> std::vector&lt;monero_key_image_spent_status&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a9f0032f9d9f44bc46a5000dc15011fed">get_key_image_spent_statuses</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; key_images) {</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_key_image_spent_statuses(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>    }</div>
+</div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span></div>
+<div class="foldopen" id="foldopen00498" data-start="{" data-end="}">
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a6e4ff3934112afdb2db45fddfd824de7">  498</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_output&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a6e4ff3934112afdb2db45fddfd824de7">get_outputs</a>(<span class="keyword">const</span> std::vector&lt;monero_output&gt;&amp; outputs) {</div>
+<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_outputs(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00500" name="l00500"></a><span class="lineno">  500</span>    }</div>
+</div>
+<div class="line"><a id="l00501" name="l00501"></a><span class="lineno">  501</span></div>
+<div class="foldopen" id="foldopen00514" data-start="{" data-end="}">
+<div class="line"><a id="l00514" name="l00514"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a6876dcd5ee34352f60ddb6a9f0b8d768">  514</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_output_histogram_entry&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a6876dcd5ee34352f60ddb6a9f0b8d768">get_output_histogram</a>(<span class="keyword">const</span> std::vector&lt;uint64_t&gt;&amp; amounts, <span class="keyword">const</span> boost::optional&lt;int&gt;&amp; min_count, <span class="keyword">const</span> boost::optional&lt;int&gt;&amp; max_count, <span class="keyword">const</span> boost::optional&lt;bool&gt;&amp; is_unlocked, <span class="keyword">const</span> boost::optional&lt;int&gt;&amp; recent_cutoff) {</div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_output_histogram(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno">  516</span>    }</div>
+</div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span></div>
+<div class="foldopen" id="foldopen00527" data-start="{" data-end="}">
+<div class="line"><a id="l00527" name="l00527"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#adf54172918f54c72a6e617a2cb7475e8">  527</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_output_distribution_entry&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#adf54172918f54c72a6e617a2cb7475e8">get_output_distribution</a>(<span class="keyword">const</span> std::vector&lt;uint64_t&gt;&amp; amounts, <span class="keyword">const</span> boost::optional&lt;bool&gt;&amp; is_cumulative = boost::none, <span class="keyword">const</span> boost::optional&lt;uint64_t&gt;&amp; start_height = boost::none, <span class="keyword">const</span> boost::optional&lt;uint64_t&gt;&amp; end_height = boost::none) {</div>
+<div class="line"><a id="l00528" name="l00528"></a><span class="lineno">  528</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_output_distribution(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span>    }</div>
+</div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span></div>
+<div class="foldopen" id="foldopen00536" data-start="{" data-end="}">
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a9e0af29f425b104a659c8b9ddd2bae3e">  536</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_daemon_info&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a9e0af29f425b104a659c8b9ddd2bae3e">get_info</a>() {</div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_info(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>    }</div>
+</div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span></div>
+<div class="foldopen" id="foldopen00545" data-start="{" data-end="}">
+<div class="line"><a id="l00545" name="l00545"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#af3fe7522920559d7c8a3311edb666498">  545</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_daemon_sync_info&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#af3fe7522920559d7c8a3311edb666498">get_sync_info</a>() {</div>
+<div class="line"><a id="l00546" name="l00546"></a><span class="lineno">  546</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_sync_info(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00547" name="l00547"></a><span class="lineno">  547</span>    }</div>
+</div>
+<div class="line"><a id="l00548" name="l00548"></a><span class="lineno">  548</span></div>
+<div class="foldopen" id="foldopen00554" data-start="{" data-end="}">
+<div class="line"><a id="l00554" name="l00554"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a3723fbc18eb5143a1b8e829897a5a2bd">  554</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_hard_fork_info&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a3723fbc18eb5143a1b8e829897a5a2bd">get_hard_fork_info</a>() {</div>
+<div class="line"><a id="l00555" name="l00555"></a><span class="lineno">  555</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_hard_fork_info(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>    }</div>
+</div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span></div>
+<div class="foldopen" id="foldopen00563" data-start="{" data-end="}">
+<div class="line"><a id="l00563" name="l00563"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a968c8711b1182e95cb4c16fa9d40eef5">  563</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_alt_chain&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a968c8711b1182e95cb4c16fa9d40eef5">get_alt_chains</a>() {</div>
+<div class="line"><a id="l00564" name="l00564"></a><span class="lineno">  564</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_alt_chains(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00565" name="l00565"></a><span class="lineno">  565</span>    }</div>
+</div>
+<div class="line"><a id="l00566" name="l00566"></a><span class="lineno">  566</span></div>
+<div class="foldopen" id="foldopen00572" data-start="{" data-end="}">
+<div class="line"><a id="l00572" name="l00572"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a301d50fe37f6957c5625ee1364a4f8d3">  572</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::string&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a301d50fe37f6957c5625ee1364a4f8d3">get_alt_block_hashes</a>() {</div>
+<div class="line"><a id="l00573" name="l00573"></a><span class="lineno">  573</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_alt_block_hashes(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00574" name="l00574"></a><span class="lineno">  574</span>    }</div>
+</div>
+<div class="line"><a id="l00575" name="l00575"></a><span class="lineno">  575</span></div>
+<div class="foldopen" id="foldopen00581" data-start="{" data-end="}">
+<div class="line"><a id="l00581" name="l00581"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a1b902f70de1864a319ef7546f33ca0ee">  581</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a1b902f70de1864a319ef7546f33ca0ee">get_download_limit</a>() {</div>
+<div class="line"><a id="l00582" name="l00582"></a><span class="lineno">  582</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_download_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00583" name="l00583"></a><span class="lineno">  583</span>    }</div>
+</div>
+<div class="line"><a id="l00584" name="l00584"></a><span class="lineno">  584</span></div>
+<div class="foldopen" id="foldopen00591" data-start="{" data-end="}">
+<div class="line"><a id="l00591" name="l00591"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ab611bcf44ec324cbb07464788b5632b6">  591</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ab611bcf44ec324cbb07464788b5632b6">set_download_limit</a>(<span class="keywordtype">int</span> limit) {</div>
+<div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::set_download_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>    }</div>
+</div>
+<div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span></div>
+<div class="foldopen" id="foldopen00600" data-start="{" data-end="}">
+<div class="line"><a id="l00600" name="l00600"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a739a1f57c9a65ff4c0e4c3151afb38e0">  600</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a739a1f57c9a65ff4c0e4c3151afb38e0">reset_download_limit</a>() {</div>
+<div class="line"><a id="l00601" name="l00601"></a><span class="lineno">  601</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::reset_download_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00602" name="l00602"></a><span class="lineno">  602</span>    }</div>
+</div>
+<div class="line"><a id="l00603" name="l00603"></a><span class="lineno">  603</span></div>
+<div class="foldopen" id="foldopen00609" data-start="{" data-end="}">
+<div class="line"><a id="l00609" name="l00609"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a6344b329e9da991b948ed96b5b2860b0">  609</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a6344b329e9da991b948ed96b5b2860b0">get_upload_limit</a>() {</div>
+<div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_upload_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>    }</div>
+</div>
+<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span></div>
+<div class="foldopen" id="foldopen00619" data-start="{" data-end="}">
+<div class="line"><a id="l00619" name="l00619"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a13b271be0b53fdfd937d5cb5e13d87df">  619</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a13b271be0b53fdfd937d5cb5e13d87df">set_upload_limit</a>(<span class="keywordtype">int</span> limit) {</div>
+<div class="line"><a id="l00620" name="l00620"></a><span class="lineno">  620</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::set_upload_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00621" name="l00621"></a><span class="lineno">  621</span>    }</div>
+</div>
+<div class="line"><a id="l00622" name="l00622"></a><span class="lineno">  622</span></div>
+<div class="foldopen" id="foldopen00628" data-start="{" data-end="}">
+<div class="line"><a id="l00628" name="l00628"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a0d05a6d912ba458c72953bc00512bac9">  628</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a0d05a6d912ba458c72953bc00512bac9">reset_upload_limit</a>() {</div>
+<div class="line"><a id="l00629" name="l00629"></a><span class="lineno">  629</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::reset_upload_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00630" name="l00630"></a><span class="lineno">  630</span>    }</div>
+</div>
+<div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span></div>
+<div class="foldopen" id="foldopen00637" data-start="{" data-end="}">
+<div class="line"><a id="l00637" name="l00637"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ae383d5df1795c7691cb1cf063fd9e1cd">  637</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_peer&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ae383d5df1795c7691cb1cf063fd9e1cd">get_peers</a>() {</div>
+<div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_peers(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>    }</div>
+</div>
+<div class="line"><a id="l00640" name="l00640"></a><span class="lineno">  640</span></div>
+<div class="foldopen" id="foldopen00646" data-start="{" data-end="}">
+<div class="line"><a id="l00646" name="l00646"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#adf91c84a9189671d7f1454c075bded1b">  646</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_peer&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#adf91c84a9189671d7f1454c075bded1b">get_known_peers</a>() {</div>
+<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_known_peers(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>    }</div>
+</div>
+<div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span></div>
+<div class="foldopen" id="foldopen00655" data-start="{" data-end="}">
+<div class="line"><a id="l00655" name="l00655"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#af053b49084b3ce5a130563893b7aeda9">  655</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#af053b49084b3ce5a130563893b7aeda9">set_outgoing_peer_limit</a>(<span class="keywordtype">int</span> limit) {</div>
+<div class="line"><a id="l00656" name="l00656"></a><span class="lineno">  656</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::set_outgoing_peer_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00657" name="l00657"></a><span class="lineno">  657</span>    }</div>
+</div>
+<div class="line"><a id="l00658" name="l00658"></a><span class="lineno">  658</span></div>
+<div class="foldopen" id="foldopen00664" data-start="{" data-end="}">
+<div class="line"><a id="l00664" name="l00664"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ab022ae08d1f250607aaa2a382c3dde4c">  664</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ab022ae08d1f250607aaa2a382c3dde4c">set_incoming_peer_limit</a>(<span class="keywordtype">int</span> limit) {</div>
+<div class="line"><a id="l00665" name="l00665"></a><span class="lineno">  665</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::set_incoming_peer_limit(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00666" name="l00666"></a><span class="lineno">  666</span>    }</div>
+</div>
+<div class="line"><a id="l00667" name="l00667"></a><span class="lineno">  667</span></div>
+<div class="foldopen" id="foldopen00673" data-start="{" data-end="}">
+<div class="line"><a id="l00673" name="l00673"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a99e0312660b7de740ce42059620cfebb">  673</a></span>    <span class="keyword">virtual</span> std::vector&lt;std::shared_ptr&lt;monero_ban&gt;&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a99e0312660b7de740ce42059620cfebb">get_peer_bans</a>() {</div>
+<div class="line"><a id="l00674" name="l00674"></a><span class="lineno">  674</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_peer_bans(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00675" name="l00675"></a><span class="lineno">  675</span>    }</div>
+</div>
+<div class="line"><a id="l00676" name="l00676"></a><span class="lineno">  676</span></div>
+<div class="foldopen" id="foldopen00682" data-start="{" data-end="}">
+<div class="line"><a id="l00682" name="l00682"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a05f9e1381b4c0e2e86019a8d38647ff1">  682</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a05f9e1381b4c0e2e86019a8d38647ff1">set_peer_bans</a>(<span class="keyword">const</span> std::vector&lt;std::shared_ptr&lt;monero_ban&gt;&gt;&amp; bans) {</div>
+<div class="line"><a id="l00683" name="l00683"></a><span class="lineno">  683</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::set_peer_bans(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00684" name="l00684"></a><span class="lineno">  684</span>    }</div>
+</div>
+<div class="line"><a id="l00685" name="l00685"></a><span class="lineno">  685</span></div>
+<div class="foldopen" id="foldopen00691" data-start="{" data-end="}">
+<div class="line"><a id="l00691" name="l00691"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a5ca3a8ac09a3f1b5ef58c637d37fc5e3">  691</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a5ca3a8ac09a3f1b5ef58c637d37fc5e3">set_peer_ban</a>(<span class="keyword">const</span> std::shared_ptr&lt;monero_ban&gt;&amp; ban) {</div>
+<div class="line"><a id="l00692" name="l00692"></a><span class="lineno">  692</span>      <span class="keywordflow">if</span> (ban == <span class="keyword">nullptr</span>) <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Ban is none&quot;</span>);</div>
+<div class="line"><a id="l00693" name="l00693"></a><span class="lineno">  693</span>      std::vector&lt;std::shared_ptr&lt;monero_ban&gt;&gt; bans;</div>
+<div class="line"><a id="l00694" name="l00694"></a><span class="lineno">  694</span>      bans.push_back(ban);</div>
+<div class="line"><a id="l00695" name="l00695"></a><span class="lineno">  695</span>      <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a05f9e1381b4c0e2e86019a8d38647ff1">set_peer_bans</a>(bans);</div>
+<div class="line"><a id="l00696" name="l00696"></a><span class="lineno">  696</span>    }</div>
+</div>
+<div class="line"><a id="l00697" name="l00697"></a><span class="lineno">  697</span></div>
+<div class="foldopen" id="foldopen00706" data-start="{" data-end="}">
+<div class="line"><a id="l00706" name="l00706"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#aaccd0daf305262b1f2020c4d3af9ce08">  706</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#aaccd0daf305262b1f2020c4d3af9ce08">start_mining</a>(<span class="keyword">const</span> std::string &amp;address, boost::optional&lt;uint64_t&gt; num_threads, boost::optional&lt;bool&gt; is_background, boost::optional&lt;bool&gt; ignore_battery) {</div>
+<div class="line"><a id="l00707" name="l00707"></a><span class="lineno">  707</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::start_mining(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00708" name="l00708"></a><span class="lineno">  708</span>    }</div>
+</div>
+<div class="line"><a id="l00709" name="l00709"></a><span class="lineno">  709</span></div>
+<div class="foldopen" id="foldopen00713" data-start="{" data-end="}">
+<div class="line"><a id="l00713" name="l00713"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ae312bd24390bd1a5bec659b9f0b1e17d">  713</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ae312bd24390bd1a5bec659b9f0b1e17d">stop_mining</a>() {</div>
+<div class="line"><a id="l00714" name="l00714"></a><span class="lineno">  714</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::stop_mining(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00715" name="l00715"></a><span class="lineno">  715</span>    }</div>
+</div>
+<div class="line"><a id="l00716" name="l00716"></a><span class="lineno">  716</span></div>
+<div class="foldopen" id="foldopen00722" data-start="{" data-end="}">
+<div class="line"><a id="l00722" name="l00722"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a95ce62e3db68f088c130acfbd69a25a4">  722</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_mining_status&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a95ce62e3db68f088c130acfbd69a25a4">get_mining_status</a>() {</div>
+<div class="line"><a id="l00723" name="l00723"></a><span class="lineno">  723</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::get_mining_status(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00724" name="l00724"></a><span class="lineno">  724</span>    }</div>
+</div>
+<div class="line"><a id="l00725" name="l00725"></a><span class="lineno">  725</span></div>
+<div class="foldopen" id="foldopen00731" data-start="{" data-end="}">
+<div class="line"><a id="l00731" name="l00731"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ab78760ef2e8ecc0cfd6c981116328da3">  731</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ab78760ef2e8ecc0cfd6c981116328da3">submit_block</a>(<span class="keyword">const</span> std::string&amp; block_blob) {</div>
+<div class="line"><a id="l00732" name="l00732"></a><span class="lineno">  732</span>      std::vector&lt;std::string&gt; block_blobs;</div>
+<div class="line"><a id="l00733" name="l00733"></a><span class="lineno">  733</span>      block_blobs.push_back(block_blob);</div>
+<div class="line"><a id="l00734" name="l00734"></a><span class="lineno">  734</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a2ad4f35d4989fa36a35ee4bb31cb72f3">submit_blocks</a>(block_blobs);</div>
+<div class="line"><a id="l00735" name="l00735"></a><span class="lineno">  735</span>    }</div>
+</div>
+<div class="line"><a id="l00736" name="l00736"></a><span class="lineno">  736</span></div>
+<div class="foldopen" id="foldopen00742" data-start="{" data-end="}">
+<div class="line"><a id="l00742" name="l00742"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a2ad4f35d4989fa36a35ee4bb31cb72f3">  742</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a2ad4f35d4989fa36a35ee4bb31cb72f3">submit_blocks</a>(<span class="keyword">const</span> std::vector&lt;std::string&gt;&amp; block_blobs) {</div>
+<div class="line"><a id="l00743" name="l00743"></a><span class="lineno">  743</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::submit_blocks(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00744" name="l00744"></a><span class="lineno">  744</span>    }</div>
+</div>
+<div class="line"><a id="l00745" name="l00745"></a><span class="lineno">  745</span></div>
+<div class="foldopen" id="foldopen00752" data-start="{" data-end="}">
+<div class="line"><a id="l00752" name="l00752"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#afcbcba5e6a02590ffb16318440cba063">  752</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_prune_result&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#afcbcba5e6a02590ffb16318440cba063">prune_blockchain</a>(<span class="keywordtype">bool</span> check) {</div>
+<div class="line"><a id="l00753" name="l00753"></a><span class="lineno">  753</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::prune_blockchain(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00754" name="l00754"></a><span class="lineno">  754</span>    }</div>
+</div>
+<div class="line"><a id="l00755" name="l00755"></a><span class="lineno">  755</span></div>
+<div class="foldopen" id="foldopen00761" data-start="{" data-end="}">
+<div class="line"><a id="l00761" name="l00761"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a64875b44879edd67e85b28f745ea1754">  761</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_daemon_update_check_result&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a64875b44879edd67e85b28f745ea1754">check_for_update</a>() {</div>
+<div class="line"><a id="l00762" name="l00762"></a><span class="lineno">  762</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::check_for_update(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00763" name="l00763"></a><span class="lineno">  763</span>    }</div>
+</div>
+<div class="line"><a id="l00764" name="l00764"></a><span class="lineno">  764</span></div>
+<div class="foldopen" id="foldopen00771" data-start="{" data-end="}">
+<div class="line"><a id="l00771" name="l00771"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a4ea2e833edcf79b302e1e55b175497e2">  771</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_daemon_update_download_result&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a4ea2e833edcf79b302e1e55b175497e2">download_update</a>(<span class="keyword">const</span> std::string&amp; path = <span class="stringliteral">&quot;&quot;</span>) {</div>
+<div class="line"><a id="l00772" name="l00772"></a><span class="lineno">  772</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::download_update(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00773" name="l00773"></a><span class="lineno">  773</span>    }</div>
+</div>
+<div class="line"><a id="l00774" name="l00774"></a><span class="lineno">  774</span></div>
+<div class="foldopen" id="foldopen00778" data-start="{" data-end="}">
+<div class="line"><a id="l00778" name="l00778"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#a14657a43904da308e78606540fffef66">  778</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classmonero_1_1monero__daemon.html#a14657a43904da308e78606540fffef66">stop</a>() {</div>
+<div class="line"><a id="l00779" name="l00779"></a><span class="lineno">  779</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::stop(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span>    }</div>
+</div>
+<div class="line"><a id="l00781" name="l00781"></a><span class="lineno">  781</span></div>
+<div class="foldopen" id="foldopen00787" data-start="{" data-end="}">
+<div class="line"><a id="l00787" name="l00787"></a><span class="lineno"><a class="line" href="classmonero_1_1monero__daemon.html#ac8aca0da4d8878a0a7c683bfddb1f1ad">  787</a></span>    <span class="keyword">virtual</span> std::shared_ptr&lt;monero_block_header&gt; <a class="code hl_function" href="classmonero_1_1monero__daemon.html#ac8aca0da4d8878a0a7c683bfddb1f1ad">wait_for_next_block_header</a>() {</div>
+<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>      <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;monero_daemon::wait_for_next_block_header(): not supported&quot;</span>);</div>
+<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span>    }</div>
+</div>
+<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span> </div>
+<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span>  };</div>
+</div>
+<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span>}</div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon__listener_html"><div class="ttname"><a href="classmonero_1_1monero__daemon__listener.html">monero::monero_daemon_listener</a></div><div class="ttdef"><b>Definition</b> monero_daemon.h:66</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon__listener_html_a3ee39d641741a4fe6b75ba1b1d51af41"><div class="ttname"><a href="classmonero_1_1monero__daemon__listener.html#a3ee39d641741a4fe6b75ba1b1d51af41">monero::monero_daemon_listener::on_block_header</a></div><div class="ttdeci">virtual void on_block_header(const std::shared_ptr&lt; monero_block_header &gt; &amp;header)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:75</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html"><div class="ttname"><a href="classmonero_1_1monero__daemon.html">monero::monero_daemon</a></div><div class="ttdef"><b>Definition</b> monero_daemon.h:83</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a05f9e1381b4c0e2e86019a8d38647ff1"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a05f9e1381b4c0e2e86019a8d38647ff1">monero::monero_daemon::set_peer_bans</a></div><div class="ttdeci">virtual void set_peer_bans(const std::vector&lt; std::shared_ptr&lt; monero_ban &gt; &gt; &amp;bans)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:682</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a0d05a6d912ba458c72953bc00512bac9"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a0d05a6d912ba458c72953bc00512bac9">monero::monero_daemon::reset_upload_limit</a></div><div class="ttdeci">virtual int reset_upload_limit()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:628</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a13b271be0b53fdfd937d5cb5e13d87df"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a13b271be0b53fdfd937d5cb5e13d87df">monero::monero_daemon::set_upload_limit</a></div><div class="ttdeci">virtual int set_upload_limit(int limit)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:619</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a14657a43904da308e78606540fffef66"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a14657a43904da308e78606540fffef66">monero::monero_daemon::stop</a></div><div class="ttdeci">virtual void stop()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:778</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a171add741661a6c77faa654a5c18f789"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a171add741661a6c77faa654a5c18f789">monero::monero_daemon::get_block_hash</a></div><div class="ttdeci">virtual std::string get_block_hash(uint64_t height)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:156</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a1b902f70de1864a319ef7546f33ca0ee"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a1b902f70de1864a319ef7546f33ca0ee">monero::monero_daemon::get_download_limit</a></div><div class="ttdeci">virtual int get_download_limit()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:581</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a216d9e8ed64c9f15a327858fb99f0f73"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a216d9e8ed64c9f15a327858fb99f0f73">monero::monero_daemon::get_version</a></div><div class="ttdeci">virtual monero_version get_version()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:128</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a2ad4f35d4989fa36a35ee4bb31cb72f3"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a2ad4f35d4989fa36a35ee4bb31cb72f3">monero::monero_daemon::submit_blocks</a></div><div class="ttdeci">virtual void submit_blocks(const std::vector&lt; std::string &gt; &amp;block_blobs)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:742</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a2e3e1a54cdc39eb47dcd7f5feb2fb9c4"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a2e3e1a54cdc39eb47dcd7f5feb2fb9c4">monero::monero_daemon::get_block_headers_by_range</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_block_header &gt; &gt; get_block_headers_by_range(uint64_t start_height, uint64_t end_height)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:207</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a301d50fe37f6957c5625ee1364a4f8d3"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a301d50fe37f6957c5625ee1364a4f8d3">monero::monero_daemon::get_alt_block_hashes</a></div><div class="ttdeci">virtual std::vector&lt; std::string &gt; get_alt_block_hashes()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:572</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a35d77aee0a5715c6de969daf637f0221"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a35d77aee0a5715c6de969daf637f0221">monero::monero_daemon::get_blocks_by_range</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_block &gt; &gt; get_blocks_by_range(boost::optional&lt; uint64_t &gt; start_height, boost::optional&lt; uint64_t &gt; end_height)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:262</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a35efa8e77c695a488b7b6b7d0f1fb399"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a35efa8e77c695a488b7b6b7d0f1fb399">monero::monero_daemon::get_height</a></div><div class="ttdeci">virtual uint64_t get_height()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:146</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a3723fbc18eb5143a1b8e829897a5a2bd"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a3723fbc18eb5143a1b8e829897a5a2bd">monero::monero_daemon::get_hard_fork_info</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_hard_fork_info &gt; get_hard_fork_info()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:554</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a3ac789a043ea70f0822c58e51495a6f5"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a3ac789a043ea70f0822c58e51495a6f5">monero::monero_daemon::get_tx_pool_stats</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_tx_pool_stats &gt; get_tx_pool_stats()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:438</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a3c9c2c78389db0e948218902ebd630fb"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a3c9c2c78389db0e948218902ebd630fb">monero::monero_daemon::get_miner_tx_sum</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_miner_tx_sum &gt; get_miner_tx_sum(uint64_t height, uint64_t num_blocks)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:360</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a47661ea3de573cd4147c16d85d2abc7a"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a47661ea3de573cd4147c16d85d2abc7a">monero::monero_daemon::remove_listeners</a></div><div class="ttdeci">virtual void remove_listeners()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:119</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a4e8b4fefb23a687fba622d83b3518bab"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a4e8b4fefb23a687fba622d83b3518bab">monero::monero_daemon::flush_tx_pool</a></div><div class="ttdeci">virtual void flush_tx_pool(const std::string &amp;hash)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:463</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a4ea2e833edcf79b302e1e55b175497e2"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a4ea2e833edcf79b302e1e55b175497e2">monero::monero_daemon::download_update</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_daemon_update_download_result &gt; download_update(const std::string &amp;path=&quot;&quot;)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:771</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a5ab62093bb560725baa955e50e6b53de"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a5ab62093bb560725baa955e50e6b53de">monero::monero_daemon::get_tx_pool</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_tx &gt; &gt; get_tx_pool()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:411</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a5ca3a8ac09a3f1b5ef58c637d37fc5e3"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a5ca3a8ac09a3f1b5ef58c637d37fc5e3">monero::monero_daemon::set_peer_ban</a></div><div class="ttdeci">virtual void set_peer_ban(const std::shared_ptr&lt; monero_ban &gt; &amp;ban)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:691</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a6231d9be56134645cd61e27f40cc6d28"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a6231d9be56134645cd61e27f40cc6d28">monero::monero_daemon::get_key_image_spent_status</a></div><div class="ttdeci">virtual monero_key_image_spent_status get_key_image_spent_status(const std::string &amp;key_image)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:473</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a627577fd462c91888c99616d23099ec8"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a627577fd462c91888c99616d23099ec8">monero::monero_daemon::is_trusted</a></div><div class="ttdeci">virtual bool is_trusted()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:137</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a6344b329e9da991b948ed96b5b2860b0"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a6344b329e9da991b948ed96b5b2860b0">monero::monero_daemon::get_upload_limit</a></div><div class="ttdeci">virtual int get_upload_limit()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:609</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a64875b44879edd67e85b28f745ea1754"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a64875b44879edd67e85b28f745ea1754">monero::monero_daemon::check_for_update</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_daemon_update_check_result &gt; check_for_update()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:761</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a65dfeffb943e4a1b48b2263f8909246b"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a65dfeffb943e4a1b48b2263f8909246b">monero::monero_daemon::get_block_header_by_hash</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block_header &gt; get_block_header_by_hash(const std::string &amp;block_hash)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:186</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a6624381c1b458038cce7d856e2b095f0"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a6624381c1b458038cce7d856e2b095f0">monero::monero_daemon::flush_tx_pool</a></div><div class="ttdeci">virtual void flush_tx_pool()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:445</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a6876dcd5ee34352f60ddb6a9f0b8d768"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a6876dcd5ee34352f60ddb6a9f0b8d768">monero::monero_daemon::get_output_histogram</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_output_histogram_entry &gt; &gt; get_output_histogram(const std::vector&lt; uint64_t &gt; &amp;amounts, const boost::optional&lt; int &gt; &amp;min_count, const boost::optional&lt; int &gt; &amp;max_count, const boost::optional&lt; bool &gt; &amp;is_unlocked, const boost::optional&lt; int &gt; &amp;recent_cutoff)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:514</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a6ab57190f279282a80736148bef75acc"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a6ab57190f279282a80736148bef75acc">monero::monero_daemon::add_listener</a></div><div class="ttdeci">virtual void add_listener(monero_daemon_listener &amp;listener)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:96</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a6e4ff3934112afdb2db45fddfd824de7"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a6e4ff3934112afdb2db45fddfd824de7">monero::monero_daemon::get_outputs</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_output &gt; &gt; get_outputs(const std::vector&lt; monero_output &gt; &amp;outputs)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:498</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a717d5eff5117db49f51c2ba2c4827794"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a717d5eff5117db49f51c2ba2c4827794">monero::monero_daemon::relay_txs_by_hash</a></div><div class="ttdeci">virtual void relay_txs_by_hash(const std::vector&lt; std::string &gt; &amp;tx_hashes)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:401</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a730813c00a60a17d876b0d2c7958c7b4"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a730813c00a60a17d876b0d2c7958c7b4">monero::monero_daemon::get_tx_hex</a></div><div class="ttdeci">virtual boost::optional&lt; std::string &gt; get_tx_hex(const std::string &amp;tx_hash, bool prune=false)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:330</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a739a1f57c9a65ff4c0e4c3151afb38e0"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a739a1f57c9a65ff4c0e4c3151afb38e0">monero::monero_daemon::reset_download_limit</a></div><div class="ttdeci">virtual int reset_download_limit()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:600</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a73e6cacde7d1f68b219903f157ebab1f"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a73e6cacde7d1f68b219903f157ebab1f">monero::monero_daemon::get_txs</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_tx &gt; &gt; get_txs(const std::vector&lt; std::string &gt; &amp;tx_hashes, bool prune=false)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:318</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a7451ed15211486388d6e6e642cdaff7b"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a7451ed15211486388d6e6e642cdaff7b">monero::monero_daemon::remove_listener</a></div><div class="ttdeci">virtual void remove_listener(monero_daemon_listener &amp;listener)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:105</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a75f4d44f394601be4ae7adf67c225c0e"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a75f4d44f394601be4ae7adf67c225c0e">monero::monero_daemon::get_block_template</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block_template &gt; get_block_template(const std::string &amp;wallet_address, const boost::optional&lt; int &gt; &amp;reserve_size=boost::none)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:167</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a7b1de094eb6ee4c1b566ad4d1cde23d5"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a7b1de094eb6ee4c1b566ad4d1cde23d5">monero::monero_daemon::get_listeners</a></div><div class="ttdeci">virtual std::set&lt; monero_daemon_listener * &gt; get_listeners()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:112</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a7b849ce1b5b54928bd83ac2ddf8c9043"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a7b849ce1b5b54928bd83ac2ddf8c9043">monero::monero_daemon::get_last_block_header</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block_header &gt; get_last_block_header()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:176</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a89a5f9e32e560be27efa729ade1a40ba"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a89a5f9e32e560be27efa729ade1a40ba">monero::monero_daemon::get_blocks_by_range_chunked</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_block &gt; &gt; get_blocks_by_range_chunked(boost::optional&lt; uint64_t &gt; start_height, boost::optional&lt; uint64_t &gt; end_height, boost::optional&lt; uint64_t &gt; max_chunk_size)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:274</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a8b0d3a3733141f8d537348d68117c12a"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a8b0d3a3733141f8d537348d68117c12a">monero::monero_daemon::get_fee_estimate</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_fee_estimate &gt; get_fee_estimate(uint64_t grace_blocks=0)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:370</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a92388a82c2493968ee72f96660a94cb7"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a92388a82c2493968ee72f96660a94cb7">monero::monero_daemon::relay_tx_by_hash</a></div><div class="ttdeci">virtual void relay_tx_by_hash(const std::string &amp;tx_hash)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:390</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a95ce62e3db68f088c130acfbd69a25a4"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a95ce62e3db68f088c130acfbd69a25a4">monero::monero_daemon::get_mining_status</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_mining_status &gt; get_mining_status()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:722</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a968c8711b1182e95cb4c16fa9d40eef5"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a968c8711b1182e95cb4c16fa9d40eef5">monero::monero_daemon::get_alt_chains</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_alt_chain &gt; &gt; get_alt_chains()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:563</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a99e0312660b7de740ce42059620cfebb"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a99e0312660b7de740ce42059620cfebb">monero::monero_daemon::get_peer_bans</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_ban &gt; &gt; get_peer_bans()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:673</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a9b87e9fe3ea6db4cd5faac51a4607c59"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a9b87e9fe3ea6db4cd5faac51a4607c59">monero::monero_daemon::get_block_hashes</a></div><div class="ttdeci">virtual std::vector&lt; std::string &gt; get_block_hashes(const std::vector&lt; std::string &gt; &amp;block_hashes, uint64_t start_height)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:287</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a9e0af29f425b104a659c8b9ddd2bae3e"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a9e0af29f425b104a659c8b9ddd2bae3e">monero::monero_daemon::get_info</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_daemon_info &gt; get_info()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:536</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_a9f0032f9d9f44bc46a5000dc15011fed"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#a9f0032f9d9f44bc46a5000dc15011fed">monero::monero_daemon::get_key_image_spent_statuses</a></div><div class="ttdeci">virtual std::vector&lt; monero_key_image_spent_status &gt; get_key_image_spent_statuses(const std::vector&lt; std::string &gt; &amp;key_images)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:487</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_aa309e1fbdf804ee9c0bd7d479ecceaef"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#aa309e1fbdf804ee9c0bd7d479ecceaef">monero::monero_daemon::get_tx_pool_hashes</a></div><div class="ttdeci">virtual std::vector&lt; std::string &gt; get_tx_pool_hashes()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:420</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_aa9c72e786e81c8722e6be977b823686a"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#aa9c72e786e81c8722e6be977b823686a">monero::monero_daemon::get_tx_pool_backlog</a></div><div class="ttdeci">virtual std::vector&lt; monero_tx_backlog_entry &gt; get_tx_pool_backlog()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:429</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_aaccd0daf305262b1f2020c4d3af9ce08"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#aaccd0daf305262b1f2020c4d3af9ce08">monero::monero_daemon::start_mining</a></div><div class="ttdeci">virtual void start_mining(const std::string &amp;address, boost::optional&lt; uint64_t &gt; num_threads, boost::optional&lt; bool &gt; is_background, boost::optional&lt; bool &gt; ignore_battery)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:706</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_aacf854685ad321b497af8abefa2cd773"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#aacf854685ad321b497af8abefa2cd773">monero::monero_daemon::flush_tx_pool</a></div><div class="ttdeci">virtual void flush_tx_pool(const std::vector&lt; std::string &gt; &amp;hashes)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:454</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ab022ae08d1f250607aaa2a382c3dde4c"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ab022ae08d1f250607aaa2a382c3dde4c">monero::monero_daemon::set_incoming_peer_limit</a></div><div class="ttdeci">virtual void set_incoming_peer_limit(int limit)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:664</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ab34cf2aeac561c2d47c82dfcb55a1ab2"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ab34cf2aeac561c2d47c82dfcb55a1ab2">monero::monero_daemon::get_blocks_by_height</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_block &gt; &gt; get_blocks_by_height(const std::vector&lt; uint64_t &gt; &amp;heights)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:251</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ab611bcf44ec324cbb07464788b5632b6"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ab611bcf44ec324cbb07464788b5632b6">monero::monero_daemon::set_download_limit</a></div><div class="ttdeci">virtual int set_download_limit(int limit)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:591</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ab78760ef2e8ecc0cfd6c981116328da3"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ab78760ef2e8ecc0cfd6c981116328da3">monero::monero_daemon::submit_block</a></div><div class="ttdeci">virtual void submit_block(const std::string &amp;block_blob)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:731</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ab85fd79c9a2ac5b627a2450cb7b67897"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ab85fd79c9a2ac5b627a2450cb7b67897">monero::monero_daemon::get_block_by_height</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block &gt; get_block_by_height(uint64_t height)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:241</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_abf9cfa3ae94352907e1cd3afb194ad82"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#abf9cfa3ae94352907e1cd3afb194ad82">monero::monero_daemon::get_blocks_by_hash</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_block &gt; &gt; get_blocks_by_hash(const std::vector&lt; std::string &gt; &amp;block_hashes, uint64_t start_height, bool prune)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:231</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ac8aca0da4d8878a0a7c683bfddb1f1ad"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ac8aca0da4d8878a0a7c683bfddb1f1ad">monero::monero_daemon::wait_for_next_block_header</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block_header &gt; wait_for_next_block_header()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:787</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_aca724f93d265cd8cc38f6bd322b5b95c"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#aca724f93d265cd8cc38f6bd322b5b95c">monero::monero_daemon::get_tx</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_tx &gt; get_tx(const std::string &amp;tx_hash, bool prune=false)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:298</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ad4875df8920f66ca85cb05168699eb1c"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ad4875df8920f66ca85cb05168699eb1c">monero::monero_daemon::~monero_daemon</a></div><div class="ttdeci">virtual ~monero_daemon()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:89</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_add2a6948313c916102b0344e95b5b801"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#add2a6948313c916102b0344e95b5b801">monero::monero_daemon::submit_tx_hex</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_submit_tx_result &gt; submit_tx_hex(const std::string &amp;tx_hex, bool do_not_relay=false)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:381</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_adf54172918f54c72a6e617a2cb7475e8"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#adf54172918f54c72a6e617a2cb7475e8">monero::monero_daemon::get_output_distribution</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_output_distribution_entry &gt; &gt; get_output_distribution(const std::vector&lt; uint64_t &gt; &amp;amounts, const boost::optional&lt; bool &gt; &amp;is_cumulative=boost::none, const boost::optional&lt; uint64_t &gt; &amp;start_height=boost::none, const boost::optional&lt; uint64_t &gt; &amp;end_height=boost::none)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:527</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_adf91c84a9189671d7f1454c075bded1b"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#adf91c84a9189671d7f1454c075bded1b">monero::monero_daemon::get_known_peers</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_peer &gt; &gt; get_known_peers()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:646</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ae1db3eadb62ca8c55ba1811af6f2b9b2"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ae1db3eadb62ca8c55ba1811af6f2b9b2">monero::monero_daemon::get_block_header_by_height</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block_header &gt; get_block_header_by_height(uint64_t height)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:196</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ae312bd24390bd1a5bec659b9f0b1e17d"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ae312bd24390bd1a5bec659b9f0b1e17d">monero::monero_daemon::stop_mining</a></div><div class="ttdeci">virtual void stop_mining()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:713</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_ae383d5df1795c7691cb1cf063fd9e1cd"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#ae383d5df1795c7691cb1cf063fd9e1cd">monero::monero_daemon::get_peers</a></div><div class="ttdeci">virtual std::vector&lt; std::shared_ptr&lt; monero_peer &gt; &gt; get_peers()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:637</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_af053b49084b3ce5a130563893b7aeda9"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#af053b49084b3ce5a130563893b7aeda9">monero::monero_daemon::set_outgoing_peer_limit</a></div><div class="ttdeci">virtual void set_outgoing_peer_limit(int limit)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:655</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_af3fe7522920559d7c8a3311edb666498"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#af3fe7522920559d7c8a3311edb666498">monero::monero_daemon::get_sync_info</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_daemon_sync_info &gt; get_sync_info()</div><div class="ttdef"><b>Definition</b> monero_daemon.h:545</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_af7bcd4bc4ae70b2a78eaf67ca7c3dd49"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#af7bcd4bc4ae70b2a78eaf67ca7c3dd49">monero::monero_daemon::get_tx_hexes</a></div><div class="ttdeci">virtual std::vector&lt; std::string &gt; get_tx_hexes(const std::vector&lt; std::string &gt; &amp;tx_hashes, bool prune=false)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:349</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_afcbcba5e6a02590ffb16318440cba063"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#afcbcba5e6a02590ffb16318440cba063">monero::monero_daemon::prune_blockchain</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_prune_result &gt; prune_blockchain(bool check)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:752</div></div>
+<div class="ttc" id="aclassmonero_1_1monero__daemon_html_afeb387e737981fd987dd033bfbc9f63e"><div class="ttname"><a href="classmonero_1_1monero__daemon.html#afeb387e737981fd987dd033bfbc9f63e">monero::monero_daemon::get_block_by_hash</a></div><div class="ttdeci">virtual std::shared_ptr&lt; monero_block &gt; get_block_by_hash(const std::string &amp;block_hash)</div><div class="ttdef"><b>Definition</b> monero_daemon.h:217</div></div>
+<div class="ttc" id="anamespacemonero_html"><div class="ttname"><a href="namespacemonero.html">monero</a></div><div class="ttdef"><b>Definition</b> monero_error.h:61</div></div>
+<div class="ttc" id="anamespacemonero_html_a19a3f4124ff3d789de6988a285717af1"><div class="ttname"><a href="namespacemonero.html#a19a3f4124ff3d789de6988a285717af1">monero::monero_key_image_spent_status</a></div><div class="ttdeci">monero_key_image_spent_status</div><div class="ttdef"><b>Definition</b> monero_daemon_model.h:286</div></div>
+<div class="ttc" id="astructmonero_1_1monero__version_html"><div class="ttname"><a href="structmonero_1_1monero__version.html">monero::monero_version</a></div><div class="ttdef"><b>Definition</b> monero_daemon_model.h:140</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
