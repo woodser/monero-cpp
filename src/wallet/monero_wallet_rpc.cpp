@@ -389,7 +389,7 @@ namespace monero {
     clear();
 
     if (config->m_server != nullptr) {
-      set_daemon_connection(config->m_server);
+      set_daemon_connection(config->m_server, config->m_is_trusted_daemon);
     }
 
     m_path = path;
@@ -428,7 +428,7 @@ namespace monero {
     else create_wallet_random(config);
 
     if (config->m_server != nullptr) {
-      set_daemon_connection(config->m_server);
+      set_daemon_connection(config->m_server, config->m_is_trusted_daemon);
     }
 
     return this;
