@@ -66,6 +66,7 @@
 #include <boost/thread/condition_variable.hpp>
 #include <chrono>
 #include <thread>
+#include <atomic>
 #include "include_base_utils.h"
 #include "common/util.h"
 
