@@ -70,21 +70,34 @@ namespace monero_utils
   // ------------------------------ CONSTANTS ---------------------------------
 
   static const int RING_SIZE = 12;  // network-enforced ring size
+  static const uint64_t XMR_AU_MULTIPLIER = 1000000000000ULL;
 
   // -------------------------------- UTILS -----------------------------------
 
   void set_log_level(int level);
+  void set_log_categories(const std::string& categories);
   void configure_logging(const std::string& path, bool console);
   monero_integrated_address get_integrated_address(monero_network_type network_type, const std::string& standard_address, const std::string& payment_id);
+  std::string get_payment_uri(const monero_tx_config& config, monero_network_type network_type);
   bool is_valid_address(const std::string& address, monero_network_type network_type);
   bool is_valid_private_view_key(const std::string& private_view_key);
   bool is_valid_private_spend_key(const std::string& private_spend_key);
+  bool is_valid_public_view_key(const std::string& public_view_key);
+  bool is_valid_public_spend_key(const std::string& public_spend_key);
+  bool is_valid_payment_id(const std::string& payment_id);
+  bool is_valid_mnemonic(const std::string& mnemonic, const std::string& language = "");
   void validate_address(const std::string& address, monero_network_type network_type);
   void validate_private_view_key(const std::string& private_view_key);
   void validate_private_spend_key(const std::string& private_spend_key);
+  void validate_public_view_key(const std::string& public_view_key);
+  void validate_public_spend_key(const std::string& public_spend_key);
+  void validate_payment_id(const std::string& payment_id);
+  void validate_mnemonic(const std::string& mnemonic, const std::string& language = "");
   void json_to_binary(const std::string &json, std::string &bin);
   void binary_to_json(const std::string &bin, std::string &json);
   void binary_blocks_to_json(const std::string &bin, std::string &json);
+  uint64_t xmr_to_atomic_units(double amount_xmr);
+  double atomic_units_to_xmr(uint64_t amount_atomic_units);
 
   // ------------------------------ RAPIDJSON ---------------------------------
 
@@ -98,7 +111,8 @@ namespace monero_utils
   template <class T>
   void add_json_member(std::string key, T val, rapidjson::Document::AllocatorType& allocator, rapidjson::Value& root, rapidjson::Value& field) {
     rapidjson::Value field_key(key.c_str(), key.size(), allocator);
-    field.SetInt64((uint64_t) val);
+    if (std::is_signed<T>::value) field.SetInt64((int64_t) val);
+    else field.SetUint64((uint64_t) val);
     root.AddMember(field_key, field, allocator);
   }
   void add_json_member(std::string key, std::string val, rapidjson::Document::AllocatorType& allocator, rapidjson::Value& root, rapidjson::Value& field);
@@ -123,16 +137,10 @@ namespace monero_utils
   }
 
   rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator, const std::vector<std::string>& strs);
+  rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator, const std::vector<int>& nums);
   rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator, const std::vector<uint8_t>& nums);
   rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator, const std::vector<uint32_t>& nums);
   rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator, const std::vector<uint64_t>& nums);
-
-  // ------------------------ PROPERTY TREES ---------------------------
-
-  // TODO: fully switch from property trees to rapidjson
-
-  std::string serialize(const boost::property_tree::ptree& node);
-  void deserialize(const std::string& json, boost::property_tree::ptree& root);
 
   // --------------------------------------------------------------------------
 
@@ -174,6 +182,32 @@ namespace monero_utils
     CHECK_AND_ASSERT_MES(r, std::string(), "Failed to serialize rct signatures base");
     return ss.str();
   }
+
+  void binary_blocks_to_property_tree(const std::string &bin, boost::property_tree::ptree &node);
+
+  /**
+    * Merges a transaction into a unique set of transactions.
+    *
+    * @param tx is the transaction to merge into the existing txs
+    * @param tx_map maps tx hashes to txs
+    * @param block_map maps block heights to blocks
+    */
+  void merge_tx(const std::shared_ptr<monero_tx_wallet>& tx, std::map<std::string, std::shared_ptr<monero_tx_wallet>>& tx_map, std::map<uint64_t, std::shared_ptr<monero_block>>& block_map);
+
+  /**
+   * Returns true iff tx1's height is known to be less than tx2's height for sorting.
+   */
+  bool tx_height_less_than(const std::shared_ptr<monero_tx>& tx1, const std::shared_ptr<monero_tx>& tx2);
+
+  /**
+    * Returns true iff transfer1 is ordered before transfer2 by ascending account and subaddress indices.
+    */
+  bool incoming_transfer_before(const std::shared_ptr<monero_incoming_transfer>& transfer1, const std::shared_ptr<monero_incoming_transfer>& transfer2);
+
+  /**
+    * Returns true iff wallet vout1 is ordered before vout2 by ascending account and subaddress indices then index.
+    */
+  bool vout_before(const std::shared_ptr<monero_output>& o1, const std::shared_ptr<monero_output>& o2);
 
   // ----------------------------- GATHER BLOCKS ------------------------------
 

@@ -22,6 +22,14 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 add_definitions(-DBOOST_UUID_DISABLE_ALIGNMENT) # match monero-project so shared struct layouts agree
 
+option(ENABLE_COVERAGE "Enable coverage" OFF)
+
+if(ENABLE_COVERAGE)
+  message(STATUS "Coverage enabled")
+  add_compile_options(--coverage -O0 -g -fprofile-update=atomic)
+  add_link_options(--coverage)
+endif()
+
 option(BUILD_LIBRARY "Build monero-cpp library" ON)
 option(BUILD_SAMPLE "Build c++ sample code" OFF)
 option(BUILD_SCRATCHPAD "Build c++ scratchpad" OFF)
@@ -317,12 +325,17 @@ set_target_properties(randomx PROPERTIES IMPORTED_LOCATION
 
 set(
     LIBRARY_SRC_FILES
+    src/common/monero_rpc_connection.cpp
     src/utils/gen_utils.cpp
     src/utils/monero_utils.cpp
     src/daemon/monero_daemon_model.cpp
     src/daemon/monero_daemon.cpp
+    src/daemon/monero_daemon_rpc_model.cpp
+    src/daemon/monero_daemon_rpc.cpp
     src/wallet/monero_wallet_model.cpp
     src/wallet/monero_wallet_keys.cpp
+    src/wallet/monero_wallet_rpc_model.cpp
+    src/wallet/monero_wallet_rpc.cpp
     src/wallet/monero_wallet_full.cpp
 )
 
@@ -421,16 +434,23 @@ if (STATIC)
   endif()
 endif()
 
+  INSTALL(FILES src/common/monero_error.h
+          src/common/monero_rpc_connection.h
+          DESTINATION include/common)
   INSTALL(FILES src/daemon/monero_daemon.h
           src/daemon/monero_daemon_model.h
+          src/daemon/monero_daemon_rpc_model.h
+          src/daemon/monero_daemon_rpc.h
           DESTINATION include/daemon)
   INSTALL(FILES src/utils/gen_utils.h
           src/utils/monero_utils.h
           DESTINATION include/utils)
   INSTALL(FILES src/wallet/monero_wallet_full.h
+          src/wallet/monero_wallet_rpc.h
           src/wallet/monero_wallet.h
           src/wallet/monero_wallet_keys.h
           src/wallet/monero_wallet_model.h
+          src/wallet/monero_wallet_rpc_model.h
           DESTINATION include/wallet)
   INSTALL(TARGETS monero-cpp monero-cpp-static
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime

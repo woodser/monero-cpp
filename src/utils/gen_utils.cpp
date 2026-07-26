@@ -51,3 +51,161 @@
  */
 
 #include "gen_utils.h"
+
+using namespace gen_utils;
+
+// ------------------------ PROPERTY TREES ---------------------------
+
+std::string gen_utils::serialize(const boost::property_tree::ptree& node) {
+  std::stringstream ss;
+  boost::property_tree::write_json(ss, node, false);
+  std::string str = ss.str();
+  return str.substr(0, str.size() - 1); // strip newline
+}
+
+void gen_utils::deserialize(const std::string& json, boost::property_tree::ptree& root) {
+  std::istringstream iss = json.empty() ? std::istringstream() : std::istringstream(json);
+  try {
+    boost::property_tree::read_json(iss, root);
+  } catch (std::exception const& e) {
+    throw std::runtime_error("Invalid JSON");
+  }
+}
+
+// --------------------------- THREAD POLLER ---------------------------
+
+thread_poller::thread_poller(): m_is_polling(false), m_poll_loop_running(false), m_poll_period_ms(20000) {
+}
+
+thread_poller::~thread_poller() {
+  // safety net only: derived classes must stop polling in their own destructor
+  // (before their members are torn down) since by the time this base destructor
+  // runs, the derived part of the object is already gone and a concurrently
+  // running poll() (a virtual call) would hit a partially-destructed object
+  set_is_polling(false);
+}
+
+namespace {
+  // stack of poller instances whose announce_scope is currently active on the current
+  // thread, innermost last. Per-instance so that a callback of poller A calling into 
+  // a *different* poller B's wait_for_callbacks_idle() still waits normally.
+  thread_local std::vector<const thread_poller*> t_active_dispatch_stack;
+}
+
+thread_poller::announce_scope::announce_scope(thread_poller& poller): m_poller(poller) {
+  t_active_dispatch_stack.push_back(&poller);
+  boost::lock_guard<boost::mutex> lock(m_poller.m_announce_mutex);
+  ++m_poller.m_announce_count;
+}
+
+thread_poller::announce_scope::~announce_scope() {
+  {
+    boost::lock_guard<boost::mutex> lock(m_poller.m_announce_mutex);
+    if (--m_poller.m_announce_count == 0) m_poller.m_announce_cv.notify_all();
+  }
+  t_active_dispatch_stack.pop_back();
+}
+
+void thread_poller::wait_for_callbacks_idle() {
+  // skip the wait only if this poller's own dispatch is active on the current thread;
+  // waiting would deadlock in that case. A different poller's active dispatch must not
+  // short-circuit this wait.
+  for (const thread_poller* active : t_active_dispatch_stack) {
+    if (active == this) return;
+  }
+  boost::unique_lock<boost::mutex> lock(m_announce_mutex);
+  m_announce_cv.wait(lock, [&]() { return m_announce_count == 0; });
+}
+
+void thread_poller::init_common(const std::string& name) {
+  m_name = name;
+}
+
+void thread_poller::request_is_polling(bool is_polling) {
+  boost::lock_guard<boost::mutex> lifecycle_lock(m_lifecycle_mutex);
+
+  if (is_polling) {
+    if (m_is_polling) return;
+    m_is_polling = true;
+    run_poll_loop();
+    return;
+  }
+
+  bool was_polling = m_is_polling.exchange(false);
+  if (was_polling) {
+    boost::lock_guard<boost::mutex> polling_lock(m_polling_mutex);
+    m_poll_cv.notify_one();
+  }
+}
+
+void thread_poller::set_is_polling(bool is_polling) {
+  boost::unique_lock<boost::mutex> lifecycle_lock(m_lifecycle_mutex);
+
+  if (is_polling) {
+    if (m_is_polling) return;
+    m_is_polling = true;
+    run_poll_loop();
+    return;
+  }
+
+  bool was_polling = m_is_polling.exchange(false);
+  if (was_polling) {
+    boost::lock_guard<boost::mutex> polling_lock(m_polling_mutex);
+    m_poll_cv.notify_one();
+  }
+
+  if (!m_poll_loop_running) return; // loop already fully exited; nothing to wait for
+
+  if (boost::this_thread::get_id() == m_poll_thread_id) {
+    // called from the poll thread itself (e.g. a listener removed itself from within a
+    // callback invoked by poll()): waiting for our own loop to exit would deadlock. Just
+    // return -- the loop re-checks m_is_polling itself and will exit and clear
+    // m_poll_loop_running/m_poll_thread_id on its own (see run_poll_loop).
+    return;
+  }
+
+  // wait for the loop to actually finish
+  m_lifecycle_cv.wait(lifecycle_lock, [&]() { return !m_poll_loop_running; });
+}
+
+void thread_poller::run_poll_loop() {
+  // called with m_lifecycle_mutex held
+  if (m_poll_loop_running) return; // only run one loop at a time
+  m_poll_loop_running = true;
+
+  // TODO: use global threadpool, background sync wasm wallet in c++ thread
+  try {
+    boost::thread([this]() {
+      {
+        boost::lock_guard<boost::mutex> lifecycle_lock(m_lifecycle_mutex);
+        m_poll_thread_id = boost::this_thread::get_id();
+      }
+
+      while (true) {
+        while (m_is_polling) {
+          try { poll(); }
+          catch (const std::exception& e) { MERROR(m_name << " failed to background poll: " << e.what()); }
+          catch (...) { MERROR(m_name << " failed to background poll"); }
+
+          // only wait if polling still enabled
+          if (m_is_polling) {
+            boost::mutex::scoped_lock lock(m_polling_mutex);
+            boost::posix_time::milliseconds wait_for_ms(m_poll_period_ms.load());
+            m_poll_cv.timed_wait(lock, wait_for_ms, [&]() { return !m_is_polling; });
+          }
+        }
+
+        boost::unique_lock<boost::mutex> lifecycle_lock(m_lifecycle_mutex);
+        if (m_is_polling) continue;
+        m_poll_loop_running = false;
+        m_poll_thread_id = boost::thread::id();
+        m_lifecycle_cv.notify_all();
+        return;
+      }
+    }).detach();
+  } catch (...) {
+    m_poll_loop_running = false;
+    m_is_polling = false;
+    throw;
+  }
+}

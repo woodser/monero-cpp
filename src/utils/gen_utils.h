@@ -58,6 +58,11 @@
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/thread/thread.hpp>
+#include <boost/thread/condition_variable.hpp>
 #include <chrono>
 #include <thread>
 #include "include_base_utils.h"
@@ -69,25 +74,36 @@
 namespace gen_utils
 {
 
- /**
-  * Return a unique identifier.
-  * 
-  * @return a unique id
-  */
+  /**
+   * Return a unique identifier.
+   *
+   * @return a unique id
+   */
   static std::string get_uuid() {
     boost::uuids::random_generator generator;
     boost::uuids::uuid uuid = generator();
     return boost::uuids::to_string(uuid);
   }
 
- /**
-  * Wait for the given duration.
-  * 
-  * @param duration_ms the duration to wait in milliseconds
-  */
+  /**
+   * Wait for the given duration.
+   *
+   * @param duration_ms the duration to wait in milliseconds
+   */
   static void wait_for(uint64_t duration_ms) {
     std::this_thread::sleep_for(std::chrono::milliseconds(duration_ms));
   }
+
+  static bool bool_equals(bool val, const boost::optional<bool>& opt_val) {
+    return opt_val == boost::none ? false : val == *opt_val;
+  }
+
+  // ------------------------ PROPERTY TREES ---------------------------
+
+  // TODO: fully switch from property trees to rapidjson
+
+  std::string serialize(const boost::property_tree::ptree& node);
+  void deserialize(const std::string& json, boost::property_tree::ptree& root);
 
   // ------------------------- VALUE RECONCILATION ----------------------------
 
@@ -150,5 +166,52 @@ namespace gen_utils
     // otherwise cannot reconcile
     throw std::runtime_error("Cannot reconcile vectors" + (!err_msg.empty() ? std::string(". ") + err_msg : std::string("")));
   }
+
+  // ------------------------- THREAD POLLER ----------------------------
+
+  // WARNING: Only destroy a thread_poller from a thread other than its own pool thread.
+  // (e.g. a listener callback running on the poll thread, drops the last owning reference/unique_ptr
+  // to the poller.)
+  class thread_poller {
+  public:
+    thread_poller();
+    virtual ~thread_poller();
+
+    bool is_polling() const { return m_is_polling; }
+    void set_is_polling(bool is_polling);
+    void request_is_polling(bool is_polling);
+
+    void set_period_in_ms(uint64_t period_ms) { m_poll_period_ms = period_ms; }
+    virtual void poll() = 0;
+    void wait_for_callbacks_idle();
+
+    class announce_scope {
+    public:
+      explicit announce_scope(thread_poller& poller);
+      ~announce_scope();
+      announce_scope(const announce_scope&) = delete;
+      announce_scope& operator=(const announce_scope&) = delete;
+    private:
+      thread_poller& m_poller;
+    };
+
+  protected:
+    std::string m_name;
+    boost::recursive_mutex m_mutex;
+    boost::mutex m_polling_mutex;              // guards the interruptible periodic sleep (m_poll_cv)
+    boost::mutex m_lifecycle_mutex;            // guards m_poll_loop_running/m_poll_thread_id and start/stop coordination
+    boost::thread::id m_poll_thread_id;        // id of the currently running loop thread; guarded by m_lifecycle_mutex
+    std::atomic<bool> m_is_polling;
+    bool m_poll_loop_running;                  // guarded by m_lifecycle_mutex
+    std::atomic<uint64_t> m_poll_period_ms;
+    boost::condition_variable m_poll_cv;       // periodic-sleep interrupt
+    boost::condition_variable m_lifecycle_cv;  // notified (under m_lifecycle_mutex) when the loop actually exits
+    boost::mutex m_announce_mutex;             // guards m_announce_count
+    boost::condition_variable m_announce_cv;   // notified (under m_announce_mutex) when m_announce_count reaches 0
+    int m_announce_count = 0;                  // number of announce_scope instances currently alive, across all threads
+
+    void init_common(const std::string& name);
+    void run_poll_loop();
+  };
 }
 #endif /* gen_utils_h */
