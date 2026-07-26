@@ -744,6 +744,18 @@ namespace monero {
     return status;
   }
 
+  std::shared_ptr<monero_generate_blocks_result> monero_daemon_rpc::generate_blocks(const std::string& wallet_address, uint64_t num_blocks, const boost::optional<std::string>& prev_block_hash, const boost::optional<uint32_t>& starting_nonce) {
+    MTRACE("monero_daemon_rpc::generate_blocks()");
+    if (wallet_address.empty()) throw monero_error("Must provide an address to mine to");
+    if (num_blocks == 0) throw monero_error("Must provide a number of blocks to generate greater than 0");
+    auto params = std::make_shared<monero_generate_blocks_params>(wallet_address, num_blocks, prev_block_hash, starting_nonce);
+    auto result = m_rpc->send_json_request("generateblocks", params);
+    check_response_status(result);
+    auto generate_result = std::make_shared<monero_generate_blocks_result>();
+    deserialize_generate_blocks_result(result, generate_result);
+    return generate_result;
+  }
+
   void monero_daemon_rpc::submit_blocks(const std::vector<std::string>& block_blobs) {
     MTRACE("monero_daemon_rpc::submit_blocks()");
     if (block_blobs.empty()) throw monero_error("Must provide an array of mined block blobs to submit");
