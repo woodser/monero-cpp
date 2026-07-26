@@ -27,8 +27,8 @@ namespace monero {
 
   rapidjson::Value monero_rpc_request::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     if (!is_json_rpc()) {
-      if (m_params == boost::none) throw monero_error("No params provided");
-      return m_params.get()->to_rapidjson_val(allocator);
+      if (m_params == nullptr) throw monero_error("No params provided");
+      return m_params->to_rapidjson_val(allocator);
     }
 
     // create root
@@ -40,7 +40,7 @@ namespace monero {
     if (m_version != boost::none) monero_utils::add_json_member("jsonrpc", m_version.get(), allocator, root, value_str);
     if (m_id != boost::none) monero_utils::add_json_member("id", m_id.get(), allocator, root, value_str);
     if (m_method != boost::none) monero_utils::add_json_member("method", m_method.get(), allocator, root, value_str);
-    if (m_params != boost::none) root.AddMember("params", m_params.get()->to_rapidjson_val(allocator), allocator);
+    if (m_params != nullptr) root.AddMember("params", m_params->to_rapidjson_val(allocator), allocator);
 
     // return root
     return root;

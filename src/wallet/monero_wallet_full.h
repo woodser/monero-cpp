@@ -140,8 +140,8 @@ namespace monero {
      */
     bool is_view_only() const override { return m_w2->watch_only(); }
     void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "", const boost::optional<bool>& is_trusted = boost::none) override;
-    void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, const boost::optional<bool>& is_trusted = boost::none) override;
-    boost::optional<std::shared_ptr<monero_rpc_connection>> get_daemon_connection() const override;
+    void set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted = boost::none) override;
+    std::shared_ptr<monero_rpc_connection> get_daemon_connection() const override;
     bool is_connected_to_daemon() const override;
     bool is_daemon_synced() const override;
     bool is_daemon_trusted() const override;

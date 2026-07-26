@@ -216,15 +216,15 @@ namespace monero_utils
     std::vector<std::shared_ptr<monero_block>> blocks;
     std::unordered_set<std::shared_ptr<monero_block>> seen_block_ptrs;
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
-      if (tx->m_block == boost::none) {
+      if (tx->m_block == nullptr) {
         if (unconfirmed_block == nullptr) unconfirmed_block = std::make_shared<monero_block>();
         tx->m_block = unconfirmed_block;
         unconfirmed_block->m_txs.push_back(tx);
       }
-      std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(tx->m_block.get());
+      std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(tx->m_block);
       if (got == seen_block_ptrs.end()) {
-        seen_block_ptrs.insert(tx->m_block.get());
-        blocks.push_back(tx->m_block.get());
+        seen_block_ptrs.insert(tx->m_block);
+        blocks.push_back(tx->m_block);
       }
     }
     return blocks;
@@ -236,15 +236,15 @@ namespace monero_utils
     std::unordered_set<std::shared_ptr<monero_block>> seen_block_ptrs;
     for (auto const& transfer : transfers) {
       std::shared_ptr<monero_tx_wallet> tx = transfer->m_tx;
-      if (tx->m_block == boost::none) {
+      if (tx->m_block == nullptr) {
         if (unconfirmed_block == nullptr) unconfirmed_block = std::make_shared<monero_block>();
         tx->m_block = unconfirmed_block;
         unconfirmed_block->m_txs.push_back(tx);
       }
-      std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(tx->m_block.get());
+      std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(tx->m_block);
       if (got == seen_block_ptrs.end()) {
-        seen_block_ptrs.insert(tx->m_block.get());
-        blocks.push_back(tx->m_block.get());
+        seen_block_ptrs.insert(tx->m_block);
+        blocks.push_back(tx->m_block);
       }
     }
     return blocks;
@@ -255,11 +255,11 @@ namespace monero_utils
     std::unordered_set<std::shared_ptr<monero_block>> seen_block_ptrs;
     for (auto const& output : outputs) {
       std::shared_ptr<monero_tx_wallet> tx = std::static_pointer_cast<monero_tx_wallet>(output->m_tx);
-      if (tx->m_block == boost::none) throw std::runtime_error("Need to handle unconfirmed output");
-      std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(*tx->m_block);
+      if (tx->m_block == nullptr) throw std::runtime_error("Need to handle unconfirmed output");
+      std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(tx->m_block);
       if (got == seen_block_ptrs.end()) {
-        seen_block_ptrs.insert(*tx->m_block);
-        blocks.push_back(*tx->m_block);
+        seen_block_ptrs.insert(tx->m_block);
+        blocks.push_back(tx->m_block);
       }
     }
     return blocks;
@@ -269,11 +269,11 @@ namespace monero_utils
 
   static void free(std::shared_ptr<monero_block> block) {
     for (std::shared_ptr<monero_tx>& tx : block->m_txs) {
-      tx->m_block->reset();
+      tx->m_block.reset();
       monero_tx_wallet* tx_wallet = dynamic_cast<monero_tx_wallet*>(tx.get());
       if (tx_wallet != nullptr) {
-        if (tx_wallet->m_tx_set != boost::none) tx_wallet->m_tx_set->reset();
-        if (tx_wallet->m_outgoing_transfer != boost::none) tx_wallet->m_outgoing_transfer.get()->m_tx.reset();
+        if (tx_wallet->m_tx_set != nullptr) tx_wallet->m_tx_set.reset();
+        if (tx_wallet->m_outgoing_transfer != nullptr) tx_wallet->m_outgoing_transfer->m_tx.reset();
         for (std::shared_ptr<monero_transfer> transfer : tx_wallet->m_incoming_transfers) transfer->m_tx.reset();
         for (std::shared_ptr<monero_output> output : tx_wallet->m_outputs) output->m_tx.reset();
         for (std::shared_ptr<monero_output> input : tx_wallet->m_inputs) {
@@ -283,13 +283,13 @@ namespace monero_utils
       }
       monero_tx_query* tx_query = dynamic_cast<monero_tx_query*>(tx.get());
       if (tx_query != nullptr) {
-        if (tx_query->m_transfer_query != boost::none) {
-          tx_query->m_transfer_query.get()->m_tx_query->reset();
-          tx_query->m_transfer_query.get().reset();
+        if (tx_query->m_transfer_query != nullptr) {
+          tx_query->m_transfer_query->m_tx_query.reset();
+          tx_query->m_transfer_query.reset();
         }
-        if (tx_query->m_output_query != boost::none) {
-          tx_query->m_output_query.get()->m_tx_query->reset();
-          tx_query->m_output_query.get().reset();
+        if (tx_query->m_output_query != nullptr) {
+          tx_query->m_output_query->m_tx_query.reset();
+          tx_query->m_output_query.reset();
         }
       }
     }
@@ -301,12 +301,12 @@ namespace monero_utils
   }
 
   static void free(std::shared_ptr<monero_tx> tx) {
-    if (tx->m_block == boost::none) {
+    if (tx->m_block == nullptr) {
       std::shared_ptr<monero_block> block = std::make_shared<monero_block>();
       tx->m_block = block;
       block->m_txs.push_back(tx);
     }
-    monero_utils::free(tx->m_block.get());
+    monero_utils::free(tx->m_block);
   }
 
   static void free(std::vector<std::shared_ptr<monero_tx_wallet>> txs) {

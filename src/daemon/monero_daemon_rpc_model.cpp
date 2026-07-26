@@ -404,7 +404,7 @@ namespace monero {
           if (key_key == std::string("amount")) output->m_amount = it2->second.get_value<uint64_t>();
           else if (key_key == std::string("k_image")) {
             if (!output->m_key_image) output->m_key_image = std::make_shared<monero_key_image>();
-            output->m_key_image.get()->m_hex = it2->second.data();
+            output->m_key_image->m_hex = it2->second.data();
           }
           else if (key_key == std::string("key_offsets")) {
             auto offsets_node = it2->second;
@@ -442,7 +442,7 @@ namespace monero {
   }
 
   void deserialize_tx(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx>& tx) {
-    std::shared_ptr<monero_block> block = tx->m_block == boost::none ? nullptr : tx->m_block.get();
+    std::shared_ptr<monero_block> block = tx->m_block;
     std::string as_json;
     std::string tx_json;
 
@@ -603,7 +603,7 @@ namespace monero {
       tx->m_is_failed = false;
     } else {
       tx->m_num_confirmations = 0;
-      tx->m_block = boost::none;
+      tx->m_block = nullptr;
     }
 
     if (tx->m_is_failed == boost::none) tx->m_is_failed = false;
@@ -795,7 +795,7 @@ namespace monero {
       // merge into one block
       block->m_txs.clear();
       for (auto& tx : txs) {
-        if (tx->m_block != boost::none) block->merge(block, tx->m_block.get());
+        if (tx->m_block != nullptr) block->merge(block, tx->m_block);
         else {
           tx->m_block = block;
           block->m_txs.push_back(tx);

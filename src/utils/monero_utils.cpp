@@ -424,7 +424,7 @@ std::shared_ptr<monero_tx> monero_utils::cn_tx_to_tx(const cryptonote::transacti
     input->m_ring_output_indices = txin.key_offsets;
     crypto::key_image cnKeyImage = txin.k_image;
     input->m_key_image = std::make_shared<monero_key_image>();
-    input->m_key_image.get()->m_hex = epee::string_tools::pod_to_hex(cnKeyImage);
+    input->m_key_image->m_hex = epee::string_tools::pod_to_hex(cnKeyImage);
   }
 
   // init outputs
@@ -517,17 +517,17 @@ void monero_utils::merge_tx(const std::shared_ptr<monero_tx_wallet>& tx, std::ma
   if (tx->get_height() != boost::none) {
     std::map<uint64_t, std::shared_ptr<monero_block>>::const_iterator block_iter = block_map.find(tx->get_height().get());
     if (block_iter == block_map.end()) {
-      block_map[tx->get_height().get()] = tx->m_block.get(); // cache new block
+      block_map[tx->get_height().get()] = tx->m_block; // cache new block
     } else {
       std::shared_ptr<monero_block>& a_block = block_map[tx->get_height().get()];
-      a_block->merge(a_block, tx->m_block.get()); // merge with existing block
+      a_block->merge(a_block, tx->m_block); // merge with existing block
     }
   }
 }
 
 bool monero_utils::tx_height_less_than(const std::shared_ptr<monero_tx>& tx1, const std::shared_ptr<monero_tx>& tx2) {
-  if (tx1->m_block != boost::none && tx2->m_block != boost::none) return tx1->get_height() < tx2->get_height();
-  else if (tx1->m_block == boost::none) return false;
+  if (tx1->m_block != nullptr && tx2->m_block != nullptr) return tx1->get_height() < tx2->get_height();
+  else if (tx1->m_block == nullptr) return false;
   else return true;
 }
 

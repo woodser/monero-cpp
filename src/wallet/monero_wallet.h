@@ -158,16 +158,16 @@ namespace monero {
      * @param connection is the connection to set
      * @param is_trusted specifies if the daemon is trusted (default = trusted if local address)
      */
-    virtual void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, const boost::optional<bool>& is_trusted = boost::none) {
+    virtual void set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted = boost::none) {
       throw std::runtime_error("set_daemon_connection() not supported");
     }
 
     /**
      * Get the wallet's daemon connection.
      *
-     * @return the wallet's daemon connection
+     * @return the wallet's daemon connection or null if not set
      */
-    virtual boost::optional<std::shared_ptr<monero_rpc_connection>> get_daemon_connection() const {
+    virtual std::shared_ptr<monero_rpc_connection> get_daemon_connection() const {
       throw std::runtime_error("get_daemon_connection() not supported");
     }
 

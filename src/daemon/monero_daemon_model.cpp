@@ -242,7 +242,7 @@ namespace monero {
     if (!m_tx_hashes.empty()) root.AddMember("txHashes", monero_utils::to_rapidjson_val(allocator, m_tx_hashes), allocator);
 
     // set sub-objects
-    if (m_miner_tx != boost::none) root.AddMember("minerTx", m_miner_tx.get()->to_rapidjson_val(allocator), allocator);
+    if (m_miner_tx != nullptr) root.AddMember("minerTx", m_miner_tx->to_rapidjson_val(allocator), allocator);
 
     // return root
     return root;
@@ -253,8 +253,8 @@ namespace monero {
     monero_block_header::copy(std::static_pointer_cast<monero_block_header>(src), std::static_pointer_cast<monero_block_header>(tgt));
     tgt->m_hex = src->m_hex;
     if (src->m_miner_tx) {
-      tgt->m_miner_tx = src->m_miner_tx.get()->copy(src->m_miner_tx.get(), std::make_shared<monero_tx>());
-      tgt->m_miner_tx.get()->m_block = tgt;
+      tgt->m_miner_tx = src->m_miner_tx->copy(src->m_miner_tx, std::make_shared<monero_tx>());
+      tgt->m_miner_tx->m_block = tgt;
     }
     if (!src->m_txs.empty()) {
       bool use_wallet_types = std::dynamic_pointer_cast<monero_tx_wallet>(src->m_txs[0]) != 0;
@@ -292,10 +292,10 @@ namespace monero {
     m_tx_hashes = gen_utils::reconcile(m_tx_hashes, other->m_tx_hashes, "block m_tx_hahes");
 
     // merge miner tx
-    if (m_miner_tx == boost::none) m_miner_tx = other->m_miner_tx;
-    if (other->m_miner_tx != boost::none) {
-      other->m_miner_tx.get()->m_block = self;
-      m_miner_tx.get()->merge(m_miner_tx.get(), other->m_miner_tx.get());
+    if (m_miner_tx == nullptr) m_miner_tx = other->m_miner_tx;
+    if (other->m_miner_tx != nullptr) {
+      other->m_miner_tx->m_block = self;
+      m_miner_tx->merge(m_miner_tx, other->m_miner_tx);
     }
 
     // merge non-miner txs
@@ -467,8 +467,8 @@ namespace monero {
   }
 
   boost::optional<uint64_t> monero_tx::get_height() const {
-    if (m_block == boost::none) return boost::none;
-    return *((*m_block)->m_height);
+    if (m_block == nullptr) return boost::none;
+    return *(m_block->m_height);
   }
 
   void monero_tx::merge(const std::shared_ptr<monero_tx>& self, const std::shared_ptr<monero_tx>& other) {
@@ -477,11 +477,11 @@ namespace monero {
 
     // merge blocks if they're different
     if (m_block != other->m_block) {
-      if (m_block == boost::none) {
+      if (m_block == nullptr) {
         m_block = other->m_block;
-        std::replace(m_block.get()->m_txs.begin(), m_block.get()->m_txs.end(), other, self); // update block to point to this tx
-      } else if (other->m_block != boost::none) {
-        m_block.get()->merge(m_block.get(), other->m_block.get()); // comes back to merging txs
+        std::replace(m_block->m_txs.begin(), m_block->m_txs.end(), other, self); // update block to point to this tx
+      } else if (other->m_block != nullptr) {
+        m_block->merge(m_block, other->m_block); // comes back to merging txs
         return;
       }
     }
@@ -526,7 +526,7 @@ namespace monero {
         bool merged = false;
         merger->m_tx = self;
         for (const std::shared_ptr<monero_output>& mergee : m_inputs) {
-          if ((*mergee->m_key_image)->m_hex == (*merger->m_key_image)->m_hex) {
+          if (mergee->m_key_image->m_hex == merger->m_key_image->m_hex) {
             mergee->merge(mergee, merger);
             merged = true;
             break;
@@ -547,7 +547,7 @@ namespace monero {
           bool merged = false;
           merger->m_tx = self;
           for (const std::shared_ptr<monero_output>& mergee : m_outputs) {
-            if ((merger->m_key_image != boost::none && (*mergee->m_key_image)->m_hex == (*merger->m_key_image)->m_hex) ||
+            if ((merger->m_key_image != nullptr && mergee->m_key_image->m_hex == merger->m_key_image->m_hex) ||
                 (merger->m_stealth_public_key != boost::none && *mergee->m_stealth_public_key == *merger->m_stealth_public_key)) {
               mergee->merge(mergee, merger);
               merged = true;
@@ -652,7 +652,7 @@ namespace monero {
     if (!m_ring_output_indices.empty()) root.AddMember("ringOutputIndices", monero_utils::to_rapidjson_val(allocator, m_ring_output_indices), allocator);
 
     // set sub-objects
-    if (m_key_image != boost::none) root.AddMember("keyImage", m_key_image.get()->to_rapidjson_val(allocator), allocator);
+    if (m_key_image != nullptr) root.AddMember("keyImage", m_key_image->to_rapidjson_val(allocator), allocator);
 
     // return root
     return root;
@@ -665,7 +665,7 @@ namespace monero {
       std::string key = it->first;
       if (key == std::string("keyImage")) {
         output->m_key_image = std::make_shared<monero_key_image>();
-        monero_key_image::from_property_tree(it->second, output->m_key_image.get());
+        monero_key_image::from_property_tree(it->second, output->m_key_image);
       }
       else if (key == std::string("amount")) output->m_amount = it->second.get_value<uint64_t>();
       else if (key == std::string("index")) output->m_index = it->second.get_value<uint32_t>();
@@ -677,7 +677,7 @@ namespace monero {
   std::shared_ptr<monero_output> monero_output::copy(const std::shared_ptr<monero_output>& src, const std::shared_ptr<monero_output>& tgt) const {
     if (this != src.get()) throw std::runtime_error("this != src");
     tgt->m_tx = src->m_tx;  // reference same parent tx by default
-    if (src->m_key_image != boost::none) tgt->m_key_image = src->m_key_image.get()->copy(src->m_key_image.get(), std::make_shared<monero_key_image>());
+    if (src->m_key_image != nullptr) tgt->m_key_image = src->m_key_image->copy(src->m_key_image, std::make_shared<monero_key_image>());
     tgt->m_amount = src->m_amount;
     tgt->m_index = src->m_index;
     if (!src->m_ring_output_indices.empty()) tgt->m_ring_output_indices = std::vector<uint64_t>(src->m_ring_output_indices);
@@ -696,8 +696,8 @@ namespace monero {
     }
 
     // otherwise merge output fields
-    if (m_key_image == boost::none) m_key_image = other->m_key_image;
-    else if (other->m_key_image != boost::none) m_key_image.get()->merge(m_key_image.get(), other->m_key_image.get());
+    if (m_key_image == nullptr) m_key_image = other->m_key_image;
+    else if (other->m_key_image != nullptr) m_key_image->merge(m_key_image, other->m_key_image);
     m_amount = gen_utils::reconcile(m_amount, other->m_amount, "output amount");
     m_index = gen_utils::reconcile(m_index, other->m_index, "output index");
   }

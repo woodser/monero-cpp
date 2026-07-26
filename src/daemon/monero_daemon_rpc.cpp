@@ -819,7 +819,7 @@ namespace monero {
     // this call forever.
     // TODO monero-java waits indefinitely.
     bool timed_out;
-    boost::optional<std::shared_ptr<monero_block_header>> header;
+    std::shared_ptr<monero_block_header> header;
     {
       boost::mutex::scoped_lock lock(temp);
       cv.timed_wait(lock, boost::posix_time::minutes(30), [&]() { return ready; });
@@ -836,8 +836,8 @@ namespace monero {
     if (timed_out) throw monero_error("Timed out waiting for next block header");
 
     // return last height
-    if (header == boost::none) throw monero_error("Could not get last block header.");
-    return header.get();
+    if (header == nullptr) throw monero_error("Could not get last block header.");
+    return header;
   }
 
   std::shared_ptr<monero_bandwidth_limits> monero_daemon_rpc::get_bandwidth_limits() {
