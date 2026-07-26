@@ -112,7 +112,16 @@ namespace monero {
   };
 
   /**
-   * Models connection bandwith limits.
+   * Enumerates Monero network types.
+   */
+  enum monero_network_type : uint8_t {
+    MAINNET = 0,
+    TESTNET,
+    STAGENET
+  };
+
+  /**
+   * Models connection bandwidth limits.
    */
   struct monero_bandwidth_limits : public serializable_struct {
     boost::optional<int> m_up;
@@ -123,15 +132,6 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_bandwidth_limits>& limits);
-  };
-
-  /**
-   * Enumerates Monero network types.
-   */
-  enum monero_network_type : uint8_t {
-    MAINNET = 0,
-    TESTNET,
-    STAGENET
   };
 
   /**

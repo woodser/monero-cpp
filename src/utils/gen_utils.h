@@ -60,6 +60,7 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include "rapidjson/document.h"
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition_variable.hpp>
@@ -98,10 +99,11 @@ namespace gen_utils
     return opt_val == boost::none ? false : val == *opt_val;
   }
 
-  // ------------------------ PROPERTY TREES ---------------------------
+  // ------------------------- SERIALIZATION ---------------------------
 
   // TODO: fully switch from property trees to rapidjson
 
+  std::string serialize(const rapidjson::Document& doc);
   std::string serialize(const boost::property_tree::ptree& node);
   void deserialize(const std::string& json, boost::property_tree::ptree& root);
 

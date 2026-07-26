@@ -298,13 +298,6 @@ void monero_utils::binary_blocks_to_json(const std::string &bin, std::string &js
 
 // ------------------------------- RAPIDJSON ----------------------------------
 
-std::string monero_utils::serialize(const rapidjson::Document& doc) {
-  rapidjson::StringBuffer buffer;
-  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-  doc.Accept(writer);
-  return buffer.GetString();
-}
-
 void monero_utils::add_json_member(std::string key, std::string val, rapidjson::Document::AllocatorType& allocator, rapidjson::Value& root, rapidjson::Value& field) {
   rapidjson::Value field_key(key.c_str(), key.size(), allocator);
   field.SetString(val.c_str(), val.size(), allocator);

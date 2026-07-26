@@ -51,10 +51,19 @@
  */
 
 #include "gen_utils.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/writer.h"
 
 using namespace gen_utils;
 
-// ------------------------ PROPERTY TREES ---------------------------
+// ------------------------- SERIALIZATION ---------------------------
+
+std::string gen_utils::serialize(const rapidjson::Document& doc) {
+  rapidjson::StringBuffer buffer;
+  rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+  doc.Accept(writer);
+  return buffer.GetString();
+}
 
 std::string gen_utils::serialize(const boost::property_tree::ptree& node) {
   std::stringstream ss;
