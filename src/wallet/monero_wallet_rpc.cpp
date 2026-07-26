@@ -56,6 +56,7 @@
 #include "common/monero_error.h"
 #include "utils/gen_utils.h"
 #include "utils/monero_utils.h"
+#include <atomic>
 
 namespace monero {
 

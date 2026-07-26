@@ -56,6 +56,7 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <atomic>
 
 #include "monero_wallet.h"
 #include "wallet/wallet2.h"
