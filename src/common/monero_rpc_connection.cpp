@@ -110,6 +110,7 @@ namespace monero {
 
   rapidjson::Value monero_rpc_connection::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
+
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
 
@@ -136,7 +137,6 @@ namespace monero {
 
   bool monero_rpc_connection::is_onion() const {
     boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
-    // check onion uri
     epee::net_utils::http::url_content parsed{};
     if (!epee::net_utils::parse_url(m_uri.value_or(""), parsed)) return false;
     return parsed.host.size() >= 6 && parsed.host.compare(parsed.host.size() - 6, 6, ".onion") == 0;
@@ -144,7 +144,6 @@ namespace monero {
 
   bool monero_rpc_connection::is_i2p() const {
     boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
-    // check i2p uri
     epee::net_utils::http::url_content parsed{};
     if (!epee::net_utils::parse_url(m_uri.value_or(""), parsed)) return false;
     return parsed.host.size() >= 8 && parsed.host.compare(parsed.host.size() - 8, 8, ".b32.i2p") == 0;
@@ -152,6 +151,7 @@ namespace monero {
 
   void monero_rpc_connection::set_credentials(const std::string& username, const std::string& password) {
     boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
+
     // disconnect http client if connected
     if (m_http_client != nullptr && m_http_client->is_connected()) m_http_client->disconnect();
 
@@ -159,16 +159,10 @@ namespace monero {
     bool password_empty = password.empty();
 
     // check username and password consistency
-    // Deliberate: one-sided credentials (e.g. username set, password empty) are rejected
-    // rather than silently tolerated, matching monero-java's validation. This is a behavior
-    // change for callers that previously relied on such configs being accepted (e.g. via
-    // monero_wallet_config::copy() reaching this constructor) -- accepted as correct/intended
-    // rather than loosened back, since those configs were malformed to begin with.
     if (!username_empty || !password_empty) {
       if (password_empty) {
         throw monero_error("password cannot be empty because username is not empty");
       }
-
       if (username_empty) {
         throw monero_error("username cannot be empty because password is not empty");
       }
@@ -203,8 +197,7 @@ namespace monero {
     boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
     std::unordered_map<std::string, std::string>::const_iterator i = m_attributes.find(key);
     if (i == m_attributes.end()) {
-      // attribute not found
-      return std::string("");
+      return std::string(""); // attribute not found
     }
     return i->second;
   }
@@ -232,10 +225,12 @@ namespace monero {
     boost::optional<std::chrono::high_resolution_clock::time_point> start_time = boost::none;
 
     try {
+
       // assume daemon connection
       monero_get_blocks_by_height_request request(100);
       start_time = std::chrono::high_resolution_clock::now();
       send_binary_request(request, timeout_ms);
+
       // set response time
       m_response_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start_time.get()).count();
       m_is_online = true;
@@ -247,6 +242,7 @@ namespace monero {
       m_response_time = boost::none;
 
       if (ex.code == 401 || ex.code == 404) {
+
         // fallback to latency check
         m_is_online = true;
         m_is_authenticated = ex.code == 404;
@@ -266,6 +262,7 @@ namespace monero {
   }
 
   boost::property_tree::ptree monero_rpc_connection::send_json_request(const std::string& path, const std::shared_ptr<serializable_struct>& params, const boost::optional<uint32_t>& timeout_ms) const {
+
     // send JSON-RPC request
     monero_rpc_request request(path, params);
     auto response = send_json_request(request, timeout_ms);
@@ -276,6 +273,7 @@ namespace monero {
   }
 
   monero_rpc_response monero_rpc_connection::send_json_request(const monero_rpc_request &request, const boost::optional<uint32_t>& timeout_ms) const {
+
     // invoke JSON-RPC method
     monero_rpc_response response;
     send_rpc_request("/json_rpc", request, response, timeout_ms);
@@ -285,8 +283,9 @@ namespace monero {
   }
 
   boost::property_tree::ptree monero_rpc_connection::send_path_request(const std::string& path, const std::shared_ptr<serializable_struct>& params, const boost::optional<uint32_t>& timeout_ms) const {
-    monero_rpc_request request(path, params, false);
+
     // send RPC request
+    monero_rpc_request request(path, params, false);
     auto response = send_path_request(request, timeout_ms);
 
     // assert RPC response is defined
@@ -295,6 +294,7 @@ namespace monero {
   }
 
   monero_rpc_response monero_rpc_connection::send_path_request(const monero_rpc_request &request, const boost::optional<uint32_t>& timeout_ms) const {
+
     // validate parameters
     if (request.m_method == boost::none || request.m_method->empty()) throw monero_error("No RPC method set in path request");
 
@@ -307,6 +307,7 @@ namespace monero {
   }
 
   monero_rpc_response monero_rpc_connection::send_binary_request(const monero_rpc_request &request, const boost::optional<uint32_t>& timeout_ms) const {
+
     // validate parameters
     if (request.m_method == boost::none || request.m_method->empty()) throw monero_error("No RPC method set in binary request");
 
@@ -319,6 +320,7 @@ namespace monero {
   }
 
   void monero_rpc_connection::ensure_configured() const {
+
     // create http client on first use, so constructing a connection does not require network support
     if (m_http_client == nullptr) {
       auto factory = std::make_unique<net::http::client_factory>();
@@ -360,26 +362,23 @@ namespace monero {
     uint32_t timeout = DEFAULT_TIMEOUT_MS;
     if (timeout_ms != boost::none) timeout = timeout_ms.get();
     else if (m_timeout_ms != boost::none) timeout = m_timeout_ms.get();
-    // Java/monero-ts document 0 as "disable the timeout" (wait indefinitely); epee has no such
-    // convention and would otherwise treat it as a literal 0 ms deadline (instant failure)
-    if (timeout == 0) timeout = std::numeric_limits<uint32_t>::max();
-    // ensure_configured()'s DEFAULT_TIMEOUT_MS bound only covers the *first* connect (it's a
-    // no-op once uri/creds/proxy have already been applied). Every reconnect after a dropped
-    // socket happens inside epee's invoke() using this same request timeout, not a separate
-    // connect-only one, so in the steady state this one value governs connect, send, and
-    // receive alike, matching Java's SO_TIMEOUT/connectTimeout both being 3 minutes anyway
+    if (timeout == 0) timeout = std::numeric_limits<uint32_t>::max(); // timeout of 0 is treated as indefinite
+
+    // ensure_configured() bounds only the first connect; epee reconnects with this request timeout
     ensure_configured();
     const epee::net_utils::http::http_response_info* pri = NULL;
 
     // invoke http json
     const uint64_t received_before = m_http_client->get_bytes_received();
     if (!m_http_client->invoke_post(uri, body, std::chrono::milliseconds(timeout), std::addressof(pri))) {
+
       // epee never surfaces the 401 status, but a rejected login means the server answered;
       // a dead or idle-closed socket yields no response bytes at all
       bool received = m_http_client->get_bytes_received() > received_before;
       if (received && m_http_client->is_connected()) {
         throw monero_rpc_error(401, "Unauthorized");
       }
+
       // drop the socket: epee leaves EOF'd sockets marked connected, so without this the next
       // call reuses the poisoned socket and hits the same misdiagnosis again
       m_http_client->disconnect();
@@ -391,11 +390,13 @@ namespace monero {
       std::string err_msg = std::to_string(pri->m_response_code) + " " + pri->m_response_comment + (pri->m_body.empty() ? "" : ": " + pri->m_body);
       throw monero_rpc_error(pri->m_response_code, err_msg);
     }
+
     // return response info body
     return pri->m_body;
   }
 
   void deserialize_rpc_response(const std::string& json, monero_rpc_response& response, const boost::string_ref uri, const std::string& method) {
+
     // parse json to property node
     boost::property_tree::ptree node;
     gen_utils::deserialize(json, node);
@@ -435,5 +436,4 @@ namespace monero {
     }
     return connection;
   }
-
 }
