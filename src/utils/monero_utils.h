@@ -101,8 +101,6 @@ namespace monero_utils
 
   // ------------------------------ RAPIDJSON ---------------------------------
 
-  std::string serialize(const rapidjson::Document& doc);
-
   /**
    * Add number, string, and boolean json members using template specialization.
    *

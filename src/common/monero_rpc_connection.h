@@ -113,10 +113,10 @@ namespace monero {
     boost::optional<std::string> m_username;
     boost::optional<std::string> m_password;
     boost::optional<std::string> m_proxy_uri;
-    boost::optional<std::string> m_zmq_uri;      // TODO implement zmq listener
-    boost::optional<uint32_t> m_timeout_ms;      // RPC request timeout in milliseconds.
+    boost::optional<std::string> m_zmq_uri;      // TODO: implement zmq listener
+    boost::optional<uint32_t> m_timeout_ms;      // RPC request timeout in milliseconds
     boost::optional<uint64_t> m_response_time;   // automatically set by calling check_connection()
-    int m_priority;                              // priority relative to other connections. 1 is highest, then priority 2, etc. Default priority is 0, lowest priority.
+    int m_priority;                              // priority relative to other connections where 1 is highest, then 2, etc, and 0 is lowest (default)
 
     static std::shared_ptr<monero_rpc_connection> from_property_tree(const boost::property_tree::ptree& node);
 

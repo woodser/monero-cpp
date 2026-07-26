@@ -88,7 +88,7 @@ namespace monero {
     doc.SetObject();
     rapidjson::Value val = to_rapidjson_val(doc.GetAllocator());
     val.Swap(doc);
-    return monero_utils::serialize(doc);
+    return gen_utils::serialize(doc);
   }
 
   // ----------------------------- MONERO VERSION -----------------------------
