@@ -104,6 +104,7 @@ Inheritance diagram for monero::monero_wallet:</div>
   <map id="monero::monero_5Fwallet_map" name="monero::monero_5Fwallet_map">
 <area href="classmonero_1_1monero__wallet__full.html" alt="monero::monero_wallet_full" shape="rect" coords="0,56,174,80"/>
 <area href="classmonero_1_1monero__wallet__keys.html" alt="monero::monero_wallet_keys" shape="rect" coords="184,56,358,80"/>
+<area href="classmonero_1_1monero__wallet__rpc.html" alt="monero::monero_wallet_rpc" shape="rect" coords="368,56,542,80"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -113,12 +114,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ac8a0a50f23cf2b6a611ca5ecc2a907ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93fa8c7bce2de04a771618378ebebe4f" id="r_a93fa8c7bce2de04a771618378ebebe4f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93fa8c7bce2de04a771618378ebebe4f">is_view_only</a> () const</td></tr>
 <tr class="separator:a93fa8c7bce2de04a771618378ebebe4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa57e732a37d70af23c24b43decc2baa0" id="r_aa57e732a37d70af23c24b43decc2baa0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa57e732a37d70af23c24b43decc2baa0">set_daemon_connection</a> (const std::string &amp;uri, const std::string &amp;username=&quot;&quot;, const std::string &amp;password=&quot;&quot;, const std::string &amp;proxy_uri=&quot;&quot;)</td></tr>
-<tr class="separator:aa57e732a37d70af23c24b43decc2baa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadd20ff644751c3f8690cf1798103886" id="r_aadd20ff644751c3f8690cf1798103886"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aadd20ff644751c3f8690cf1798103886">set_daemon_connection</a> (const boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;connection)</td></tr>
-<tr class="separator:aadd20ff644751c3f8690cf1798103886"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaf6b4b721b18a9b66e54a78deb9d7c85" id="r_aaf6b4b721b18a9b66e54a78deb9d7c85"><td class="memItemLeft" align="right" valign="top">virtual boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaf6b4b721b18a9b66e54a78deb9d7c85">get_daemon_connection</a> () const</td></tr>
-<tr class="separator:aaf6b4b721b18a9b66e54a78deb9d7c85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a22e0c8e2ab22dbaac0ca80ed7670ea08" id="r_a22e0c8e2ab22dbaac0ca80ed7670ea08"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a22e0c8e2ab22dbaac0ca80ed7670ea08">set_daemon_connection</a> (const std::string &amp;uri, const std::string &amp;username=&quot;&quot;, const std::string &amp;password=&quot;&quot;, const std::string &amp;proxy_uri=&quot;&quot;, const boost::optional&lt; bool &gt; &amp;is_trusted=boost::none)</td></tr>
+<tr class="separator:a22e0c8e2ab22dbaac0ca80ed7670ea08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa76949996a17ea509c171d731aa4fa82" id="r_aa76949996a17ea509c171d731aa4fa82"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa76949996a17ea509c171d731aa4fa82">set_daemon_connection</a> (const std::shared_ptr&lt; <a class="el" href="classmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;connection, const boost::optional&lt; bool &gt; &amp;is_trusted=boost::none)</td></tr>
+<tr class="separator:aa76949996a17ea509c171d731aa4fa82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2e557086e9d642e75529cb6cfe70bb1" id="r_ac2e557086e9d642e75529cb6cfe70bb1"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="classmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac2e557086e9d642e75529cb6cfe70bb1">get_daemon_connection</a> () const</td></tr>
+<tr class="separator:ac2e557086e9d642e75529cb6cfe70bb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a78d5a9303854a743333d1ba226a673c1" id="r_a78d5a9303854a743333d1ba226a673c1"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a78d5a9303854a743333d1ba226a673c1">is_connected_to_daemon</a> () const</td></tr>
 <tr class="separator:a78d5a9303854a743333d1ba226a673c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a14002cdbaeeada2890fbad3a73543855" id="r_a14002cdbaeeada2890fbad3a73543855"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a14002cdbaeeada2890fbad3a73543855">is_daemon_synced</a> () const</td></tr>
@@ -217,6 +218,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:aea7bd458801615a1fa94e99a7c83dd6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b13de391246727d013e768fc64d12c1" id="r_a3b13de391246727d013e768fc64d12c1"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__account.html">monero_account</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b13de391246727d013e768fc64d12c1">create_account</a> (const std::string &amp;label=&quot;&quot;)</td></tr>
 <tr class="separator:a3b13de391246727d013e768fc64d12c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a934926814cfb131670905b0d31f75715" id="r_a934926814cfb131670905b0d31f75715"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a934926814cfb131670905b0d31f75715">tag_accounts</a> (const std::string &amp;tag, const std::vector&lt; uint32_t &gt; &amp;account_indices)</td></tr>
+<tr class="separator:a934926814cfb131670905b0d31f75715"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9477d44f8e8da185ef56d7f122862b6d" id="r_a9477d44f8e8da185ef56d7f122862b6d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9477d44f8e8da185ef56d7f122862b6d">untag_accounts</a> (const std::vector&lt; uint32_t &gt; &amp;account_indices)</td></tr>
+<tr class="separator:a9477d44f8e8da185ef56d7f122862b6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4fa4de692cff6073ecfdf746e48af87" id="r_aa4fa4de692cff6073ecfdf746e48af87"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__account__tag.html">monero_account_tag</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa4fa4de692cff6073ecfdf746e48af87">get_account_tags</a> () const</td></tr>
+<tr class="separator:aa4fa4de692cff6073ecfdf746e48af87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bf2d7bd032e3c0d27f850d62749bdd9" id="r_a2bf2d7bd032e3c0d27f850d62749bdd9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2bf2d7bd032e3c0d27f850d62749bdd9">set_account_tag_label</a> (const std::string &amp;tag, const std::string &amp;label)</td></tr>
+<tr class="separator:a2bf2d7bd032e3c0d27f850d62749bdd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ff3968708422df3ac4c7ba000975b31" id="r_a6ff3968708422df3ac4c7ba000975b31"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6ff3968708422df3ac4c7ba000975b31">get_subaddresses</a> (const uint32_t account_idx) const</td></tr>
 <tr class="separator:a6ff3968708422df3ac4c7ba000975b31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5eb46580b410754a531b8440bedd62a1" id="r_a5eb46580b410754a531b8440bedd62a1"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5eb46580b410754a531b8440bedd62a1">get_subaddresses</a> (const uint32_t account_idx, const std::vector&lt; uint32_t &gt; &amp;subaddress_indices) const</td></tr>
@@ -424,7 +433,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the index of the added entry </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa951832028d0f2eb6d508b51cc37cc65">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa951832028d0f2eb6d508b51cc37cc65">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a61760c6343a62282102959513054f8b0">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -458,7 +467,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a76a7a7c4adcdba682e66d283970e1717">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a76a7a7c4adcdba682e66d283970e1717">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ab4d6f95838d0bed22cd804330624625c">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -497,7 +506,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aaf1d7828e888de5d96c2a89d603c84d2">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aaf1d7828e888de5d96c2a89d603c84d2">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#af08ef379ba2b1de2a830557652e1dd1f">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -543,7 +552,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of checking the signature proof </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a4f70d0532ff7c772073f69dfcfaf2478">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a4f70d0532ff7c772073f69dfcfaf2478">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#aa4c94c9bd7e2d070bea789b4131331cd">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -589,7 +598,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the signature is good, false otherwise </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa64cc89faed0dc301258e1d4a7a6004c">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa64cc89faed0dc301258e1d4a7a6004c">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a34e5ec94c55c51a700c865021437d7df">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -635,7 +644,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the check </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9ed61c721f3456addf1962eb318de10a">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9ed61c721f3456addf1962eb318de10a">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#afe4cf4e1b592236d935067328695f524">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -687,7 +696,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of the check </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a759d2cceeae7506f10479d8d19751aa3">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a759d2cceeae7506f10479d8d19751aa3">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8a4d2769648053f60e14de421af3b02e">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -721,7 +730,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#adac59b1d628e75ccd4d02411fe5019b4">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a2847e32abdcc6c9882297368d68c94c2">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#adac59b1d628e75ccd4d02411fe5019b4">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a2847e32abdcc6c9882297368d68c94c2">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a2a817346df80e12865cb2f459b4110f3">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -756,7 +765,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the created account </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac6ef9acc3d1febf8a092eda28dbaccc6">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac6ef9acc3d1febf8a092eda28dbaccc6">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ae08f806c1e23675017a8183c62320bce">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -796,7 +805,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the created subaddress </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2ce8da5afc25411f5dd1384543d9e6a0">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2ce8da5afc25411f5dd1384543d9e6a0">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a44ee77825f7d236bb84e533e554f41df">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -864,7 +873,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the created transactions (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a48e711a5d2993be5ada5f61d94c09bd1">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a48e711a5d2993be5ada5f61d94c09bd1">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a5de0241c6a59da4579e48b1f947a3d26">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -899,7 +908,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the decoded integrated address including standard address and payment id </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5a0996ab777d2a44161968ef2b3b4bc8">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#aef45d1c29b6604da1248c3e7e72353b2">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5a0996ab777d2a44161968ef2b3b4bc8">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#aef45d1c29b6604da1248c3e7e72353b2">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#aec23e10fd2fb175e60edfb5407de41a8">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -933,7 +942,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa78c047741ad5e7283da4c2c720b59ac">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa78c047741ad5e7283da4c2c720b59ac">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a4629c03dba2811894d9dc2cc68571b03">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -968,7 +977,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the tx set containing structured transactions </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a62b231c45189c981cf2674a651881957">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a62b231c45189c981cf2674a651881957">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a96d90510a07c1b821256af2be0e935e5">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1025,7 +1034,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad69f7b5f3dc9c8a129e66ebba89c02fa">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad69f7b5f3dc9c8a129e66ebba89c02fa">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#adfd54d3ee523973b0239501ec46e96d2">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1066,7 +1075,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result which has the multisig's address xor this wallet's multisig hex to share with participants iff not done </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#abe242ba427c0d8169732129c4e1095c2">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#abe242ba427c0d8169732129c4e1095c2">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a37096b9a4868e17fdf02e3ff81a2a000">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1101,7 +1110,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's signed key images </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a251a70f5146e8a199e71cfb285ca1788">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a251a70f5146e8a199e71cfb285ca1788">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a0f16015d414c635d19879f014942d67d">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1130,7 +1139,7 @@ Public Member Functions</h2></td></tr>
 <p>Export this wallet's multisig info as hex for other participants.</p>
 <dl class="section return"><dt>Returns</dt><dd>this wallet's multisig info as hex for other participants </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad33f5a21522a6c17205cbcf11dd83ca4">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad33f5a21522a6c17205cbcf11dd83ca4">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ae0227b6bc9d04606af26b5fe71bb4472">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1165,7 +1174,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>outputs in hex format, empty std::string if no outputs </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a59470585f491768ae7417538ed1be342">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a59470585f491768ae7417538ed1be342">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a91c2157cac0642ce6b9fb2c843d508ed">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1199,7 +1208,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a292a177bc1d7fe3f583abe8e7bb7bad1">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a292a177bc1d7fe3f583abe8e7bb7bad1">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a62b81ff4d53ae6b273e7f58d0302057b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1239,7 +1248,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the retrieved account </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0fc3e155a18df640e42b147d1c3804f1">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a01be7fd8f0f4791cb42dc9901350d3c5">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0fc3e155a18df640e42b147d1c3804f1">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a01be7fd8f0f4791cb42dc9901350d3c5">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a0e36b8ef02828da014d50de4040b77d0">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1273,6 +1282,35 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the retrieved account </dd></dl>
+
+</div>
+</div>
+<a id="aa4fa4de692cff6073ecfdf746e48af87" name="aa4fa4de692cff6073ecfdf746e48af87"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4fa4de692cff6073ecfdf746e48af87">&#9670;&#160;</a></span>get_account_tags()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__account__tag.html">monero_account_tag</a> &gt; &gt; monero::monero_wallet::get_account_tags </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return all account tags.</p>
+<dl class="section return"><dt>Returns</dt><dd>the wallet's account tags </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__rpc.html#abfcb33d2f491e8db5c8b7b414448793a">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1372,7 +1410,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>List&lt;monero_account&gt; are all accounts for the wallet with the given tag </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a13fbafd362f545b2292c5f8bfc46103d">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a13fbafd362f545b2292c5f8bfc46103d">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a86ec852bd59c1461f031d4379ea10f3c">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1445,7 +1483,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the receive address of the specified subaddress </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa2abdb80b46ea1a4e7b9731100d9c07b">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#ad74a044419431c480ca773a7bab0a2ed">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa2abdb80b46ea1a4e7b9731100d9c07b">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#ad74a044419431c480ca773a7bab0a2ed">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a730c71095d6f3b1c997a5e6e7bc982e7">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1480,7 +1518,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the address book entries </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0e8df829747a7ef8d4a7b806376731ea">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0e8df829747a7ef8d4a7b806376731ea">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#abd7b58f31ce71621c6d06367af1e343c">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1521,7 +1559,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a475ee65b0c41626e5223d261992194c0">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a475ee65b0c41626e5223d261992194c0">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a512ab95ebff13a31bfd0774a0859026b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1561,7 +1599,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the key's value has been set, false otherwise </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a978cd879097cd3f5e890635435ba2e31">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a978cd879097cd3f5e890635435ba2e31">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#adf916ab41f6aba4265216ca2ff6e2d61">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1590,7 +1628,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's balance.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's balance </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aba7567ab3f759238d8e389a156668396">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aba7567ab3f759238d8e389a156668396">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8503cbc4a5edcf2723430e2ba8532fde">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1625,7 +1663,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the account's balance </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aed8ee2a5240a928b57f1bd5a16041f37">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aed8ee2a5240a928b57f1bd5a16041f37">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8b2be6f490ce76b160ae7656515151c4">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1665,12 +1703,12 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the subaddress's balance </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af87467f7b8f871d2826272822b126991">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af87467f7b8f871d2826272822b126991">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a17fd86ed2f56345a6004790cfee2dfaf">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
-<a id="aaf6b4b721b18a9b66e54a78deb9d7c85" name="aaf6b4b721b18a9b66e54a78deb9d7c85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aaf6b4b721b18a9b66e54a78deb9d7c85">&#9670;&#160;</a></span>get_daemon_connection()</h2>
+<a id="ac2e557086e9d642e75529cb6cfe70bb1" name="ac2e557086e9d642e75529cb6cfe70bb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2e557086e9d642e75529cb6cfe70bb1">&#9670;&#160;</a></span>get_daemon_connection()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1679,7 +1717,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; monero::monero_wallet::get_daemon_connection </td>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="classmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; monero::monero_wallet::get_daemon_connection </td>
           <td>(</td>
           <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
           <td> const</td>
@@ -1692,9 +1730,9 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 <p>Get the wallet's daemon connection.</p>
-<dl class="section return"><dt>Returns</dt><dd>the wallet's daemon connection </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the wallet's daemon connection or null if not set </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a54eb65f1a897991749cfcb70258ba8ec">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a07ad311609231673d7293058b0db6e70">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a66b9ca47f18d6d5d2927ca6c20048f8e">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1723,7 +1761,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the height that the wallet's daemon is synced to.</p>
 <dl class="section return"><dt>Returns</dt><dd>the height that the wallet's daemon is synced to </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae9e3522fc52cb56998f95589b773d4b3">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae9e3522fc52cb56998f95589b773d4b3">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a11f326ecbd20606d5c1657c7be44769b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1781,7 +1819,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the current default fee priority (unimportant, normal, elevated, etc).</p>
 <dl class="section return"><dt>Returns</dt><dd>the current fee priority </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9e439b8abcba2e2105e7e72d40c0f83b">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9e439b8abcba2e2105e7e72d40c0f83b">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8896563d4d325c115c116f25954ea05e">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1810,7 +1848,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the height of the last block processed by the wallet (its index + 1).</p>
 <dl class="section return"><dt>Returns</dt><dd>the height of the last block processed by the wallet </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad6811bbc709aaf7be8b396dad28a1750">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad6811bbc709aaf7be8b396dad28a1750">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8b540f6aab882db22b0027fe67b25e6f">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1856,7 +1894,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the blockchain's approximate height at the given date </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a56620accabd9de7c09408fbdd8c164f2">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a56620accabd9de7c09408fbdd8c164f2">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a08935e18d61e3732e57be9a25a065c1a">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1896,7 +1934,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the integrated address </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#abb7e003615703f7c1e363f30625ea673">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#ac33f17c60d237822b60a960d4f8f1ded">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#abb7e003615703f7c1e363f30625ea673">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#ac33f17c60d237822b60a960d4f8f1ded">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a96e620d4740bba479ced820d2dea58f3">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1924,7 +1962,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Get the listeners registered with the wallet. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa5c60da9c6f73aeffed702e57eb91832">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa5c60da9c6f73aeffed702e57eb91832">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#aa6af358a5335bfc55b8a75869f7475e8">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -1953,7 +1991,7 @@ Public Member Functions</h2></td></tr>
 <p>Get multisig info about this wallet.</p>
 <dl class="section return"><dt>Returns</dt><dd>multisig info about this wallet </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ab70bb8bdbe63b6aa6584166686c4b96b">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ab70bb8bdbe63b6aa6584166686c4b96b">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a9488b3fc1bf43da6f1f127ae8c39670b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2018,7 +2056,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>wallet outputs per the query (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a04f11df03accb31e14b9fc67f7daa5f1">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a04f11df03accb31e14b9fc67f7daa5f1">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8cbd2037b29a803792beb5adca438a26">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2047,7 +2085,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the path of this wallet's file on disk.</p>
 <dl class="section return"><dt>Returns</dt><dd>the path of this wallet's file on disk </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a1856b86e596e9a45c8d1c5f2af6549fc">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a1856b86e596e9a45c8d1c5f2af6549fc">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a5662dec829058f326b2b3783f894c524">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2082,7 +2120,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>is the payment uri </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a7459e53acaed895df8de27b5e5aa0ff4">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a7459e53acaed895df8de27b5e5aa0ff4">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#aae71b5d71a9d84cb251039f7001f1ebf">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2140,7 +2178,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's private spend key.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's private spend key </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad81c49c5efff02aac2fe4bc117a93c75">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#aeca6751dff2d1286878b0bff755b73d4">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad81c49c5efff02aac2fe4bc117a93c75">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#aeca6751dff2d1286878b0bff755b73d4">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a92d7f753af411f7605596e04b408ba3c">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2169,7 +2207,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's private view key.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's private view key </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0cb1cf3761db9bdec420ef68cc0e8ff5">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a1a256166f00fbb8487c52dc7dcdae32e">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0cb1cf3761db9bdec420ef68cc0e8ff5">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a1a256166f00fbb8487c52dc7dcdae32e">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ae152700fbdaa30aaa8552dc2155c0920">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2198,7 +2236,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's public spend key.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's public spend key </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aeabe747f154f03042da340571eaed941">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#aaa29dad0f3eddf8a325e377779be9b85">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aeabe747f154f03042da340571eaed941">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#aaa29dad0f3eddf8a325e377779be9b85">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ad98a0f1e25d123c9926442ee742a6348">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2227,7 +2265,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's public view key.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's public view key </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0e4bccdfdf7ad5914acc8e6323941698">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#ad3d14076b6b7c07e89924e9a1b7741d7">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0e4bccdfdf7ad5914acc8e6323941698">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#ad3d14076b6b7c07e89924e9a1b7741d7">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a57c9ddae6cac116b0a9d8daebf014ee0">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2273,7 +2311,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the reserve proof signature </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af5ba5b41d1eecc48b3fbd827aa5c9f97">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af5ba5b41d1eecc48b3fbd827aa5c9f97">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#acf7109848a265f8630e0d4a92fce514e">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2308,7 +2346,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the reserve proof signature </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a916e33492dd6481daaee6ad13685a557">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a916e33492dd6481daaee6ad13685a557">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ac703ec647569f8ad8c63bb9d5878ec3c">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2366,7 +2404,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's mnemonic phrase or seed.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's mnemonic phrase or seed. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a01693fb79192a5f5909d92beaa23a8ed">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#acfa833fcc9b5369fcba5f8ee1caad6f3">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a01693fb79192a5f5909d92beaa23a8ed">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#acfa833fcc9b5369fcba5f8ee1caad6f3">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a1fa5fbf95ea2ba333880c164135cd963">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2395,7 +2433,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the language of the wallet's mnemonic phrase or seed.</p>
 <dl class="section return"><dt>Returns</dt><dd>the language of the wallet's mnemonic phrase or seed. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac214c5e6558bcaab543b48f22876af35">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a890195401d087b65a1e8aba61c5bafad">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac214c5e6558bcaab543b48f22876af35">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a890195401d087b65a1e8aba61c5bafad">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a82ff1d3969e6245e33ae7c5c0cdab769">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2435,7 +2473,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the transaction signature </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a540bbade4f891a51d065d8126267cd53">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a540bbade4f891a51d065d8126267cd53">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a56d6cb51178bd9804221972246a260b8">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2475,6 +2513,8 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the retrieved subaddress </dd></dl>
 
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a476cea516f59f3f1945a15e6d3c639a3">monero::monero_wallet_rpc</a>.</p>
+
 </div>
 </div>
 <a id="a6ff3968708422df3ac4c7ba000975b31" name="a6ff3968708422df3ac4c7ba000975b31"></a>
@@ -2507,6 +2547,8 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>List&lt;monero_subaddress&gt; are the retrieved subaddresses </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ac05b92b38ef3767f15d0de4d99d4129a">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2546,7 +2588,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the retrieved subaddresses </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a20905c4cc03485d65328a4bb688bbe8b">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a3c524bd25e4c7013d60b114b61d8b9d0">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a20905c4cc03485d65328a4bb688bbe8b">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a3c524bd25e4c7013d60b114b61d8b9d0">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a3e98a04f4556d77074f65fc8fa7e4b9b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2582,7 +2624,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>wallet transfers per the query (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aee973f0c06d9a92de30309ada906b99c">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aee973f0c06d9a92de30309ada906b99c">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a86fc40ff0364bc2cd062124b7188d5f4">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2617,7 +2659,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>is the transaction's secret key </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a441a19a2b3a819c95b6d1cf1f0e02a68">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a441a19a2b3a819c95b6d1cf1f0e02a68">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a15a3262afef09dc5be249c96aacfcd8d">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2652,7 +2694,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the tx note </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a09adfa09bf279561d52ac0d04296ebb5">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a09adfa09bf279561d52ac0d04296ebb5">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a6255abab73f08cd68ba7bde78e885d4b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2687,7 +2729,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>notes for the transactions </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af0d4acb81d4931e16b6ee80aaea1e407">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af0d4acb81d4931e16b6ee80aaea1e407">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ab7ef1cfe66374719fc27ff3d4b6b70de">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2733,7 +2775,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the transaction signature </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9489da05e7bcf5b0e409420812e25c57">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9489da05e7bcf5b0e409420812e25c57">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a9d194d131d137741fd982229fb3f8e3b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2762,7 +2804,7 @@ Public Member Functions</h2></td></tr>
 <p>Get all wallet transactions. Wallet transactions contain one or more transfers that are either incoming or outgoing to the wallet.</p>
 <dl class="section return"><dt>Returns</dt><dd>all wallet transactions (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5f751d58a46342674b25584a20011f3a">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5f751d58a46342674b25584a20011f3a">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a0dca803e468bed725ebb0e0b4d6e124e">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2798,7 +2840,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>wallet transactions per the query (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa3ea881f83a3abbb76587b7b1cfbfd43">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aa3ea881f83a3abbb76587b7b1cfbfd43">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#abf9d60230cfb3273c81071930649d1d4">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2827,7 +2869,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's unlocked balance.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's unlocked balance </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a44784910aceb3158e27388fb98ad00ab">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a44784910aceb3158e27388fb98ad00ab">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ab2ca8dba54ac3976989b9799b5068c85">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2862,7 +2904,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the account's unlocked balance </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#afa2d24aeb011179db712e250244b8bd5">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#afa2d24aeb011179db712e250244b8bd5">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a4ada9ee29bd057f799af817b85bb18ee">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2902,7 +2944,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the subaddress's balance </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae27a94b95835941b3fb32785beba6a83">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae27a94b95835941b3fb32785beba6a83">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#afc113d65596a6e66c166028cf36cad37">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2931,7 +2973,7 @@ Public Member Functions</h2></td></tr>
 <p>Get the wallet's version.</p>
 <dl class="section return"><dt>Returns</dt><dd>the wallet's version </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0a325158f17b75383aa26686fe7a041d">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a408e2f71d80854ba59f49207042cbabc">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0a325158f17b75383aa26686fe7a041d">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a408e2f71d80854ba59f49207042cbabc">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#af4f91c03f040a84425226dc9756cbbfd">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -2966,7 +3008,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>results of the import </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a271ce803903991bf8980c56e3404e531">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a271ce803903991bf8980c56e3404e531">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a073784dfc3f8fcc636b32e3e9a5ba16b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3007,7 +3049,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of outputs signed with the given multisig hex </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2ba229f8ae169cf498517d95d2a50ded">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2ba229f8ae169cf498517d95d2a50ded">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a1f682db91aa11a7a6544865905b5209f">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3042,7 +3084,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the number of outputs imported </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a6c9308121dbc52e409576287ada6a562">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a6c9308121dbc52e409576287ada6a562">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a463277f8296eb72f1a8f4a96b1071a72">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3070,7 +3112,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Check if the wallet is closed. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af276845716a876280a62cb92a489a292">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af276845716a876280a62cb92a489a292">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a56b7726bdae720e757987c1751e54454">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3099,7 +3141,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates if the wallet is connected a daemon.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if the wallet is connected to a daemon, false otherwise </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aae8f28b266f7cb745c100bfe893ae056">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#aae8f28b266f7cb745c100bfe893ae056">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#af7beea3fe6088560ea6ab4006292dfc9">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3213,7 +3255,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates if importing multisig data is needed for returning a correct balance.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if importing multisig data is needed for returning a correct balance, false otherwise </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a8ac27cdfe37e38a01ed78c9d24f2fe7b">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a8ac27cdfe37e38a01ed78c9d24f2fe7b">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a911a14bdb834891846e2e87c75a146be">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3248,7 +3290,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>true if the output is frozen, false otherwise </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a7b7f2e373a70fed3f00e02d83eb14312">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a7b7f2e373a70fed3f00e02d83eb14312">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a7fc28bda0d1aa7bbba4feb839f4503b3">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3306,7 +3348,7 @@ Public Member Functions</h2></td></tr>
 <p>Indicates if the wallet is view-only, meaning it does have the private spend key and can therefore only observe incoming outputs.</p>
 <dl class="section return"><dt>Returns</dt><dd>true if the wallet is view-only, false otherwise </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a3220e4ebaccc4ae2cc5c7eedea19c592">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a534e10f6fa13d8da262e81c581355937">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a3220e4ebaccc4ae2cc5c7eedea19c592">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a534e10f6fa13d8da262e81c581355937">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a119822c143ba2b81112410c26e209363">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3352,7 +3394,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>this wallet's multisig hex to share with participants </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac28b11afbadc722da14b46302a061c03">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ac28b11afbadc722da14b46302a061c03">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a6c50687963cae7bab364b2440f0c84b5">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3426,7 +3468,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the tx configuration parsed from the uri </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a4e92f7edbc4e00ec7e219a6ccbee6242">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a4e92f7edbc4e00ec7e219a6ccbee6242">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a932c137f56e62e56c8ff3696ccce724b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3455,7 +3497,7 @@ Public Member Functions</h2></td></tr>
 <p>Get multisig info as hex to share with participants to begin creating a multisig wallet.</p>
 <dl class="section return"><dt>Returns</dt><dd>this wallet's multisig hex to share with participants </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0e2e12d8e7613569197029a4b0785478">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a0e2e12d8e7613569197029a4b0785478">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a6ebb9913d1a3ecf5fe5d43ba3bf00d21">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3589,7 +3631,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the hashes of the relayed txs </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2a957dda893238346495e02982fb04db">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2a957dda893238346495e02982fb04db">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ad8c47246522274d7355a465582b04689">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3623,7 +3665,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad52745b626f389fd234da9886c6f716a">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ad52745b626f389fd234da9886c6f716a">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ac82118a10849f91efd1aeda181d14cfc">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3652,7 +3694,7 @@ Public Member Functions</h2></td></tr>
 <p>Rescan the blockchain from scratch, losing any information which cannot be recovered from the blockchain itself.</p>
 <p>WARNING: This method discards local wallet data like destination addresses, tx secret keys, tx notes, etc. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2f531d495aa46224fa19c54298a8029e">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2f531d495aa46224fa19c54298a8029e">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a98da74aded57bae7af840ab92aaf1b2b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3682,7 +3724,7 @@ Public Member Functions</h2></td></tr>
 <p>Note: this can only be called with a trusted daemon.</p>
 <p>Example use case: peer multisig hex is import when connected to an untrusted daemon, so the wallet will not rescan spent outputs. Then the wallet connects to a trusted daemon. This method should be manually invoked to rescan outputs. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a389d49f275722641fc4d7367f13ea0f2">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a389d49f275722641fc4d7367f13ea0f2">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a3abe65f4d6f19c45e22fac8572bfbb08">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3710,7 +3752,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Save the wallet at its current path. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a7ae67e098b10ba7486d79a8a7383c996">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a7ae67e098b10ba7486d79a8a7383c996">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a7905636379cb1e7d5fa0e00eb52f12d6">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3744,7 +3786,46 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9f1d059d6a27b51ae5be44c5dfdfe3e4">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9f1d059d6a27b51ae5be44c5dfdfe3e4">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a02bd83b6b3139016b584c63ec4943ac9">monero::monero_wallet_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a2bf2d7bd032e3c0d27f850d62749bdd9" name="a2bf2d7bd032e3c0d27f850d62749bdd9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2bf2d7bd032e3c0d27f850d62749bdd9">&#9670;&#160;</a></span>set_account_tag_label()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_wallet::set_account_tag_label </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>label</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Sets a human-readable description for a tag.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>is the tag to set a description for </td></tr>
+    <tr><td class="paramname">label</td><td>is the label to set for the tag </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a7cdf280f383d49253ad192e5981058e6">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3783,12 +3864,12 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a1261441354e76f0b3b6dc108e4d083e7">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a1261441354e76f0b3b6dc108e4d083e7">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ace51304dc07c83d91f3f70e4dcb76e61">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
-<a id="aadd20ff644751c3f8690cf1798103886" name="aadd20ff644751c3f8690cf1798103886"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aadd20ff644751c3f8690cf1798103886">&#9670;&#160;</a></span>set_daemon_connection() <span class="overload">[1/2]</span></h2>
+<a id="aa76949996a17ea509c171d731aa4fa82" name="aa76949996a17ea509c171d731aa4fa82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa76949996a17ea509c171d731aa4fa82">&#9670;&#160;</a></span>set_daemon_connection() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3799,8 +3880,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="memname">virtual void monero::monero_wallet::set_daemon_connection </td>
           <td>(</td>
-          <td class="paramtype">const boost::optional&lt; <a class="el" href="structmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>connection</em></span></td><td>)</td>
+          <td class="paramtype">const std::shared_ptr&lt; <a class="el" href="classmonero_1_1monero__rpc__connection.html">monero_rpc_connection</a> &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>connection</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const boost::optional&lt; bool &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>is_trusted</em></span><span class="paramdefsep"> = </span><span class="paramdefval">boost::none</span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -3813,16 +3898,17 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">connection</td><td>is the connection to set </td></tr>
+    <tr><td class="paramname">is_trusted</td><td>specifies if the daemon is trusted (default = trusted if local address) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a108de050f007e0ec0f308c53ab9fefcf">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae580309a3dc7b5ecba8f626a2e5b2e23">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a3fd5dac6c852065ca679a4eb0d67028b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
-<a id="aa57e732a37d70af23c24b43decc2baa0" name="aa57e732a37d70af23c24b43decc2baa0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa57e732a37d70af23c24b43decc2baa0">&#9670;&#160;</a></span>set_daemon_connection() <span class="overload">[2/2]</span></h2>
+<a id="a22e0c8e2ab22dbaac0ca80ed7670ea08" name="a22e0c8e2ab22dbaac0ca80ed7670ea08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a22e0c8e2ab22dbaac0ca80ed7670ea08">&#9670;&#160;</a></span>set_daemon_connection() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -3848,7 +3934,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>proxy_uri</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>proxy_uri</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const boost::optional&lt; bool &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>is_trusted</em></span><span class="paramdefsep"> = </span><span class="paramdefval">boost::none</span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -3864,11 +3955,12 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramname">username</td><td>is the username to authenticate with the daemon (optional) </td></tr>
     <tr><td class="paramname">password</td><td>is the password to authenticate with the daemon (optional) </td></tr>
     <tr><td class="paramname">proxy_uri</td><td>is the proxy to the daemon (e.g. over Tor). </td></tr>
+    <tr><td class="paramname">is_trusted</td><td>specifies if the daemon is trusted (default = trusted if local address) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#af319b4108af9469c7639dc2f99d101fc">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ab47a91e12b75aef525521aee6a39470f">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#af21b62d49bb57594c17f3831bce6edf3">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3947,7 +4039,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae9500587ef6d520358a1c5831c6cdaa2">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ae9500587ef6d520358a1c5831c6cdaa2">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#acf2d1a3720ce5f1e273dae40427d37da">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -3986,7 +4078,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a21038abe346fdd0565c1c8033a2f2d64">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a21038abe346fdd0565c1c8033a2f2d64">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a49042ca12cae4a099ab12b9844ff659d">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4025,7 +4117,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a150ce9691173962e022bb75c4ee965f1">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a150ce9691173962e022bb75c4ee965f1">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#abe80a716e5a4f883037a28b9a98b389f">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4077,7 +4169,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the message signature </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a400f9ac04199ad8956d4f0e6e3f85b54">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a817780c43761f5471bea5153e705f1d5">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a400f9ac04199ad8956d4f0e6e3f85b54">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a817780c43761f5471bea5153e705f1d5">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a3644f103c75bbba3c0af57f431bb5480">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4112,7 +4204,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the result of signing the multisig transactions </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a27d5d11e04fc6add0dc5dc0d412f4520">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a27d5d11e04fc6add0dc5dc0d412f4520">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a805e96878a10b7a72e8819fd566649fc">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4147,7 +4239,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the signed transaction set </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5eccfcdd50c3d43367a8d2f32451c1bf">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a5eccfcdd50c3d43367a8d2f32451c1bf">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ae529935519ca27911687c0610f7106ef">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4192,7 +4284,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a00d6363b33ba2d711d5d4afcfc8d58b1">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a00d6363b33ba2d711d5d4afcfc8d58b1">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a466aba505902ff52e50bc76eda04bdad">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4226,7 +4318,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a75ba267ea4c2bff0b6eb4c7456eb115e">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a75ba267ea4c2bff0b6eb4c7456eb115e">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ac8cc49ebafe825641c06fc5935ee76b3">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4254,7 +4346,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Stop mining. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a96aa765519134c6b971223e1f7e9610c">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a96aa765519134c6b971223e1f7e9610c">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a57e52ca6b7a2341f082bbc30727afaa6">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4282,7 +4374,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 <p>Stop the asynchronous thread to continuously synchronize the wallet with the daemon. </p>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a178f4ba645cd4e19ae0c73d6349d7e10">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a178f4ba645cd4e19ae0c73d6349d7e10">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a064977e516680a21960e79b61961001b">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4317,7 +4409,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the resulting transaction hashes </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a52a5398db78c2dc9460ced09feac35c0">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a52a5398db78c2dc9460ced09feac35c0">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a34a193fcc4f1101af9283bfa4acb2639">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4352,7 +4444,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the resulting transaction hashes </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a47bb20537b768ddd758adf3ba3d31863">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a47bb20537b768ddd758adf3ba3d31863">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ab7ae342262b20272fd930cd080c5886d">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4387,7 +4479,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the created transactions (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a11bc5f91701d5789a284526a74d8b0bb">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a11bc5f91701d5789a284526a74d8b0bb">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a8d9cb2f327d0d66a330cb94da5f83c90">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4422,7 +4514,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the created transaction (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a94236e66ee3abbfd5d509ee91f829242">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a94236e66ee3abbfd5d509ee91f829242">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a1ec252703122b690a78696111e1caed3">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4457,7 +4549,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the created transactions (free memory using monero_utils::free) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a60c671c7a3485f444c4f4eba21f2db2a">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a60c671c7a3485f444c4f4eba21f2db2a">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ac9d45f2926392f72288ac20f472b46df">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4486,7 +4578,7 @@ Public Member Functions</h2></td></tr>
 <p>Synchronize the wallet with the daemon as a one-time synchronous process.</p>
 <dl class="section return"><dt>Returns</dt><dd>the sync result </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ace8cada93560f0cf1e2c90684d1e7f61">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#ace8cada93560f0cf1e2c90684d1e7f61">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a6490183d62cd103d5e535e8276c23db4">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4521,7 +4613,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the sync result </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a3a5d216410c426db81ca4025cd5ad91f">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a3a5d216410c426db81ca4025cd5ad91f">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a6b93e47405efdeac49a7fa5e96e05d98">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4556,7 +4648,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the sync result </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2911a5f60f907fb487f06621707d4614">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a2911a5f60f907fb487f06621707d4614">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a6796b8663ef388b37a142665614284b0">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4596,7 +4688,46 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the sync result </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a4b9631a522e3e33a6342f52f31504e63">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a4b9631a522e3e33a6342f52f31504e63">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a0ac46cb81f0a1830b4f2c0ee659cb716">monero::monero_wallet_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a934926814cfb131670905b0d31f75715" name="a934926814cfb131670905b0d31f75715"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a934926814cfb131670905b0d31f75715">&#9670;&#160;</a></span>tag_accounts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_wallet::tag_accounts </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>account_indices</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Tag accounts.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>is the tag to apply to the specified accounts </td></tr>
+    <tr><td class="paramname">account_indices</td><td>are the indices of the accounts to tag </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__rpc.html#ae8f863fa416e534c861558bf6d8a40d7">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4630,7 +4761,41 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a443bba504a3df69453dee1a575d8d767">monero::monero_wallet_full</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a443bba504a3df69453dee1a575d8d767">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a440d768c339edc434381078a094dbfc4">monero::monero_wallet_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a9477d44f8e8da185ef56d7f122862b6d" name="a9477d44f8e8da185ef56d7f122862b6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9477d44f8e8da185ef56d7f122862b6d">&#9670;&#160;</a></span>untag_accounts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_wallet::untag_accounts </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>account_indices</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Untag accounts.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">account_indices</td><td>are the indices of the accounts to untag </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a510369419744b8ee38c35d6c5d2b57e1">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>
@@ -4676,7 +4841,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the message signature result </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9277185e29b8fa29b860d54b5eda2b2b">monero::monero_wallet_full</a>, and <a class="el" href="classmonero_1_1monero__wallet__keys.html#a423810896328a3c25a9ad36b52001a5b">monero::monero_wallet_keys</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__wallet__full.html#a9277185e29b8fa29b860d54b5eda2b2b">monero::monero_wallet_full</a>, <a class="el" href="classmonero_1_1monero__wallet__keys.html#a423810896328a3c25a9ad36b52001a5b">monero::monero_wallet_keys</a>, and <a class="el" href="classmonero_1_1monero__wallet__rpc.html#a89d9ce705abed27fa0993488dfeae1fb">monero::monero_wallet_rpc</a>.</p>
 
 </div>
 </div>

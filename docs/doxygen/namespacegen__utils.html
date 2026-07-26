@@ -85,13 +85,28 @@ $(function(){ initResizable(false); });
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Classes</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">gen_utils Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classgen__utils_1_1thread__poller.html">thread_poller</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:adb4f3e9320482fbe192a1d743182f0eb" id="r_adb4f3e9320482fbe192a1d743182f0eb"><td class="memItemLeft" align="right" valign="top"><a id="adb4f3e9320482fbe192a1d743182f0eb" name="adb4f3e9320482fbe192a1d743182f0eb"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>serialize</b> (const rapidjson::Document &amp;doc)</td></tr>
+<tr class="separator:adb4f3e9320482fbe192a1d743182f0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56f470424a14bca32faa7f5f5dc56f2c" id="r_a56f470424a14bca32faa7f5f5dc56f2c"><td class="memItemLeft" align="right" valign="top"><a id="a56f470424a14bca32faa7f5f5dc56f2c" name="a56f470424a14bca32faa7f5f5dc56f2c"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>serialize</b> (const boost::property_tree::ptree &amp;node)</td></tr>
+<tr class="separator:a56f470424a14bca32faa7f5f5dc56f2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f88c0e2aeec21126af3b2ce0c0988e1" id="r_a2f88c0e2aeec21126af3b2ce0c0988e1"><td class="memItemLeft" align="right" valign="top"><a id="a2f88c0e2aeec21126af3b2ce0c0988e1" name="a2f88c0e2aeec21126af3b2ce0c0988e1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize</b> (const std::string &amp;json, boost::property_tree::ptree &amp;root)</td></tr>
+<tr class="separator:a2f88c0e2aeec21126af3b2ce0c0988e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8a22f1a133bf6db0c6c94769c54bafd" id="r_ab8a22f1a133bf6db0c6c94769c54bafd"><td class="memTemplParams" colspan="2"><a id="ab8a22f1a133bf6db0c6c94769c54bafd" name="ab8a22f1a133bf6db0c6c94769c54bafd"></a>
 template&lt;class T, typename std::enable_if&lt; std::is_same&lt; T, std::string &gt;::value, T &gt;::type * = nullptr&gt; </td></tr>
 <tr class="memitem:ab8a22f1a133bf6db0c6c94769c54bafd"><td class="memTemplItemLeft" align="right" valign="top">boost::optional&lt; T &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><b>reconcile</b> (const boost::optional&lt; T &gt; &amp;val1, const boost::optional&lt; T &gt; &amp;val2, boost::optional&lt; bool &gt; resolve_defined, boost::optional&lt; bool &gt; resolve_true, boost::optional&lt; bool &gt; resolve_max, const std::string &amp;err_msg=&quot;&quot;)</td></tr>
