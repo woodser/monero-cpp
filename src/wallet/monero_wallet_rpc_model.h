@@ -271,6 +271,8 @@ namespace monero {
   struct monero_sign_describe_transfer_params : public serializable_struct {
     boost::optional<std::string> m_unsigned_txset;
     boost::optional<std::string> m_multisig_txset;
+    boost::optional<bool> m_export_raw;
+    boost::optional<bool> m_get_tx_keys;
 
     monero_sign_describe_transfer_params() { }
     monero_sign_describe_transfer_params(const std::string &unsigned_txset) : m_unsigned_txset(unsigned_txset) { }

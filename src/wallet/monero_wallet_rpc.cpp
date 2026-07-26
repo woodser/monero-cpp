@@ -1204,6 +1204,8 @@ namespace monero {
 
   monero_tx_set monero_wallet_rpc::sign_txs(const std::string& unsigned_tx_hex) {
     auto params = std::make_shared<monero_sign_describe_transfer_params>(unsigned_tx_hex);
+    params->m_export_raw = true;
+    params->m_get_tx_keys = true;
     auto result = m_rpc->send_json_request("sign_transfer", params);
     auto set = std::make_shared<monero_tx_set>();
     deserialize_sent_tx_set(result, set);
