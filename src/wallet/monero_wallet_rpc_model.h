@@ -323,9 +323,10 @@ namespace monero {
   struct monero_wallet_data_params : public serializable_struct {
     boost::optional<bool> m_all;
     std::vector<std::shared_ptr<monero_key_image>> m_key_images;
+    boost::optional<uint64_t> m_offset;
     boost::optional<std::string> m_outputs_hex;
 
-    monero_wallet_data_params(const std::vector<std::shared_ptr<monero_key_image>> &key_images): m_key_images(key_images) { };
+    monero_wallet_data_params(const std::vector<std::shared_ptr<monero_key_image>> &key_images, uint64_t offset): m_key_images(key_images), m_offset(offset) { };
     monero_wallet_data_params(bool all): m_all(all) { }
     monero_wallet_data_params(const std::string& outputs_hex): m_outputs_hex(outputs_hex) { }
 
@@ -472,7 +473,7 @@ namespace monero {
   std::string deserialize_tx_key(const boost::property_tree::ptree& node);
   void deserialize_tx_notes(const boost::property_tree::ptree& node, std::vector<std::string>& tx_notes);
   void deserialize_integrated_address(const boost::property_tree::ptree& node, monero_integrated_address& subaddress);
-  void deserialize_key_images(const boost::property_tree::ptree& node, std::vector<std::shared_ptr<monero_key_image>>& key_images);
+  void deserialize_key_image_export_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_export_result>& result);
   void deserialize_key_image_import_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_import_result>& result);
   void deserialize_message_signature_result(const boost::property_tree::ptree& node, monero_message_signature_result& result);
   void deserialize_check_tx(const boost::property_tree::ptree& node, const std::shared_ptr<monero_check_tx>& check);

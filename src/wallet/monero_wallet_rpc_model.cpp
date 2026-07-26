@@ -183,6 +183,10 @@ namespace monero {
     // set bool values
     if (m_all != boost::none) monero_utils::add_json_member("all", m_all.get(), allocator, root);
 
+    // set num values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_offset != boost::none) monero_utils::add_json_member("offset", m_offset.get(), allocator, root, value_num);
+
     // set sub-arrays
     std::vector<std::shared_ptr<monero_rpc_key_image>> signed_key_images;
     for (const auto& ki : m_key_images) signed_key_images.push_back(std::make_shared<monero_rpc_key_image>(ki));
@@ -1584,16 +1588,17 @@ namespace monero {
     }
   }
 
-  void deserialize_key_images(const boost::property_tree::ptree& node, std::vector<std::shared_ptr<monero_key_image>>& key_images) {
+  void deserialize_key_image_export_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_export_result>& result) {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
-      if (key == std::string("signed_key_images")) {
+      if (key == std::string("offset")) result->m_offset = it->second.get_value<uint64_t>();
+      else if (key == std::string("signed_key_images")) {
         auto key_images_node = it->second;
 
         for (auto it2 = key_images_node.begin(); it2 != key_images_node.end(); ++it2) {
           auto key_image = std::make_shared<monero_key_image>();
           deserialize_key_image(it2->second, key_image);
-          key_images.push_back(key_image);
+          result->m_key_images.push_back(key_image);
         }
       }
     }

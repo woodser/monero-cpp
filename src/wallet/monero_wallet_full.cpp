@@ -1871,24 +1871,25 @@ namespace monero {
     return m_w2->import_outputs_from_str(blob);
   }
 
-  std::vector<std::shared_ptr<monero_key_image>> monero_wallet_full::export_key_images(bool all) const {
+  std::shared_ptr<monero_key_image_export_result> monero_wallet_full::export_key_images(bool all) const {
     MTRACE("monero_wallet_full::export_key_images()");
     assert_not_closed();
 
-    // build key images from wallet2 types
-    std::vector<std::shared_ptr<monero_key_image>> key_images;
+    // build export result from wallet2 types
+    std::shared_ptr<monero_key_image_export_result> result = std::make_shared<monero_key_image_export_result>();
     sync_op_lock op_lock(*this); // do not refresh while exporting key images
     std::pair<uint64_t, std::vector<std::pair<crypto::key_image, crypto::signature>>> ski = m_w2->export_key_images(all);
+    result->m_offset = ski.first;
     for (uint64_t n = 0; n < ski.second.size(); ++n) {
       std::shared_ptr<monero_key_image> key_image = std::make_shared<monero_key_image>();
-      key_images.push_back(key_image);
+      result->m_key_images.push_back(key_image);
       key_image->m_hex = epee::string_tools::pod_to_hex(ski.second[n].first);
       key_image->m_signature = epee::string_tools::pod_to_hex(ski.second[n].second);
     }
-    return key_images;
+    return result;
   }
 
-  std::shared_ptr<monero_key_image_import_result> monero_wallet_full::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) {
+  std::shared_ptr<monero_key_image_import_result> monero_wallet_full::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images, uint64_t offset) {
     MTRACE("monero_wallet_full::import_key_images()");
     assert_not_closed();
 
@@ -1907,7 +1908,7 @@ namespace monero {
     // import key images
     uint64_t spent = 0, unspent = 0;
     sync_op_lock op_lock(*this); // do not refresh while importing key images
-    uint64_t height = m_w2->import_key_images(ski, 0, spent, unspent, is_connected_to_daemon()); // TODO: use offset? refer to wallet_rpc_server::on_import_key_images() req.offset
+    uint64_t height = m_w2->import_key_images(ski, offset, spent, unspent, is_connected_to_daemon());
 
     // translate results
     std::shared_ptr<monero_key_image_import_result> result = std::make_shared<monero_key_image_import_result>();

@@ -951,18 +951,18 @@ namespace monero {
     return deserialize_num_imported_outputs(result);
   }
 
-  std::vector<std::shared_ptr<monero_key_image>> monero_wallet_rpc::export_key_images(bool all) const {
+  std::shared_ptr<monero_key_image_export_result> monero_wallet_rpc::export_key_images(bool all) const {
     MTRACE("monero_wallet_rpc::export_key_images()");
     auto params = std::make_shared<monero_wallet_data_params>(all);
     auto result = m_rpc->send_json_request("export_key_images", params);
-    std::vector<std::shared_ptr<monero_key_image>> key_images;
-    deserialize_key_images(result, key_images);
-    return key_images;
+    auto export_result = std::make_shared<monero_key_image_export_result>();
+    deserialize_key_image_export_result(result, export_result);
+    return export_result;
   }
 
-  std::shared_ptr<monero_key_image_import_result> monero_wallet_rpc::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) {
+  std::shared_ptr<monero_key_image_import_result> monero_wallet_rpc::import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images, uint64_t offset) {
     MTRACE("monero_wallet_rpc::import_key_images()");
-    auto params = std::make_shared<monero_wallet_data_params>(key_images);
+    auto params = std::make_shared<monero_wallet_data_params>(key_images, offset);
     auto result = m_rpc->send_json_request("import_key_images", params);
     auto import_result = std::make_shared<monero_key_image_import_result>();
     deserialize_key_image_import_result(result, import_result);

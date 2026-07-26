@@ -820,9 +820,9 @@ namespace monero {
      * Export signed key images.
      *
      * @param all - export all key images if true, else export key images since the last export
-     * @return the wallet's signed key images
+     * @return the wallet's signed key images and their offset among the wallet's outputs
      */
-    virtual std::vector<std::shared_ptr<monero_key_image>> export_key_images(bool all = false) const {
+    virtual std::shared_ptr<monero_key_image_export_result> export_key_images(bool all = false) const {
       throw std::runtime_error("export_key_images() not supported");
     }
 
@@ -830,9 +830,10 @@ namespace monero {
      * Import signed key images and verify their spent status.
      *
      * @param key_images are key images to import and verify (requires hex and signature)
+     * @param offset - offset of the first key image among the wallet's outputs (default 0)
      * @return results of the import
      */
-    virtual std::shared_ptr<monero_key_image_import_result> import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) {
+    virtual std::shared_ptr<monero_key_image_import_result> import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images, uint64_t offset = 0) {
       throw std::runtime_error("import_key_images() not supported");
     }
 

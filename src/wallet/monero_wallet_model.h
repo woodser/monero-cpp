@@ -416,6 +416,17 @@ namespace monero {
   };
 
   /**
+   * Models results from exporting signed key images.
+   */
+  struct monero_key_image_export_result : public serializable_struct {
+    boost::optional<uint64_t> m_offset;
+    std::vector<std::shared_ptr<monero_key_image>> m_key_images;
+
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static std::shared_ptr<monero_key_image_export_result> deserialize(const std::string& result_json);
+  };
+
+  /**
    * Models results from importing key images.
    */
   struct monero_key_image_import_result : public serializable_struct {
