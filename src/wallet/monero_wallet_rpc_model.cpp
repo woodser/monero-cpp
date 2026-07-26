@@ -1157,12 +1157,12 @@ namespace monero {
       if (gen_utils::bool_equals(false, outgoing_transfer->m_tx->m_is_confirmed)) tx->m_num_confirmations = 0;
       tx->m_is_outgoing = true;
 
-      if (tx->m_outgoing_transfer != boost::none) {
+      if (tx->m_outgoing_transfer != nullptr) {
         // overwrite to avoid reconcile error TODO: remove after >18.3.1 when amounts_by_dest supported
         if (!outgoing_transfer->m_destinations.empty()) {
-          tx->m_outgoing_transfer.get()->m_destinations.clear();
+          tx->m_outgoing_transfer->m_destinations.clear();
         }
-        tx->m_outgoing_transfer.get()->merge(tx->m_outgoing_transfer.get(), outgoing_transfer);
+        tx->m_outgoing_transfer->merge(tx->m_outgoing_transfer, outgoing_transfer);
       }
       else tx->m_outgoing_transfer = outgoing_transfer;
     }
@@ -1247,8 +1247,8 @@ namespace monero {
         deserialize_tx_with_transfer(it2->second, tx);
 
         if (tx->m_is_confirmed != boost::none && *tx->m_is_confirmed == true) {
-          if (tx->m_block == boost::none) throw monero_error("Confirmed tx has no block");
-          auto& block_txs = tx->m_block.get()->m_txs;
+          if (tx->m_block == nullptr) throw monero_error("Confirmed tx has no block");
+          auto& block_txs = tx->m_block->m_txs;
           if (std::find(block_txs.begin(), block_txs.end(), tx) == block_txs.end()) {
             throw monero_error("Tx not found in its block");
           }
@@ -1256,9 +1256,9 @@ namespace monero {
 
         // replace transfer amount with destination sum
         // TODO monero-wallet-rpc: confirmed tx from/to same account has amount 0 but cached transfers
-        if (tx->m_outgoing_transfer != boost::none && gen_utils::bool_equals(true, tx->m_is_relayed) && !gen_utils::bool_equals(true, tx->m_is_failed) &&
-            !tx->m_outgoing_transfer.get()->m_destinations.empty() && tx->m_outgoing_transfer.get()->m_amount.get() == 0) {
-          auto outgoing_transfer = tx->m_outgoing_transfer.get();
+        if (tx->m_outgoing_transfer != nullptr && gen_utils::bool_equals(true, tx->m_is_relayed) && !gen_utils::bool_equals(true, tx->m_is_failed) &&
+            !tx->m_outgoing_transfer->m_destinations.empty() && tx->m_outgoing_transfer->m_amount.get() == 0) {
+          auto outgoing_transfer = tx->m_outgoing_transfer;
           uint64_t transfer_total = 0;
           for(const auto& destination : outgoing_transfer->m_destinations) {
             transfer_total += destination->m_amount.get();
@@ -1389,12 +1389,12 @@ namespace monero {
         int i = 0;
         for (auto it2 = node2.begin(); it2 != node2.end(); ++it2) {
           auto tx = tx_at(i);
-          if (tx->m_outgoing_transfer == boost::none) {
+          if (tx->m_outgoing_transfer == nullptr) {
             auto outgoing_transfer = std::make_shared<monero_outgoing_transfer>();
             outgoing_transfer->m_tx = tx;
             tx->m_outgoing_transfer = outgoing_transfer;
           }
-          tx->m_outgoing_transfer.get()->m_amount = it2->second.get_value<uint64_t>();
+          tx->m_outgoing_transfer->m_amount = it2->second.get_value<uint64_t>();
           i++;
         }
       }
@@ -1424,7 +1424,7 @@ namespace monero {
               for (auto it4 = node4.begin(); it4 != node4.end(); ++it4) {
                 auto output = std::make_shared<monero_output_wallet>();
                 output->m_key_image = std::make_shared<monero_key_image>();
-                output->m_key_image.get()->m_hex = it4->second.data();
+                output->m_key_image->m_hex = it4->second.data();
                 output->m_tx = tx;
                 tx->m_inputs.push_back(output);
               }
@@ -1451,13 +1451,13 @@ namespace monero {
                 amounts_by_dest.push_back(it4->second.get_value<uint64_t>());
               }
 
-              if (tx->m_outgoing_transfer == boost::none) {
+              if (tx->m_outgoing_transfer == nullptr) {
                 auto outgoing_transfer = std::make_shared<monero_outgoing_transfer>();
                 outgoing_transfer->m_tx = tx;
                 tx->m_outgoing_transfer = outgoing_transfer;
               }
 
-              tx->m_outgoing_transfer.get()->m_destinations.clear();
+              tx->m_outgoing_transfer->m_destinations.clear();
 
               for(const auto& amount : amounts_by_dest) {
                 if (conf == boost::none) throw monero_error("Expected tx configuration");
@@ -1467,7 +1467,7 @@ namespace monero {
                   auto dest = std::make_shared<monero_destination>();
                   dest->m_address = config.get_normalized_destinations()[0]->m_address;
                   dest->m_amount = amount;
-                  tx->m_outgoing_transfer.get()->m_destinations.push_back(dest);
+                  tx->m_outgoing_transfer->m_destinations.push_back(dest);
                 }
                 else {
                   auto normalized_destinations = config.get_normalized_destinations();
@@ -1475,7 +1475,7 @@ namespace monero {
                   auto dest = std::make_shared<monero_destination>();
                   dest->m_address = normalized_destinations[destination_idx]->m_address;
                   dest->m_amount = amount;
-                  tx->m_outgoing_transfer.get()->m_destinations.push_back(dest);
+                  tx->m_outgoing_transfer->m_destinations.push_back(dest);
                   destination_idx++;
                 }
               }

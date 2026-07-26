@@ -186,7 +186,7 @@ namespace monero {
    */
   struct monero_block : public monero_block_header {
     boost::optional<std::string> m_hex;
-    boost::optional<std::shared_ptr<monero_tx>> m_miner_tx;
+    std::shared_ptr<monero_tx> m_miner_tx;
     std::vector<std::shared_ptr<monero_tx>> m_txs;
     std::vector<std::string> m_tx_hashes;
 
@@ -203,7 +203,7 @@ namespace monero {
     static const std::string DEFAULT_PAYMENT_ID;  // default payment id "0000000000000000"
     static const std::string DEFAULT_ID;
 
-    boost::optional<std::shared_ptr<monero_block>> m_block;
+    std::shared_ptr<monero_block> m_block;
     boost::optional<std::string> m_hash;
     boost::optional<uint32_t> m_version;
     boost::optional<bool> m_is_miner_tx;
@@ -268,7 +268,7 @@ namespace monero {
    */
   struct monero_output : public serializable_struct {
     std::shared_ptr<monero_tx> m_tx;
-    boost::optional<std::shared_ptr<monero_key_image>> m_key_image;
+    std::shared_ptr<monero_key_image> m_key_image;
     boost::optional<uint64_t> m_amount;
     boost::optional<uint64_t> m_index;
     std::vector<uint64_t> m_ring_output_indices;

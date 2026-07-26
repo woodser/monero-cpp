@@ -221,7 +221,7 @@ namespace monero {
     std::vector<uint32_t> m_subaddress_indices;
     std::vector<std::shared_ptr<monero_destination>> m_destinations;
     boost::optional<bool> m_has_destinations;
-    boost::optional<std::shared_ptr<monero_tx_query>> m_tx_query;
+    std::shared_ptr<monero_tx_query> m_tx_query;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_transfer_query>& transfer_query);
@@ -260,7 +260,7 @@ namespace monero {
     std::vector<uint32_t> m_subaddress_indices;
     boost::optional<uint64_t> m_min_amount;
     boost::optional<uint64_t> m_max_amount;
-    boost::optional<std::shared_ptr<monero_tx_query>> m_tx_query;
+    std::shared_ptr<monero_tx_query> m_tx_query;
 
     //boost::property_tree::ptree to_property_tree() const;
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
@@ -277,11 +277,11 @@ namespace monero {
    * Models a Monero transaction in the context of a wallet.
    */
   struct monero_tx_wallet : public monero_tx {
-    boost::optional<std::shared_ptr<monero_tx_set>> m_tx_set;
+    std::shared_ptr<monero_tx_set> m_tx_set;
     boost::optional<bool> m_is_incoming;
     boost::optional<bool> m_is_outgoing;
     std::vector<std::shared_ptr<monero_incoming_transfer>> m_incoming_transfers;
-    boost::optional<std::shared_ptr<monero_outgoing_transfer>> m_outgoing_transfer;
+    std::shared_ptr<monero_outgoing_transfer> m_outgoing_transfer;
     boost::optional<std::string> m_note;
     boost::optional<bool> m_is_locked;
     boost::optional<uint64_t> m_input_sum;
@@ -320,9 +320,9 @@ namespace monero {
     boost::optional<uint64_t> m_min_height;
     boost::optional<uint64_t> m_max_height;
     boost::optional<uint64_t> m_include_outputs;
-    boost::optional<std::shared_ptr<monero_transfer_query>> m_transfer_query;
-    boost::optional<std::shared_ptr<monero_output_query>> m_input_query;
-    boost::optional<std::shared_ptr<monero_output_query>> m_output_query;
+    std::shared_ptr<monero_transfer_query> m_transfer_query;
+    std::shared_ptr<monero_output_query> m_input_query;
+    std::shared_ptr<monero_output_query> m_output_query;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx_query>& tx_query);

@@ -134,9 +134,9 @@ namespace monero {
     void remove_listener(monero_wallet_listener& listener) override;
     std::set<monero_wallet_listener*> get_listeners() override;
     bool is_view_only() const override;
-    boost::optional<std::shared_ptr<monero_rpc_connection>> get_daemon_connection() const override;
-    void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, bool is_trusted, const boost::optional<ssl_options>& ssl_options);
-    void set_daemon_connection(const boost::optional<std::shared_ptr<monero_rpc_connection>>& connection, const boost::optional<bool>& is_trusted = boost::none) override;
+    std::shared_ptr<monero_rpc_connection> get_daemon_connection() const override;
+    void set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, bool is_trusted, const boost::optional<ssl_options>& ssl_options);
+    void set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted = boost::none) override;
     void set_daemon_connection(const std::string& uri, const std::string& username = "", const std::string& password = "", const std::string& proxy_uri = "", const boost::optional<bool>& is_trusted = boost::none) override;
     bool is_connected_to_daemon() const override;
     monero_version get_version() const override;

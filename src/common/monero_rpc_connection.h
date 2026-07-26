@@ -84,7 +84,7 @@ namespace monero {
     boost::optional<std::string> m_id;
     boost::optional<std::string> m_version;
     boost::optional<std::string> m_method;
-    boost::optional<std::shared_ptr<serializable_struct>> m_params;
+    std::shared_ptr<serializable_struct> m_params;
 
     monero_rpc_request() { }
     monero_rpc_request(const std::string& method, const std::shared_ptr<serializable_struct>& params, bool json_rpc = true);

@@ -65,7 +65,7 @@ namespace monero {
    */
   class monero_daemon_listener {
   public:
-    boost::optional<std::shared_ptr<monero_block_header>> m_last_header;
+    std::shared_ptr<monero_block_header> m_last_header;
 
     /**
      * Called when a new block is added to the chain.
@@ -295,11 +295,11 @@ namespace monero {
      * @param prune specifies if the returned tx should be pruned (defaults to false)
      * @return the transaction with the given hash or null if not found
      */
-    virtual boost::optional<std::shared_ptr<monero_tx>> get_tx(const std::string& tx_hash, bool prune = false) {
+    virtual std::shared_ptr<monero_tx> get_tx(const std::string& tx_hash, bool prune = false) {
       std::vector<std::string> hashes;
       hashes.push_back(tx_hash);
       auto txs = get_txs(hashes, prune);
-      boost::optional<std::shared_ptr<monero_tx>> tx;
+      std::shared_ptr<monero_tx> tx;
 
       if (txs.size() > 0) {
         tx = txs[0];
