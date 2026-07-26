@@ -50,9 +50,8 @@ else
 fi
 cd ../../
 
-# build libmonero-cpp shared library
-mkdir -p build && 
-cd build && 
-cmake .. && 
-cmake --build . && 
-make .
+# build libmonero-cpp shared library; extra args go to cmake, e.g. -D BUILD_SAMPLE=ON
+mkdir -p build &&
+cd build &&
+cmake "$@" .. &&
+cmake --build . -j$HOST_NCORES
