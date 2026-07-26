@@ -10,6 +10,13 @@ A C++ library for creating Monero applications using RPC or native bindings to [
 * Receive notifications when wallets sync, send, or receive.
 * Tested by over 100 tests in [monero-java](https://github.com/woodser/monero-java) and [monero-ts](https://github.com/woodser/monero-ts) using JNI and WebAssembly bindings.
 
+## Architecture
+
+<p align="center">
+	<img width="85%" height="auto" src="docs/architecture.png"/><br>
+	<i>Build C++ applications using RPC or native bindings to <a href="https://github.com/monero-project/monero">monero-project/monero</a>.  Wallet implementations are interchangeable by conforming to a common interface, <a href="https://woodser.github.io/monero-cpp/doxygen/classmonero_1_1monero__wallet.html">monero_wallet.h</a>.</i>
+</p>
+
 ## Sample code
 
 ```c++
