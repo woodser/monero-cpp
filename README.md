@@ -189,14 +189,10 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
 1. Download and install [Monero CLI](https://web.getmonero.org/downloads/).
 2. Start monerod, e.g.: `./monerod --stagenet` (or use a remote daemon).
 3. Start monero-wallet-rpc, e.g.: `./monero-wallet-rpc --daemon-address http://localhost:38081 --stagenet --rpc-bind-port 38083 --rpc-login rpc_user:abc123 --wallet-dir ./`
-4. In CMakeLists.txt, set the flags to build:
+4. Build with the sample code, scratchpad, and tests enabled: `./bin/build_libmonero_cpp.sh -D BUILD_SAMPLE=ON -D BUILD_SCRATCHPAD=ON -D BUILD_TESTS=ON`
 
-         set(BUILD_LIBRARY ON)
-         set(BUILD_SAMPLE ON)
-         set(BUILD_SCRATCHPAD ON)
-         set(BUILD_TESTS ON)
-5. `./bin/build_libmonero_cpp.sh`
-6. Run the app, for example: `./build/sample_code`
+    Flags are cached in ./build/CMakeCache.txt, so pass them on every build to change them. Editing the defaults in CMakeLists.txt has no effect once ./build exists.
+5. Run the app, for example: `./build/sample_code`
 
 ## Related projects
 
