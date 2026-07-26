@@ -152,15 +152,8 @@ namespace monero {
 
   void monero_rpc_connection::set_credentials(const std::string& username, const std::string& password) {
     boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
-    // reset http client
-    if (m_http_client == nullptr) {
-      auto factory = std::make_unique<net::http::client_factory>();
-      m_http_client = factory->create();
-      m_http_client->set_auto_connect(true);
-    }
-    else if (m_http_client->is_connected()) {
-      m_http_client->disconnect();
-    }
+    // disconnect http client if connected
+    if (m_http_client != nullptr && m_http_client->is_connected()) m_http_client->disconnect();
 
     bool username_empty = username.empty();
     bool password_empty = password.empty();
@@ -326,8 +319,12 @@ namespace monero {
   }
 
   void monero_rpc_connection::ensure_configured() const {
-    // assert internal http client is initialized
-    if (!m_http_client) throw monero_error("http client not initialized.");
+    // create http client on first use, so constructing a connection does not require network support
+    if (m_http_client == nullptr) {
+      auto factory = std::make_unique<net::http::client_factory>();
+      m_http_client = factory->create();
+      m_http_client->set_auto_connect(true);
+    }
 
     // only reconfigure when uri/creds/proxy changed since last apply
     std::string uri = m_uri.value_or("");

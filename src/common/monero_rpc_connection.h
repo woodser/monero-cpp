@@ -269,7 +269,7 @@ namespace monero {
     mutable boost::recursive_mutex m_mutex;
     boost::optional<bool> m_is_online;
     boost::optional<bool> m_is_authenticated;
-    std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
+    mutable std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
     std::unordered_map<std::string, std::string> m_attributes;
     mutable std::tuple<std::string, std::string, std::string, std::string> m_applied;
 
