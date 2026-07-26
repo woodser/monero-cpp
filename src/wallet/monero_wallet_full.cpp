@@ -2806,6 +2806,7 @@ namespace monero {
         for (const crypto::secret_key& additional_tx_key : ptx.additional_tx_keys) {
             tx->m_key = tx->m_key.get() += epee::string_tools::pod_to_hex(unwrap(unwrap(additional_tx_key)));
         }
+        tx->m_full_hex = epee::string_tools::buff_to_hex_nodelimer(cryptonote::tx_to_blob(ptx.tx));
         tx_set.m_txs.push_back(tx);
       }
       return tx_set;

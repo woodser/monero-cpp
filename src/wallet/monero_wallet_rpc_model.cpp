@@ -575,6 +575,10 @@ namespace monero {
     if (m_unsigned_txset != boost::none) monero_utils::add_json_member("unsigned_txset", m_unsigned_txset.get(), allocator, root, value_str);
     if (m_multisig_txset != boost::none) monero_utils::add_json_member("multisig_txset", m_multisig_txset.get(), allocator, root, value_str);
 
+    // set bool values
+    if (m_export_raw != boost::none) monero_utils::add_json_member("export_raw", m_export_raw.get(), allocator, root);
+    if (m_get_tx_keys != boost::none) monero_utils::add_json_member("get_tx_keys", m_get_tx_keys.get(), allocator, root);
+
     // return root
     return root;
   }
@@ -1361,7 +1365,7 @@ namespace monero {
           i++;
         }
       }
-      else if (key == std::string("tx_blob_list")) {
+      else if (key == std::string("tx_blob_list") || key == std::string("tx_raw_list")) {
         auto node2 = it->second;
         int i = 0;
         for (auto it2 = node2.begin(); it2 != node2.end(); ++it2) {
