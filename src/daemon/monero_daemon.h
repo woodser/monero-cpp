@@ -724,6 +724,19 @@ namespace monero {
     }
 
     /**
+     * Generate blocks to a wallet address (regtest only).
+     *
+     * @param wallet_address is the address of the wallet to receive miner transactions if block is successfully mined
+     * @param num_blocks is the number of blocks to generate
+     * @param prev_block_hash is the hash of the previous block to build on top of (optional, builds on the current tip if not given)
+     * @param starting_nonce is the starting nonce to use (optional)
+     * @return the result of generating blocks; height is the height of the last block generated
+     */
+    virtual std::shared_ptr<monero_generate_blocks_result> generate_blocks(const std::string& wallet_address, uint64_t num_blocks, const boost::optional<std::string>& prev_block_hash = boost::none, const boost::optional<uint32_t>& starting_nonce = boost::none) {
+      throw std::runtime_error("monero_daemon::generate_blocks(): not supported");
+    }
+
+    /**
      * Submit a mined block to the network.
      * 
      * @param block_blob is the mined block to submit

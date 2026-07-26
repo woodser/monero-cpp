@@ -156,6 +156,7 @@ namespace monero {
     void start_mining(const std::string &address, boost::optional<uint64_t> num_threads, boost::optional<bool> background_mining, boost::optional<bool> ignore_battery) override;
     void stop_mining() override;
     std::shared_ptr<monero_mining_status> get_mining_status() override;
+    std::shared_ptr<monero_generate_blocks_result> generate_blocks(const std::string& wallet_address, uint64_t num_blocks, const boost::optional<std::string>& prev_block_hash = boost::none, const boost::optional<uint32_t>& starting_nonce = boost::none) override;
     void submit_blocks(const std::vector<std::string>& block_blobs) override;
     std::shared_ptr<monero_prune_result> prune_blockchain(bool check) override;
     std::shared_ptr<monero_daemon_update_check_result> check_for_update() override;

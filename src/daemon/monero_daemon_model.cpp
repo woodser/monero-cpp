@@ -1478,4 +1478,31 @@ namespace monero {
     return root;
   }
 
+  // --------------------------- MONERO GENERATE BLOCKS RESULT ---------------------------
+
+  void monero_generate_blocks_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_generate_blocks_result>& result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("blockHashes")) {
+        for (const auto& child : it->second) result->m_block_hashes.push_back(child.second.data());
+      }
+      else if (key == std::string("height")) result->m_height = it->second.get_value<uint64_t>();
+    }
+  }
+
+  rapidjson::Value monero_generate_blocks_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_height != boost::none) monero_utils::add_json_member("height", m_height.get(), allocator, root, value_num);
+
+    // set sub-arrays
+    if (!m_block_hashes.empty()) root.AddMember("blockHashes", monero_utils::to_rapidjson_val(allocator, m_block_hashes), allocator);
+
+    // return root
+    return root;
+  }
+
 }

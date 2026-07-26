@@ -144,6 +144,17 @@ namespace monero {
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
+  struct monero_generate_blocks_params : public serializable_struct {
+    boost::optional<std::string> m_wallet_address;
+    boost::optional<uint64_t> m_num_blocks;
+    boost::optional<std::string> m_prev_block_hash;
+    boost::optional<uint32_t> m_starting_nonce;
+
+    monero_generate_blocks_params(const std::string& wallet_address, uint64_t num_blocks, const boost::optional<std::string>& prev_block_hash, const boost::optional<uint32_t>& starting_nonce): m_wallet_address(wallet_address), m_num_blocks(num_blocks), m_prev_block_hash(prev_block_hash), m_starting_nonce(starting_nonce) { }
+
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
   struct monero_prune_blockchain_params : public serializable_struct {
     boost::optional<bool> m_check;
 
@@ -259,6 +270,7 @@ namespace monero {
   void deserialize_bans(const boost::property_tree::ptree& node, std::vector<std::shared_ptr<monero_ban>>& bans);
   void deserialize_prune_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_prune_result>& result);
   void deserialize_mining_status(const boost::property_tree::ptree& node, const std::shared_ptr<monero_mining_status>& status);
+  void deserialize_generate_blocks_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_generate_blocks_result>& result);
   void deserialize_miner_tx_sum(const boost::property_tree::ptree& node, const std::shared_ptr<monero_miner_tx_sum>& sum);
   void deserialize_block_template(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block_template>& tmplt);
   void deserialize_peers(const boost::property_tree::ptree& node, std::vector<std::shared_ptr<monero_peer>>& peers);

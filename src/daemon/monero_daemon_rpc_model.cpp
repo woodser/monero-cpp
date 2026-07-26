@@ -230,6 +230,26 @@ namespace monero {
     return root;
   }
 
+  // --------------------------- MONERO GENERATE BLOCKS PARAMS ---------------------------
+
+  rapidjson::Value monero_generate_blocks_params::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    if (m_wallet_address != boost::none) monero_utils::add_json_member("wallet_address", m_wallet_address.get(), allocator, root, value_str);
+    if (m_prev_block_hash != boost::none) monero_utils::add_json_member("prev_block", m_prev_block_hash.get(), allocator, root, value_str);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_num_blocks != boost::none) monero_utils::add_json_member("amount_of_blocks", m_num_blocks.get(), allocator, root, value_num);
+    if (m_starting_nonce != boost::none) monero_utils::add_json_member("starting_nonce", m_starting_nonce.get(), allocator, root, value_num);
+
+    // return root
+    return root;
+  }
+
   // --------------------------- MONERO PRUNE BLOCKCHAIN PARAMS ---------------------------
 
   rapidjson::Value monero_prune_blockchain_params::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -913,6 +933,18 @@ namespace monero {
     if (status->m_is_active != boost::none && *status->m_is_active == false) {
       status->m_is_background = boost::none;
       status->m_address = boost::none;
+    }
+  }
+
+  void deserialize_generate_blocks_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_generate_blocks_result>& result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("blocks")) {
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          result->m_block_hashes.push_back(it2->second.data());
+        }
+      }
+      else if (key == std::string("height")) result->m_height = it->second.get_value<uint64_t>();
     }
   }
 
