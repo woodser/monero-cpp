@@ -196,8 +196,8 @@ namespace monero {
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs(const monero_output_query& query) const override;
     std::string export_outputs(bool all = false) const override;
     int import_outputs(const std::string& outputs_hex) override;
-    std::vector<std::shared_ptr<monero_key_image>> export_key_images(bool all = false) const override;
-    std::shared_ptr<monero_key_image_import_result> import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images) override;
+    std::shared_ptr<monero_key_image_export_result> export_key_images(bool all = false) const override;
+    std::shared_ptr<monero_key_image_import_result> import_key_images(const std::vector<std::shared_ptr<monero_key_image>>& key_images, uint64_t offset = 0) override;
     void freeze_output(const std::string& key_image) override;
     void thaw_output(const std::string& key_image) override;
     bool is_output_frozen(const std::string& key_image) override;

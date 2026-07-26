@@ -1471,6 +1471,47 @@ namespace monero {
     }
   }
 
+  // -------------------- MONERO KEY IMAGE EXPORT RESULT ----------------------
+
+  rapidjson::Value monero_key_image_export_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set num values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_offset != boost::none) monero_utils::add_json_member("offset", m_offset.get(), allocator, root, value_num);
+
+    // set sub-arrays
+    if (!m_key_images.empty()) root.AddMember("keyImages", monero_utils::to_rapidjson_val(allocator, m_key_images), allocator);
+
+    // return root
+    return root;
+  }
+
+  std::shared_ptr<monero_key_image_export_result> monero_key_image_export_result::deserialize(const std::string& result_json) {
+
+    // deserialize json to property node
+    std::istringstream iss = result_json.empty() ? std::istringstream() : std::istringstream(result_json);
+    boost::property_tree::ptree node;
+    boost::property_tree::read_json(iss, node);
+
+    // convert property tree to export result
+    std::shared_ptr<monero_key_image_export_result> result = std::make_shared<monero_key_image_export_result>();
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("offset")) result->m_offset = it->second.get_value<uint64_t>();
+      else if (key == std::string("keyImages")) {
+        for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          std::shared_ptr<monero_key_image> key_image = std::make_shared<monero_key_image>();
+          monero_key_image::from_property_tree(it2->second, key_image);
+          result->m_key_images.push_back(key_image);
+        }
+      }
+    }
+    return result;
+  }
+
   // -------------------- MONERO KEY IMAGE IMPORT RESULT ----------------------
 
   void monero_key_image_import_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_import_result>& result) {
