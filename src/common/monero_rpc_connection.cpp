@@ -379,14 +379,15 @@ namespace monero {
     if (!m_http_client->invoke_post(uri, body, std::chrono::milliseconds(timeout), std::addressof(pri))) {
       // epee never surfaces the 401 status, but a rejected login means the server answered;
       // a dead or idle-closed socket yields no response bytes at all
-      if (m_http_client->get_bytes_received() > received_before && m_http_client->is_connected()) {
+      bool received = m_http_client->get_bytes_received() > received_before;
+      if (received && m_http_client->is_connected()) {
         throw monero_rpc_error(401, "Unauthorized");
       }
       // drop the socket: epee leaves EOF'd sockets marked connected, so without this the next
       // call reuses the poisoned socket and hits the same misdiagnosis again
       m_http_client->disconnect();
       if (m_uri == boost::none || m_uri->empty()) throw monero_error("Cannot send RPC request: uri not set.");
-      throw monero_error("Network error");
+      throw monero_error("Network error: " + std::string(received ? "connection dropped mid-response" : "no response") + " from " + m_uri.get() + uri.to_string() + " (timeout: " + std::to_string(timeout) + "ms)");
     }
     if (!pri) throw monero_error("Could not get response info");
     if (pri->m_response_code < 200 || pri->m_response_code > 299) {
