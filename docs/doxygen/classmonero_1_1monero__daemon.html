@@ -234,6 +234,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae312bd24390bd1a5bec659b9f0b1e17d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a95ce62e3db68f088c130acfbd69a25a4" id="r_a95ce62e3db68f088c130acfbd69a25a4"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__mining__status.html">monero_mining_status</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a95ce62e3db68f088c130acfbd69a25a4">get_mining_status</a> ()</td></tr>
 <tr class="separator:a95ce62e3db68f088c130acfbd69a25a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40dd65c931ebdcb04cb4b628b5c1ecd5" id="r_a40dd65c931ebdcb04cb4b628b5c1ecd5"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__generate__blocks__result.html">monero_generate_blocks_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a40dd65c931ebdcb04cb4b628b5c1ecd5">generate_blocks</a> (const std::string &amp;wallet_address, uint64_t num_blocks, const boost::optional&lt; std::string &gt; &amp;prev_block_hash=boost::none, const boost::optional&lt; uint32_t &gt; &amp;starting_nonce=boost::none)</td></tr>
+<tr class="separator:a40dd65c931ebdcb04cb4b628b5c1ecd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab78760ef2e8ecc0cfd6c981116328da3" id="r_ab78760ef2e8ecc0cfd6c981116328da3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab78760ef2e8ecc0cfd6c981116328da3">submit_block</a> (const std::string &amp;block_blob)</td></tr>
 <tr class="separator:ab78760ef2e8ecc0cfd6c981116328da3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ad4f35d4989fa36a35ee4bb31cb72f3" id="r_a2ad4f35d4989fa36a35ee4bb31cb72f3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2ad4f35d4989fa36a35ee4bb31cb72f3">submit_blocks</a> (const std::vector&lt; std::string &gt; &amp;block_blobs)</td></tr>
@@ -470,6 +472,58 @@ Public Member Functions</h2></td></tr>
 </dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#ac21c107e7cbc76ca29757f3129014ec7">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a40dd65c931ebdcb04cb4b628b5c1ecd5" name="a40dd65c931ebdcb04cb4b628b5c1ecd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40dd65c931ebdcb04cb4b628b5c1ecd5">&#9670;&#160;</a></span>generate_blocks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__generate__blocks__result.html">monero_generate_blocks_result</a> &gt; monero::monero_daemon::generate_blocks </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>wallet_address</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>num_blocks</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const boost::optional&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>prev_block_hash</em></span><span class="paramdefsep"> = </span><span class="paramdefval">boost::none</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const boost::optional&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>starting_nonce</em></span><span class="paramdefsep"> = </span><span class="paramdefval">boost::none</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Generate blocks to a wallet address (regtest only).</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">wallet_address</td><td>is the address of the wallet to receive miner transactions if block is successfully mined </td></tr>
+    <tr><td class="paramname">num_blocks</td><td>is the number of blocks to generate </td></tr>
+    <tr><td class="paramname">prev_block_hash</td><td>is the hash of the previous block to build on top of (optional, builds on the current tip if not given) </td></tr>
+    <tr><td class="paramname">starting_nonce</td><td>is the starting nonce to use (optional) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the result of generating blocks; height is the height of the last block generated </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a742b6dc19d8ead1f746fa95d6a9c2043">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>

@@ -247,10 +247,10 @@ std::vector&lt; <a class="el" href="structmonero_1_1monero__subaddress.html">mon
 <tr class="separator:a91c2157cac0642ce6b9fb2c843d508ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a463277f8296eb72f1a8f4a96b1071a72" id="r_a463277f8296eb72f1a8f4a96b1071a72"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a463277f8296eb72f1a8f4a96b1071a72">import_outputs</a> (const std::string &amp;outputs_hex) override</td></tr>
 <tr class="separator:a463277f8296eb72f1a8f4a96b1071a72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f16015d414c635d19879f014942d67d" id="r_a0f16015d414c635d19879f014942d67d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0f16015d414c635d19879f014942d67d">export_key_images</a> (bool all=false) const override</td></tr>
-<tr class="separator:a0f16015d414c635d19879f014942d67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a073784dfc3f8fcc636b32e3e9a5ba16b" id="r_a073784dfc3f8fcc636b32e3e9a5ba16b"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__import__result.html">monero_key_image_import_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a073784dfc3f8fcc636b32e3e9a5ba16b">import_key_images</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt; &amp;key_images) override</td></tr>
-<tr class="separator:a073784dfc3f8fcc636b32e3e9a5ba16b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a413aa0b89b97047991eaf528cac632b6" id="r_a413aa0b89b97047991eaf528cac632b6"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__export__result.html">monero_key_image_export_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a413aa0b89b97047991eaf528cac632b6">export_key_images</a> (bool all=false) const override</td></tr>
+<tr class="separator:a413aa0b89b97047991eaf528cac632b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8871e3604ec9498c8ef2fee573e60e2" id="r_af8871e3604ec9498c8ef2fee573e60e2"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__import__result.html">monero_key_image_import_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8871e3604ec9498c8ef2fee573e60e2">import_key_images</a> (const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt; &amp;key_images, uint64_t offset=0) override</td></tr>
+<tr class="separator:af8871e3604ec9498c8ef2fee573e60e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62b81ff4d53ae6b273e7f58d0302057b" id="r_a62b81ff4d53ae6b273e7f58d0302057b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a62b81ff4d53ae6b273e7f58d0302057b">freeze_output</a> (const std::string &amp;key_image) override</td></tr>
 <tr class="separator:a62b81ff4d53ae6b273e7f58d0302057b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a440d768c339edc434381078a094dbfc4" id="r_a440d768c339edc434381078a094dbfc4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a440d768c339edc434381078a094dbfc4">thaw_output</a> (const std::string &amp;key_image) override</td></tr>
@@ -1100,8 +1100,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
 
 </div>
 </div>
-<a id="a0f16015d414c635d19879f014942d67d" name="a0f16015d414c635d19879f014942d67d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0f16015d414c635d19879f014942d67d">&#9670;&#160;</a></span>export_key_images()</h2>
+<a id="a413aa0b89b97047991eaf528cac632b6" name="a413aa0b89b97047991eaf528cac632b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a413aa0b89b97047991eaf528cac632b6">&#9670;&#160;</a></span>export_key_images()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1110,7 +1110,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt; monero::monero_wallet_rpc::export_key_images </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__export__result.html">monero_key_image_export_result</a> &gt; monero::monero_wallet_rpc::export_key_images </td>
           <td>(</td>
           <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>all</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
           <td> const</td>
@@ -1129,9 +1129,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the wallet's signed key images </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the wallet's signed key images and their offset among the wallet's outputs </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aa695582abeb47b6b2a8f36364f86409a">monero::monero_wallet</a>.</p>
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a77484c4adfc11473cc8adff8835ffaeb">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
@@ -2802,8 +2802,8 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
 
 </div>
 </div>
-<a id="a073784dfc3f8fcc636b32e3e9a5ba16b" name="a073784dfc3f8fcc636b32e3e9a5ba16b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a073784dfc3f8fcc636b32e3e9a5ba16b">&#9670;&#160;</a></span>import_key_images()</h2>
+<a id="af8871e3604ec9498c8ef2fee573e60e2" name="af8871e3604ec9498c8ef2fee573e60e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8871e3604ec9498c8ef2fee573e60e2">&#9670;&#160;</a></span>import_key_images()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2814,8 +2814,12 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
         <tr>
           <td class="memname">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image__import__result.html">monero_key_image_import_result</a> &gt; monero::monero_wallet_rpc::import_key_images </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>key_images</em></span></td><td>)</td>
+          <td class="paramtype">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__key__image.html">monero_key_image</a> &gt; &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>key_images</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>offset</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -2828,12 +2832,13 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">key_images</td><td>are key images to import and verify (requires hex and signature) </td></tr>
+    <tr><td class="paramname">offset</td><td>- offset of the first key image among the wallet's outputs (default 0) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>results of the import </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aa1034c6a9d12b22702dbf0ef991e2dfe">monero::monero_wallet</a>.</p>
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a8f7f57b879071885485ab0c02e258150">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
