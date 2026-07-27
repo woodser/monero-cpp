@@ -399,5 +399,7 @@ jobs:
       - name: Attach archives to release
         uses: softprops/action-gh-release@v2
         with:
+          name: monero-cpp-${{ github.ref_name }}
           files: release/*
-          draft: true # publish manually after reviewing the notes
+          generate_release_notes: true
+          draft: true # publish this draft after reviewing the notes; a separate release would have no assets
