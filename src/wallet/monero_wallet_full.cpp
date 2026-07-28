@@ -957,6 +957,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
+    if (network_type == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->init_common();
     return wallet;
   }
@@ -973,6 +974,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
+    if (network_type == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->set_daemon_connection(daemon_connection);
     wallet->init_common();
     return wallet;
@@ -1039,6 +1041,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
+    if (config.m_network_type.get() == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_seed_language(language);
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
@@ -1138,6 +1141,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
+    if (config.m_network_type.get() == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->m_w2->set_seed_language(config.m_language.get());
@@ -1161,6 +1165,7 @@ namespace monero {
       wallet->m_w2->allow_mismatched_daemon_version(true);
       wallet->m_w2->max_reorg_depth(100000);
     }
+    if (config.m_network_type.get() == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_seed_language(config.m_language.get());
     crypto::secret_key secret_key;
