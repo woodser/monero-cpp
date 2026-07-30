@@ -2671,6 +2671,8 @@ namespace monero {
         // init tx
         std::shared_ptr<monero_tx_wallet> tx = std::make_shared<monero_tx_wallet>();
         tx->m_is_outgoing = true;
+        tx->m_is_confirmed = false;
+        tx->m_num_confirmations = 0;
         tx->m_input_sum = 0;
         tx->m_output_sum = 0;
         tx->m_change_amount = 0;
