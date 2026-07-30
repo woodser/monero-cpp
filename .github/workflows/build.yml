@@ -131,6 +131,7 @@ jobs:
           cd build
           cmake -DSTATIC=ON -DBOOST_ROOT=/usr/local -DBoost_NO_SYSTEM_PATHS=ON -DBUILD_SAMPLE=ON -DBUILD_SCRATCHPAD=ON -DBUILD_TESTS=ON ..
           cmake --build . -j3
+          strip --strip-unneeded libmonero-cpp.so # drop debug info and local symbols; dynamic exports are unaffected
           cd ..
 
       - name: Verify libraries
@@ -240,6 +241,7 @@ jobs:
           cd build
           cmake -DSTATIC=ON -DBUILD_SAMPLE=ON -DBUILD_SCRATCHPAD=ON -DBUILD_TESTS=ON ..
           cmake --build .
+          strip --strip-unneeded libmonero-cpp.dll # drop debug info and symbols; exports live in the export table
           cd ..
 
       - name: Verify libraries
@@ -344,6 +346,7 @@ jobs:
           cd build
           cmake -DSTATIC=ON -DBOOST_ROOT=/usr/local -DBoost_NO_SYSTEM_PATHS=ON -DBUILD_SAMPLE=ON -DBUILD_SCRATCHPAD=ON -DBUILD_TESTS=ON ..
           cmake --build . -j3
+          strip -x libmonero-cpp.dylib # drop local symbols; exported symbols remain
           cd ..
 
       - name: Verify libraries
