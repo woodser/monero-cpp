@@ -1868,7 +1868,7 @@ namespace monero {
     // validate and parse hex data
     cryptonote::blobdata blob;
     if (!epee::string_tools::parse_hexstr_to_binbuff(outputs_hex, blob)) {
-      throw std::runtime_error("Failed to parse hex");
+      throw std::runtime_error("Failed to parse hex.");
     }
 
     // import hex and return result
@@ -2582,7 +2582,7 @@ namespace monero {
       // parse tx metadata hex
       cryptonote::blobdata blob;
       if (!epee::string_tools::parse_hexstr_to_binbuff(txMetadata, blob)) {
-        throw std::runtime_error("Failed to parse hex");
+        throw std::runtime_error("Failed to parse hex.");
       }
 
       // deserialize tx
@@ -3438,7 +3438,7 @@ namespace monero {
     multisig_blobs.resize(multisig_hexes.size());
     for (uint64_t n = 0; n < multisig_hexes.size(); ++n) {
       if (!epee::string_tools::parse_hexstr_to_binbuff(multisig_hexes[n], multisig_blobs[n])) {
-        throw std::runtime_error("Failed to parse hex");
+        throw std::runtime_error("Failed to parse hex.");
       }
     }
 
@@ -3467,7 +3467,7 @@ namespace monero {
     // validate and parse multisig tx hex as blob
     cryptonote::blobdata multisig_tx_blob;
     if (!epee::string_tools::parse_hexstr_to_binbuff(multisig_tx_hex, multisig_tx_blob)) {
-      throw std::runtime_error("Failed to parse hex");
+      throw std::runtime_error("Failed to parse hex.");
     }
 
     // validate and parse blob as multisig_tx_set
@@ -3513,7 +3513,7 @@ namespace monero {
     // validate signed multisig tx hex as blob
     cryptonote::blobdata signed_multisig_tx_blob;
     if (!epee::string_tools::parse_hexstr_to_binbuff(signed_multisig_tx_hex, signed_multisig_tx_blob)) {
-      throw std::runtime_error("Failed to parse hex");
+      throw std::runtime_error("Failed to parse hex.");
     }
 
     // validate and parse blob as multisig_tx_set
