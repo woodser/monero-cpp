@@ -636,6 +636,15 @@ namespace monero {
         if (m_sync_start_height != boost::none || m_sync_end_height != boost::none) throw std::runtime_error("Sync start or end height should not already be allocated, is previous sync in progress?");
         m_sync_start_height = start_height;
         m_sync_end_height = m_wallet.get_daemon_height();
+        m_sync_progress_base = start_height;
+
+        // notify listeners of sync progress before the first block arrives when skipping ahead to the start height
+        uint64_t wallet_height = m_wallet.get_height();
+        if (wallet_height < start_height && start_height < *m_sync_end_height) {
+          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+            listener->on_sync_progress(wallet_height, start_height, *m_sync_end_height, 0.0, "Synchronizing");
+          }
+        }
       });
       waiter.wait(); // TODO: this processes notification on thread, process off thread
     }
@@ -647,6 +656,7 @@ namespace monero {
         if (m_prev_locked_tx_hashes.size() > 0) check_for_changed_unlocked_txs();
         m_sync_start_height = boost::none;
         m_sync_end_height = boost::none;
+        m_sync_progress_base = boost::none;
       });
       m_notification_pool->recycle();
       waiter.wait();
@@ -655,31 +665,52 @@ namespace monero {
     void on_new_block(uint64_t height, const cryptonote::block& cn_block) override {
       if (m_wallet.get_listeners().empty()) return;
 
-      // ignore notifications before sync start height, irrelevant to clients
-      if (m_sync_start_height == boost::none || height < *m_sync_start_height) return;
+      // ignore notifications outside an active sync
+      if (m_sync_start_height == boost::none) return;
+
+      // heights below the sync start are hash-skip positions, reported as progress only
+      bool skip_phase = height < *m_sync_start_height;
+
+      // throttle progress notifications and balance checks to every 250ms, always reporting the sync's last block
+      bool notify_progress = true;
+      if (height + 1 < *m_sync_end_height) {
+        uint64_t now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+        if (now_ms - m_last_sync_notify_ms < 250) notify_progress = false;
+        else m_last_sync_notify_ms = now_ms;
+      }
+      if (skip_phase && !notify_progress) return;
 
       // queue notification processing off main thread
       tools::threadpool::waiter waiter(*m_notification_pool);
-      m_notification_pool->submit(&waiter, [this, height]() {
+      m_notification_pool->submit(&waiter, [this, height, skip_phase, notify_progress]() {
 
-        // notify listeners of new block
-        for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
-          listener->on_new_block(height);
+        // rebase the progress base so progress reflects the hash skip to the restore height
+        if (height < *m_sync_progress_base) m_sync_progress_base = height;
+
+        // notify listeners of every scanned block, preserving the per-block contract
+        if (!skip_phase) {
+          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+            listener->on_new_block(height);
+          }
         }
 
-        // notify listeners of sync progress
-        if (height >= *m_sync_end_height) m_sync_end_height = height + 1; // increase end height if necessary
-        double percent_done = (double) (height - *m_sync_start_height + 1) / (double) (*m_sync_end_height - *m_sync_start_height);
-        std::string message = std::string("Synchronizing");
-        for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
-          listener->on_sync_progress(height, *m_sync_start_height, *m_sync_end_height, percent_done, message);
+        // notify listeners of throttled sync progress
+        if (notify_progress) {
+          if (height >= *m_sync_end_height) m_sync_end_height = height + 1; // increase end height if necessary
+          double percent_done = (double) (height - *m_sync_progress_base + 1) / (double) (*m_sync_end_height - *m_sync_progress_base);
+          std::string message = std::string("Synchronizing");
+          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+            listener->on_sync_progress(height, *m_sync_progress_base, *m_sync_end_height, percent_done, message);
+          }
+
+          // notify if balances change, skipping the hash skip which cannot change them
+          if (!skip_phase) {
+            bool balances_changed = check_for_changed_balances();
+
+            // notify when txs unlock after wallet is synced
+            if (balances_changed && m_wallet.is_synced()) check_for_changed_unlocked_txs();
+          }
         }
-
-        // notify if balances change
-        bool balances_changed = check_for_changed_balances();
-
-        // notify when txs unlock after wallet is synced
-        if (balances_changed && m_wallet.is_synced()) check_for_changed_unlocked_txs();
       });
       waiter.wait();
     }
@@ -832,6 +863,8 @@ namespace monero {
     tools::wallet2& m_w2;         // internal wallet implementation to listen to
     boost::optional<uint64_t> m_sync_start_height;
     boost::optional<uint64_t> m_sync_end_height;
+    boost::optional<uint64_t> m_sync_progress_base; // sync start height rebased down to report the hash skip as progress
+    uint64_t m_last_sync_notify_ms = 0; // last time block notifications were announced during sync
     boost::mutex m_listener_mutex;
     uint64_t m_prev_balance;
     uint64_t m_prev_unlocked_balance;
