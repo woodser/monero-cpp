@@ -1085,6 +1085,7 @@ namespace monero {
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_seed_language(language);
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
+    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get()); // must be set before generate so the height is written to the keys file
 
     // generate wallet
     if (config.m_is_multisig.get()) {
@@ -1106,7 +1107,6 @@ namespace monero {
       epee::wipeable_string electrum_words;
       if (!crypto::ElectrumWords::bytes_to_words(recovery_val, electrum_words, language)) throw std::runtime_error("Failed to encode seed");
     }
-    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->init_common();
     return wallet;
   }
@@ -1173,6 +1173,7 @@ namespace monero {
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
+    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get()); // must be set before generate so the height is written to the keys file
     if (has_spend_key && has_view_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, spend_key_sk, view_key_sk);
     else if (has_spend_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), spend_key_sk, true, false);
     else wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, view_key_sk);
@@ -1183,7 +1184,6 @@ namespace monero {
     }
     if (config.m_network_type.get() == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
-    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->m_w2->set_seed_language(config.m_language.get());
     wallet->init_common();
     return wallet;
