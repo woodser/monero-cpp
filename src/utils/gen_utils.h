@@ -143,7 +143,7 @@ namespace gen_utils
     }
 
     // resolve different booleans
-    if (resolve_true != boost::none) return (bool)(*val1) == *resolve_true ? val1 : val2; // if resolve true, return true, else return false
+    if (resolve_true != boost::none) return *val1 == *resolve_true ? val1 : val2; // resolve conflicting booleans to the preferred value
 
     // resolve different numbers
     if (resolve_max != boost::none) return *resolve_max ? std::max(*val1, *val2) : std::min(*val1, *val2);
