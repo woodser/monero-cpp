@@ -269,6 +269,7 @@ namespace monero {
 
     std::map<uint32_t, std::vector<uint32_t>> get_account_indices(bool get_subaddress_indices) const;
     std::vector<uint32_t> get_subaddress_indices(uint32_t account_idx) const;
+    std::vector<std::shared_ptr<monero_tx_wallet>> get_txs_aux(const monero_tx_query& query, int max_attempts) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::string query_key(const std::string& key_type) const;

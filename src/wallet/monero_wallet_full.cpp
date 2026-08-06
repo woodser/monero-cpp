@@ -1744,6 +1744,10 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs(const monero_tx_query& query) const {
+    return get_txs_aux(query, 5); // bound re-fetches when txs are inconsistent across wallet2 calls
+  }
+
+  std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs_aux(const monero_tx_query& query, int max_attempts) const {
     MTRACE("get_txs(query)");
     assert_not_closed();
 
@@ -1830,10 +1834,14 @@ namespace monero {
     // special case: re-fetch txs if inconsistency caused by needing to make multiple wallet calls  // TODO monero-project: offer wallet.get_txs(...)
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
       if ((*tx->m_is_confirmed && tx->m_block == nullptr) || (!*tx->m_is_confirmed && tx->m_block != nullptr)) {
-        MWARNING("Inconsistency detected building txs from multiple wallet2 calls, re-fetching");
         monero_utils::free(txs);
         txs.clear();
-        txs = get_txs(*_query);
+        if (max_attempts <= 1) {
+          monero_utils::free(_query);
+          throw std::runtime_error("Unable to build consistent txs from multiple wallet calls");
+        }
+        MWARNING("Inconsistency detected building txs from multiple wallet2 calls, re-fetching");
+        txs = get_txs_aux(*_query, max_attempts - 1);
         monero_utils::free(_query);
         return txs;
       }
