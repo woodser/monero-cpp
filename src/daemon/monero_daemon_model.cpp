@@ -494,8 +494,8 @@ namespace monero {
     m_ring_size = gen_utils::reconcile(m_ring_size, other->m_ring_size, "tx m_ring_size");
     m_is_confirmed = gen_utils::reconcile(m_is_confirmed, other->m_is_confirmed, boost::none, true, boost::none, "tx m_is_confirmed");  // tx can become confirmed
     m_is_miner_tx = gen_utils::reconcile(m_is_miner_tx, other->m_is_miner_tx, "tx m_is_miner_tx");
-    m_relay = gen_utils::reconcile(m_relay, other->m_relay, "tx m_relay");
-    m_is_relayed = gen_utils::reconcile(m_is_relayed, other->m_is_relayed, "tx m_is_relayed");
+    m_relay = gen_utils::reconcile(m_relay, other->m_relay, boost::none, true, boost::none, "tx m_relay"); // tx can become relayed
+    m_is_relayed = gen_utils::reconcile(m_is_relayed, other->m_is_relayed, boost::none, true, boost::none, "tx m_is_relayed"); // tx can become relayed
     m_is_double_spend_seen = gen_utils::reconcile(m_is_double_spend_seen, other->m_is_double_spend_seen, boost::none, true, boost::none, "tx m_is_double_spend_seen"); // double spend can become seen
     m_key = gen_utils::reconcile(m_key, other->m_key, "tx m_key");
     m_full_hex = gen_utils::reconcile(m_full_hex, other->m_full_hex, "tx m_full_hex");
@@ -511,7 +511,7 @@ namespace monero {
     m_rct_signatures = gen_utils::reconcile(m_rct_signatures, other->m_rct_signatures, "tx m_rct_signatures");
     m_rct_sig_prunable = gen_utils::reconcile(m_rct_sig_prunable, other->m_rct_sig_prunable, "tx m_rct_sig_prunable");
     m_is_kept_by_block = gen_utils::reconcile(m_is_kept_by_block, other->m_is_kept_by_block, "tx m_is_kept_by_block");
-    m_is_failed = gen_utils::reconcile(m_is_failed, other->m_is_failed, "tx m_is_failed");
+    m_is_failed = gen_utils::reconcile(m_is_failed, other->m_is_failed, boost::none, true, boost::none, "tx m_is_failed"); // tx can become failed
     m_last_failed_height = gen_utils::reconcile(m_last_failed_height, other->m_last_failed_height, "tx m_last_failed_height");
     m_last_failed_hash = gen_utils::reconcile(m_last_failed_hash, other->m_last_failed_hash, "tx m_last_failed_hash");
     m_max_used_block_height = gen_utils::reconcile(m_max_used_block_height, other->m_max_used_block_height, "tx m_max_used_block_height");
