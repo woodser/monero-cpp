@@ -277,6 +277,7 @@ namespace monero {
     static monero_wallet_full* create_wallet_random(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
 
     std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
+    std::vector<std::shared_ptr<monero_tx_wallet>> get_txs_aux(const monero_tx_query& query, int max_attempts) const;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config& config);  // sweeps unlocked funds within an account; private helper to sweep_unlocked()
