@@ -277,16 +277,16 @@ namespace monero {
     static monero_wallet_full* create_wallet_random(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
 
     std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
-    std::vector<std::shared_ptr<monero_tx_wallet>> get_txs_aux(const monero_tx_query& query, int max_attempts) const;
+    std::vector<std::shared_ptr<monero_tx_wallet>> get_txs_aux(const monero_tx_query& query, int max_attempts = 5) const; // unlocked; callers may hold sync_op_lock
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config& config);  // sweeps unlocked funds within an account; private helper to sweep_unlocked()
 
     void assert_not_closed() const;
 
-    // serializes a wallet operation with background sync: pauses the sync loop, interrupts background refresh, and locks m_sync_mutex
+    // serializes a wallet operation with background sync: pauses the sync loop, interrupts background refresh unless interrupt_sync is false, and locks m_sync_mutex
     struct sync_op_lock {
-      sync_op_lock(const monero_wallet_full& wallet);
+      sync_op_lock(const monero_wallet_full& wallet, bool interrupt_sync = true);
       sync_op_lock(const sync_op_lock&) = delete;
       ~sync_op_lock();
       const monero_wallet_full& m_wallet;
