@@ -846,7 +846,7 @@ namespace monero {
       tx_query.m_hashes = tx_hashes;
       tx_query.m_include_outputs = true;
       tx_query.m_is_locked = true;
-      on_spend_txs(m_wallet.get_txs(tx_query));
+      on_spend_txs(m_wallet.get_txs_aux(tx_query)); // unlocked; callers hold sync_op_lock
     }
 
     void on_spend_txs(const std::vector<std::shared_ptr<monero_tx_wallet>>& txs) {
@@ -894,7 +894,7 @@ namespace monero {
       query.m_is_locked = true;
       query.m_is_confirmed = true;
       query.m_min_height = m_wallet.get_height() - 70; // only monitor recent txs
-      std::vector<std::shared_ptr<monero_tx_wallet>> locked_txs = m_wallet.get_txs(query);
+      std::vector<std::shared_ptr<monero_tx_wallet>> locked_txs = m_wallet.get_txs_aux(query); // unlocked; announcing thread holds the sync lock
 
       // collect hashes of txs no longer locked
       std::vector<std::string> tx_hashes_no_longer_locked;
@@ -915,7 +915,7 @@ namespace monero {
         query.m_hashes = tx_hashes_no_longer_locked;
         query.m_is_locked = false;
         query.m_include_outputs = true;
-        txs_no_longer_locked = m_wallet.get_txs(query);
+        txs_no_longer_locked = m_wallet.get_txs_aux(query);
       }
 
       // notify listeners of newly unlocked inputs and outputs
@@ -1744,7 +1744,8 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs(const monero_tx_query& query) const {
-    return get_txs_aux(query, 5); // bound re-fetches when txs are inconsistent across wallet2 calls
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+    return get_txs_aux(query);
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs_aux(const monero_tx_query& query, int max_attempts) const {
@@ -1871,7 +1872,10 @@ namespace monero {
 //    } else std::cout << "Transfer query: " << query.serialize() << std::endl;
 
     // get transfers directly if query does not require tx context (e.g. other transfers, outputs)
-    if (!monero_transfer_query::is_contextual(query)) return get_transfers_aux(query);
+    if (!monero_transfer_query::is_contextual(query)) {
+      sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+      return get_transfers_aux(query);
+    }
 
     // otherwise get txs with full models to fulfill query
     std::vector<std::shared_ptr<monero_transfer>> transfers;
@@ -1893,7 +1897,10 @@ namespace monero {
 //    } else std::cout << "Output query: " << query.serialize() << std::endl;
 
     // get outputs directly if query does not require tx context (e.g. other outputs, transfers)
-    if (!monero_output_query::is_contextual(query)) return get_outputs_aux(query);
+    if (!monero_output_query::is_contextual(query)) {
+      sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+      return get_outputs_aux(query);
+    }
 
     // otherwise get txs with full models to fulfill query
     std::vector<std::shared_ptr<monero_output_wallet>> outputs;
@@ -3662,9 +3669,9 @@ namespace monero {
   }
 
   // serialize a wallet operation with background sync, like upstream wallet2 consumers (e.g. simplewallet's LOCK_IDLE_SCOPE)
-  monero_wallet_full::sync_op_lock::sync_op_lock(const monero_wallet_full& wallet) : m_wallet(wallet) {
+  monero_wallet_full::sync_op_lock::sync_op_lock(const monero_wallet_full& wallet, bool interrupt_sync) : m_wallet(wallet) {
     wallet.m_num_sync_pauses++; // pause background sync
-    if (wallet.m_background_syncing) wallet.m_w2->stop(); // interrupt background refresh
+    if (interrupt_sync && wallet.m_background_syncing) wallet.m_w2->stop(); // interrupt background refresh
     wallet.m_sync_mutex.lock();
   }
 
