@@ -80,6 +80,7 @@ namespace monero {
 
   static const int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 1000 * 30; // default connection timeout 30 sec
   static const bool STRICT_ = false; // relies exclusively on blockchain data if true, includes local wallet data if false TODO: good use case to expose externally? (note: cannot use `STRICT` due to namespace collision on Windows)
+  static const uint64_t SYNC_CHUNK_SIZE = 10000; // refresh far-behind wallets in bounded chunks so operations like save can interleave
 
   // ----------------------- INTERNAL PRIVATE HELPERS -----------------------
 
@@ -629,12 +630,21 @@ namespace monero {
       }
     }
 
-    void on_sync_start(uint64_t start_height) {
+    void on_sync_start(uint64_t start_height, uint64_t end_height) {
       tools::threadpool::waiter waiter(*m_notification_pool);
-      m_notification_pool->submit(&waiter, [this, start_height]() {
+      m_notification_pool->submit(&waiter, [this, start_height, end_height]() {
         if (m_sync_start_height != boost::none || m_sync_end_height != boost::none) throw std::runtime_error("Sync start or end height should not already be allocated, is previous sync in progress?");
         m_sync_start_height = start_height;
-        m_sync_end_height = m_wallet.get_daemon_height();
+        m_sync_end_height = end_height;
+        m_sync_progress_base = start_height;
+
+        // notify listeners of sync progress before the first block arrives when skipping ahead to the start height
+        uint64_t wallet_height = m_wallet.get_height();
+        if (wallet_height < start_height && start_height < *m_sync_end_height) {
+          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+            listener->on_sync_progress(wallet_height, start_height, *m_sync_end_height, 0.0, "Synchronizing");
+          }
+        }
       });
       waiter.wait(); // TODO: this processes notification on thread, process off thread
     }
@@ -646,6 +656,7 @@ namespace monero {
         if (m_prev_locked_tx_hashes.size() > 0) check_for_changed_unlocked_txs();
         m_sync_start_height = boost::none;
         m_sync_end_height = boost::none;
+        m_sync_progress_base = boost::none;
       });
       m_notification_pool->recycle();
       waiter.wait();
@@ -654,31 +665,52 @@ namespace monero {
     void on_new_block(uint64_t height, const cryptonote::block& cn_block) override {
       if (m_wallet.get_listeners().empty()) return;
 
-      // ignore notifications before sync start height, irrelevant to clients
-      if (m_sync_start_height == boost::none || height < *m_sync_start_height) return;
+      // ignore notifications outside an active sync
+      if (m_sync_start_height == boost::none) return;
+
+      // heights below the sync start are hash-skip positions, reported as progress only
+      bool skip_phase = height < *m_sync_start_height;
+
+      // throttle progress notifications and balance checks to every 250ms, always reporting the sync's last block
+      bool notify_progress = true;
+      if (height + 1 < *m_sync_end_height) {
+        uint64_t now_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+        if (now_ms - m_last_sync_notify_ms < 250) notify_progress = false;
+        else m_last_sync_notify_ms = now_ms;
+      }
+      if (skip_phase && !notify_progress) return;
 
       // queue notification processing off main thread
       tools::threadpool::waiter waiter(*m_notification_pool);
-      m_notification_pool->submit(&waiter, [this, height]() {
+      m_notification_pool->submit(&waiter, [this, height, skip_phase, notify_progress]() {
 
-        // notify listeners of new block
-        for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
-          listener->on_new_block(height);
+        // rebase the progress base so progress reflects the hash skip to the restore height
+        if (height < *m_sync_progress_base) m_sync_progress_base = height;
+
+        // notify listeners of every scanned block, preserving the per-block contract
+        if (!skip_phase) {
+          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+            listener->on_new_block(height);
+          }
         }
 
-        // notify listeners of sync progress
-        if (height >= *m_sync_end_height) m_sync_end_height = height + 1; // increase end height if necessary
-        double percent_done = (double) (height - *m_sync_start_height + 1) / (double) (*m_sync_end_height - *m_sync_start_height);
-        std::string message = std::string("Synchronizing");
-        for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
-          listener->on_sync_progress(height, *m_sync_start_height, *m_sync_end_height, percent_done, message);
+        // notify listeners of throttled sync progress
+        if (notify_progress) {
+          if (height >= *m_sync_end_height) m_sync_end_height = height + 1; // increase end height if necessary
+          double percent_done = (double) (height - *m_sync_progress_base + 1) / (double) (*m_sync_end_height - *m_sync_progress_base);
+          std::string message = std::string("Synchronizing");
+          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+            listener->on_sync_progress(height, *m_sync_progress_base, *m_sync_end_height, percent_done, message);
+          }
+
+          // notify if balances change, skipping the hash skip which cannot change them
+          if (!skip_phase) {
+            bool balances_changed = check_for_changed_balances();
+
+            // notify when txs unlock after wallet is synced
+            if (balances_changed && m_wallet.is_synced()) check_for_changed_unlocked_txs();
+          }
         }
-
-        // notify if balances change
-        bool balances_changed = check_for_changed_balances();
-
-        // notify when txs unlock after wallet is synced
-        if (balances_changed && m_wallet.is_synced()) check_for_changed_unlocked_txs();
       });
       waiter.wait();
     }
@@ -813,7 +845,7 @@ namespace monero {
       tx_query.m_hashes = tx_hashes;
       tx_query.m_include_outputs = true;
       tx_query.m_is_locked = true;
-      on_spend_txs(m_wallet.get_txs(tx_query));
+      on_spend_txs(m_wallet.get_txs_aux(tx_query)); // unlocked; callers hold sync_op_lock
     }
 
     void on_spend_txs(const std::vector<std::shared_ptr<monero_tx_wallet>>& txs) {
@@ -831,6 +863,8 @@ namespace monero {
     tools::wallet2& m_w2;         // internal wallet implementation to listen to
     boost::optional<uint64_t> m_sync_start_height;
     boost::optional<uint64_t> m_sync_end_height;
+    boost::optional<uint64_t> m_sync_progress_base; // sync start height rebased down to report the hash skip as progress
+    uint64_t m_last_sync_notify_ms = 0; // last time block notifications were announced during sync
     boost::mutex m_listener_mutex;
     uint64_t m_prev_balance;
     uint64_t m_prev_unlocked_balance;
@@ -859,7 +893,7 @@ namespace monero {
       query.m_is_locked = true;
       query.m_is_confirmed = true;
       query.m_min_height = m_wallet.get_height() - 70; // only monitor recent txs
-      std::vector<std::shared_ptr<monero_tx_wallet>> locked_txs = m_wallet.get_txs(query);
+      std::vector<std::shared_ptr<monero_tx_wallet>> locked_txs = m_wallet.get_txs_aux(query); // unlocked; announcing thread holds the sync lock
 
       // collect hashes of txs no longer locked
       std::vector<std::string> tx_hashes_no_longer_locked;
@@ -880,7 +914,7 @@ namespace monero {
         query.m_hashes = tx_hashes_no_longer_locked;
         query.m_is_locked = false;
         query.m_include_outputs = true;
-        txs_no_longer_locked = m_wallet.get_txs(query);
+        txs_no_longer_locked = m_wallet.get_txs_aux(query);
       }
 
       // notify listeners of newly unlocked inputs and outputs
@@ -1045,6 +1079,7 @@ namespace monero {
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
     wallet->m_w2->set_seed_language(language);
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
+    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get()); // must be set before generate so the height is written to the keys file
 
     // generate wallet
     if (config.m_is_multisig.get()) {
@@ -1066,7 +1101,6 @@ namespace monero {
       epee::wipeable_string electrum_words;
       if (!crypto::ElectrumWords::bytes_to_words(recovery_val, electrum_words, language)) throw std::runtime_error("Failed to encode seed");
     }
-    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->init_common();
     return wallet;
   }
@@ -1133,6 +1167,7 @@ namespace monero {
     if (http_client_factory == nullptr) wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true));
     else wallet->m_w2 = std::unique_ptr<tools::wallet2>(new tools::wallet2(static_cast<cryptonote::network_type>(config.m_network_type.get()), 1, true, std::move(http_client_factory)));
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
+    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get()); // must be set before generate so the height is written to the keys file
     if (has_spend_key && has_view_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, spend_key_sk, view_key_sk);
     else if (has_spend_key) wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), spend_key_sk, true, false);
     else wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), address_info.address, view_key_sk);
@@ -1143,7 +1178,6 @@ namespace monero {
     }
     if (config.m_network_type.get() == monero_network_type::TESTNET) wallet->m_w2->allow_mismatched_daemon_version(true); // testnet may use custom hard fork heights
     wallet->set_daemon_connection(config.m_server, config.m_is_trusted_daemon);
-    wallet->m_w2->set_refresh_from_block_height(config.m_restore_height.get());
     wallet->m_w2->set_seed_language(config.m_language.get());
     wallet->init_common();
     return wallet;
@@ -1523,6 +1557,7 @@ namespace monero {
   void monero_wallet_full::stop_syncing() {
     assert_not_closed();
     m_syncing_enabled = false;
+    m_interrupt_sync = true; // end an in-progress sync at the next chunk boundary
     m_w2->stop();
   }
 
@@ -1703,6 +1738,11 @@ namespace monero {
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs(const monero_tx_query& query) const {
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+    return get_txs_aux(query);
+  }
+
+  std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs_aux(const monero_tx_query& query, int max_attempts) const {
     MTRACE("get_txs(query)");
     assert_not_closed();
 
@@ -1789,10 +1829,14 @@ namespace monero {
     // special case: re-fetch txs if inconsistency caused by needing to make multiple wallet calls  // TODO monero-project: offer wallet.get_txs(...)
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
       if ((*tx->m_is_confirmed && tx->m_block == nullptr) || (!*tx->m_is_confirmed && tx->m_block != nullptr)) {
-        std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
         monero_utils::free(txs);
         txs.clear();
-        txs = get_txs(*_query);
+        if (max_attempts <= 1) {
+          monero_utils::free(_query);
+          throw std::runtime_error("Unable to build consistent txs from multiple wallet calls");
+        }
+        std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
+        txs = get_txs_aux(*_query, max_attempts - 1);
         monero_utils::free(_query);
         return txs;
       }
@@ -1822,7 +1866,10 @@ namespace monero {
 //    } else std::cout << "Transfer query: " << query.serialize() << std::endl;
 
     // get transfers directly if query does not require tx context (e.g. other transfers, outputs)
-    if (!monero_transfer_query::is_contextual(query)) return get_transfers_aux(query);
+    if (!monero_transfer_query::is_contextual(query)) {
+      sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+      return get_transfers_aux(query);
+    }
 
     // otherwise get txs with full models to fulfill query
     std::vector<std::shared_ptr<monero_transfer>> transfers;
@@ -1844,7 +1891,10 @@ namespace monero {
 //    } else std::cout << "Output query: " << query.serialize() << std::endl;
 
     // get outputs directly if query does not require tx context (e.g. other outputs, transfers)
-    if (!monero_output_query::is_contextual(query)) return get_outputs_aux(query);
+    if (!monero_output_query::is_contextual(query)) {
+      sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+      return get_outputs_aux(query);
+    }
 
     // otherwise get txs with full models to fulfill query
     std::vector<std::shared_ptr<monero_output_wallet>> outputs;
@@ -3611,9 +3661,9 @@ namespace monero {
   }
 
   // serialize a wallet operation with background sync, like upstream wallet2 consumers (e.g. simplewallet's LOCK_IDLE_SCOPE)
-  monero_wallet_full::sync_op_lock::sync_op_lock(const monero_wallet_full& wallet) : m_wallet(wallet) {
+  monero_wallet_full::sync_op_lock::sync_op_lock(const monero_wallet_full& wallet, bool interrupt_sync) : m_wallet(wallet) {
     wallet.m_num_sync_pauses++; // pause background sync
-    if (wallet.m_background_syncing) wallet.m_w2->stop(); // interrupt background refresh
+    if (interrupt_sync && wallet.m_background_syncing) wallet.m_w2->stop(); // interrupt background refresh
     wallet.m_sync_mutex.lock();
   }
 
@@ -3644,6 +3694,7 @@ namespace monero {
     m_sync_loop_running = false;
     m_num_sync_pauses = 0;
     m_background_syncing = false;
+    m_interrupt_sync = false;
     m_is_closed = false;
   }
 
@@ -3923,7 +3974,7 @@ namespace monero {
   }
 
   monero_sync_result monero_wallet_full::lock_and_sync(boost::optional<uint64_t> start_height, bool background) {
-    boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize sync() and syncAsync()
+    boost::unique_lock<boost::mutex> lock(m_sync_mutex); // synchronize sync() and syncAsync()
     assert_not_closed(); // wallet can be closed while waiting for the lock
     monero_sync_result result;
     result.m_num_blocks_fetched = 0;
@@ -3940,7 +3991,7 @@ namespace monero {
           if (rescan) m_w2->rescan_blockchain(false);
 
           // sync wallet
-          result = sync_aux(start_height);
+          result = sync_aux(start_height, lock);
         }
       } while (!rescan && (rescan = m_rescan_on_sync.exchange(false))); // repeat if not rescanned and rescan was requested
     } catch (...) {
@@ -3951,20 +4002,51 @@ namespace monero {
     return result;
   }
 
-  monero_sync_result monero_wallet_full::sync_aux(boost::optional<uint64_t> start_height) {
+  monero_sync_result monero_wallet_full::sync_aux(boost::optional<uint64_t> start_height, boost::unique_lock<boost::mutex>& lock) {
     MTRACE("sync_aux()");
 
     // determine sync start height
     uint64_t sync_start_height = start_height == boost::none ? std::max(get_height(), get_restore_height()) : *start_height;
     if (sync_start_height < get_restore_height()) set_restore_height(sync_start_height); // TODO monero-project: start height processed > requested start height unless sync height manually set
 
+    // determine the sync end height for progress reporting, tolerating failure so it cannot abort the sync
+    uint64_t sync_end_height;
+    try { sync_end_height = get_daemon_height(); }
+    catch (const std::exception& e) {
+      MWARNING("Failed to get daemon height on sync start: " << e.what());
+      sync_end_height = std::max(sync_start_height, m_w2->get_approximate_blockchain_height()); // listeners raise the end height as blocks arrive
+    }
+
     // notify listeners of sync start
-    m_w2_listener->on_sync_start(sync_start_height);
+    m_w2_listener->on_sync_start(sync_start_height, sync_end_height);
     monero_sync_result result;
+    result.m_num_blocks_fetched = 0;
+    result.m_received_money = false;
 
     // attempt to refresh wallet2 which may throw exception
     try {
-      m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, result.m_num_blocks_fetched, result.m_received_money, true);
+
+      // refresh in bounded chunks like wallet-rpc, yielding between chunks so operations like save can interleave
+      m_interrupt_sync = false;
+      bool done = false;
+      while (!done) {
+        uint64_t blocks_fetched = 0;
+        bool received_money = false;
+        m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, blocks_fetched, received_money, true, true, SYNC_CHUNK_SIZE);
+        result.m_num_blocks_fetched += blocks_fetched;
+        if (received_money) result.m_received_money = true;
+        done = blocks_fetched == 0 || m_interrupt_sync;
+        if (!done && m_num_sync_pauses > 0) {
+          if (m_background_syncing) done = true; // let the waiting operation run; background sync resumes on its next cycle
+          else {
+            lock.unlock(); // yield to the waiting operation
+            while (m_num_sync_pauses > 0 && !m_is_closed) std::this_thread::sleep_for(std::chrono::milliseconds(3));
+            lock.lock();
+            if (m_is_closed) return result; // closed while yielded; listener is torn down so skip end notifications
+            if (m_interrupt_sync) done = true;
+          }
+        }
+      }
       if (!m_is_synced) m_is_synced = true;
       m_w2_listener->update_listening();  // cannot unregister during sync which would segfault
     } catch (std::exception& e) {

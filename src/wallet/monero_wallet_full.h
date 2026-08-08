@@ -277,15 +277,16 @@ namespace monero {
     static monero_wallet_full* create_wallet_random(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
 
     std::vector<monero_subaddress> get_subaddresses_aux(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, const std::vector<tools::wallet2::transfer_details>& transfers) const;
+    std::vector<std::shared_ptr<monero_tx_wallet>> get_txs_aux(const monero_tx_query& query, int max_attempts = 5) const; // unlocked; callers may hold sync_op_lock
     std::vector<std::shared_ptr<monero_transfer>> get_transfers_aux(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_aux(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_tx_wallet>> sweep_account(const monero_tx_config& config);  // sweeps unlocked funds within an account; private helper to sweep_unlocked()
 
     void assert_not_closed() const;
 
-    // serializes a wallet operation with background sync: pauses the sync loop, interrupts background refresh, and locks m_sync_mutex
+    // serializes a wallet operation with background sync: pauses the sync loop, interrupts background refresh unless interrupt_sync is false, and locks m_sync_mutex
     struct sync_op_lock {
-      sync_op_lock(const monero_wallet_full& wallet);
+      sync_op_lock(const monero_wallet_full& wallet, bool interrupt_sync = true);
       sync_op_lock(const sync_op_lock&) = delete;
       ~sync_op_lock();
       const monero_wallet_full& m_wallet;
@@ -298,6 +299,7 @@ namespace monero {
     mutable boost::mutex m_sync_mutex;           // synchronize sync and other wallet operations
     mutable std::atomic<uint32_t> m_num_sync_pauses; // number of operations pausing background sync
     std::atomic<bool> m_background_syncing;      // whether or not a background sync pass is in progress
+    std::atomic<bool> m_interrupt_sync;          // request to end an in-progress sync at the next chunk boundary
     std::atomic<bool> m_rescan_on_sync;          // whether or not to rescan on sync
     std::atomic<bool> m_syncing_enabled;         // whether or not auto sync is enabled
     std::atomic<bool> m_sync_loop_running;       // whether or not the syncing thread is shut down
@@ -306,6 +308,6 @@ namespace monero {
     boost::mutex m_syncing_mutex;                // synchronize auto sync loop
     void run_sync_loop();                        // run the sync loop in a thread
     monero_sync_result lock_and_sync(boost::optional<uint64_t> start_height = boost::none, bool background = false);  // internal function to synchronize request to sync and rescan
-    monero_sync_result sync_aux(boost::optional<uint64_t> start_height = boost::none);       // internal function to immediately block, sync, and report progress
+    monero_sync_result sync_aux(boost::optional<uint64_t> start_height, boost::unique_lock<boost::mutex>& lock);  // internal function to immediately block, sync, and report progress
   };
 }
