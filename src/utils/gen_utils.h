@@ -64,11 +64,14 @@
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 #include <chrono>
 #include <thread>
 #include <atomic>
 #include "include_base_utils.h"
 #include "common/util.h"
+#include "crypto/crypto.h"
 
 /**
  * Collection of generic utilities.
@@ -85,6 +88,42 @@ namespace gen_utils
     boost::uuids::random_generator generator;
     boost::uuids::uuid uuid = generator();
     return boost::uuids::to_string(uuid);
+  }
+
+  static bool is_uint64_t(const std::string& str) {
+    try {
+      size_t sz;
+      std::stol(str, &sz);
+      return sz == str.size();
+    }
+    catch (const std::invalid_argument&) {
+      // if no conversion could be performed.
+      return false;   
+    }
+    catch (const std::out_of_range&) {
+      //  if the converted value would fall out of the range of the result type.
+      return false;
+    }
+  }
+
+  static uint64_t uint64_t_cast(const std::string& str) {
+    if (!is_uint64_t(str)) throw std::out_of_range("String provided is not a valid uint64_t");
+    uint64_t value;
+    std::istringstream itr(str);
+    itr >> value;
+    return value;
+  }
+
+  static uint64_t timestamp_to_epoch(const std::string& iso_timestamp) {
+    // ISO 8601
+    std::string timestamp = boost::replace_all_copy(iso_timestamp, "T", " ");
+    boost::replace_all(timestamp, "Z", "");
+
+    boost::posix_time::ptime pt = boost::posix_time::time_from_string(timestamp);
+    boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
+    boost::posix_time::time_duration diff = pt - epoch;
+
+    return static_cast<uint64_t>(diff.total_seconds());
   }
 
   /**
@@ -168,6 +207,26 @@ namespace gen_utils
 
     // otherwise cannot reconcile
     throw std::runtime_error("Cannot reconcile vectors" + (!err_msg.empty() ? std::string(". ") + err_msg : std::string("")));
+  }
+
+  template<typename T>
+  T pop_index(std::vector<T>& vec, size_t idx) {
+    CHECK_AND_ASSERT_MES(!vec.empty(), T(), "Vector must be non-empty");
+    CHECK_AND_ASSERT_MES(idx < vec.size(), T(), "idx out of bounds");
+
+    T res = std::move(vec[idx]);
+    if (idx + 1 != vec.size()) vec[idx] = std::move(vec.back());
+    vec.resize(vec.size() - 1);
+
+    return res;
+  }
+
+  template<typename T>
+  T pop_random_value(std::vector<T>& vec) {
+    CHECK_AND_ASSERT_MES(!vec.empty(), T(), "Vector must be non-empty");
+
+    size_t idx = crypto::rand<size_t>() % vec.size();
+    return pop_index(vec, idx);
   }
 
   // ------------------------- THREAD POLLER ----------------------------

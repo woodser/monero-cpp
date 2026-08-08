@@ -1232,6 +1232,9 @@ namespace monero {
     auto params = std::make_shared<monero_verify_sign_message_params>(msg, address, signature);
     monero_message_signature_result sig_result;
     sig_result.m_is_good = false;
+    sig_result.m_is_old = false;
+    sig_result.m_version = 0;
+    sig_result.m_signature_type = monero_message_signature_type::SIGN_WITH_SPEND_KEY;
     try {
       auto result = m_rpc->send_json_request("verify", params);
       deserialize_message_signature_result(result, sig_result);
