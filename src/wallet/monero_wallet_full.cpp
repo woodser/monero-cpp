@@ -630,12 +630,12 @@ namespace monero {
       }
     }
 
-    void on_sync_start(uint64_t start_height) {
+    void on_sync_start(uint64_t start_height, uint64_t end_height) {
       tools::threadpool::waiter waiter(*m_notification_pool);
-      m_notification_pool->submit(&waiter, [this, start_height]() {
+      m_notification_pool->submit(&waiter, [this, start_height, end_height]() {
         if (m_sync_start_height != boost::none || m_sync_end_height != boost::none) throw std::runtime_error("Sync start or end height should not already be allocated, is previous sync in progress?");
         m_sync_start_height = start_height;
-        m_sync_end_height = m_wallet.get_daemon_height();
+        m_sync_end_height = end_height;
 
         // notify listeners of sync progress before the first block arrives when skipping ahead to the start height
         uint64_t wallet_height = m_wallet.get_height();
@@ -3995,8 +3995,16 @@ namespace monero {
     uint64_t sync_start_height = start_height == boost::none ? std::max(get_height(), get_restore_height()) : *start_height;
     if (sync_start_height < get_restore_height()) set_restore_height(sync_start_height); // TODO monero-project: start height processed > requested start height unless sync height manually set
 
+    // determine the sync end height for progress reporting, tolerating failure so it cannot abort the sync
+    uint64_t sync_end_height;
+    try { sync_end_height = get_daemon_height(); }
+    catch (const std::exception& e) {
+      MWARNING("Failed to get daemon height on sync start: " << e.what());
+      sync_end_height = std::max(sync_start_height, m_w2->get_approximate_blockchain_height()); // listeners raise the end height as blocks arrive
+    }
+
     // notify listeners of sync start
-    m_w2_listener->on_sync_start(sync_start_height);
+    m_w2_listener->on_sync_start(sync_start_height, sync_end_height);
     monero_sync_result result;
     result.m_num_blocks_fetched = 0;
     result.m_received_money = false;
