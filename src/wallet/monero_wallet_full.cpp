@@ -4004,17 +4004,16 @@ namespace monero {
     // attempt to refresh wallet2 which may throw exception
     try {
 
-      // refresh a far-behind wallet in bounded chunks, yielding between chunks so operations like save can interleave
+      // refresh in bounded chunks like wallet-rpc, yielding between chunks so operations like save can interleave
       m_interrupt_sync = false;
-      uint64_t max_blocks = get_daemon_height() > get_height() + SYNC_CHUNK_SIZE ? SYNC_CHUNK_SIZE : std::numeric_limits<uint64_t>::max();
       bool done = false;
       while (!done) {
         uint64_t blocks_fetched = 0;
         bool received_money = false;
-        m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, blocks_fetched, received_money, true, true, max_blocks);
+        m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, blocks_fetched, received_money, true, true, SYNC_CHUNK_SIZE);
         result.m_num_blocks_fetched += blocks_fetched;
         if (received_money) result.m_received_money = true;
-        done = max_blocks == std::numeric_limits<uint64_t>::max() || blocks_fetched == 0 || m_interrupt_sync;
+        done = blocks_fetched == 0 || m_interrupt_sync;
         if (!done && m_num_sync_pauses > 0) {
           if (m_background_syncing) done = true; // let the waiting operation run; background sync resumes on its next cycle
           else {
