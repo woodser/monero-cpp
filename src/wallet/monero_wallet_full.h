@@ -300,6 +300,7 @@ namespace monero {
     mutable std::atomic<uint32_t> m_num_sync_pauses; // number of operations pausing background sync
     std::atomic<bool> m_background_syncing;      // whether or not a background sync pass is in progress
     std::atomic<bool> m_interrupt_sync;          // request to end an in-progress sync at the next chunk boundary
+    std::atomic<bool> m_sync_in_progress;        // whether or not a sync pass is executing
     std::atomic<bool> m_rescan_on_sync;          // whether or not to rescan on sync
     std::atomic<bool> m_syncing_enabled;         // whether or not auto sync is enabled
     std::atomic<bool> m_sync_loop_running;       // whether or not the syncing thread is shut down

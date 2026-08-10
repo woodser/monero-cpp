@@ -1503,14 +1503,14 @@ namespace monero {
   monero_sync_result monero_wallet_full::sync() {
     MTRACE("sync()");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
     return lock_and_sync();
   }
 
   monero_sync_result monero_wallet_full::sync(monero_wallet_listener& listener) {
     MTRACE("sync(listener)");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
 
     // register listener
     add_listener(listener);
@@ -1528,14 +1528,14 @@ namespace monero {
   monero_sync_result monero_wallet_full::sync(uint64_t start_height) {
     MTRACE("sync(" << start_height << ")");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
     return lock_and_sync(start_height);
   }
 
   monero_sync_result monero_wallet_full::sync(uint64_t start_height, monero_wallet_listener& listener) {
     MTRACE("sync(" << start_height << ", listener)");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
 
     // wrap and register sync listener as wallet listener
     add_listener(listener);
@@ -1564,7 +1564,7 @@ namespace monero {
     assert_not_closed();
     m_syncing_enabled = false;
     m_interrupt_sync = true; // end an in-progress sync at the next chunk boundary
-    m_w2->stop();
+    if (m_sync_in_progress) m_w2->stop(); // abort the sync's in-flight daemon request, not an idle client
   }
 
   void monero_wallet_full::scan_txs(const std::vector<std::string>& tx_ids) {
@@ -1590,7 +1590,7 @@ namespace monero {
   void monero_wallet_full::rescan_spent() {
     MTRACE("rescan_spent()");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
+    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
     if (!is_daemon_trusted()) throw std::runtime_error("Rescan spent can only be used with a trusted daemon");
     sync_op_lock op_lock(*this); // do not refresh while rescanning spent
     m_w2->rescan_spent();
@@ -3505,7 +3505,7 @@ namespace monero {
     int num_outputs = m_w2->import_multisig(multisig_blobs, refresh_after_import);
 
     // if daemon is trusted, rescan spent (directly since rescan_spent() locks m_sync_mutex)
-    if (is_daemon_trusted() && refresh_after_import) m_w2->rescan_spent();
+    if (refresh_after_import && is_daemon_trusted()) m_w2->rescan_spent();
 
     // return the number of outputs signed by the given multisig hex
     return num_outputs;
@@ -3703,6 +3703,7 @@ namespace monero {
     m_num_sync_pauses = 0;
     m_background_syncing = false;
     m_interrupt_sync = false;
+    m_sync_in_progress = false;
     m_is_closed = false;
   }
 
@@ -3990,6 +3991,7 @@ namespace monero {
     if (background && m_num_sync_pauses > 0) return result; // skip background sync while a wallet operation waits
     bool rescan = m_rescan_on_sync.exchange(false);
     m_background_syncing = background; // set under mutex so interrupts only target background sync
+    m_sync_in_progress = true;
     try {
       do {
         // verify connection with a live check, healing cached state; error so callers cannot mistake a skipped sync for success
@@ -4009,9 +4011,11 @@ namespace monero {
         }
       } while (!rescan && (rescan = m_rescan_on_sync.exchange(false))); // repeat if not rescanned and rescan was requested
     } catch (...) {
+      m_sync_in_progress = false;
       m_background_syncing = false;
       throw;
     }
+    m_sync_in_progress = false;
     m_background_syncing = false;
     return result;
   }
