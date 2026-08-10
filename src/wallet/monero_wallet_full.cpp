@@ -81,6 +81,7 @@ namespace monero {
 
   static const int DEFAULT_CONNECTION_TIMEOUT_MILLIS = 1000 * 30; // default connection timeout 30 sec
   static const bool STRICT_ = false; // relies exclusively on blockchain data if true, includes local wallet data if false TODO: good use case to expose externally? (note: cannot use `STRICT` due to namespace collision on Windows)
+  static const uint64_t SYNC_CHUNK_SIZE = 10000; // refresh far-behind wallets in bounded chunks so operations like save can interleave
 
   // ----------------------- INTERNAL PRIVATE HELPERS -----------------------
 
@@ -1562,6 +1563,7 @@ namespace monero {
   void monero_wallet_full::stop_syncing() {
     assert_not_closed();
     m_syncing_enabled = false;
+    m_interrupt_sync = true; // end an in-progress sync at the next chunk boundary
     m_w2->stop();
   }
 
@@ -3685,6 +3687,7 @@ namespace monero {
     m_sync_loop_running = false;
     m_num_sync_pauses = 0;
     m_background_syncing = false;
+    m_interrupt_sync = false;
     m_is_closed = false;
   }
 
@@ -3964,7 +3967,7 @@ namespace monero {
   }
 
   monero_sync_result monero_wallet_full::lock_and_sync(boost::optional<uint64_t> start_height, bool background) {
-    boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // synchronize sync() and syncAsync()
+    boost::unique_lock<boost::mutex> lock(m_sync_mutex); // synchronize sync() and syncAsync()
     assert_not_closed(); // wallet can be closed while waiting for the lock
     monero_sync_result result;
     result.m_num_blocks_fetched = 0;
@@ -3981,7 +3984,7 @@ namespace monero {
           if (rescan) m_w2->rescan_blockchain(false);
 
           // sync wallet
-          result = sync_aux(start_height);
+          result = sync_aux(start_height, lock);
         }
       } while (!rescan && (rescan = m_rescan_on_sync.exchange(false))); // repeat if not rescanned and rescan was requested
     } catch (...) {
@@ -3992,7 +3995,7 @@ namespace monero {
     return result;
   }
 
-  monero_sync_result monero_wallet_full::sync_aux(boost::optional<uint64_t> start_height) {
+  monero_sync_result monero_wallet_full::sync_aux(boost::optional<uint64_t> start_height, boost::unique_lock<boost::mutex>& lock) {
     MTRACE("sync_aux()");
 
     // determine sync start height
@@ -4002,10 +4005,37 @@ namespace monero {
     // notify listeners of sync start
     m_w2_listener->on_sync_start(sync_start_height);
     monero_sync_result result;
+    result.m_num_blocks_fetched = 0;
+    result.m_received_money = false;
 
     // attempt to refresh wallet2 which may throw exception
     try {
-      m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, result.m_num_blocks_fetched, result.m_received_money, true);
+
+      // refresh in bounded chunks like wallet-rpc, yielding between chunks so operations like save can interleave
+      m_interrupt_sync = false;
+      bool done = false;
+      while (!done) {
+        uint64_t blocks_fetched = 0;
+        bool received_money = false;
+        m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, blocks_fetched, received_money, true, true, SYNC_CHUNK_SIZE);
+        result.m_num_blocks_fetched += blocks_fetched;
+        if (received_money) result.m_received_money = true;
+        done = blocks_fetched == 0 || m_interrupt_sync;
+        if (!done && m_num_sync_pauses > 0) {
+          #if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
+          done = true; // single-threaded: a waiting operation can only run once this sync returns
+          #else
+          if (m_background_syncing) done = true; // let the waiting operation run; background sync resumes on its next cycle
+          else {
+            lock.unlock(); // yield to the waiting operation
+            while (m_num_sync_pauses > 0 && !m_is_closed) std::this_thread::sleep_for(std::chrono::milliseconds(3));
+            lock.lock();
+            if (m_is_closed) return result; // closed while yielded; listener is torn down so skip end notifications
+            if (m_interrupt_sync) done = true;
+          }
+          #endif
+        }
+      }
       if (!m_is_synced) m_is_synced = true;
       m_w2_listener->update_listening();  // cannot unregister during sync which would segfault
     } catch (std::exception& e) {
