@@ -4051,7 +4051,7 @@ namespace monero {
         uint64_t blocks_fetched = 0;
         bool received_money = false;
         m_w2->refresh(m_w2->is_trusted_daemon(), sync_start_height, blocks_fetched, received_money, true, true, SYNC_CHUNK_SIZE);
-        result.m_num_blocks_fetched += blocks_fetched;
+        if (m_w2->get_blockchain_current_height() >= sync_start_height) result.m_num_blocks_fetched += blocks_fetched; // chunks below the sync start skip hashes rather than fetch blocks
         if (received_money) result.m_received_money = true;
         done = blocks_fetched == 0 || m_interrupt_sync;
         if (!done && m_num_sync_pauses > 0) {
