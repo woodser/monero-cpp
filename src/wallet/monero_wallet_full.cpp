@@ -2691,6 +2691,7 @@ namespace monero {
     if (unsigned_tx_hex.empty() && multisig_tx_hex.empty()) throw std::runtime_error("no txset provided");
 
     std::vector <wallet2::tx_construction_data> tx_constructions;
+    std::vector<uint64_t> tx_weights;
     if (!unsigned_tx_hex.empty()) {
       try {
         tools::wallet2::unsigned_tx_set exported_txs;
@@ -2698,6 +2699,7 @@ namespace monero {
         if (!epee::string_tools::parse_hexstr_to_binbuff(unsigned_tx_hex, blob)) throw std::runtime_error("Failed to parse hex.");
         if (!m_w2->parse_unsigned_tx_from_str(blob, exported_txs)) throw std::runtime_error("cannot load unsigned_txset");
         tx_constructions = exported_txs.txes;
+        tx_weights.resize(tx_constructions.size()); // an unsigned txset does not contain a transaction with an exact weight yet
       }
       catch (const std::exception &e) {
         throw std::runtime_error("failed to parse unsigned transfers: " + std::string(e.what()));
@@ -2710,6 +2712,7 @@ namespace monero {
         if (!m_w2->parse_multisig_tx_from_str(blob, exported_txs)) throw std::runtime_error("cannot load multisig_txset");
         for (uint64_t n = 0; n < exported_txs.m_ptx.size(); ++n) {
           tx_constructions.push_back(exported_txs.m_ptx[n].construction_data);
+          tx_weights.push_back(cryptonote::get_transaction_weight(exported_txs.m_ptx[n].tx));
         }
       }
       catch (const std::exception &e) {
@@ -2823,6 +2826,7 @@ namespace monero {
         }
 
         tx->m_fee = tx->m_input_sum.get() - tx->m_output_sum.get();
+        if (tx_weights[n] > 0) tx->m_weight = tx_weights[n];
         tx->m_unlock_time = cd.unlock_time;
         tx->m_extra_hex = epee::to_hex::string({cd.extra.data(), cd.extra.size()});
         txs.push_back(tx);
