@@ -604,8 +604,8 @@ namespace monero {
     wallet2_listener(monero_wallet_full& wallet, tools::wallet2& wallet2) : m_wallet(wallet), m_w2(wallet2) {
       this->m_sync_start_height = boost::none;
       this->m_sync_end_height = boost::none;
-      m_prev_balance = wallet.get_balance();
-      m_prev_unlocked_balance = wallet.get_unlocked_balance();
+      m_prev_balance = wallet2.balance_all(STRICT_);
+      m_prev_unlocked_balance = wallet2.unlocked_balance_all(STRICT_);
       m_notification_pool = std::unique_ptr<tools::threadpool>(tools::threadpool::getNewForUnitTests(1));  // TODO (monero-project): utility can be for general use
     }
 
@@ -873,8 +873,8 @@ namespace monero {
     std::unique_ptr<tools::threadpool> m_notification_pool;  // threadpool of size 1 to queue notifications for external announcement
 
     bool check_for_changed_balances() {
-      uint64_t balance = m_wallet.get_balance();
-      uint64_t unlocked_balance = m_wallet.get_unlocked_balance();
+      uint64_t balance = m_w2.balance_all(STRICT_); // unlocked; announcing thread holds the sync lock
+      uint64_t unlocked_balance = m_w2.unlocked_balance_all(STRICT_);
       if (balance != m_prev_balance || unlocked_balance != m_prev_unlocked_balance) {
         m_prev_balance = balance;
         m_prev_unlocked_balance = unlocked_balance;
@@ -1377,6 +1377,7 @@ namespace monero {
   monero_subaddress monero_wallet_full::get_address_index(const std::string& address) const {
     MTRACE("get_address_index(" << address << ")");
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
 
     // validate address
     cryptonote::address_parse_info info;
@@ -1609,16 +1610,19 @@ namespace monero {
 
   uint64_t monero_wallet_full::get_balance() const {
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
     return m_w2->balance_all(STRICT_);
   }
 
   uint64_t monero_wallet_full::get_balance(uint32_t account_idx) const {
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
     return m_w2->balance(account_idx, STRICT_);
   }
 
   uint64_t monero_wallet_full::get_balance(uint32_t account_idx, uint32_t subaddress_idx) const {
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
     std::map<uint32_t, uint64_t> balance_per_subaddress = m_w2->balance_per_subaddress(account_idx, STRICT_);
     auto iter = balance_per_subaddress.find(subaddress_idx);
     return iter == balance_per_subaddress.end() ? 0 : iter->second;
@@ -1626,16 +1630,19 @@ namespace monero {
 
   uint64_t monero_wallet_full::get_unlocked_balance() const {
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
     return m_w2->unlocked_balance_all(STRICT_);
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance(uint32_t account_idx) const {
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
     return m_w2->unlocked_balance(account_idx, STRICT_);
   }
 
   uint64_t monero_wallet_full::get_unlocked_balance(uint32_t account_idx, uint32_t subaddress_idx) const {
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
     std::map<uint32_t, std::pair<uint64_t, std::pair<uint64_t, uint64_t>>> unlocked_balance_per_subaddress = m_w2->unlocked_balance_per_subaddress(account_idx, STRICT_);
     auto iter = unlocked_balance_per_subaddress.find(subaddress_idx);
     return iter == unlocked_balance_per_subaddress.end() ? 0 : iter->second.first;
@@ -1644,6 +1651,7 @@ namespace monero {
   std::vector<monero_account> monero_wallet_full::get_accounts(bool include_subaddresses, const std::string& tag) const {
     MTRACE("get_accounts(" << include_subaddresses << ", " << tag << ")");
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
 
     // need transfers to inform if subaddresses used
     std::vector<tools::wallet2::transfer_details> transfers;
@@ -1667,6 +1675,7 @@ namespace monero {
   monero_account monero_wallet_full::get_account(uint32_t account_idx, bool include_subaddresses) const {
     MTRACE("get_account(" << account_idx << ", " << include_subaddresses << ")");
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
 
     // need transfers to inform if subaddresses used
     std::vector<tools::wallet2::transfer_details> transfers;
@@ -1703,6 +1712,7 @@ namespace monero {
     MTRACE("get_subaddresses(" << account_idx << ", ...)");
     MTRACE("Subaddress indices size: " << subaddress_indices.size());
     assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
 
     std::vector<tools::wallet2::transfer_details> transfers;
     m_w2->get_transfers(transfers);
