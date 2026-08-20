@@ -69,7 +69,7 @@ namespace monero_utils
 
   // ------------------------------ CONSTANTS ---------------------------------
 
-  static const int RING_SIZE = 12;  // network-enforced ring size
+  static const int RING_SIZE = 16;  // network-enforced ring size
   static const uint64_t XMR_AU_MULTIPLIER = 1000000000000ULL;
 
   // -------------------------------- UTILS -----------------------------------
