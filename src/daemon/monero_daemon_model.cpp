@@ -803,7 +803,7 @@ namespace monero {
   void monero_prune_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_prune_result>& result) {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
-      if (key == std::string("pruned")) result->m_is_pruned = it->second.get_value<bool>();
+      if (key == std::string("isPruned")) result->m_is_pruned = it->second.get_value<bool>();
       else if (key == std::string("pruningSeed")) result->m_pruning_seed = it->second.get_value<int>();
     }
   }
@@ -982,6 +982,7 @@ namespace monero {
       else if (key == std::string("avgUpload")) peer->m_avg_upload = it->second.get_value<uint64_t>();
       else if (key == std::string("hash")) peer->m_hash = it->second.data();
       else if (key == std::string("height")) peer->m_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("isOnline")) peer->m_is_online = it->second.get_value<bool>();
       else if (key == std::string("isIncoming")) peer->m_is_incoming = it->second.get_value<bool>();
       else if (key == std::string("liveTime")) peer->m_live_time = it->second.get_value<uint64_t>();
       else if (key == std::string("isLocalIp")) peer->m_is_local_ip = it->second.get_value<bool>();
@@ -1042,6 +1043,7 @@ namespace monero {
     if (m_receive_idle_time != boost::none) monero_utils::add_json_member("receiveIdleTime", m_receive_idle_time.get(), allocator, root, value_num);
     if (m_send_idle_time != boost::none) monero_utils::add_json_member("sendIdleTime", m_send_idle_time.get(), allocator, root, value_num);
     if (m_num_support_flags != boost::none) monero_utils::add_json_member("numSupportFlags", m_num_support_flags.get(), allocator, root, value_num);
+    if (m_connection_type != boost::none) monero_utils::add_json_member("addressType", (int)m_connection_type.get(), allocator, root, value_num);
 
     // set bool values
     if (m_is_online != boost::none) monero_utils::add_json_member("isOnline", m_is_online.get(), allocator, root);
@@ -1060,7 +1062,8 @@ namespace monero {
 
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
-      if (key == std::string("isDoubleSpend")) result->m_is_double_spend = it->second.get_value<bool>();
+      if (key == std::string("isGood")) result->m_is_good = it->second.get_value<bool>();
+      else if (key == std::string("isDoubleSpend")) result->m_is_double_spend = it->second.get_value<bool>();
       else if (key == std::string("isFeeTooLow")) result->m_is_fee_too_low = it->second.get_value<bool>();
       else if (key == std::string("hasInvalidInput")) result->m_has_invalid_input = it->second.get_value<bool>();
       else if (key == std::string("hasInvalidOutput")) result->m_has_invalid_output = it->second.get_value<bool>();
@@ -1181,7 +1184,9 @@ namespace monero {
       else if (key == std::string("histo98pc")) stats->m_histo98pc = it->second.get_value<uint64_t>();
       else if (key == std::string("oldestTimestamp")) stats->m_oldest_timestamp = it->second.get_value<uint64_t>();
       else if (key == std::string("histo")) {
-        // TODO implement histogram deserialization
+        for (const auto& child : it->second) {
+          stats->m_histo[std::stoull(child.first)] = child.second.get_value<uint64_t>();
+        }
       }
     }
   }
@@ -1414,6 +1419,20 @@ namespace monero {
       else if (key == std::string("targetHeight")) info->m_target_height = it->second.get_value<uint64_t>();
       else if (key == std::string("nextNeededPruningSeed")) info->m_next_needed_pruning_seed = it->second.get_value<int>();
       else if (key == std::string("overview") && !it->second.data().empty() && it->second.data() != std::string("[]")) info->m_overview = it->second.data();
+      else if (key == std::string("peers")) {
+        for (const auto& child : it->second) {
+          std::shared_ptr<monero_peer> peer = std::make_shared<monero_peer>();
+          monero_peer::from_property_tree(child.second, peer);
+          info->m_peers.push_back(peer);
+        }
+      }
+      else if (key == std::string("spans")) {
+        for (const auto& child : it->second) {
+          std::shared_ptr<monero_connection_span> span = std::make_shared<monero_connection_span>();
+          monero_connection_span::from_property_tree(child.second, span);
+          info->m_spans.push_back(span);
+        }
+      }
     }
   }
 
