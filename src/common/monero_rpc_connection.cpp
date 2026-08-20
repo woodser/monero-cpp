@@ -433,6 +433,8 @@ namespace monero {
       else if (key == std::string("password")) connection->m_password = it->second.data();
       else if (key == std::string("proxyUri") || key == std::string("proxy_uri")) connection->m_proxy_uri = it->second.data();
       else if (key == std::string("zmqUri")) connection->m_zmq_uri = it->second.data();
+      else if (key == std::string("priority")) connection->m_priority = it->second.get_value<int>();
+      else if (key == std::string("timeoutMs")) connection->m_timeout_ms = it->second.get_value<uint32_t>();
     }
     return connection;
   }

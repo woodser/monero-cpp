@@ -311,8 +311,6 @@ namespace monero {
    * All transactions are returned except those that do not meet the criteria defined in this query.
    */
   struct monero_tx_query : public monero_tx_wallet {
-    boost::optional<bool> m_is_outgoing;
-    boost::optional<bool> m_is_incoming;
     std::vector<std::string> m_hashes;
     boost::optional<bool> m_has_payment_id;
     std::vector<std::string> m_payment_ids;

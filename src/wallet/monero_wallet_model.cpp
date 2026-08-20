@@ -221,6 +221,13 @@ namespace monero {
       else if (key == std::string("unlockedBalance")) account->m_unlocked_balance = it->second.get_value<uint64_t>();
       else if (key == std::string("primaryAddress")) account->m_primary_address = it->second.data();
       else if (key == std::string("tag") && !it->second.data().empty()) account->m_tag = it->second.data();
+      else if (key == std::string("subaddresses")) {
+        for (const auto& child : it->second) {
+          std::shared_ptr<monero_subaddress> subaddress = std::make_shared<monero_subaddress>();
+          monero_subaddress::from_property_tree(child.second, subaddress);
+          account->m_subaddresses.push_back(*subaddress);
+        }
+      }
     }
   }
 
@@ -499,8 +506,6 @@ namespace monero {
     if (m_max_height != boost::none) monero_utils::add_json_member("maxHeight", m_max_height.get(), allocator, root, value_num);
 
     // set bool values
-    if (m_is_outgoing != boost::none) monero_utils::add_json_member("isOutgoing", m_is_outgoing.get(), allocator, root);
-    if (m_is_incoming != boost::none) monero_utils::add_json_member("isIncoming", m_is_incoming.get(), allocator, root);
     if (m_has_payment_id != boost::none) monero_utils::add_json_member("hasPaymentId", m_has_payment_id.get(), allocator, root);
     if (m_include_outputs != boost::none) monero_utils::add_json_member("includeOutputs", m_include_outputs.get(), allocator, root);
 
@@ -521,9 +526,7 @@ namespace monero {
     // initialize query from node
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
-      if (key == std::string("isOutgoing")) tx_query->m_is_outgoing = it->second.get_value<bool>();
-      else if (key == std::string("isIncoming")) tx_query->m_is_incoming = it->second.get_value<bool>();
-      else if (key == std::string("hashes")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) tx_query->m_hashes.push_back(it2->second.data());
+      if (key == std::string("hashes")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) tx_query->m_hashes.push_back(it2->second.data());
       else if (key == std::string("hasPaymentId")) tx_query->m_has_payment_id = it->second.get_value<bool>();
       else if (key == std::string("paymentIds")) for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) tx_query->m_payment_ids.push_back(it2->second.data());
       else if (key == std::string("height")) tx_query->m_height = it->second.get_value<uint64_t>();
