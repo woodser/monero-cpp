@@ -1565,7 +1565,7 @@ namespace monero {
     assert_not_closed();
     m_syncing_enabled = false;
     m_interrupt_sync = true; // end an in-progress sync at the next chunk boundary
-    if (m_sync_in_progress) m_w2->stop(); // abort the sync's in-flight daemon request, not an idle client
+    if (m_sync_in_progress) m_w2->stop(); // end wallet2's refresh at its next chunk boundary
   }
 
   void monero_wallet_full::scan_txs(const std::vector<std::string>& tx_ids) {
@@ -3661,6 +3661,7 @@ namespace monero {
     MTRACE("close()");
     if (m_is_closed) return; // closing a closed wallet has no effect
     stop_syncing(); // prevent sync thread from starting again and interrupt refresh
+    m_w2->shutdown(); // teardown: refresh cannot re-arm, and an in-flight daemon request is aborted
     if (m_sync_loop_running) {
       m_sync_cv.notify_one();
       std::this_thread::sleep_for(std::chrono::milliseconds(1));  // TODO: in emscripten, m_sync_cv.notify_one() returns without waiting, so sleep; bug in emscripten upstream llvm?
@@ -3668,7 +3669,6 @@ namespace monero {
     }
     boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // wait for external sync to finish before saving or tearing down
     if (save) m_w2->store(); // store directly since save() locks m_sync_mutex
-    m_w2->stop();
     m_w2->deinit();
     m_w2->callback(nullptr);  // unregister listener after sync
     m_w2_listener.reset();    // wait for queued notifications
