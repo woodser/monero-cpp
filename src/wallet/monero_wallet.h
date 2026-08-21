@@ -946,6 +946,7 @@ namespace monero {
      * @return the hash of the relayed tx
      */
     virtual std::string relay_tx(const monero_tx_wallet& tx) {
+      if (tx.m_metadata == boost::none || tx.m_metadata.get().empty()) throw std::runtime_error("Tx metadata is not initialized");
       return relay_tx(tx.m_metadata.get());
     }
 
@@ -957,7 +958,10 @@ namespace monero {
      */
     virtual std::vector<std::string> relay_txs(const std::vector<std::shared_ptr<monero_tx_wallet>>& txs) {
       std::vector<std::string> tx_hexes;
-      for (const std::shared_ptr<monero_tx_wallet>& tx : txs) tx_hexes.push_back(tx->m_metadata.get());
+      for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
+        if (tx == nullptr || tx->m_metadata == boost::none || tx->m_metadata.get().empty()) throw std::runtime_error("Tx metadata is not initialized");
+        tx_hexes.push_back(tx->m_metadata.get());
+      }
       return relay_txs(tx_hexes);
     }
 
