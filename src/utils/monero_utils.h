@@ -233,6 +233,7 @@ namespace monero_utils
     std::vector<std::shared_ptr<monero_block>> blocks;
     std::unordered_set<std::shared_ptr<monero_block>> seen_block_ptrs;
     for (auto const& transfer : transfers) {
+      if (transfer->m_tx == nullptr) throw std::runtime_error("Transfer has no tx");
       std::shared_ptr<monero_tx_wallet> tx = transfer->m_tx;
       if (tx->m_block == nullptr) {
         if (unconfirmed_block == nullptr) unconfirmed_block = std::make_shared<monero_block>();
@@ -252,6 +253,7 @@ namespace monero_utils
     std::vector<std::shared_ptr<monero_block>> blocks;
     std::unordered_set<std::shared_ptr<monero_block>> seen_block_ptrs;
     for (auto const& output : outputs) {
+      if (output->m_tx == nullptr) throw std::runtime_error("Output has no tx");
       std::shared_ptr<monero_tx_wallet> tx = std::static_pointer_cast<monero_tx_wallet>(output->m_tx);
       if (tx->m_block == nullptr) throw std::runtime_error("Need to handle unconfirmed output");
       std::unordered_set<std::shared_ptr<monero_block>>::const_iterator got = seen_block_ptrs.find(tx->m_block);
@@ -266,6 +268,7 @@ namespace monero_utils
   // ------------------------------ FREE MEMORY -------------------------------
 
   static void free(std::shared_ptr<monero_block> block) {
+    if (block == nullptr) return;
     for (std::shared_ptr<monero_tx>& tx : block->m_txs) {
       tx->m_block.reset();
       monero_tx_wallet* tx_wallet = dynamic_cast<monero_tx_wallet*>(tx.get());
@@ -299,6 +302,7 @@ namespace monero_utils
   }
 
   static void free(std::shared_ptr<monero_tx> tx) {
+    if (tx == nullptr) return;
     if (tx->m_block == nullptr) {
       std::shared_ptr<monero_block> block = std::make_shared<monero_block>();
       tx->m_block = block;
