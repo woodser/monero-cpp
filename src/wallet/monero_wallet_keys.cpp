@@ -228,7 +228,53 @@ namespace monero {
     close();
   }
 
+  bool monero_wallet_keys::is_view_only() const {
+    assert_not_closed();
+    return m_is_view_only;
+  }
+
+  monero_network_type monero_wallet_keys::get_network_type() const {
+    assert_not_closed();
+    return m_network_type;
+  }
+
+  std::string monero_wallet_keys::get_seed() const {
+    assert_not_closed();
+    return m_seed;
+  }
+
+  std::string monero_wallet_keys::get_seed_language() const {
+    assert_not_closed();
+    return m_language;
+  }
+
+  std::string monero_wallet_keys::get_private_view_key() const {
+    assert_not_closed();
+    return m_prv_view_key;
+  }
+
+  std::string monero_wallet_keys::get_private_spend_key() const {
+    assert_not_closed();
+    return m_prv_spend_key;
+  }
+
+  std::string monero_wallet_keys::get_public_view_key() const {
+    assert_not_closed();
+    return m_pub_view_key;
+  }
+
+  std::string monero_wallet_keys::get_public_spend_key() const {
+    assert_not_closed();
+    return m_pub_spend_key;
+  }
+
+  std::string monero_wallet_keys::get_primary_address() const {
+    assert_not_closed();
+    return m_primary_address;
+  }
+
   monero_version monero_wallet_keys::get_version() const {
+    assert_not_closed();
     monero_version version;
     version.m_number = 65552; // same as monero-wallet-rpc v0.15.0.1 release
     version.m_is_release = false; // TODO: could pull from MONERO_VERSION_IS_RELEASE in version.cpp
@@ -236,6 +282,7 @@ namespace monero {
   }
 
   std::string monero_wallet_keys::get_address(uint32_t account_idx, uint32_t subaddress_idx) const {
+    assert_not_closed();
     hw::device &hwdev = m_account.get_device();
     cryptonote::subaddress_index index{account_idx, subaddress_idx};
     cryptonote::account_public_address address = hwdev.get_subaddress(m_account.get_keys(), index);
@@ -244,16 +291,19 @@ namespace monero {
 
   monero_integrated_address monero_wallet_keys::get_integrated_address(const std::string& standard_address, const std::string& payment_id) const {
     MTRACE("monero_wallet_keys::get_integrated_address()");
+    assert_not_closed();
     throw std::runtime_error("monero_wallet_keys::get_integrated_address() not implemented");
   }
 
   monero_integrated_address monero_wallet_keys::decode_integrated_address(const std::string& integrated_address) const {
     MTRACE("monero_wallet_keys::decode_integrated_address()");
+    assert_not_closed();
     throw std::runtime_error("monero_wallet_keys::decode_integrated_address() not implemented");
   }
 
   monero_account monero_wallet_keys::get_account(uint32_t account_idx, bool include_subaddresses) const {
     MTRACE("monero_wallet_keys::get_account()");
+    assert_not_closed();
 
     if (include_subaddresses) {
       std::string err = "monero_wallet_keys::get_account(account_idx, include_subaddresses) include_subaddresses must be false";
@@ -269,6 +319,7 @@ namespace monero {
   }
 
   std::vector<monero_subaddress> monero_wallet_keys::get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const {
+    assert_not_closed();
 
     // must provide subaddress indices
     if (subaddress_indices.empty()) {
@@ -293,17 +344,21 @@ namespace monero {
 
   std::string monero_wallet_keys::sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx, uint32_t subaddress_idx) const {
     MTRACE("monero_wallet_keys::sign_message()");
+    assert_not_closed();
     throw std::runtime_error("monero_wallet_keys::sign_message() not implemented");
   }
 
   monero_message_signature_result monero_wallet_keys::verify_message(const std::string& msg, const std::string& address, const std::string& signature) const {
     MTRACE("monero_wallet_keys::verify_message()");
+    assert_not_closed();
     throw std::runtime_error("monero_wallet_keys::verify_message() not implemented");
   }
 
   void monero_wallet_keys::close(bool save) {
+    if (m_is_closed) return; // closing a closed wallet has no effect
     if (save) throw std::runtime_error("MoneroWalletKeys does not support saving");
     // no pointers to destroy
+    m_is_closed = true;
   }
 
   // ------------------------------- PRIVATE HELPERS ----------------------------
@@ -316,5 +371,10 @@ namespace monero {
     m_pub_spend_key = epee::string_tools::pod_to_hex(keys.m_account_address.m_spend_public_key);
     m_prv_spend_key = epee::string_tools::pod_to_hex(unwrap(unwrap(keys.m_spend_secret_key)));
     if (m_prv_spend_key == "0000000000000000000000000000000000000000000000000000000000000000") m_prv_spend_key = "";
+    m_is_closed = false;
+  }
+
+  void monero_wallet_keys::assert_not_closed() const {
+    if (m_is_closed) throw std::runtime_error("Wallet is closed");
   }
 }
