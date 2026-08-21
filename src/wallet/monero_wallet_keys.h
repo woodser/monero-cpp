@@ -54,6 +54,7 @@
 
 #include "monero_wallet.h"
 #include "cryptonote_basic/account.h"
+#include <atomic>
 
 using namespace monero;
 
@@ -109,16 +110,16 @@ namespace monero {
     /**
      * Supported wallet methods.
      */
-    bool is_view_only() const override { return m_is_view_only; }
+    bool is_view_only() const override;
     monero_version get_version() const override;
-    monero_network_type get_network_type() const override { return m_network_type; }
-    std::string get_seed() const override { return m_seed; }
-    std::string get_seed_language() const override { return m_language; }
-    std::string get_private_view_key() const override { return m_prv_view_key; }
-    std::string get_private_spend_key() const override { return m_prv_spend_key; }
-    std::string get_public_view_key() const override { return m_pub_view_key; }
-    std::string get_public_spend_key() const override { return m_pub_spend_key; }
-    std::string get_primary_address() const override { return m_primary_address; }
+    monero_network_type get_network_type() const override;
+    std::string get_seed() const override;
+    std::string get_seed_language() const override;
+    std::string get_private_view_key() const override;
+    std::string get_private_spend_key() const override;
+    std::string get_public_view_key() const override;
+    std::string get_public_spend_key() const override;
+    std::string get_primary_address() const override;
     std::string get_address(const uint32_t account_idx, const uint32_t subaddress_idx) const override;
     monero_integrated_address get_integrated_address(const std::string& standard_address = "", const std::string& payment_id = "") const override;
     monero_integrated_address decode_integrated_address(const std::string& integrated_address) const override;
@@ -127,6 +128,7 @@ namespace monero {
     std::string sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx = 0, uint32_t subaddress_idx = 0) const override;
     monero_message_signature_result verify_message(const std::string& msg, const std::string& address, const std::string& signature) const override;
     void close(bool save = false) override;
+    bool is_closed() const override { return m_is_closed; }
 
     // --------------------------------- PRIVATE --------------------------------
 
@@ -141,7 +143,9 @@ namespace monero {
     std::string m_pub_spend_key;
     std::string m_prv_spend_key;
     std::string m_primary_address;
+    std::atomic<bool> m_is_closed{false};
 
     void init_common();
+    void assert_not_closed() const;
   };
 }
