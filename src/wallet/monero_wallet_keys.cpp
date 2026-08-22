@@ -61,6 +61,8 @@
 #include "cryptonote_basic/cryptonote_basic_impl.h"
 #include "string_tools.h"
 #include "device/device.hpp"
+#include "version.h"
+#include "wallet/wallet_rpc_server_commands_defs.h"
 
 using namespace epee;
 using namespace tools;
@@ -276,8 +278,8 @@ namespace monero {
   monero_version monero_wallet_keys::get_version() const {
     assert_not_closed();
     monero_version version;
-    version.m_number = 65552; // same as monero-wallet-rpc v0.15.0.1 release
-    version.m_is_release = false; // TODO: could pull from MONERO_VERSION_IS_RELEASE in version.cpp
+    version.m_number = WALLET_RPC_VERSION; // matches the version reported by monero-wallet-rpc's get_version
+    version.m_is_release = MONERO_VERSION_IS_RELEASE;
     return version;
   }
 
