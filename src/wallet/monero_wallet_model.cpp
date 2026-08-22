@@ -337,7 +337,26 @@ namespace monero {
 
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
-      if (key == std::string("txSet")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
+      // monero_tx::from_property_tree() parses m_inputs/m_outputs as monero_output, re-parse them here as monero_output_wallet
+      if (key == std::string("inputs")) {
+        size_t i = 0;
+        for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2, ++i) {
+          std::shared_ptr<monero_output_wallet> input_wallet = std::make_shared<monero_output_wallet>();
+          monero_output_wallet::from_property_tree(it2->second, input_wallet);
+          input_wallet->m_tx = tx_wallet;
+          tx_wallet->m_inputs.at(i) = input_wallet;
+        }
+      }
+      else if (key == std::string("outputs")) {
+        size_t i = 0;
+        for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2, ++i) {
+          std::shared_ptr<monero_output_wallet> output_wallet = std::make_shared<monero_output_wallet>();
+          monero_output_wallet::from_property_tree(it2->second, output_wallet);
+          output_wallet->m_tx = tx_wallet;
+          tx_wallet->m_outputs.at(i) = output_wallet;
+        }
+      }
+      else if (key == std::string("txSet")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
       else if (key == std::string("isIncoming")) tx_wallet->m_is_incoming = it->second.get_value<bool>();
       else if (key == std::string("isOutgoing")) tx_wallet->m_is_outgoing = it->second.get_value<bool>();
       else if (key == std::string("incomingTransfers")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
@@ -362,6 +381,22 @@ namespace monero {
 
     // copy base class
     monero_tx::copy(std::static_pointer_cast<monero_tx>(src), std::static_pointer_cast<monero_tx>(tgt));
+
+    // monero_tx::copy() copies m_inputs/m_outputs to monero_output, re-copy them here as monero_output_wallet
+    for (size_t i = 0; i < src->m_inputs.size(); ++i) {
+      std::shared_ptr<monero_output_wallet> input_wallet = std::dynamic_pointer_cast<monero_output_wallet>(src->m_inputs[i]);
+      if (input_wallet == nullptr) continue;
+      std::shared_ptr<monero_output_wallet> input_wallet_copy = input_wallet->copy(input_wallet, std::make_shared<monero_output_wallet>());
+      input_wallet_copy->m_tx = tgt;
+      tgt->m_inputs[i] = input_wallet_copy;
+    }
+    for (size_t i = 0; i < src->m_outputs.size(); ++i) {
+      std::shared_ptr<monero_output_wallet> output_wallet = std::dynamic_pointer_cast<monero_output_wallet>(src->m_outputs[i]);
+      if (output_wallet == nullptr) continue;
+      std::shared_ptr<monero_output_wallet> output_wallet_copy = output_wallet->copy(output_wallet, std::make_shared<monero_output_wallet>());
+      output_wallet_copy->m_tx = tgt;
+      tgt->m_outputs[i] = output_wallet_copy;
+    }
 
     // copy wallet extensions
     tgt->m_tx_set = src->m_tx_set;
