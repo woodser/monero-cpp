@@ -371,10 +371,11 @@ namespace monero {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("hash")) tx->m_hash = it->second.data();
-      else if (key == std::string("version")) throw std::runtime_error("version deserialization not implemented");
+      else if (key == std::string("version")) tx->m_version = it->second.get_value<uint32_t>();
       else if (key == std::string("isMinerTx")) tx->m_is_miner_tx = it->second.get_value<bool>();
       else if (key == std::string("paymentId")) tx->m_payment_id = it->second.data();
       else if (key == std::string("fee")) tx->m_fee = it->second.get_value<uint64_t>();
+      else if (key == std::string("ringSize")) tx->m_ring_size = it->second.get_value<uint32_t>();
       else if (key == std::string("mixin")) throw std::runtime_error("mixin deserialization not implemented");
       else if (key == std::string("relay")) tx->m_relay = it->second.get_value<bool>();
       else if (key == std::string("isRelayed")) tx->m_is_relayed = it->second.get_value<bool>();
@@ -392,19 +393,41 @@ namespace monero {
       else if (key == std::string("prunableHash")) tx->m_prunable_hash = it->second.data();
       else if (key == std::string("size")) tx->m_size = it->second.get_value<uint64_t>();
       else if (key == std::string("weight")) tx->m_weight = it->second.get_value<uint64_t>();
-      else if (key == std::string("inputs")) throw std::runtime_error("inputs deserialization not implemented");
-      else if (key == std::string("outputs")) throw std::runtime_error("outputs deserialization not implemented");
-      else if (key == std::string("outputIndices")) throw std::runtime_error("m_output_indices deserialization not implemented");
+      else if (key == std::string("inputs")) {
+        for (boost::property_tree::ptree::const_iterator it_input = it->second.begin(); it_input != it->second.end(); ++it_input) {
+          std::shared_ptr<monero_output> input = std::make_shared<monero_output>();
+          monero_output::from_property_tree(it_input->second, input);
+          input->m_tx = tx;
+          tx->m_inputs.push_back(input);
+        }
+      }
+      else if (key == std::string("outputs")) {
+        for (boost::property_tree::ptree::const_iterator it_output = it->second.begin(); it_output != it->second.end(); ++it_output) {
+          std::shared_ptr<monero_output> output = std::make_shared<monero_output>();
+          monero_output::from_property_tree(it_output->second, output);
+          output->m_tx = tx;
+          tx->m_outputs.push_back(output);
+        }
+      }
+      else if (key == std::string("outputIndices")) {
+        for (boost::property_tree::ptree::const_iterator it_idx = it->second.begin(); it_idx != it->second.end(); ++it_idx) {
+          tx->m_output_indices.push_back(it_idx->second.get_value<uint64_t>());
+        }
+      }
       else if (key == std::string("metadata")) tx->m_metadata = it->second.data();
-      else if (key == std::string("commonTxSets")) throw std::runtime_error("commonTxSets deserialization not implemented");
-      else if (key == std::string("extra")) throw std::runtime_error("extra deserialization not implemented");
+      else if (key == std::string("commonTxSets")) tx->m_common_tx_sets = it->second.data();
+      else if (key == std::string("extra")) {
+        for (boost::property_tree::ptree::const_iterator it_extra = it->second.begin(); it_extra != it->second.end(); ++it_extra) {
+          tx->m_extra.push_back(it_extra->second.get_value<uint8_t>());
+        }
+      }
       else if (key == std::string("rctSignatures")) throw std::runtime_error("rctSignatures deserialization not implemented");
       else if (key == std::string("rctSigPrunable")) throw std::runtime_error("rctSigPrunable deserialization not implemented");
       else if (key == std::string("isKeptByBlock")) tx->m_is_kept_by_block = it->second.get_value<bool>();
       else if (key == std::string("isFailed")) tx->m_is_failed = it->second.get_value<bool>();
-      else if (key == std::string("lastFailedHeight")) throw std::runtime_error("lastFailedHeight deserialization not implemented");
+      else if (key == std::string("lastFailedHeight")) tx->m_last_failed_height = it->second.get_value<uint64_t>();
       else if (key == std::string("lastFailedHash")) tx->m_last_failed_hash = it->second.data();
-      else if (key == std::string("maxUsedBlockHeight")) throw std::runtime_error("maxUsedBlockHeight deserialization not implemented");
+      else if (key == std::string("maxUsedBlockHeight")) tx->m_max_used_block_height = it->second.get_value<uint64_t>();
       else if (key == std::string("maxUsedBlockHash")) tx->m_max_used_block_hash = it->second.data();
       else if (key == std::string("signatures")) throw std::runtime_error("signatures deserialization not implemented");
     }
@@ -453,7 +476,7 @@ namespace monero {
     if (!src->m_output_indices.empty()) tgt->m_output_indices = std::vector<uint64_t>(src->m_output_indices);
     tgt->m_metadata = src->m_metadata;
     tgt->m_common_tx_sets = src->m_common_tx_sets;
-    if (!src->m_extra.empty()) throw std::runtime_error("extra deep copy not implemented");  // TODO: implement extra
+    if (!src->m_extra.empty()) tgt->m_extra = std::vector<uint8_t>(src->m_extra);
     tgt->m_rct_signatures = src->m_rct_signatures;
     tgt->m_rct_sig_prunable = src->m_rct_sig_prunable;
     tgt->m_is_kept_by_block = src->m_is_kept_by_block;
@@ -504,10 +527,10 @@ namespace monero {
     m_prunable_hash = gen_utils::reconcile(m_prunable_hash, other->m_prunable_hash, "tx m_prunable_hash");
     m_size = gen_utils::reconcile(m_size, other->m_size, "tx m_size");
     m_weight = gen_utils::reconcile(m_weight, other->m_weight, "tx m_weight");
-    //m_output_indices = gen_utils::reconcile(m_output_indices, other->m_output_indices, "tx m_output_indices");  // TODO
+    m_output_indices = gen_utils::reconcile(m_output_indices, other->m_output_indices, "tx m_output_indices");
     m_metadata = gen_utils::reconcile(m_metadata, other->m_metadata, "tx m_metadata");
     m_common_tx_sets = gen_utils::reconcile(m_common_tx_sets, other->m_common_tx_sets, "tx m_common_tx_sets");
-    //m_extra = gen_utils::reconcile(m_extra, other->m_extra, "tx m_extra");  // TODO
+    m_extra = gen_utils::reconcile(m_extra, other->m_extra, "tx m_extra");
     m_rct_signatures = gen_utils::reconcile(m_rct_signatures, other->m_rct_signatures, "tx m_rct_signatures");
     m_rct_sig_prunable = gen_utils::reconcile(m_rct_sig_prunable, other->m_rct_sig_prunable, "tx m_rct_sig_prunable");
     m_is_kept_by_block = gen_utils::reconcile(m_is_kept_by_block, other->m_is_kept_by_block, "tx m_is_kept_by_block");
@@ -669,8 +692,12 @@ namespace monero {
       }
       else if (key == std::string("amount")) output->m_amount = it->second.get_value<uint64_t>();
       else if (key == std::string("index")) output->m_index = it->second.get_value<uint32_t>();
-      else if (key == std::string("ringOutputIndices")) throw std::runtime_error("node_to_tx() deserialize ringOutputIndices not implemented");
-      else if (key == std::string("stealthPublicKey")) throw std::runtime_error("node_to_tx() deserialize stealthPublicKey not implemented");
+      else if (key == std::string("ringOutputIndices")) {
+        for (boost::property_tree::ptree::const_iterator it_idx = it->second.begin(); it_idx != it->second.end(); ++it_idx) {
+          output->m_ring_output_indices.push_back(it_idx->second.get_value<uint64_t>());
+        }
+      }
+      else if (key == std::string("stealthPublicKey")) output->m_stealth_public_key = it->second.data();
     }
   }
 
@@ -700,6 +727,8 @@ namespace monero {
     else if (other->m_key_image != nullptr) m_key_image->merge(m_key_image, other->m_key_image);
     m_amount = gen_utils::reconcile(m_amount, other->m_amount, "output amount");
     m_index = gen_utils::reconcile(m_index, other->m_index, "output index");
+    m_ring_output_indices = gen_utils::reconcile(m_ring_output_indices, other->m_ring_output_indices, "output m_ring_output_indices");
+    m_stealth_public_key = gen_utils::reconcile(m_stealth_public_key, other->m_stealth_public_key, "output m_stealth_public_key");
   }
 
   // --------------------------- MONERO RPC PAYMENT INFO ---------------------------
