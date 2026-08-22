@@ -515,6 +515,8 @@ namespace monero {
 
     // set sub-objects
     if (m_transfer_query != nullptr) root.AddMember("transferQuery", m_transfer_query->to_rapidjson_val(allocator), allocator);
+    if (m_input_query != nullptr) root.AddMember("inputQuery", m_input_query->to_rapidjson_val(allocator), allocator);
+    if (m_output_query != nullptr) root.AddMember("outputQuery", m_output_query->to_rapidjson_val(allocator), allocator);
 
     // return root
     return root;
@@ -766,6 +768,7 @@ namespace monero {
       std::string key = it->first;
       if (key == std::string("unsignedTxHex")) tx_set.m_unsigned_tx_hex = it->second.data();
       else if (key == std::string("multisigTxHex")) tx_set.m_multisig_tx_hex = it->second.data();
+      else if (key == std::string("signedTxHex")) tx_set.m_signed_tx_hex = it->second.data();
       else if (key == std::string("txs")) {
         boost::property_tree::ptree txs_node = it->second;
         for (boost::property_tree::ptree::const_iterator it2 = txs_node.begin(); it2 != txs_node.end(); ++it2) {
@@ -786,6 +789,13 @@ namespace monero {
       if (key == std::string("multisigTxHex") && !it->second.data().empty()) set->m_multisig_tx_hex = it->second.data();
       else if (key == std::string("unsignedTxHex") && !it->second.data().empty()) set->m_unsigned_tx_hex = it->second.data();
       else if (key == std::string("signedTxHex") && !it->second.data().empty()) set->m_signed_tx_hex = it->second.data();
+      else if (key == std::string("txs")) {
+        for (boost::property_tree::ptree::const_iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          std::shared_ptr<monero_tx_wallet> tx_wallet = std::make_shared<monero_tx_wallet>();
+          monero_tx_wallet::from_property_tree(it2->second, tx_wallet);
+          set->m_txs.push_back(tx_wallet);
+        }
+      }
     }
   }
 
