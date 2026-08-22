@@ -718,7 +718,7 @@ namespace monero {
           // free memory
           monero_utils::free(tx);
         } catch (std::exception& e) {
-          std::cout << "Error processing unconfirmed output received: " << std::string(e.what()) << std::endl;
+          MERROR("Error processing unconfirmed output received: " << std::string(e.what()));
         }
       });
       waiter.wait();
@@ -760,7 +760,7 @@ namespace monero {
           // free memory
           monero_utils::free(block);
         } catch (std::exception& e) {
-          std::cout << "Error processing confirmed output received: " << std::string(e.what()) << std::endl;
+          MERROR("Error processing confirmed output received: " << std::string(e.what()));
         }
       });
       waiter.wait();
@@ -802,7 +802,7 @@ namespace monero {
           // free memory
           monero_utils::free(block);
         } catch (std::exception& e) {
-          std::cout << "Error processing confirmed output spent: " << std::string(e.what()) << std::endl;
+          MERROR("Error processing confirmed output spent: " << std::string(e.what()));
         }
       });
       waiter.wait();
@@ -1790,7 +1790,7 @@ namespace monero {
     // special case: re-fetch txs if inconsistency caused by needing to make multiple wallet calls  // TODO monero-project: offer wallet.get_txs(...)
     for (const std::shared_ptr<monero_tx_wallet>& tx : txs) {
       if ((*tx->m_is_confirmed && tx->m_block == nullptr) || (!*tx->m_is_confirmed && tx->m_block != nullptr)) {
-        std::cout << "WARNING: Inconsistency detected building txs from multiple wallet2 calls, re-fetching" << std::endl;
+        MWARNING("Inconsistency detected building txs from multiple wallet2 calls, re-fetching");
         monero_utils::free(txs);
         txs.clear();
         txs = get_txs(*_query);
@@ -3907,8 +3907,8 @@ namespace monero {
       while (m_syncing_enabled) {
         if (m_num_sync_pauses == 0) {
           try { lock_and_sync(boost::none, true); }
-          catch (std::exception const& e) { std::cout << "monero_wallet_full failed to background synchronize: " << e.what() << std::endl; }
-          catch (...) { std::cout << "monero_wallet_full failed to background synchronize" << std::endl; }
+          catch (std::exception const& e) { MERROR("monero_wallet_full failed to background synchronize: " << std::string(e.what())); }
+          catch (...) { MERROR("monero_wallet_full failed to background synchronize"); }
         }
 
         // only wait if syncing still enabled
