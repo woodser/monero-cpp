@@ -133,7 +133,7 @@ namespace monero {
     // --------------------------------- PRIVATE --------------------------------
 
   private:
-    bool m_is_view_only;
+    bool m_is_view_only = false;
     monero_network_type m_network_type;
     cryptonote::account_base m_account;
     std::string m_seed;

@@ -242,11 +242,13 @@ namespace monero {
 
   std::string monero_wallet_keys::get_seed() const {
     assert_not_closed();
+    if (m_is_view_only) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed.");
     return m_seed;
   }
 
   std::string monero_wallet_keys::get_seed_language() const {
     assert_not_closed();
+    if (m_is_view_only) throw std::runtime_error("The wallet is watch-only. Cannot retrieve seed language.");
     return m_language;
   }
 
@@ -257,6 +259,7 @@ namespace monero {
 
   std::string monero_wallet_keys::get_private_spend_key() const {
     assert_not_closed();
+    if (m_is_view_only) throw std::runtime_error("The wallet is watch-only. Cannot retrieve spend key.");
     return m_prv_spend_key;
   }
 
