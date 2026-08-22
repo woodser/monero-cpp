@@ -1232,6 +1232,9 @@ namespace monero {
     auto params = std::make_shared<monero_verify_sign_message_params>(msg, address, signature);
     monero_message_signature_result sig_result;
     sig_result.m_is_good = false;
+    sig_result.m_is_old = false;
+    sig_result.m_version = 0;
+    sig_result.m_signature_type = monero_message_signature_type::SIGN_WITH_SPEND_KEY;
     try {
       auto result = m_rpc->send_json_request("verify", params);
       deserialize_message_signature_result(result, sig_result);
@@ -1301,6 +1304,7 @@ namespace monero {
     MTRACE("monero_wallet_rpc::check_tx_proof()");
 
     auto check = std::make_shared<monero_check_tx>();
+    check->m_is_good = false;
     try {
       auto params = std::make_shared<monero_reserve_proof_params>(tx_hash, address, message, signature);
       auto result = m_rpc->send_json_request("check_tx_proof", params);
@@ -1331,6 +1335,7 @@ namespace monero {
     MTRACE("monero_wallet_rpc::check_spend_proof()");
 
     auto proof = std::make_shared<monero_check_reserve>();
+    proof->m_is_good = false;
     try {
       auto params = std::make_shared<monero_reserve_proof_params>(tx_hash, message);
       params->m_signature = signature;
@@ -1362,6 +1367,7 @@ namespace monero {
     auto params = std::make_shared<monero_reserve_proof_params>(address, message, signature);
     auto result = m_rpc->send_json_request("check_reserve_proof", params);
     auto proof = std::make_shared<monero_check_reserve>();
+    proof->m_is_good = false;
     deserialize_check_reserve(result, proof);
     return proof;
   }
