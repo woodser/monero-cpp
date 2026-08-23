@@ -2777,8 +2777,16 @@ namespace monero {
 
         for (uint64_t s = 0; s < cd.sources.size(); ++s)
         {
-          tx->m_input_sum = tx->m_input_sum.get() + cd.sources[s].amount;
-          uint64_t ring_size = cd.sources[s].outputs.size();
+          const cryptonote::tx_source_entry &source = cd.sources[s];
+          const cryptonote::tx_source_entry::output_entry &real_ring_member = source.outputs.at(source.real_output);
+          std::shared_ptr<monero_output_wallet> input = std::make_shared<monero_output_wallet>();
+          input->m_tx = tx;
+          input->m_amount = source.amount;
+          input->m_index = real_ring_member.first;
+          input->m_stealth_public_key = epee::string_tools::pod_to_hex(real_ring_member.second.dest);
+          tx->m_inputs.push_back(input);
+          tx->m_input_sum = tx->m_input_sum.get() + source.amount;
+          uint64_t ring_size = source.outputs.size();
           if (ring_size < tx->m_ring_size.get())
             tx->m_ring_size = ring_size;
         }
