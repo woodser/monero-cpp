@@ -1096,6 +1096,22 @@ namespace monero {
       else if (key == std::string("dummy_outputs")) tx->m_num_dummy_outputs = it->second.get_value<uint64_t>();
       else if (key == std::string("extra")) tx->m_extra_hex = it->second.data();
       else if (key == std::string("ring_size")) tx->m_ring_size = it->second.get_value<uint32_t>();
+      else if (key == std::string("sources")) {
+        for (auto it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
+          auto input = std::make_shared<monero_output_wallet>();
+
+          for (auto it3 = it2->second.begin(); it3 != it2->second.end(); ++it3) {
+            std::string _key = it3->first;
+
+            if (_key == std::string("amount")) input->m_amount = it3->second.get_value<uint64_t>();
+            else if (_key == std::string("global_index")) input->m_index = it3->second.get_value<uint64_t>();
+            else if (_key == std::string("pubkey")) input->m_stealth_public_key = it3->second.data().substr(0, 64); // dest key of dest||mask
+          }
+
+          input->m_tx = tx;
+          tx->m_inputs.push_back(input);
+        }
+      }
       else if (key == std::string("spent_key_images")) {
         auto node2 = it->second;
 
