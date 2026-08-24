@@ -1903,9 +1903,11 @@ namespace monero {
     std::vector<std::pair<crypto::key_image, crypto::signature>> ski;
     ski.resize(key_images.size());
     for (uint64_t n = 0; n < ski.size(); ++n) {
+      if (key_images[n]->m_hex == boost::none) throw std::runtime_error("key image hex is not defined");
       if (!epee::string_tools::hex_to_pod(key_images[n]->m_hex.get(), ski[n].first)) {
         throw std::runtime_error("failed to parse key image");
       }
+      if (key_images[n]->m_signature == boost::none) throw std::runtime_error("key image signature is not defined");
       if (!epee::string_tools::hex_to_pod(key_images[n]->m_signature.get(), ski[n].second)) {
         throw std::runtime_error("failed to parse signature");
       }
