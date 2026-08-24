@@ -143,6 +143,7 @@ namespace monero {
     if (config.m_language == boost::none || config_normalized.m_language.get().empty()) config_normalized.m_language = "English";
     if (config.m_private_spend_key == boost::none) config_normalized.m_private_spend_key = std::string("");
     if (config.m_private_view_key == boost::none) config_normalized.m_private_view_key = std::string("");
+    if (config.m_primary_address == boost::none) config_normalized.m_primary_address = std::string("");
     if (!monero_utils::is_valid_language(config_normalized.m_language.get())) throw std::runtime_error("Unknown language: " + config_normalized.m_language.get());
 
     // parse and validate private spend key
