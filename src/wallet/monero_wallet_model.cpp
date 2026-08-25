@@ -1395,7 +1395,7 @@ namespace monero {
     }
 
     // filter on extensions
-    if (!m_subaddress_indices.empty() && find(m_subaddress_indices.begin(), m_subaddress_indices.end(), *output->m_subaddress_index) == m_subaddress_indices.end()) return false;
+    if (!m_subaddress_indices.empty() && (output->m_subaddress_index == boost::none || find(m_subaddress_indices.begin(), m_subaddress_indices.end(), *output->m_subaddress_index) == m_subaddress_indices.end())) return false;
     if (m_min_amount != boost::none && (output->m_amount == boost::none || output->m_amount.get() < m_min_amount.get())) return false;
     if (m_max_amount != boost::none && (output->m_amount == boost::none || output->m_amount.get() > m_max_amount.get())) return false;
 
