@@ -297,9 +297,14 @@ namespace monero {
     std::shared_ptr<monero_tx_wallet> copy(const std::shared_ptr<monero_tx_wallet>& src, const std::shared_ptr<monero_tx_wallet>& tgt) const;
     void merge(const std::shared_ptr<monero_tx>& self, const std::shared_ptr<monero_tx>& other);
     void merge(const std::shared_ptr<monero_tx_wallet>& self, const std::shared_ptr<monero_tx_wallet>& other);
+    uint64_t get_incoming_amount() const;
+    uint64_t get_outgoing_amount() const;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers() const;
     std::vector<std::shared_ptr<monero_transfer>> get_transfers(const monero_transfer_query& query) const;
     std::vector<std::shared_ptr<monero_transfer>> filter_transfers(const monero_transfer_query& query);
+    std::vector<std::shared_ptr<monero_output_wallet>> get_inputs_wallet() const;
+    std::vector<std::shared_ptr<monero_output_wallet>> get_inputs_wallet(const monero_output_query& query) const;
+    std::vector<std::shared_ptr<monero_output_wallet>> filter_inputs_wallet(const monero_output_query& query);
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_wallet() const;
     std::vector<std::shared_ptr<monero_output_wallet>> get_outputs_wallet(const monero_output_query& query) const;
     std::vector<std::shared_ptr<monero_output_wallet>> filter_outputs_wallet(const monero_output_query& query);
