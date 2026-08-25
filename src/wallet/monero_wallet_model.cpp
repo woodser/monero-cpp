@@ -469,6 +469,17 @@ namespace monero {
     m_extra_hex = gen_utils::reconcile(m_extra_hex, other->m_extra_hex, "tx wallet m_extra_hex");
   }
 
+  uint64_t monero_tx_wallet::get_incoming_amount() const {
+    uint64_t amount = 0;
+    for (const auto& transfer : m_incoming_transfers) amount += transfer->m_amount.value_or(0);
+    return amount;
+  }
+
+  uint64_t monero_tx_wallet::get_outgoing_amount() const {
+    if (m_outgoing_transfer == nullptr) return 0;
+    return m_outgoing_transfer->m_amount.value_or(0);
+  }
+
   std::vector<std::shared_ptr<monero_transfer>> monero_tx_wallet::get_transfers() const {
     monero_transfer_query query;
     return get_transfers(query);
@@ -499,6 +510,35 @@ namespace monero {
       }
     }
     return transfers;
+  }
+
+  std::vector<std::shared_ptr<monero_output_wallet>> monero_tx_wallet::get_inputs_wallet() const {
+    monero_output_query query;
+    return get_inputs_wallet(query);
+  }
+
+  std::vector<std::shared_ptr<monero_output_wallet>> monero_tx_wallet::get_inputs_wallet(const monero_output_query& query) const {
+    std::vector<std::shared_ptr<monero_output_wallet>> inputs;
+    for (const std::shared_ptr<monero_output>& input : m_inputs) {
+      std::shared_ptr<monero_output_wallet> input_wallet = std::dynamic_pointer_cast<monero_output_wallet>(input);
+      if (query.meets_criteria(input_wallet.get())) inputs.push_back(input_wallet);
+    }
+    return inputs;
+  }
+
+  std::vector<std::shared_ptr<monero_output_wallet>> monero_tx_wallet::filter_inputs_wallet(const monero_output_query& query) {
+    std::vector<std::shared_ptr<monero_output_wallet>> inputs;
+    std::vector<std::shared_ptr<monero_output>>::iterator iter = m_inputs.begin();
+    while (iter != m_inputs.end()) {
+      std::shared_ptr<monero_output_wallet> input_wallet = std::dynamic_pointer_cast<monero_output_wallet>(*iter);
+      if (query.meets_criteria(input_wallet.get())) {
+        inputs.push_back(input_wallet);
+        iter++;
+      } else {
+        iter = m_inputs.erase(iter);
+      }
+    }
+    return inputs;
   }
 
   std::vector<std::shared_ptr<monero_output_wallet>> monero_tx_wallet::get_outputs_wallet() const {
