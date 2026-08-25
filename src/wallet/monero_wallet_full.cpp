@@ -1003,12 +1003,17 @@ namespace monero {
     if (config.m_regtest != boost::none && *config.m_regtest == true && *config.m_network_type != monero_network_type::MAINNET) throw std::runtime_error("Network type must be mainnet when using regtest option");
 
     // create wallet
-    if (!config_normalized.m_seed.get().empty()) {
-      return create_wallet_from_seed(config_normalized, std::move(http_client_factory));
-    } else if (!config_normalized.m_primary_address.get().empty() || !config_normalized.m_private_spend_key.get().empty() || !config_normalized.m_private_view_key.get().empty()) {
-      return create_wallet_from_keys(config_normalized, std::move(http_client_factory));
-    } else {
-      return create_wallet_random(config_normalized, std::move(http_client_factory));
+    try {
+      if (!config_normalized.m_seed.get().empty()) {
+        return create_wallet_from_seed(config_normalized, std::move(http_client_factory));
+      } else if (!config_normalized.m_primary_address.get().empty() || !config_normalized.m_private_spend_key.get().empty() || !config_normalized.m_private_view_key.get().empty()) {
+        return create_wallet_from_keys(config_normalized, std::move(http_client_factory));
+      } else {
+        return create_wallet_random(config_normalized, std::move(http_client_factory));
+      }
+    } catch (const std::exception& ex) {
+      if (std::string(ex.what()).find("file already exists") != std::string::npos) throw std::runtime_error("Wallet already exists: " + config_normalized.m_path.get());
+      throw;
     }
   }
 
