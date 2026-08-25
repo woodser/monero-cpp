@@ -67,7 +67,7 @@ namespace monero {
 
   void merge_tx(std::vector<std::shared_ptr<monero_tx>>& txs, const std::shared_ptr<monero_tx>& tx) {
     for (const std::shared_ptr<monero_tx>& aTx : txs) {
-      if (aTx->m_hash.get() == tx->m_hash.get()) {
+      if (aTx->m_hash != boost::none && tx->m_hash != boost::none && aTx->m_hash.get() == tx->m_hash.get()) {
         aTx->merge(aTx, tx);
         return;
       }

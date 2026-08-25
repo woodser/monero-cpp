@@ -65,7 +65,9 @@ namespace monero {
 
   void merge_incoming_transfer(std::vector<std::shared_ptr<monero_incoming_transfer>>& transfers, const std::shared_ptr<monero_incoming_transfer>& transfer) {
     for (const std::shared_ptr<monero_incoming_transfer>& aTransfer : transfers) {
-      if (aTransfer->m_account_index.get() == transfer->m_account_index.get() && aTransfer->m_subaddress_index.get() == transfer->m_subaddress_index.get()) {
+      if (aTransfer->m_account_index != boost::none && transfer->m_account_index != boost::none &&
+          aTransfer->m_subaddress_index != boost::none && transfer->m_subaddress_index != boost::none &&
+          aTransfer->m_account_index.get() == transfer->m_account_index.get() && aTransfer->m_subaddress_index.get() == transfer->m_subaddress_index.get()) {
         aTransfer->merge(aTransfer, transfer);
         return;
       }
@@ -989,7 +991,9 @@ namespace monero {
     else if (!m_destinations.empty() && !other->m_destinations.empty()) {
       if (m_destinations.size() != other->m_destinations.size()) throw std::runtime_error("Destination vectors are different sizes");
       for (int i = 0; i < m_destinations.size(); i++) {
-        if (m_destinations[i]->m_address.get() != other->m_destinations[i]->m_address.get() ||
+        if (m_destinations[i]->m_address == boost::none || other->m_destinations[i]->m_address == boost::none ||
+            m_destinations[i]->m_amount == boost::none || other->m_destinations[i]->m_amount == boost::none ||
+            m_destinations[i]->m_address.get() != other->m_destinations[i]->m_address.get() ||
             m_destinations[i]->m_amount.get() != other->m_destinations[i]->m_amount.get()) {
           throw std::runtime_error("Destination vectors are different");
         }
