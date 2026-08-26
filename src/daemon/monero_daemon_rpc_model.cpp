@@ -1246,9 +1246,11 @@ namespace monero {
       else if (key == std::string("height_without_bootstrap")) info->m_height_without_bootstrap = it->second.get_value<uint64_t>();
       else if (key == std::string("nettype")) {
         std::string nettype = it->second.data();
-        if (nettype == std::string("mainnet") || nettype == std::string("fakechain")) info->m_network_type = monero_network_type::MAINNET;
+        bool is_regtest = nettype == std::string("fakechain");
+        if (nettype == std::string("mainnet") || is_regtest) info->m_network_type = monero_network_type::MAINNET;
         else if (nettype == std::string("testnet")) info->m_network_type = monero_network_type::TESTNET;
         else if (nettype == std::string("stagenet")) info->m_network_type = monero_network_type::STAGENET;
+        info->m_is_regtest = is_regtest;
       }
       else if (key == std::string("offline")) info->m_is_offline = it->second.get_value<bool>();
       else if (key == std::string("incoming_connections_count")) info->m_num_incoming_connections = it->second.get_value<int>();
