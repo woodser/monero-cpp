@@ -214,6 +214,7 @@ namespace monero {
     boost::optional<bool> m_is_relayed;
     boost::optional<bool> m_is_confirmed;
     boost::optional<bool> m_in_tx_pool;
+    boost::optional<bool> m_is_locked;
     boost::optional<uint64_t> m_num_confirmations;
     boost::optional<uint64_t> m_unlock_time;
     boost::optional<uint64_t> m_last_relayed_timestamp;
@@ -273,6 +274,7 @@ namespace monero {
     boost::optional<uint64_t> m_index;
     std::vector<uint64_t> m_ring_output_indices;
     boost::optional<std::string> m_stealth_public_key;
+    boost::optional<std::string> m_mask;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_output>& output);
@@ -383,6 +385,52 @@ namespace monero {
     boost::optional<uint64_t> m_seed_height;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block_template>& tmplt);
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
+   * Data needed to construct a block template for mining, e.g. for a pool that
+   * assembles its own block templates.
+   */
+  struct monero_miner_data : public monero_rpc_payment_info {
+    boost::optional<uint32_t> m_major_version;
+    boost::optional<uint64_t> m_height;
+    boost::optional<std::string> m_prev_hash;
+    boost::optional<std::string> m_seed_hash;
+    boost::optional<std::string> m_difficulty;
+    boost::optional<uint64_t> m_median_weight;
+    boost::optional<uint64_t> m_already_generated_coins;
+    std::vector<std::shared_ptr<monero_tx>> m_tx_pool_backlog;
+
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_miner_data>& data);
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
+   * Identifies an auxiliary chain's block by id and proof-of-work hash for merge mining.
+   */
+  struct monero_auxiliary_pow : public serializable_struct {
+    boost::optional<std::string> m_id;
+    boost::optional<std::string> m_hash;
+
+    monero_auxiliary_pow() { }
+    monero_auxiliary_pow(const std::string& id, const std::string& hash): m_id(id), m_hash(hash) { }
+
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_auxiliary_pow>& aux_pow);
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
+   * Result of adding auxiliary proof-of-work to a block template for merge mining.
+   */
+  struct monero_add_auxiliary_pow_result : public monero_rpc_payment_info {
+    boost::optional<std::string> m_block_template_blob;
+    boost::optional<std::string> m_block_hashing_blob;
+    boost::optional<std::string> m_merkle_root;
+    boost::optional<uint32_t> m_merkle_tree_depth;
+    std::vector<std::shared_ptr<monero_auxiliary_pow>> m_aux_pow;
+
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_add_auxiliary_pow_result>& result);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -606,6 +654,20 @@ namespace monero {
     std::vector<std::shared_ptr<monero_connection_span>> m_spans;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_sync_info>& info);
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
+   * Models daemon network (bandwidth) statistics.
+   */
+  struct monero_daemon_network_stats : public monero_rpc_payment_info {
+    boost::optional<uint64_t> m_start_time;
+    boost::optional<uint64_t> m_total_packets_in;
+    boost::optional<uint64_t> m_total_bytes_in;
+    boost::optional<uint64_t> m_total_packets_out;
+    boost::optional<uint64_t> m_total_bytes_out;
+
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_network_stats>& stats);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
