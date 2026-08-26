@@ -491,7 +491,7 @@ namespace monero {
 
   boost::optional<uint64_t> monero_tx::get_height() const {
     if (m_block == nullptr) return boost::none;
-    return *(m_block->m_height);
+    return m_block->m_height;
   }
 
   void monero_tx::merge(const std::shared_ptr<monero_tx>& self, const std::shared_ptr<monero_tx>& other) {
