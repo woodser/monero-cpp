@@ -1385,6 +1385,7 @@ namespace monero {
       else if (key == std::string("isBusySyncing")) info->m_is_busy_syncing = it->second.get_value<bool>();
       else if (key == std::string("isSynchronized")) info->m_is_synchronized = it->second.get_value<bool>();
       else if (key == std::string("isRestricted")) info->m_is_restricted = it->second.get_value<bool>();
+      else if (key == std::string("isRegtest")) info->m_is_regtest = it->second.get_value<bool>();
     }
   }
 
@@ -1432,6 +1433,7 @@ namespace monero {
     if (m_is_busy_syncing != boost::none) monero_utils::add_json_member("isBusySyncing", m_is_busy_syncing.get(), allocator, root);
     if (m_is_synchronized != boost::none) monero_utils::add_json_member("isSynchronized", m_is_synchronized.get(), allocator, root);
     if (m_is_restricted != boost::none) monero_utils::add_json_member("isRestricted", m_is_restricted.get(), allocator, root);
+    if (m_is_regtest != boost::none) monero_utils::add_json_member("isRegtest", m_is_regtest.get(), allocator, root);
 
     // return root
     return root;

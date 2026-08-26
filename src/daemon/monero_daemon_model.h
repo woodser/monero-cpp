@@ -588,6 +588,7 @@ namespace monero {
     boost::optional<bool> m_is_busy_syncing;
     boost::optional<bool> m_is_synchronized;
     boost::optional<bool> m_is_restricted;
+    boost::optional<bool> m_is_regtest;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_info>& info);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
