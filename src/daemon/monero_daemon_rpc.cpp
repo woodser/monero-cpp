@@ -146,7 +146,7 @@ namespace monero {
         if (status == std::string("OK") || status == std::string("")) {
           return;
         }
-        else throw monero_rpc_error(status);
+        else throw monero_rpc_error(normalize_daemon_rpc_status(status));
       }
     }
 
@@ -258,6 +258,35 @@ namespace monero {
     std::shared_ptr<monero_block_template> tmplt = std::make_shared<monero_block_template>();
     deserialize_block_template(result, tmplt);
     return tmplt;
+  }
+
+  std::shared_ptr<monero_miner_data> monero_daemon_rpc::get_miner_data() {
+    MTRACE("monero_daemon_rpc::get_miner_data()");
+    auto result = m_rpc->send_json_request("get_miner_data");
+    check_response_status(result);
+    auto data = std::make_shared<monero_miner_data>();
+    deserialize_miner_data(result, data);
+    return data;
+  }
+
+  std::string monero_daemon_rpc::calculate_pow(uint32_t major_version, uint64_t height, const std::string& block_blob, const std::string& seed_hash) {
+    MTRACE("monero_daemon_rpc::calculate_pow()");
+    if (block_blob.empty()) throw monero_error("Must provide a block blob to hash");
+    auto params = std::make_shared<monero_calculate_pow_params>(major_version, height, block_blob, seed_hash);
+    auto result = m_rpc->send_json_request("calc_pow", params);
+    return result.data();
+  }
+
+  std::shared_ptr<monero_add_auxiliary_pow_result> monero_daemon_rpc::add_auxiliary_pow(const std::string& block_template_blob, const std::vector<std::shared_ptr<monero_auxiliary_pow>>& aux_pow) {
+    MTRACE("monero_daemon_rpc::add_auxiliary_pow()");
+    if (block_template_blob.empty()) throw monero_error("Must provide a block template blob to add auxiliary proof of work to");
+    if (aux_pow.empty()) throw monero_error("Must provide auxiliary proof of work to add");
+    auto params = std::make_shared<monero_add_aux_pow_params>(block_template_blob, aux_pow);
+    auto result = m_rpc->send_json_request("add_aux_pow", params);
+    check_response_status(result);
+    auto add_result = std::make_shared<monero_add_auxiliary_pow_result>();
+    deserialize_add_auxiliary_pow_result(result, add_result);
+    return add_result;
   }
 
   std::shared_ptr<monero_block_header> monero_daemon_rpc::get_last_block_header() {
@@ -560,8 +589,26 @@ namespace monero {
     return statuses;
   }
 
+  std::vector<uint64_t> monero_daemon_rpc::get_output_indices(const std::string& tx_hash) {
+    MTRACE("monero_daemon_rpc::get_output_indices()");
+    if (tx_hash.empty()) throw monero_error("Must provide a transaction hash");
+    monero_get_output_indices_request request(tx_hash);
+    auto response = m_rpc->send_binary_request(request);
+    if (response.m_binary == boost::none) throw monero_error("Invalid Monero Binary response");
+    std::vector<uint64_t> indices;
+    deserialize_output_indices(response.m_binary.get(), indices);
+    return indices;
+  }
+
   std::vector<std::shared_ptr<monero_output>> monero_daemon_rpc::get_outputs(const std::vector<monero_output>& outputs) {
-    throw monero_error("monero_daemon_rpc::get_outputs(): not implemented");
+    MTRACE("monero_daemon_rpc::get_outputs()");
+    if (outputs.empty()) throw monero_error("Must provide outputs to fetch");
+    monero_get_outputs_request request(outputs);
+    auto response = m_rpc->send_binary_request(request);
+    if (response.m_binary == boost::none) throw monero_error("Invalid Monero Binary response");
+    std::vector<std::shared_ptr<monero_output>> result;
+    deserialize_outputs(response.m_binary.get(), outputs, result);
+    return result;
   }
 
   std::vector<std::shared_ptr<monero_output_histogram_entry>> monero_daemon_rpc::get_output_histogram(const std::vector<uint64_t>& amounts, const boost::optional<int>& min_count, const boost::optional<int>& max_count, const boost::optional<bool>& is_unlocked, const boost::optional<int>& recent_cutoff) {
@@ -598,6 +645,15 @@ namespace monero {
     std::shared_ptr<monero_daemon_sync_info> info = std::make_shared<monero_daemon_sync_info>();
     deserialize_daemon_sync_info(result, info);
     return info;
+  }
+
+  std::shared_ptr<monero_daemon_network_stats> monero_daemon_rpc::get_network_stats() {
+    MTRACE("monero_daemon_rpc::get_network_stats()");
+    auto result = m_rpc->send_path_request("get_net_stats");
+    check_response_status(result);
+    auto stats = std::make_shared<monero_daemon_network_stats>();
+    deserialize_network_stats(result, stats);
+    return stats;
   }
 
   std::shared_ptr<monero_hard_fork_info> monero_daemon_rpc::get_hard_fork_info() {
@@ -686,6 +742,16 @@ namespace monero {
     return peers;
   }
 
+  std::vector<std::shared_ptr<monero_peer>> monero_daemon_rpc::get_public_peers(bool include_offline) {
+    MTRACE("monero_daemon_rpc::get_public_peers()");
+    auto params = std::make_shared<monero_get_public_nodes_params>(include_offline);
+    auto result = m_rpc->send_path_request("get_public_nodes", params);
+    check_response_status(result);
+    std::vector<std::shared_ptr<monero_peer>> peers;
+    deserialize_public_peers(result, peers);
+    return peers;
+  }
+
   void monero_daemon_rpc::set_outgoing_peer_limit(int limit) {
     MTRACE("monero_daemon_rpc::set_outgoing_peer_limit()");
     if (limit < 0) throw monero_error("Outgoing peer limit must be >= 0");
@@ -718,6 +784,22 @@ namespace monero {
     auto params = std::make_shared<monero_set_bans_params>(bans);
     auto result = m_rpc->send_json_request("set_bans", params);
     check_response_status(result);
+  }
+
+  std::shared_ptr<monero_ban> monero_daemon_rpc::get_peer_ban(const std::string& address) {
+    MTRACE("monero_daemon_rpc::get_peer_ban()");
+    if (address.empty()) throw monero_error("Must provide an address to check the ban status of");
+    auto params = std::make_shared<monero_banned_params>(address);
+    auto result = m_rpc->send_json_request("banned", params);
+    check_response_status(result);
+    auto ban = std::make_shared<monero_ban>();
+    ban->m_host = address;
+    for (boost::property_tree::ptree::const_iterator it = result.begin(); it != result.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("banned")) ban->m_is_banned = it->second.get_value<bool>();
+      else if (key == std::string("seconds")) ban->m_seconds = it->second.get_value<uint64_t>();
+    }
+    return ban;
   }
 
   void monero_daemon_rpc::start_mining(const std::string &address, boost::optional<uint64_t> num_threads, boost::optional<bool> background_mining, boost::optional<bool> ignore_battery) {
@@ -772,6 +854,64 @@ namespace monero {
     std::shared_ptr<monero_prune_result> prune_result = std::make_shared<monero_prune_result>();
     deserialize_prune_result(result, prune_result);
     return prune_result;
+  }
+
+  void monero_daemon_rpc::save_blockchain() {
+    MTRACE("monero_daemon_rpc::save_blockchain()");
+    auto result = m_rpc->send_path_request("save_bc");
+    check_response_status(result);
+  }
+
+  uint64_t monero_daemon_rpc::pop_blocks(uint64_t num_blocks) {
+    MTRACE("monero_daemon_rpc::pop_blocks()");
+    if (num_blocks == 0) throw monero_error("Must provide a number of blocks to pop greater than 0");
+    auto params = std::make_shared<monero_pop_blocks_params>(num_blocks);
+    auto result = m_rpc->send_path_request("pop_blocks", params);
+    check_response_status(result);
+    for (boost::property_tree::ptree::const_iterator it = result.begin(); it != result.end(); ++it) {
+      if (it->first == std::string("height")) return it->second.get_value<uint64_t>();
+    }
+    throw monero_error("Could not get height after popping blocks");
+  }
+
+  void monero_daemon_rpc::flush_cache(bool bad_blocks) {
+    MTRACE("monero_daemon_rpc::flush_cache()");
+    auto params = std::make_shared<monero_flush_cache_params>(bad_blocks);
+    auto result = m_rpc->send_json_request("flush_cache", params);
+    check_response_status(result);
+  }
+
+  void monero_daemon_rpc::set_bootstrap_daemon(const std::string& address, const std::string& username, const std::string& password, const std::string& proxy) {
+    MTRACE("monero_daemon_rpc::set_bootstrap_daemon()");
+    auto params = std::make_shared<monero_set_bootstrap_daemon_params>(address, username, password, proxy);
+    auto result = m_rpc->send_path_request("set_bootstrap_daemon", params);
+    check_response_status(result);
+  }
+
+  void monero_daemon_rpc::set_log_hash_rate(bool is_visible) {
+    MTRACE("monero_daemon_rpc::set_log_hash_rate()");
+    auto params = std::make_shared<monero_set_log_hash_rate_params>(is_visible);
+    auto result = m_rpc->send_path_request("set_log_hash_rate", params);
+    check_response_status(result);
+  }
+
+  void monero_daemon_rpc::set_log_level(int level) {
+    MTRACE("monero_daemon_rpc::set_log_level()");
+    if (level < 0 || level > 4) throw monero_error("Log level must be an integer between 0 and 4");
+    auto params = std::make_shared<monero_set_log_level_params>(level);
+    auto result = m_rpc->send_path_request("set_log_level", params);
+    check_response_status(result);
+  }
+
+  std::string monero_daemon_rpc::set_log_categories(const std::string& categories) {
+    MTRACE("monero_daemon_rpc::set_log_categories()");
+    auto params = std::make_shared<monero_set_log_categories_params>(categories);
+    auto result = m_rpc->send_path_request("set_log_categories", params);
+    check_response_status(result);
+    for (boost::property_tree::ptree::const_iterator it = result.begin(); it != result.end(); ++it) {
+      if (it->first == std::string("categories")) return it->second.data();
+    }
+    return std::string();
   }
 
   std::shared_ptr<monero_daemon_update_check_result> monero_daemon_rpc::check_for_update() {

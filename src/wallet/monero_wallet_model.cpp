@@ -323,7 +323,6 @@ namespace monero {
     // set bool values
     if (m_is_incoming != boost::none) monero_utils::add_json_member("isIncoming", m_is_incoming.get(), allocator, root);
     if (m_is_outgoing != boost::none) monero_utils::add_json_member("isOutgoing", m_is_outgoing.get(), allocator, root);
-    if (m_is_locked != boost::none) monero_utils::add_json_member("isLocked", m_is_locked.get(), allocator, root);
 
     // set sub-arrays
     if (!m_incoming_transfers.empty()) root.AddMember("incomingTransfers", monero_utils::to_rapidjson_val(allocator, m_incoming_transfers), allocator);
@@ -365,7 +364,6 @@ namespace monero {
       else if (key == std::string("incomingTransfers")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
       else if (key == std::string("outgoingTransfer")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
       else if (key == std::string("note")) tx_wallet->m_note = it->second.data();
-      else if (key == std::string("isLocked")) tx_wallet->m_is_locked = it->second.get_value<bool>();
       else if (key == std::string("inputSum")) tx_wallet->m_input_sum = it->second.get_value<uint64_t>();
       else if (key == std::string("outputSum")) tx_wallet->m_output_sum = it->second.get_value<uint64_t>();
       else if (key == std::string("changeAddress")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
@@ -419,7 +417,6 @@ namespace monero {
       tgt->m_outgoing_transfer = transfer_copy;
     }
     tgt->m_note = src->m_note;
-    tgt->m_is_locked = src->m_is_locked;
     tgt->m_input_sum = src->m_input_sum;
     tgt->m_output_sum = src->m_output_sum;
     tgt->m_change_address = src->m_change_address;
@@ -460,7 +457,6 @@ namespace monero {
     m_is_incoming = gen_utils::reconcile(m_is_incoming, other->m_is_incoming, "tx wallet m_is_incoming");
     m_is_outgoing = gen_utils::reconcile(m_is_outgoing, other->m_is_outgoing, "tx wallet m_is_outgoing");
     m_note = gen_utils::reconcile(m_note, other->m_note, "tx wallet m_note");
-    m_is_locked = gen_utils::reconcile(m_is_locked, other->m_is_locked, boost::none, false, boost::none, "tx wallet m_is_locked");  // tx can become unlocked
     m_input_sum = gen_utils::reconcile(m_input_sum, other->m_input_sum, "tx wallet m_input_sum");
     m_output_sum = gen_utils::reconcile(m_output_sum, other->m_output_sum, "tx wallet m_output_sum");
     m_change_address = gen_utils::reconcile(m_change_address, other->m_change_address, "tx wallet m_change_address");

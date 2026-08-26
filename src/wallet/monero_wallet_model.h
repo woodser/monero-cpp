@@ -283,7 +283,6 @@ namespace monero {
     std::vector<std::shared_ptr<monero_incoming_transfer>> m_incoming_transfers;
     std::shared_ptr<monero_outgoing_transfer> m_outgoing_transfer;
     boost::optional<std::string> m_note;
-    boost::optional<bool> m_is_locked;
     boost::optional<uint64_t> m_input_sum;
     boost::optional<uint64_t> m_output_sum;
     boost::optional<std::string> m_change_address;

@@ -169,6 +169,41 @@ namespace monero {
     }
 
     /**
+     * Get the data needed to construct a block template for mining, e.g. for use by a
+     * pool that assembles its own block templates.
+     * 
+     * @return the current data for mining a new block
+     */
+    virtual std::shared_ptr<monero_miner_data> get_miner_data() {
+      throw std::runtime_error("monero_daemon::get_miner_data(): not supported");
+    }
+
+    /**
+     * Calculate the proof-of-work hash of a mined block.
+     * 
+     * @param major_version is the block's major version
+     * @param height is the block's height
+     * @param block_blob is the block's blob to hash
+     * @param seed_hash is the seed hash used to select the RandomX dataset/cache
+     * @return the block's proof-of-work hash
+     */
+    virtual std::string calculate_pow(uint32_t major_version, uint64_t height, const std::string& block_blob, const std::string& seed_hash) {
+      throw std::runtime_error("monero_daemon::calculate_pow(): not supported");
+    }
+
+    /**
+     * Add auxiliary proof-of-work to a block template for merge mining, returning an
+     * updated block template whose Merkle root commits to the given auxiliary blocks.
+     * 
+     * @param block_template_blob is the block template blob to add auxiliary PoW to
+     * @param aux_pow identifies each auxiliary chain by id and its block's PoW hash
+     * @return the updated block template along with the (possibly reordered) auxiliary PoW
+     */
+    virtual std::shared_ptr<monero_add_auxiliary_pow_result> add_auxiliary_pow(const std::string& block_template_blob, const std::vector<std::shared_ptr<monero_auxiliary_pow>>& aux_pow) {
+      throw std::runtime_error("monero_daemon::add_auxiliary_pow(): not supported");
+    }
+
+    /**
      * Get the last block's header.
      * 
      * @return the last block's header
@@ -489,6 +524,16 @@ namespace monero {
     }
 
     /**
+     * Get the global output index of each output in a transaction.
+     * 
+     * @param tx_hash is the hash of the transaction to get output indices for
+     * @return the global output index of each output in the transaction, in order
+     */
+    virtual std::vector<uint64_t> get_output_indices(const std::string& tx_hash) {
+      throw std::runtime_error("monero_daemon::get_output_indices(): not supported");
+    }
+
+    /**
      * Get outputs identified by a list of output amounts and indices as a binary
      * request.
      * 
@@ -544,6 +589,15 @@ namespace monero {
      */
     virtual std::shared_ptr<monero_daemon_sync_info> get_sync_info() {
       throw std::runtime_error("monero_daemon::get_sync_info(): not supported");
+    }
+
+    /**
+     * Get network (bandwidth) statistics since the daemon started.
+     * 
+     * @return the daemon's network statistics
+     */
+    virtual std::shared_ptr<monero_daemon_network_stats> get_network_stats() {
+      throw std::runtime_error("monero_daemon::get_network_stats(): not supported");
     }
 
     /**
@@ -648,6 +702,16 @@ namespace monero {
     }
 
     /**
+     * Get public nodes known to the daemon.
+     *
+     * @param include_offline specifies if offline nodes should be included (default false)
+     * @return the daemon's known public nodes
+     */
+    virtual std::vector<std::shared_ptr<monero_peer>> get_public_peers(bool include_offline = false) {
+      throw std::runtime_error("monero_daemon::get_public_peers(): not supported");
+    }
+
+    /**
      * Limit number of outgoing peers.
      * 
      * @param limit is the maximum number of outgoing peers
@@ -693,6 +757,16 @@ namespace monero {
       std::vector<std::shared_ptr<monero_ban>> bans;
       bans.push_back(ban);
       set_peer_bans(bans);
+    }
+
+    /**
+     * Get the ban status of a peer node.
+     * 
+     * @param address is the address of the peer node to check, e.g. "1.2.3.4" or "1.2.3.4:18080"
+     * @return the peer's ban status
+     */
+    virtual std::shared_ptr<monero_ban> get_peer_ban(const std::string& address) {
+      throw std::runtime_error("monero_daemon::get_peer_ban(): not supported");
     }
 
     /**
@@ -764,6 +838,81 @@ namespace monero {
      */
     virtual std::shared_ptr<monero_prune_result> prune_blockchain(bool check) {
       throw std::runtime_error("monero_daemon::prune_blockchain(): not supported");
+    }
+
+    /**
+     * Save (flush) the blockchain to disk.
+     */
+    virtual void save_blockchain() {
+      throw std::runtime_error("monero_daemon::save_blockchain(): not supported");
+    }
+
+    /**
+     * Pop (remove) blocks from the top of the blockchain.
+     * 
+     * @param num_blocks is the number of blocks to pop
+     * @return the blockchain height after popping the blocks
+     */
+    virtual uint64_t pop_blocks(uint64_t num_blocks) {
+      throw std::runtime_error("monero_daemon::pop_blocks(): not supported");
+    }
+
+    /**
+     * Flush the daemon's invalid block and transaction caches.
+     * 
+     * @param bad_blocks specifies to flush the bad blocks cache (default false)
+     */
+    virtual void flush_cache(bool bad_blocks = false) {
+      throw std::runtime_error("monero_daemon::flush_cache(): not supported");
+    }
+
+    /**
+     * Set the bootstrap daemon used by the daemon to serve requests while it is not
+     * fully synced, e.g. a remote node.
+     * 
+     * @param address is the bootstrap daemon's address (host:port), "auto" to select a
+     *        public node automatically, or an empty string to disable the bootstrap daemon
+     * @param username is the username to authenticate with the bootstrap daemon (optional)
+     * @param password is the password to authenticate with the bootstrap daemon (optional)
+     * @param proxy is the proxy used to reach the bootstrap daemon, e.g. a SOCKS proxy (optional)
+     */
+    virtual void set_bootstrap_daemon(const std::string& address, const std::string& username = "", const std::string& password = "", const std::string& proxy = "") {
+      throw std::runtime_error("monero_daemon::set_bootstrap_daemon(): not supported");
+    }
+
+    /**
+     * Disable the bootstrap daemon so the daemon no longer falls back to it.
+     */
+    virtual void remove_bootstrap_daemon() {
+      set_bootstrap_daemon("");
+    }
+
+    /**
+     * Show or hide the mining hash rate in the daemon's console log.
+     * 
+     * @param is_visible specifies if the hash rate should be logged
+     */
+    virtual void set_log_hash_rate(bool is_visible) {
+      throw std::runtime_error("monero_daemon::set_log_hash_rate(): not supported");
+    }
+
+    /**
+     * Set the daemon's log level.
+     * 
+     * @param level is the log level to set, from 0 (least verbose) to 4 (most verbose)
+     */
+    virtual void set_log_level(int level) {
+      throw std::runtime_error("monero_daemon::set_log_level(): not supported");
+    }
+
+    /**
+     * Set the daemon's log categories.
+     * 
+     * @param categories are the log categories to set, e.g. "*:WARNING,net.p2p:DEBUG" (an empty string resets categories to the default)
+     * @return the daemon's resulting log categories
+     */
+    virtual std::string set_log_categories(const std::string& categories = "") {
+      throw std::runtime_error("monero_daemon::set_log_categories(): not supported");
     }
 
     /**

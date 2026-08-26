@@ -350,6 +350,7 @@ namespace monero {
     if (m_is_relayed != boost::none) monero_utils::add_json_member("isRelayed", m_is_relayed.get(), allocator, root);
     if (m_is_confirmed != boost::none) monero_utils::add_json_member("isConfirmed", m_is_confirmed.get(), allocator, root);
     if (m_in_tx_pool != boost::none) monero_utils::add_json_member("inTxPool", m_in_tx_pool.get(), allocator, root);
+    if (m_is_locked != boost::none) monero_utils::add_json_member("isLocked", m_is_locked.get(), allocator, root);
     if (m_is_double_spend_seen != boost::none) monero_utils::add_json_member("isDoubleSpendSeen", m_is_double_spend_seen.get(), allocator, root);
     if (m_is_kept_by_block != boost::none) monero_utils::add_json_member("isKeptByBlock", m_is_kept_by_block.get(), allocator, root);
     if (m_is_failed != boost::none) monero_utils::add_json_member("isFailed", m_is_failed.get(), allocator, root);
@@ -381,6 +382,7 @@ namespace monero {
       else if (key == std::string("isRelayed")) tx->m_is_relayed = it->second.get_value<bool>();
       else if (key == std::string("isConfirmed")) tx->m_is_confirmed = it->second.get_value<bool>();
       else if (key == std::string("inTxPool")) tx->m_in_tx_pool = it->second.get_value<bool>();
+      else if (key == std::string("isLocked")) tx->m_is_locked = it->second.get_value<bool>();
       else if (key == std::string("numConfirmations")) tx->m_num_confirmations = it->second.get_value<uint64_t>();
       else if (key == std::string("unlockTime")) tx->m_unlock_time = it->second.get_value<uint64_t>();
       else if (key == std::string("lastRelayedTimestamp")) tx->m_last_relayed_timestamp = it->second.get_value<uint64_t>();
@@ -445,6 +447,7 @@ namespace monero {
     tgt->m_is_relayed = src->m_is_relayed;
     tgt->m_is_confirmed = src->m_is_confirmed;
     tgt->m_in_tx_pool = src->m_in_tx_pool;
+    tgt->m_is_locked = src->m_is_locked;
     tgt->m_num_confirmations = src->m_num_confirmations;
     tgt->m_unlock_time = src->m_unlock_time;
     tgt->m_last_relayed_timestamp = src->m_last_relayed_timestamp;
@@ -520,6 +523,7 @@ namespace monero {
     m_relay = gen_utils::reconcile(m_relay, other->m_relay, "tx m_relay");
     m_is_relayed = gen_utils::reconcile(m_is_relayed, other->m_is_relayed, "tx m_is_relayed");
     m_is_double_spend_seen = gen_utils::reconcile(m_is_double_spend_seen, other->m_is_double_spend_seen, boost::none, true, boost::none, "tx m_is_double_spend_seen"); // double spend can become seen
+    m_is_locked = gen_utils::reconcile(m_is_locked, other->m_is_locked, boost::none, false, boost::none, "tx m_is_locked"); // tx can become unlocked
     m_key = gen_utils::reconcile(m_key, other->m_key, "tx m_key");
     m_full_hex = gen_utils::reconcile(m_full_hex, other->m_full_hex, "tx m_full_hex");
     m_pruned_hex = gen_utils::reconcile(m_pruned_hex, other->m_pruned_hex, "tx m_pruned_hex");
@@ -671,6 +675,10 @@ namespace monero {
     if (m_index != boost::none) monero_utils::add_json_member("index", m_index.get(), allocator, root, value_num);
     if (m_stealth_public_key != boost::none) monero_utils::add_json_member("stealthPublicKey", m_stealth_public_key.get(), allocator, root, value_num);
 
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    if (m_mask != boost::none) monero_utils::add_json_member("mask", m_mask.get(), allocator, root, value_str);
+
     // set sub-arrays
     if (!m_ring_output_indices.empty()) root.AddMember("ringOutputIndices", monero_utils::to_rapidjson_val(allocator, m_ring_output_indices), allocator);
 
@@ -698,6 +706,7 @@ namespace monero {
         }
       }
       else if (key == std::string("stealthPublicKey")) output->m_stealth_public_key = it->second.data();
+      else if (key == std::string("mask")) output->m_mask = it->second.data();
     }
   }
 
@@ -709,6 +718,7 @@ namespace monero {
     tgt->m_index = src->m_index;
     if (!src->m_ring_output_indices.empty()) tgt->m_ring_output_indices = std::vector<uint64_t>(src->m_ring_output_indices);
     tgt->m_stealth_public_key = src->m_stealth_public_key;
+    tgt->m_mask = src->m_mask;
     return tgt;
   }
 
@@ -729,6 +739,7 @@ namespace monero {
     m_index = gen_utils::reconcile(m_index, other->m_index, "output index");
     m_ring_output_indices = gen_utils::reconcile(m_ring_output_indices, other->m_ring_output_indices, "output m_ring_output_indices");
     m_stealth_public_key = gen_utils::reconcile(m_stealth_public_key, other->m_stealth_public_key, "output m_stealth_public_key");
+    m_mask = gen_utils::reconcile(m_mask, other->m_mask, "output m_mask");
   }
 
   // --------------------------- MONERO RPC PAYMENT INFO ---------------------------
@@ -957,6 +968,119 @@ namespace monero {
     if (m_height != boost::none) monero_utils::add_json_member("height", m_height.get(), allocator, root, value_num);
     if (m_reserved_offset != boost::none) monero_utils::add_json_member("reservedOffset", m_reserved_offset.get(), allocator, root, value_num);
     if (m_seed_height != boost::none) monero_utils::add_json_member("seedHeight", m_seed_height.get(), allocator, root, value_num);
+
+    // return root
+    return root;
+  }
+
+  // --------------------------- MONERO MINER DATA ---------------------------
+
+  void monero_miner_data::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_miner_data>& data) {
+    monero_rpc_payment_info::from_property_tree(node, data);
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("majorVersion")) data->m_major_version = it->second.get_value<uint32_t>();
+      else if (key == std::string("height")) data->m_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("prevHash")) data->m_prev_hash = it->second.data();
+      else if (key == std::string("seedHash")) data->m_seed_hash = it->second.data();
+      else if (key == std::string("difficulty")) data->m_difficulty = it->second.data();
+      else if (key == std::string("medianWeight")) data->m_median_weight = it->second.get_value<uint64_t>();
+      else if (key == std::string("alreadyGeneratedCoins")) data->m_already_generated_coins = it->second.get_value<uint64_t>();
+      else if (key == std::string("txPoolBacklog")) {
+        for (const auto& child : it->second) {
+          auto tx = std::make_shared<monero_tx>();
+          monero_tx::from_property_tree(child.second, tx);
+          data->m_tx_pool_backlog.push_back(tx);
+        }
+      }
+    }
+  }
+
+  rapidjson::Value monero_miner_data::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
+
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    if (m_prev_hash != boost::none) monero_utils::add_json_member("prevHash", m_prev_hash.get(), allocator, root, value_str);
+    if (m_seed_hash != boost::none) monero_utils::add_json_member("seedHash", m_seed_hash.get(), allocator, root, value_str);
+    if (m_difficulty != boost::none) monero_utils::add_json_member("difficulty", m_difficulty.get(), allocator, root, value_str);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_major_version != boost::none) monero_utils::add_json_member("majorVersion", m_major_version.get(), allocator, root, value_num);
+    if (m_height != boost::none) monero_utils::add_json_member("height", m_height.get(), allocator, root, value_num);
+    if (m_median_weight != boost::none) monero_utils::add_json_member("medianWeight", m_median_weight.get(), allocator, root, value_num);
+    if (m_already_generated_coins != boost::none) monero_utils::add_json_member("alreadyGeneratedCoins", m_already_generated_coins.get(), allocator, root, value_num);
+
+    // set sub-arrays
+    if (!m_tx_pool_backlog.empty()) root.AddMember("txPoolBacklog", monero_utils::to_rapidjson_val(allocator, m_tx_pool_backlog), allocator);
+
+    // return root
+    return root;
+  }
+
+  // --------------------------- MONERO AUX POW ---------------------------
+
+  void monero_auxiliary_pow::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_auxiliary_pow>& aux_pow) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("id")) aux_pow->m_id = it->second.data();
+      else if (key == std::string("hash")) aux_pow->m_hash = it->second.data();
+    }
+  }
+
+  rapidjson::Value monero_auxiliary_pow::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    if (m_id != boost::none) monero_utils::add_json_member("id", m_id.get(), allocator, root, value_str);
+    if (m_hash != boost::none) monero_utils::add_json_member("hash", m_hash.get(), allocator, root, value_str);
+
+    // return root
+    return root;
+  }
+
+  // --------------------------- MONERO ADD AUX POW RESULT ---------------------------
+
+  void monero_add_auxiliary_pow_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_add_auxiliary_pow_result>& result) {
+    monero_rpc_payment_info::from_property_tree(node, result);
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("blockTemplateBlob")) result->m_block_template_blob = it->second.data();
+      else if (key == std::string("blockHashingBlob")) result->m_block_hashing_blob = it->second.data();
+      else if (key == std::string("merkleRoot")) result->m_merkle_root = it->second.data();
+      else if (key == std::string("merkleTreeDepth")) result->m_merkle_tree_depth = it->second.get_value<uint32_t>();
+      else if (key == std::string("auxPow")) {
+        for (const auto& child : it->second) {
+          auto aux_pow = std::make_shared<monero_auxiliary_pow>();
+          monero_auxiliary_pow::from_property_tree(child.second, aux_pow);
+          result->m_aux_pow.push_back(aux_pow);
+        }
+      }
+    }
+  }
+
+  rapidjson::Value monero_add_auxiliary_pow_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
+
+    // set string values
+    rapidjson::Value value_str(rapidjson::kStringType);
+    if (m_block_template_blob != boost::none) monero_utils::add_json_member("blockTemplateBlob", m_block_template_blob.get(), allocator, root, value_str);
+    if (m_block_hashing_blob != boost::none) monero_utils::add_json_member("blockHashingBlob", m_block_hashing_blob.get(), allocator, root, value_str);
+    if (m_merkle_root != boost::none) monero_utils::add_json_member("merkleRoot", m_merkle_root.get(), allocator, root, value_str);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_merkle_tree_depth != boost::none) monero_utils::add_json_member("merkleTreeDepth", m_merkle_tree_depth.get(), allocator, root, value_num);
+
+    // set sub-arrays
+    if (!m_aux_pow.empty()) root.AddMember("auxPow", monero_utils::to_rapidjson_val(allocator, m_aux_pow), allocator);
 
     // return root
     return root;
@@ -1482,6 +1606,37 @@ namespace monero {
     // set sub-arrays
     if (!m_peers.empty()) root.AddMember("peers", monero_utils::to_rapidjson_val(allocator, m_peers), allocator);
     if (!m_spans.empty()) root.AddMember("spans", monero_utils::to_rapidjson_val(allocator, m_spans), allocator);
+
+    // return root
+    return root;
+  }
+
+  // --------------------------- MONERO NET STATS ---------------------------
+
+  void monero_daemon_network_stats::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_network_stats>& stats) {
+    monero_rpc_payment_info::from_property_tree(node, stats);
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("startTime")) stats->m_start_time = it->second.get_value<uint64_t>();
+      else if (key == std::string("totalPacketsIn")) stats->m_total_packets_in = it->second.get_value<uint64_t>();
+      else if (key == std::string("totalBytesIn")) stats->m_total_bytes_in = it->second.get_value<uint64_t>();
+      else if (key == std::string("totalPacketsOut")) stats->m_total_packets_out = it->second.get_value<uint64_t>();
+      else if (key == std::string("totalBytesOut")) stats->m_total_bytes_out = it->second.get_value<uint64_t>();
+    }
+  }
+
+  rapidjson::Value monero_daemon_network_stats::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_start_time != boost::none) monero_utils::add_json_member("startTime", m_start_time.get(), allocator, root, value_num);
+    if (m_total_packets_in != boost::none) monero_utils::add_json_member("totalPacketsIn", m_total_packets_in.get(), allocator, root, value_num);
+    if (m_total_bytes_in != boost::none) monero_utils::add_json_member("totalBytesIn", m_total_bytes_in.get(), allocator, root, value_num);
+    if (m_total_packets_out != boost::none) monero_utils::add_json_member("totalPacketsOut", m_total_packets_out.get(), allocator, root, value_num);
+    if (m_total_bytes_out != boost::none) monero_utils::add_json_member("totalBytesOut", m_total_bytes_out.get(), allocator, root, value_num);
 
     // return root
     return root;
