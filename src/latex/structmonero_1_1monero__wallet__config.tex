@@ -1,0 +1,120 @@
+\doxysection{monero\+::monero\+\_\+wallet\+\_\+config Struct Reference}
+\hypertarget{structmonero_1_1monero__wallet__config}{}\label{structmonero_1_1monero__wallet__config}\index{monero::monero\_wallet\_config@{monero::monero\_wallet\_config}}
+
+
+{\ttfamily \#include $<$monero\+\_\+wallet\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+wallet\+\_\+config\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__wallet__config}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_ad6446ee1be8116f03504ef7efe9b3424}\label{structmonero_1_1monero__wallet__config_ad6446ee1be8116f03504ef7efe9b3424} 
+{\bfseries monero\+\_\+wallet\+\_\+config} (const \mbox{\hyperlink{structmonero_1_1monero__wallet__config}{monero\+\_\+wallet\+\_\+config}} \&config)
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_afb2f54719c718f58686f529dfae28487}\label{structmonero_1_1monero__wallet__config_afb2f54719c718f58686f529dfae28487} 
+\mbox{\hyperlink{structmonero_1_1monero__wallet__config}{monero\+\_\+wallet\+\_\+config}} {\bfseries copy} () const
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__wallet__config_a1c42adc920b5116e839fe0f4d7f8211d}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_af596ede2894e8d13675505a5334c1072}\label{structmonero_1_1monero__wallet__config_af596ede2894e8d13675505a5334c1072} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__wallet__config}{monero\+\_\+wallet\+\_\+config}} $>$ {\bfseries deserialize} (const std\+::string \&config\+\_\+json)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a76c8d0f36aeb5cdb736adbcb22c8c46d}\label{structmonero_1_1monero__wallet__config_a76c8d0f36aeb5cdb736adbcb22c8c46d} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+path}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a3ecd58a56147ded6ba829e9d9ecdc488}\label{structmonero_1_1monero__wallet__config_a3ecd58a56147ded6ba829e9d9ecdc488} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+password}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a600e6dbf68ea8ca0a59fb3f745cb0ea2}\label{structmonero_1_1monero__wallet__config_a600e6dbf68ea8ca0a59fb3f745cb0ea2} 
+boost\+::optional$<$ \mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\+\_\+network\+\_\+type}} $>$ {\bfseries m\+\_\+network\+\_\+type}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a0d95df26f5efa548df0632c2f3aefb6c}\label{structmonero_1_1monero__wallet__config_a0d95df26f5efa548df0632c2f3aefb6c} 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classmonero_1_1monero__rpc__connection}{monero\+\_\+rpc\+\_\+connection}} $>$ {\bfseries m\+\_\+server}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a8450126b6022c88f23cc3c10604cb3fe}\label{structmonero_1_1monero__wallet__config_a8450126b6022c88f23cc3c10604cb3fe} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+trusted\+\_\+daemon}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a8dfd62daa984e7c526627ceb17bd8eae}\label{structmonero_1_1monero__wallet__config_a8dfd62daa984e7c526627ceb17bd8eae} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+seed}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a30c6b4d2e58b4e3bda8725beab2cfc9e}\label{structmonero_1_1monero__wallet__config_a30c6b4d2e58b4e3bda8725beab2cfc9e} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+seed\+\_\+offset}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a107ac9e073728f2ea3641360c1de6609}\label{structmonero_1_1monero__wallet__config_a107ac9e073728f2ea3641360c1de6609} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+primary\+\_\+address}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_af8204e2f1e5da8397531000c4a209837}\label{structmonero_1_1monero__wallet__config_af8204e2f1e5da8397531000c4a209837} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+private\+\_\+view\+\_\+key}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a07e9c605599fd624dd5d8d32ec708f07}\label{structmonero_1_1monero__wallet__config_a07e9c605599fd624dd5d8d32ec708f07} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+private\+\_\+spend\+\_\+key}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_ac2b649dc5ad5db0883c3cbfa29caa097}\label{structmonero_1_1monero__wallet__config_ac2b649dc5ad5db0883c3cbfa29caa097} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+restore\+\_\+height}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a3c5d82d06d85dcf42abe090c2e1bd042}\label{structmonero_1_1monero__wallet__config_a3c5d82d06d85dcf42abe090c2e1bd042} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+language}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a8f7db4a6bfe7515d1d41744196106cdb}\label{structmonero_1_1monero__wallet__config_a8f7db4a6bfe7515d1d41744196106cdb} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+save\+\_\+current}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a982135fd422ffaae886cfe5f0daed68c}\label{structmonero_1_1monero__wallet__config_a982135fd422ffaae886cfe5f0daed68c} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+account\+\_\+lookahead}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a3a2430f4a274de4baa6a2588cb3ac17a}\label{structmonero_1_1monero__wallet__config_a3a2430f4a274de4baa6a2588cb3ac17a} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+subaddress\+\_\+lookahead}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_aeadba24a8dc37b5cf5634905fb03d2f2}\label{structmonero_1_1monero__wallet__config_aeadba24a8dc37b5cf5634905fb03d2f2} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+multisig}
+\item 
+\Hypertarget{structmonero_1_1monero__wallet__config_a405de07662981cbed71a360d471657a9}\label{structmonero_1_1monero__wallet__config_a405de07662981cbed71a360d471657a9} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+regtest}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Configures a wallet to create. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__wallet__config_a1c42adc920b5116e839fe0f4d7f8211d}\index{monero::monero\_wallet\_config@{monero::monero\_wallet\_config}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_wallet\_config@{monero::monero\_wallet\_config}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__wallet__config_a1c42adc920b5116e839fe0f4d7f8211d} 
+rapidjson\+::\+Value monero\+::monero\+\_\+wallet\+\_\+config\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+h\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+cpp\end{DoxyCompactItemize}

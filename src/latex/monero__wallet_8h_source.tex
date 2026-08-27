@@ -1,0 +1,565 @@
+\doxysection{monero\+\_\+wallet.\+h}
+\hypertarget{monero__wallet_8h_source}{}\label{monero__wallet_8h_source}\index{wallet/monero\_wallet.h@{wallet/monero\_wallet.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#include\ "{}monero\_wallet\_model.h"{}}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ <vector>}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#include\ <set>}}
+\DoxyCodeLine{00058\ }
+\DoxyCodeLine{00059\ \textcolor{keyword}{using\ namespace\ }\mbox{\hyperlink{namespacemonero}{monero}};}
+\DoxyCodeLine{00060\ }
+\DoxyCodeLine{00064\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacemonero}{monero}}\ \{}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ LISTENERS\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00067\ }
+\DoxyCodeLine{00071\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classmonero_1_1monero__wallet__listener}{monero\_wallet\_listener}}\ \{}
+\DoxyCodeLine{00072\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00083\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet__listener_ad118f758ea41c8957cc75b7356e5370e}{on\_sync\_progress}}(uint64\_t\ height,\ uint64\_t\ start\_height,\ uint64\_t\ end\_height,\ \textcolor{keywordtype}{double}\ percent\_done,\ \textcolor{keyword}{const}\ std::string\&\ message)\ \{\}}
+\DoxyCodeLine{00084\ }
+\DoxyCodeLine{00090\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet__listener_a0276dc5dbe62b7df42e3eab1b5967895}{on\_new\_block}}(uint64\_t\ height)\ \{\};}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet__listener_a98c1ace6690b5cbb2a72de61275f83e0}{on\_balances\_changed}}(uint64\_t\ new\_balance,\ uint64\_t\ new\_unlocked\_balance)\ \{\};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet__listener_a858412263ef3d02da6453334abacff18}{on\_output\_received}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__output__wallet}{monero\_output\_wallet}}\&\ output)\ \{\};}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00112\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet__listener_a3938fd913222b0f107d5b133d1afd439}{on\_output\_spent}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__output__wallet}{monero\_output\_wallet}}\&\ output)\ \{\};}
+\DoxyCodeLine{00113\ \ \ \};}
+\DoxyCodeLine{00114\ }
+\DoxyCodeLine{00115\ \ \ \textcolor{comment}{//\ forward\ declaration\ of\ internal\ wallet2\ listener}}
+\DoxyCodeLine{00116\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1wallet2__listener}{wallet2\_listener}};}
+\DoxyCodeLine{00117\ }
+\DoxyCodeLine{00118\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ WALLET\ METHODS\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00123\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classmonero_1_1monero__wallet}{monero\_wallet}}\ \{}
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00126\ }
+\DoxyCodeLine{00130\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ac8a0a50f23cf2b6a611ca5ecc2a907ce}{\string~monero\_wallet}}()\ \{\}}
+\DoxyCodeLine{00131\ }
+\DoxyCodeLine{00138\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a93fa8c7bce2de04a771618378ebebe4f}{is\_view\_only}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00139\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_view\_only()\ not\ supported"{}});}
+\DoxyCodeLine{00140\ \ \ \ \ \}}
+\DoxyCodeLine{00141\ }
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a22e0c8e2ab22dbaac0ca80ed7670ea08}{set\_daemon\_connection}}(\textcolor{keyword}{const}\ std::string\&\ uri,\ \textcolor{keyword}{const}\ std::string\&\ username\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ password\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ proxy\_uri\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ boost::optional<bool>\&\ is\_trusted\ =\ boost::none)\ \{}
+\DoxyCodeLine{00152\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_daemon\_connection()\ not\ supported"{}});}
+\DoxyCodeLine{00153\ \ \ \ \ \}}
+\DoxyCodeLine{00154\ }
+\DoxyCodeLine{00161\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa76949996a17ea509c171d731aa4fa82}{set\_daemon\_connection}}(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_rpc\_connection>\&\ connection,\ \textcolor{keyword}{const}\ boost::optional<bool>\&\ is\_trusted\ =\ boost::none)\ \{}
+\DoxyCodeLine{00162\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_daemon\_connection()\ not\ supported"{}});}
+\DoxyCodeLine{00163\ \ \ \ \ \}}
+\DoxyCodeLine{00164\ }
+\DoxyCodeLine{00170\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_rpc\_connection>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ac2e557086e9d642e75529cb6cfe70bb1}{get\_daemon\_connection}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00171\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_daemon\_connection()\ not\ supported"{}});}
+\DoxyCodeLine{00172\ \ \ \ \ \}}
+\DoxyCodeLine{00173\ }
+\DoxyCodeLine{00179\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a78d5a9303854a743333d1ba226a673c1}{is\_connected\_to\_daemon}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00180\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_connected\_to\_daemon()\ not\ supported"{}});}
+\DoxyCodeLine{00181\ \ \ \ \ \}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00188\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a14002cdbaeeada2890fbad3a73543855}{is\_daemon\_synced}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00189\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_daemon\_synced()\ not\ supported"{}});}
+\DoxyCodeLine{00190\ \ \ \ \ \}}
+\DoxyCodeLine{00191\ }
+\DoxyCodeLine{00197\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a3b82f565485c5527e1198f041c7477eb}{is\_daemon\_trusted}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00198\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_daemon\_trusted()\ not\ supported"{}});}
+\DoxyCodeLine{00199\ \ \ \ \ \}}
+\DoxyCodeLine{00200\ }
+\DoxyCodeLine{00206\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6e17802954d57abd37615388ec1e7133}{is\_synced}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00207\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_synced()\ not\ supported"{}});}
+\DoxyCodeLine{00208\ \ \ \ \ \}}
+\DoxyCodeLine{00209\ }
+\DoxyCodeLine{00215\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__version}{monero\_version}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6b69f718345c5425264b0de9b89b6a27}{get\_version}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00216\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_version()\ not\ supported"{}});}
+\DoxyCodeLine{00217\ \ \ \ \ \}}
+\DoxyCodeLine{00218\ }
+\DoxyCodeLine{00224\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8554771610e805aa18e023fc0d3b16fc}{get\_path}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_path()\ not\ supported"{}});}
+\DoxyCodeLine{00226\ \ \ \ \ \}}
+\DoxyCodeLine{00227\ }
+\DoxyCodeLine{00233\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\_network\_type}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8a34be813b6285ed15fd61fcc3200cb8}{get\_network\_type}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00234\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_network\_type()\ not\ supported"{}});}
+\DoxyCodeLine{00235\ \ \ \ \ \}}
+\DoxyCodeLine{00236\ }
+\DoxyCodeLine{00242\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ad98f1ff0533d654f29a4155f6efcc8c2}{get\_seed}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_seed()\ not\ supported"{}});}
+\DoxyCodeLine{00244\ \ \ \ \ \}}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_afa7cbec0ed2215f22829c05979416cee}{get\_seed\_language}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00252\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_seed\_language()\ not\ supported"{}});}
+\DoxyCodeLine{00253\ \ \ \ \ \}}
+\DoxyCodeLine{00254\ }
+\DoxyCodeLine{00260\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa14e6da8c148be38336f9a987fc60643}{get\_public\_view\_key}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_public\_view\_key()\ not\ supported"{}});}
+\DoxyCodeLine{00262\ \ \ \ \ \}}
+\DoxyCodeLine{00263\ }
+\DoxyCodeLine{00269\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a02a0dffa31a1ad6ba9b8c407b07965a1}{get\_private\_view\_key}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00270\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_private\_view\_key()\ not\ supported"{}});}
+\DoxyCodeLine{00271\ \ \ \ \ \}}
+\DoxyCodeLine{00272\ }
+\DoxyCodeLine{00278\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a2266e22ebb43a9c86a76eb37a1c6fe16}{get\_public\_spend\_key}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_public\_spend\_key()\ not\ supported"{}});}
+\DoxyCodeLine{00280\ \ \ \ \ \}}
+\DoxyCodeLine{00281\ }
+\DoxyCodeLine{00287\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8e81e19a990723b04bb807a55885eb0e}{get\_private\_spend\_key}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_private\_spend\_key()\ not\ supported"{}});}
+\DoxyCodeLine{00289\ \ \ \ \ \}}
+\DoxyCodeLine{00290\ }
+\DoxyCodeLine{00296\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a9136cf9c9ea362bf5b90b89d4377239b}{get\_primary\_address}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a98fdb5e65c9e9c4e0baa948250a54421}{get\_address}}(0,\ 0);}
+\DoxyCodeLine{00298\ \ \ \ \ \}}
+\DoxyCodeLine{00299\ }
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a98fdb5e65c9e9c4e0baa948250a54421}{get\_address}}(\textcolor{keyword}{const}\ uint32\_t\ account\_idx,\ \textcolor{keyword}{const}\ uint32\_t\ subaddress\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00308\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_address()\ not\ supported"{}});}
+\DoxyCodeLine{00309\ \ \ \ \ \}}
+\DoxyCodeLine{00310\ }
+\DoxyCodeLine{00318\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__subaddress}{monero\_subaddress}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_adc423914991839b7e81b7e7fe4b0a92e}{get\_address\_index}}(\textcolor{keyword}{const}\ std::string\&\ address)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00319\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_address\_index()\ not\ supported"{}});}
+\DoxyCodeLine{00320\ \ \ \ \ \}}
+\DoxyCodeLine{00321\ }
+\DoxyCodeLine{00329\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__integrated__address}{monero\_integrated\_address}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_afb1e8e58940572f5b82d91189d0d00e0}{get\_integrated\_address}}(\textcolor{keyword}{const}\ std::string\&\ standard\_address\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ payment\_id\ =\ \textcolor{stringliteral}{"{}"{}})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00330\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_integrated\_address()\ not\ supported"{}});}
+\DoxyCodeLine{00331\ \ \ \ \ \}}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00339\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__integrated__address}{monero\_integrated\_address}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a7a0c8667be57e608559e747f8f87e27b}{decode\_integrated\_address}}(\textcolor{keyword}{const}\ std::string\&\ integrated\_address)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00340\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}decode\_integrated\_address()\ not\ supported"{}});}
+\DoxyCodeLine{00341\ \ \ \ \ \}}
+\DoxyCodeLine{00342\ }
+\DoxyCodeLine{00348\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a4a9835efe3ba16f26b2cd96fe08bf954}{get\_height}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00349\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_height()\ not\ supported"{}});}
+\DoxyCodeLine{00350\ \ \ \ \ \}}
+\DoxyCodeLine{00351\ }
+\DoxyCodeLine{00357\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a72bce80953209cdd83246c3b8adee874}{get\_restore\_height}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00358\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_restore\_height()\ not\ supported"{}});}
+\DoxyCodeLine{00359\ \ \ \ \ \}}
+\DoxyCodeLine{00360\ }
+\DoxyCodeLine{00366\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa7e461520ff360fbcfb66484b953a4ed}{set\_restore\_height}}(uint64\_t\ restore\_height)\ \{}
+\DoxyCodeLine{00367\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_restore\_height()\ not\ supported"{}});}
+\DoxyCodeLine{00368\ \ \ \ \ \}}
+\DoxyCodeLine{00369\ }
+\DoxyCodeLine{00375\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a208093344861ded703f0a4e99f97e109}{get\_daemon\_height}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00376\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_daemon\_height()\ not\ supported"{}});}
+\DoxyCodeLine{00377\ \ \ \ \ \}}
+\DoxyCodeLine{00378\ }
+\DoxyCodeLine{00384\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a66e346a50478c38bc3ce46a99f1da1a8}{get\_daemon\_max\_peer\_height}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00385\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_daemon\_max\_peer\_height()\ not\ supported"{}});}
+\DoxyCodeLine{00386\ \ \ \ \ \}}
+\DoxyCodeLine{00387\ \ \ \ \ }
+\DoxyCodeLine{00396\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aac9c360bf6eaf5a92ef31c9d98cda16b}{get\_height\_by\_date}}(uint16\_t\ year,\ uint8\_t\ month,\ uint8\_t\ day)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00397\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_height\_by\_date(year,\ month,\ day)\ not\ supported"{}});}
+\DoxyCodeLine{00398\ \ \ \ \ \}}
+\DoxyCodeLine{00399\ }
+\DoxyCodeLine{00405\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa663cf2b2096a377a9d752cf8b2522d5}{add\_listener}}(\mbox{\hyperlink{classmonero_1_1monero__wallet__listener}{monero\_wallet\_listener}}\&\ listener)\ \{}
+\DoxyCodeLine{00406\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}add\_listener()\ not\ supported"{}});}
+\DoxyCodeLine{00407\ \ \ \ \ \}}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00414\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a64b939b0afe3969b3e3c2163b4a5914e}{remove\_listener}}(\mbox{\hyperlink{classmonero_1_1monero__wallet__listener}{monero\_wallet\_listener}}\&\ listener)\ \{}
+\DoxyCodeLine{00415\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}remove\_listener()\ not\ supported"{}});}
+\DoxyCodeLine{00416\ \ \ \ \ \}}
+\DoxyCodeLine{00417\ }
+\DoxyCodeLine{00421\ \ \ \ \ \textcolor{keyword}{virtual}\ std::set<monero\_wallet\_listener*>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab21c597b75e303738fc494e907aa0fb3}{get\_listeners}}()\ \{}
+\DoxyCodeLine{00422\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_listeners()\ not\ supported"{}});}
+\DoxyCodeLine{00423\ \ \ \ \ \}}
+\DoxyCodeLine{00424\ }
+\DoxyCodeLine{00430\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__sync__result}{monero\_sync\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a05cae62793b6b2a25344a2c73091caf3}{sync}}()\ \{}
+\DoxyCodeLine{00431\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sync()\ not\ supported"{}});}
+\DoxyCodeLine{00432\ \ \ \ \ \}}
+\DoxyCodeLine{00433\ }
+\DoxyCodeLine{00440\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__sync__result}{monero\_sync\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a65bee86d2d28cdb4177fa607a40ac0c6}{sync}}(\mbox{\hyperlink{classmonero_1_1monero__wallet__listener}{monero\_wallet\_listener}}\&\ listener)\ \{}
+\DoxyCodeLine{00441\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sync()\ not\ supported"{}});}
+\DoxyCodeLine{00442\ \ \ \ \ \}}
+\DoxyCodeLine{00443\ }
+\DoxyCodeLine{00450\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__sync__result}{monero\_sync\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ae64976b9f7a6b1ff2a3526be884776ee}{sync}}(uint64\_t\ start\_height)\ \{}
+\DoxyCodeLine{00451\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sync()\ not\ supported"{}});}
+\DoxyCodeLine{00452\ \ \ \ \ \}}
+\DoxyCodeLine{00453\ }
+\DoxyCodeLine{00461\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__sync__result}{monero\_sync\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a0ad3fbed74339a869d669afccc5f42c7}{sync}}(uint64\_t\ start\_height,\ \mbox{\hyperlink{classmonero_1_1monero__wallet__listener}{monero\_wallet\_listener}}\&\ listener)\ \{}
+\DoxyCodeLine{00462\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sync()\ not\ supported"{}});}
+\DoxyCodeLine{00463\ \ \ \ \ \}}
+\DoxyCodeLine{00464\ }
+\DoxyCodeLine{00470\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ad742d34231b98e9f17bd24180b835815}{start\_syncing}}(uint64\_t\ sync\_period\_in\_ms\ =\ 10000)\ \{}
+\DoxyCodeLine{00471\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}start\_syncing()\ not\ supported"{}});}
+\DoxyCodeLine{00472\ \ \ \ \ \}}
+\DoxyCodeLine{00473\ }
+\DoxyCodeLine{00477\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a2bcfb8cec0d0abe2b7323c424b7b51b6}{stop\_syncing}}()\ \{}
+\DoxyCodeLine{00478\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}stop\_syncing()\ not\ supported"{}});}
+\DoxyCodeLine{00479\ \ \ \ \ \}}
+\DoxyCodeLine{00480\ }
+\DoxyCodeLine{00486\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ada3031771d26c64125bf554ed8fde28e}{scan\_txs}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_hashes)\ \{}
+\DoxyCodeLine{00487\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}scan\_txs()\ not\ supported"{}});}
+\DoxyCodeLine{00488\ \ \ \ \ \}}
+\DoxyCodeLine{00489\ }
+\DoxyCodeLine{00499\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_adbe2ef67afed8331617dbf7f4e47641d}{rescan\_spent}}()\ \{}
+\DoxyCodeLine{00500\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}rescan\_spent()\ not\ supported"{}});}
+\DoxyCodeLine{00501\ \ \ \ \ \}}
+\DoxyCodeLine{00502\ }
+\DoxyCodeLine{00510\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a031e8dea171f6a0fb3b2f4efb28fc3a1}{rescan\_blockchain}}()\ \{}
+\DoxyCodeLine{00511\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}rescan\_blockchain()\ not\ supported"{}});}
+\DoxyCodeLine{00512\ \ \ \ \ \}}
+\DoxyCodeLine{00513\ }
+\DoxyCodeLine{00519\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8b427a028b95ed9b7191f323c465816c}{get\_balance}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00520\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_balance()\ not\ supported"{}});}
+\DoxyCodeLine{00521\ \ \ \ \ \}}
+\DoxyCodeLine{00522\ }
+\DoxyCodeLine{00529\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a7441e647c7ea4432ffcc5f4bc2b7404b}{get\_balance}}(uint32\_t\ account\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00530\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_balance()\ not\ supported"{}});}
+\DoxyCodeLine{00531\ \ \ \ \ \}}
+\DoxyCodeLine{00532\ }
+\DoxyCodeLine{00540\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a61ce881dc5cf678677b7c60d4adc606e}{get\_balance}}(uint32\_t\ account\_idx,\ uint32\_t\ subaddress\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00541\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_balance()\ not\ supported"{}});}
+\DoxyCodeLine{00542\ \ \ \ \ \}}
+\DoxyCodeLine{00543\ }
+\DoxyCodeLine{00549\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aafb61b373a95617586731443d1d69659}{get\_unlocked\_balance}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00550\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_unlocked\_balance()\ not\ supported"{}});}
+\DoxyCodeLine{00551\ \ \ \ \ \}}
+\DoxyCodeLine{00552\ }
+\DoxyCodeLine{00559\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab88841a6efa7e906f120499ad2ca7349}{get\_unlocked\_balance}}(uint32\_t\ account\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00560\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_unlocked\_balance()\ not\ supported"{}});}
+\DoxyCodeLine{00561\ \ \ \ \ \}}
+\DoxyCodeLine{00562\ }
+\DoxyCodeLine{00570\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab29f23aa6f4006fe8c4cc8de1bc33ca7}{get\_unlocked\_balance}}(uint32\_t\ account\_idx,\ uint32\_t\ subaddress\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00571\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_unlocked\_balance()\ not\ supported"{}});}
+\DoxyCodeLine{00572\ \ \ \ \ \}}
+\DoxyCodeLine{00573\ }
+\DoxyCodeLine{00579\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_account>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6d358af42e87b57923c9ecd1bf1ee2c2}{get\_accounts}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00580\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6d358af42e87b57923c9ecd1bf1ee2c2}{get\_accounts}}(\textcolor{keyword}{false},\ std::string(\textcolor{stringliteral}{"{}"{}}));}
+\DoxyCodeLine{00581\ \ \ \ \ \}}
+\DoxyCodeLine{00582\ }
+\DoxyCodeLine{00589\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_account>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ad1cde4f5a22e6a2abd1e4abec4562e7a}{get\_accounts}}(\textcolor{keywordtype}{bool}\ include\_subaddresses)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00590\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6d358af42e87b57923c9ecd1bf1ee2c2}{get\_accounts}}(include\_subaddresses,\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00591\ \ \ \ \ \}}
+\DoxyCodeLine{00592\ }
+\DoxyCodeLine{00599\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_account>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8812deaadbc364b15be6b2f4f88c8ace}{get\_accounts}}(\textcolor{keyword}{const}\ std::string\&\ tag)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00600\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6d358af42e87b57923c9ecd1bf1ee2c2}{get\_accounts}}(\textcolor{keyword}{false},\ tag);}
+\DoxyCodeLine{00601\ \ \ \ \ \}}
+\DoxyCodeLine{00602\ }
+\DoxyCodeLine{00610\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_account>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a10bcaa443577602da97900b42c21932a}{get\_accounts}}(\textcolor{keywordtype}{bool}\ include\_subaddresses,\ \textcolor{keyword}{const}\ std::string\&\ tag)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00611\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_accounts()\ not\ supported"{}});}
+\DoxyCodeLine{00612\ \ \ \ \ \}}
+\DoxyCodeLine{00613\ }
+\DoxyCodeLine{00620\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__account}{monero\_account}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a2892affa378f7a465ca045172ba2c270}{get\_account}}(uint32\_t\ account\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00621\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a2892affa378f7a465ca045172ba2c270}{get\_account}}(account\_idx,\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00622\ \ \ \ \ \}}
+\DoxyCodeLine{00623\ }
+\DoxyCodeLine{00631\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__account}{monero\_account}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aea7bd458801615a1fa94e99a7c83dd6b}{get\_account}}(\textcolor{keyword}{const}\ uint32\_t\ account\_idx,\ \textcolor{keywordtype}{bool}\ include\_subaddresses)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00632\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_account()\ not\ supported"{}});}
+\DoxyCodeLine{00633\ \ \ \ \ \}}
+\DoxyCodeLine{00634\ }
+\DoxyCodeLine{00641\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__account}{monero\_account}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a3b13de391246727d013e768fc64d12c1}{create\_account}}(\textcolor{keyword}{const}\ std::string\&\ label\ =\ \textcolor{stringliteral}{"{}"{}})\ \{}
+\DoxyCodeLine{00642\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}create\_account()\ not\ supported"{}});}
+\DoxyCodeLine{00643\ \ \ \ \ \}}
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00651\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a934926814cfb131670905b0d31f75715}{tag\_accounts}}(\textcolor{keyword}{const}\ std::string\&\ tag,\ \textcolor{keyword}{const}\ std::vector<uint32\_t>\&\ account\_indices)\ \{}
+\DoxyCodeLine{00652\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}tag\_accounts()\ not\ supported"{}});}
+\DoxyCodeLine{00653\ \ \ \ \ \}}
+\DoxyCodeLine{00654\ }
+\DoxyCodeLine{00660\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a9477d44f8e8da185ef56d7f122862b6d}{untag\_accounts}}(\textcolor{keyword}{const}\ std::vector<uint32\_t>\&\ account\_indices)\ \{}
+\DoxyCodeLine{00661\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}untag\_accounts()\ not\ supported"{}});}
+\DoxyCodeLine{00662\ \ \ \ \ \}}
+\DoxyCodeLine{00663\ }
+\DoxyCodeLine{00669\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_account\_tag>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa4fa4de692cff6073ecfdf746e48af87}{get\_account\_tags}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00670\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_account\_tags()\ not\ supported"{}});}
+\DoxyCodeLine{00671\ \ \ \ \ \}}
+\DoxyCodeLine{00672\ }
+\DoxyCodeLine{00679\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a2bf2d7bd032e3c0d27f850d62749bdd9}{set\_account\_tag\_label}}(\textcolor{keyword}{const}\ std::string\&\ tag,\ \textcolor{keyword}{const}\ std::string\&\ label)\ \{}
+\DoxyCodeLine{00680\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_account\_tag\_label()\ not\ supported"{}});}
+\DoxyCodeLine{00681\ \ \ \ \ \}}
+\DoxyCodeLine{00682\ }
+\DoxyCodeLine{00689\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_subaddress>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6ff3968708422df3ac4c7ba000975b31}{get\_subaddresses}}(\textcolor{keyword}{const}\ uint32\_t\ account\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00690\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6ff3968708422df3ac4c7ba000975b31}{get\_subaddresses}}(account\_idx,\ std::vector<uint32\_t>());}
+\DoxyCodeLine{00691\ \ \ \ \ \}}
+\DoxyCodeLine{00692\ }
+\DoxyCodeLine{00700\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_subaddress>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a5eb46580b410754a531b8440bedd62a1}{get\_subaddresses}}(\textcolor{keyword}{const}\ uint32\_t\ account\_idx,\ \textcolor{keyword}{const}\ std::vector<uint32\_t>\&\ subaddress\_indices)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00701\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_subaddresses()\ not\ supported"{}});}
+\DoxyCodeLine{00702\ \ \ \ \ \}}
+\DoxyCodeLine{00703\ }
+\DoxyCodeLine{00711\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__subaddress}{monero\_subaddress}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa1fde8e1361233c51d4cad7aba28a10e}{get\_subaddress}}(\textcolor{keyword}{const}\ uint32\_t\ account\_idx,\ \textcolor{keyword}{const}\ uint32\_t\ subaddress\_idx)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00712\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_subaddress()\ not\ supported"{}});}
+\DoxyCodeLine{00713\ \ \ \ \ \}}
+\DoxyCodeLine{00714\ }
+\DoxyCodeLine{00722\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__subaddress}{monero\_subaddress}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ac1500500b3fcbd60b6c8bd9384a6c09e}{create\_subaddress}}(uint32\_t\ account\_idx,\ \textcolor{keyword}{const}\ std::string\&\ label\ =\ \textcolor{stringliteral}{"{}"{}})\ \{}
+\DoxyCodeLine{00723\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}create\_subaddress()\ not\ supported"{}});}
+\DoxyCodeLine{00724\ \ \ \ \ \}}
+\DoxyCodeLine{00725\ }
+\DoxyCodeLine{00733\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_adf6ca25d7d7c8a2a2ac20a2be1dcc730}{set\_subaddress\_label}}(uint32\_t\ account\_idx,\ uint32\_t\ subaddress\_idx,\ \textcolor{keyword}{const}\ std::string\&\ label\ =\ \textcolor{stringliteral}{"{}"{}})\ \{}
+\DoxyCodeLine{00734\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_subaddress\_label()\ not\ supported"{}});}
+\DoxyCodeLine{00735\ \ \ \ \ \}}
+\DoxyCodeLine{00736\ }
+\DoxyCodeLine{00743\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aba45b4d40c883209fdba8e69e140594c}{get\_txs}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00744\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_txs()\ not\ supported"{}});}
+\DoxyCodeLine{00745\ \ \ \ \ \}}
+\DoxyCodeLine{00746\ }
+\DoxyCodeLine{00759\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aefe57f72ad6aafc40102d4a0ec17f902}{get\_txs}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__query}{monero\_tx\_query}}\&\ query)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00760\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_txs(query)\ not\ supported"{}});}
+\DoxyCodeLine{00761\ \ \ \ \ \}}
+\DoxyCodeLine{00762\ }
+\DoxyCodeLine{00779\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_transfer>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab71825b6ad0d72d5d120e5b816ea7eb6}{get\_transfers}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__transfer__query}{monero\_transfer\_query}}\&\ query)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00780\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_transfers()\ not\ supported"{}});}
+\DoxyCodeLine{00781\ \ \ \ \ \}}
+\DoxyCodeLine{00782\ }
+\DoxyCodeLine{00795\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_output\_wallet>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a73113818c6f961f11db791aa218120f5}{get\_outputs}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__output__query}{monero\_output\_query}}\&\ query)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00796\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_outputs()\ not\ supported"{}});}
+\DoxyCodeLine{00797\ \ \ \ \ \}}
+\DoxyCodeLine{00798\ }
+\DoxyCodeLine{00805\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a674f225802ccdc87837060b0af98a57d}{export\_outputs}}(\textcolor{keywordtype}{bool}\ all\ =\ \textcolor{keyword}{false})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00806\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}export\_outputs()\ not\ supported"{}});}
+\DoxyCodeLine{00807\ \ \ \ \ \}}
+\DoxyCodeLine{00808\ }
+\DoxyCodeLine{00815\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab1ef7a15b0b0c1dbab16da2ddf7957f3}{import\_outputs}}(\textcolor{keyword}{const}\ std::string\&\ outputs\_hex)\ \{}
+\DoxyCodeLine{00816\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}import\_outputs()\ not\ supported"{}});}
+\DoxyCodeLine{00817\ \ \ \ \ \}}
+\DoxyCodeLine{00818\ }
+\DoxyCodeLine{00825\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_key\_image\_export\_result>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a77484c4adfc11473cc8adff8835ffaeb}{export\_key\_images}}(\textcolor{keywordtype}{bool}\ all\ =\ \textcolor{keyword}{false})\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00826\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}export\_key\_images()\ not\ supported"{}});}
+\DoxyCodeLine{00827\ \ \ \ \ \}}
+\DoxyCodeLine{00828\ }
+\DoxyCodeLine{00836\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_key\_image\_import\_result>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8f7f57b879071885485ab0c02e258150}{import\_key\_images}}(\textcolor{keyword}{const}\ std::vector<std::shared\_ptr<monero\_key\_image>>\&\ key\_images,\ uint64\_t\ offset\ =\ 0)\ \{}
+\DoxyCodeLine{00837\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}import\_key\_images()\ not\ supported"{}});}
+\DoxyCodeLine{00838\ \ \ \ \ \}}
+\DoxyCodeLine{00839\ }
+\DoxyCodeLine{00845\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a3e19e09a0139c773bd51a692a15cb750}{freeze\_output}}(\textcolor{keyword}{const}\ std::string\&\ key\_image)\ \{}
+\DoxyCodeLine{00846\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}freeze\_output()\ not\ supported"{}});}
+\DoxyCodeLine{00847\ \ \ \ \ \}}
+\DoxyCodeLine{00848\ }
+\DoxyCodeLine{00854\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aac40822e28d9a96e45cae5396dbb783f}{thaw\_output}}(\textcolor{keyword}{const}\ std::string\&\ key\_image)\ \{}
+\DoxyCodeLine{00855\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}thaw\_output()\ not\ supported"{}});}
+\DoxyCodeLine{00856\ \ \ \ \ \}}
+\DoxyCodeLine{00857\ }
+\DoxyCodeLine{00864\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a664589fa4ff837479f03457cef5741be}{is\_output\_frozen}}(\textcolor{keyword}{const}\ std::string\&\ key\_image)\ \{}
+\DoxyCodeLine{00865\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_output\_frozen()\ not\ supported"{}});}
+\DoxyCodeLine{00866\ \ \ \ \ \}}
+\DoxyCodeLine{00867\ }
+\DoxyCodeLine{00873\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{namespacemonero_aaa3433e5c51f3ac269204e7cd1bd5c4c}{monero\_tx\_priority}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ad431eb67f521998ddccdcbb4a00388e0}{get\_default\_fee\_priority}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{00874\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_default\_fee\_priority()\ not\ supported"{}});}
+\DoxyCodeLine{00875\ \ \ \ \ \}}
+\DoxyCodeLine{00876\ }
+\DoxyCodeLine{00883\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_tx\_wallet>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a30e0dd5c7a46c10f5076845fde417fd8}{create\_tx}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\&\ config)\ \{}
+\DoxyCodeLine{00884\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (config.m\_can\_split\ !=\ boost::none\ \&\&\ config.m\_can\_split.get())\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Cannot\ split\ transactions\ with\ create\_tx();\ use\ create\_txs()\ instead"{}});}
+\DoxyCodeLine{00885\ \ \ \ \ \ \ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\ config\_copy\ =\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}(config);}
+\DoxyCodeLine{00886\ \ \ \ \ \ \ config\_copy.m\_can\_split\ =\ \textcolor{keyword}{false};}
+\DoxyCodeLine{00887\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a142472298876d1d56f0a6d9952e0d4de}{create\_txs}}(config\_copy)[0];}
+\DoxyCodeLine{00888\ \ \ \ \ \}}
+\DoxyCodeLine{00889\ }
+\DoxyCodeLine{00896\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a142472298876d1d56f0a6d9952e0d4de}{create\_txs}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\&\ config)\ \{}
+\DoxyCodeLine{00897\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}create\_txs()\ not\ supported"{}});}
+\DoxyCodeLine{00898\ \ \ \ \ \}}
+\DoxyCodeLine{00899\ }
+\DoxyCodeLine{00906\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a4064468edf68849bacc5f748c85d8b99}{sweep\_unlocked}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\&\ config)\ \{}
+\DoxyCodeLine{00907\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sweep\_unlocked()\ not\ supported"{}});}
+\DoxyCodeLine{00908\ \ \ \ \ \}}
+\DoxyCodeLine{00909\ }
+\DoxyCodeLine{00916\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_tx\_wallet>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a7ff2a03220f30a813bf60b4ae2245190}{sweep\_output}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\&\ config)\ \{}
+\DoxyCodeLine{00917\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sweep\_output()\ not\ supported"{}});}
+\DoxyCodeLine{00918\ \ \ \ \ \}}
+\DoxyCodeLine{00919\ }
+\DoxyCodeLine{00926\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aaabb28de9fb4100136c3d45a5c265175}{sweep\_dust}}(\textcolor{keywordtype}{bool}\ relay\ =\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{00927\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sweep\_dust()\ not\ supported"{}});}
+\DoxyCodeLine{00928\ \ \ \ \ \}}
+\DoxyCodeLine{00929\ }
+\DoxyCodeLine{00936\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa4fe7492f5ffbfeaf0e268e202936cd8}{relay\_tx}}(\textcolor{keyword}{const}\ std::string\&\ tx\_metadata)\ \{}
+\DoxyCodeLine{00937\ \ \ \ \ \ \ std::vector<std::string>\ tx\_metadatas;}
+\DoxyCodeLine{00938\ \ \ \ \ \ \ tx\_metadatas.push\_back(tx\_metadata);}
+\DoxyCodeLine{00939\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab56339524fa55ccd336b76d909da18ef}{relay\_txs}}(tx\_metadatas)[0];}
+\DoxyCodeLine{00940\ \ \ \ \ \}}
+\DoxyCodeLine{00941\ }
+\DoxyCodeLine{00948\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aaca0952da75b3301145a182ca7eeb874}{relay\_tx}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__wallet}{monero\_tx\_wallet}}\&\ tx)\ \{}
+\DoxyCodeLine{00949\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx.m\_metadata\ ==\ boost::none\ ||\ tx.m\_metadata.get().empty())\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Tx\ metadata\ is\ not\ initialized"{}});}
+\DoxyCodeLine{00950\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa4fe7492f5ffbfeaf0e268e202936cd8}{relay\_tx}}(tx.m\_metadata.get());}
+\DoxyCodeLine{00951\ \ \ \ \ \}}
+\DoxyCodeLine{00952\ }
+\DoxyCodeLine{00959\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab56339524fa55ccd336b76d909da18ef}{relay\_txs}}(\textcolor{keyword}{const}\ std::vector<std::shared\_ptr<monero\_tx\_wallet>>\&\ txs)\ \{}
+\DoxyCodeLine{00960\ \ \ \ \ \ \ std::vector<std::string>\ tx\_hexes;}
+\DoxyCodeLine{00961\ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx\_wallet>\&\ tx\ :\ txs)\ \{}
+\DoxyCodeLine{00962\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\ ==\ \textcolor{keyword}{nullptr}\ ||\ tx-\/>m\_metadata\ ==\ boost::none\ ||\ tx-\/>m\_metadata.get().empty())\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Tx\ metadata\ is\ not\ initialized"{}});}
+\DoxyCodeLine{00963\ \ \ \ \ \ \ \ \ tx\_hexes.push\_back(tx-\/>m\_metadata.get());}
+\DoxyCodeLine{00964\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00965\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab56339524fa55ccd336b76d909da18ef}{relay\_txs}}(tx\_hexes);}
+\DoxyCodeLine{00966\ \ \ \ \ \}}
+\DoxyCodeLine{00967\ }
+\DoxyCodeLine{00974\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a6a6af8b8edc0cc504c5fcdd443faf84d}{relay\_txs}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_metadatas)\ \{}
+\DoxyCodeLine{00975\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}relay\_txs()\ not\ supported"{}});}
+\DoxyCodeLine{00976\ \ \ \ \ \}}
+\DoxyCodeLine{00977\ }
+\DoxyCodeLine{00984\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__tx__set}{monero\_tx\_set}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a20cb4581a06ad94db80a3da2cdfa2279}{describe\_tx\_set}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__set}{monero\_tx\_set}}\&\ tx\_set)\ \{}
+\DoxyCodeLine{00985\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}describe\_tx\_set()\ not\ supported"{}});}
+\DoxyCodeLine{00986\ \ \ \ \ \}}
+\DoxyCodeLine{00987\ }
+\DoxyCodeLine{00994\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__tx__set}{monero\_tx\_set}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a479f9c37761ecb34126df8125a6db941}{sign\_txs}}(\textcolor{keyword}{const}\ std::string\&\ unsigned\_tx\_hex)\ \{}
+\DoxyCodeLine{00995\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sign\_txs()\ not\ supported"{}});}
+\DoxyCodeLine{00996\ \ \ \ \ \}}
+\DoxyCodeLine{00997\ }
+\DoxyCodeLine{01004\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aeb2e854c9507276a9d1affa249370ec5}{submit\_txs}}(\textcolor{keyword}{const}\ std::string\&\ signed\_tx\_hex)\ \{}
+\DoxyCodeLine{01005\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}submit\_txs()\ not\ supported"{}});}
+\DoxyCodeLine{01006\ \ \ \ \ \}}
+\DoxyCodeLine{01007\ }
+\DoxyCodeLine{01017\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_af65667677cd03973ab87389c1dc0c545}{sign\_message}}(\textcolor{keyword}{const}\ std::string\&\ msg,\ \mbox{\hyperlink{namespacemonero_a5ada8f66cddd59159701650a6a8c078b}{monero\_message\_signature\_type}}\ signature\_type,\ uint32\_t\ account\_idx\ =\ 0,\ uint32\_t\ subaddress\_idx\ =\ 0)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01018\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sign\_message()\ not\ supported"{}});}
+\DoxyCodeLine{01019\ \ \ \ \ \}}
+\DoxyCodeLine{01020\ }
+\DoxyCodeLine{01029\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__message__signature__result}{monero\_message\_signature\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a1d124fdc9f8586974aa03cbaad0e315d}{verify\_message}}(\textcolor{keyword}{const}\ std::string\&\ msg,\ \textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keyword}{const}\ std::string\&\ signature)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01030\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}verify\_message()\ not\ supported"{}});}
+\DoxyCodeLine{01031\ \ \ \ \ \}}
+\DoxyCodeLine{01032\ }
+\DoxyCodeLine{01039\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a28f5607877a4e580e0b6e49666544d1e}{get\_tx\_key}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01040\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_tx\_key()\ not\ supported"{}});}
+\DoxyCodeLine{01041\ \ \ \ \ \}}
+\DoxyCodeLine{01042\ }
+\DoxyCodeLine{01051\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_check\_tx>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab122bf64b86b40a312b51e7095d606be}{check\_tx\_key}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash,\ \textcolor{keyword}{const}\ std::string\&\ tx\_key,\ \textcolor{keyword}{const}\ std::string\&\ address)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01052\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}check\_tx\_key()\ not\ supported"{}});}
+\DoxyCodeLine{01053\ \ \ \ \ \}}
+\DoxyCodeLine{01054\ }
+\DoxyCodeLine{01063\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a9c68c8d24eb1471458caa6ceb7d3af39}{get\_tx\_proof}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash,\ \textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keyword}{const}\ std::string\&\ message)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01064\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_tx\_proof()\ not\ supported"{}});}
+\DoxyCodeLine{01065\ \ \ \ \ \}}
+\DoxyCodeLine{01066\ }
+\DoxyCodeLine{01076\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_check\_tx>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a5c549647f82d43726130f237a314f6e3}{check\_tx\_proof}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash,\ \textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keyword}{const}\ std::string\&\ message,\ \textcolor{keyword}{const}\ std::string\&\ signature)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01077\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}check\_tx\_proof()\ not\ supported"{}});}
+\DoxyCodeLine{01078\ \ \ \ \ \}}
+\DoxyCodeLine{01079\ }
+\DoxyCodeLine{01087\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a070af75f28e9b6a6e0240ab64de2dc4c}{get\_spend\_proof}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash,\ \textcolor{keyword}{const}\ std::string\&\ message)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01088\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_spend\_proof()\ not\ supported"{}});}
+\DoxyCodeLine{01089\ \ \ \ \ \}}
+\DoxyCodeLine{01090\ }
+\DoxyCodeLine{01099\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a0c7455cdc43839338cfc7126907d1d60}{check\_spend\_proof}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash,\ \textcolor{keyword}{const}\ std::string\&\ message,\ \textcolor{keyword}{const}\ std::string\&\ signature)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01100\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}check\_spend\_proof()\ not\ supported"{}});}
+\DoxyCodeLine{01101\ \ \ \ \ \}}
+\DoxyCodeLine{01102\ }
+\DoxyCodeLine{01109\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a35a40aba5667a6c2c9a0c02527f2f90b}{get\_reserve\_proof\_wallet}}(\textcolor{keyword}{const}\ std::string\&\ message)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01110\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_reserve\_proof\_wallet()\ not\ supported"{}});}
+\DoxyCodeLine{01111\ \ \ \ \ \}}
+\DoxyCodeLine{01112\ }
+\DoxyCodeLine{01121\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ab7924db9e65cbde201521006a1a60121}{get\_reserve\_proof\_account}}(uint32\_t\ account\_idx,\ uint64\_t\ amount,\ \textcolor{keyword}{const}\ std::string\&\ message)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01122\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_reserve\_proof\_account()\ not\ supported"{}});}
+\DoxyCodeLine{01123\ \ \ \ \ \}}
+\DoxyCodeLine{01124\ }
+\DoxyCodeLine{01133\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_check\_reserve>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a304e8f7a14965c794c3881d3cb08e8e9}{check\_reserve\_proof}}(\textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keyword}{const}\ std::string\&\ message,\ \textcolor{keyword}{const}\ std::string\&\ signature)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01134\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}check\_reserve\_proof()\ not\ supported"{}});}
+\DoxyCodeLine{01135\ \ \ \ \ \}}
+\DoxyCodeLine{01136\ }
+\DoxyCodeLine{01143\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aed742141b640fff4e3399e95057dea0e}{get\_tx\_note}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01144\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_tx\_note()\ not\ supported"{}});}
+\DoxyCodeLine{01145\ \ \ \ \ \}}
+\DoxyCodeLine{01146\ }
+\DoxyCodeLine{01153\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a0855313ace0bfc356f1211ada701f340}{get\_tx\_notes}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_hashes)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01154\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_tx\_notes()\ not\ supported"{}});}
+\DoxyCodeLine{01155\ \ \ \ \ \}}
+\DoxyCodeLine{01156\ }
+\DoxyCodeLine{01163\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a62ae2385255b3ae6e429e0f3a7f2284e}{set\_tx\_note}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash,\ \textcolor{keyword}{const}\ std::string\&\ note)\ \{}
+\DoxyCodeLine{01164\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_tx\_note()\ not\ supported"{}});}
+\DoxyCodeLine{01165\ \ \ \ \ \}}
+\DoxyCodeLine{01166\ }
+\DoxyCodeLine{01173\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a50e02feb23e27bfd5caa43198d3a3d99}{set\_tx\_notes}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_hashes,\ \textcolor{keyword}{const}\ std::vector<std::string>\&\ notes)\ \{}
+\DoxyCodeLine{01174\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_tx\_notes()\ not\ supported"{}});}
+\DoxyCodeLine{01175\ \ \ \ \ \}}
+\DoxyCodeLine{01176\ }
+\DoxyCodeLine{01183\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<monero\_address\_book\_entry>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a40cc28f10d971d0b3816cf3e149e3360}{get\_address\_book\_entries}}(\textcolor{keyword}{const}\ std::vector<uint64\_t>\&\ indices)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01184\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_address\_book\_entries()\ not\ supported"{}});}
+\DoxyCodeLine{01185\ \ \ \ \ \}}
+\DoxyCodeLine{01186\ }
+\DoxyCodeLine{01194\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a73aa3db3dbcc170091afa3049fa55905}{add\_address\_book\_entry}}(\textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keyword}{const}\ std::string\&\ description)\ \{}
+\DoxyCodeLine{01195\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}add\_address\_book\_entry()\ not\ supported"{}});}
+\DoxyCodeLine{01196\ \ \ \ \ \}}
+\DoxyCodeLine{01197\ }
+\DoxyCodeLine{01207\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a947b6826743e9707cbe831bc9207fafa}{edit\_address\_book\_entry}}(uint64\_t\ index,\ \textcolor{keywordtype}{bool}\ set\_address,\ \textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keywordtype}{bool}\ set\_description,\ \textcolor{keyword}{const}\ std::string\&\ description)\ \{}
+\DoxyCodeLine{01208\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}edit\_address\_book\_entry()\ not\ supported"{}});}
+\DoxyCodeLine{01209\ \ \ \ \ \}}
+\DoxyCodeLine{01210\ }
+\DoxyCodeLine{01216\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8c89b2f74da444e254dcfd337ccb1034}{delete\_address\_book\_entry}}(uint64\_t\ index)\ \{}
+\DoxyCodeLine{01217\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}delete\_address\_book\_entry()\ not\ supported"{}});}
+\DoxyCodeLine{01218\ \ \ \ \ \}}
+\DoxyCodeLine{01219\ }
+\DoxyCodeLine{01226\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a383c81b2b8ba566b39889be6088eefe0}{get\_payment\_uri}}(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\&\ config)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01227\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_payment\_uri()\ not\ supported"{}});}
+\DoxyCodeLine{01228\ \ \ \ \ \}}
+\DoxyCodeLine{01229\ }
+\DoxyCodeLine{01236\ \ \ \ \ \textcolor{keyword}{virtual}\ std::shared\_ptr<monero\_tx\_config>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_af9550a73038c323d3f5b15c03609f4ed}{parse\_payment\_uri}}(\textcolor{keyword}{const}\ std::string\&\ uri)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01237\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}parse\_payment\_uri()\ not\ supported"{}});}
+\DoxyCodeLine{01238\ \ \ \ \ \}}
+\DoxyCodeLine{01239\ }
+\DoxyCodeLine{01247\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a341c6233de9dd4fb114badad6205c92f}{get\_attribute}}(\textcolor{keyword}{const}\ std::string\&\ key,\ std::string\&\ value)\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01248\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_attribute()\ not\ supported"{}});}
+\DoxyCodeLine{01249\ \ \ \ \ \}}
+\DoxyCodeLine{01250\ }
+\DoxyCodeLine{01257\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a102efa22ea564896d043414ebdcf0c55}{set\_attribute}}(\textcolor{keyword}{const}\ std::string\&\ key,\ \textcolor{keyword}{const}\ std::string\&\ val)\ \{}
+\DoxyCodeLine{01258\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}set\_attribute()\ not\ supported"{}});}
+\DoxyCodeLine{01259\ \ \ \ \ \}}
+\DoxyCodeLine{01260\ }
+\DoxyCodeLine{01268\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8d73894b5f7fd6e86abb512abee5b31a}{start\_mining}}(boost::optional<uint64\_t>\ num\_threads,\ boost::optional<bool>\ background\_mining,\ boost::optional<bool>\ ignore\_battery)\ \{}
+\DoxyCodeLine{01269\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}start\_mining()\ not\ supported"{}});}
+\DoxyCodeLine{01270\ \ \ \ \ \}}
+\DoxyCodeLine{01271\ }
+\DoxyCodeLine{01275\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a339a4897c8379e0f018b3179fa16c8c2}{stop\_mining}}()\ \{}
+\DoxyCodeLine{01276\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}stop\_mining()\ not\ supported"{}});}
+\DoxyCodeLine{01277\ \ \ \ \ \}}
+\DoxyCodeLine{01278\ }
+\DoxyCodeLine{01284\ \ \ \ \ \textcolor{keyword}{virtual}\ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__wallet_abd0de2804af1b35aa6271f5884bd22c7}{wait\_for\_next\_block}}()\ \{}
+\DoxyCodeLine{01285\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}wait\_for\_next\_block()\ not\ supported"{}});}
+\DoxyCodeLine{01286\ \ \ \ \ \}}
+\DoxyCodeLine{01287\ }
+\DoxyCodeLine{01293\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a4c67e3f47a838e2837840a055d420403}{is\_multisig\_import\_needed}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01294\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_multisig\_import\_needed()\ not\ supported"{}});}
+\DoxyCodeLine{01295\ \ \ \ \ \}}
+\DoxyCodeLine{01296\ }
+\DoxyCodeLine{01302\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aef46bda9bf991cedc2ff68c317e68018}{is\_multisig}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01303\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa6e19b5d3eead2d07f2546f48c7cf11e}{get\_multisig\_info}}().m\_is\_multisig;}
+\DoxyCodeLine{01304\ \ \ \ \ \}}
+\DoxyCodeLine{01305\ }
+\DoxyCodeLine{01311\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__multisig__info}{monero\_multisig\_info}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_aa6e19b5d3eead2d07f2546f48c7cf11e}{get\_multisig\_info}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01312\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}get\_multisig\_info()\ not\ supported"{}});}
+\DoxyCodeLine{01313\ \ \ \ \ \}}
+\DoxyCodeLine{01314\ }
+\DoxyCodeLine{01321\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a8f9b31c8abcbb90caf1c4c00538dbf83}{prepare\_multisig}}()\ \{}
+\DoxyCodeLine{01322\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}prepare\_multisig()\ not\ supported"{}});}
+\DoxyCodeLine{01323\ \ \ \ \ \}}
+\DoxyCodeLine{01324\ }
+\DoxyCodeLine{01333\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a04d5bd95d2c595a103186cb116c6bbd3}{make\_multisig}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ multisig\_hexes,\ \textcolor{keywordtype}{int}\ threshold,\ \textcolor{keyword}{const}\ std::string\&\ password)\ \{}
+\DoxyCodeLine{01334\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}make\_multisig()\ not\ supported"{}});}
+\DoxyCodeLine{01335\ \ \ \ \ \}}
+\DoxyCodeLine{01336\ }
+\DoxyCodeLine{01346\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__multisig__init__result}{monero\_multisig\_init\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a168ce5edf0a5c6e566844c64373c3462}{exchange\_multisig\_keys}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ multisig\_hexes,\ \textcolor{keyword}{const}\ std::string\&\ password)\ \{}
+\DoxyCodeLine{01347\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}exchange\_multisig\_keys()\ not\ supported"{}});}
+\DoxyCodeLine{01348\ \ \ \ \ \}}
+\DoxyCodeLine{01349\ }
+\DoxyCodeLine{01355\ \ \ \ \ \textcolor{keyword}{virtual}\ std::string\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ad512fb648e9166d0f9ee910271fcdb55}{export\_multisig\_hex}}()\ \{}
+\DoxyCodeLine{01356\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}export\_multisig\_hex()\ not\ supported"{}});}
+\DoxyCodeLine{01357\ \ \ \ \ \}}
+\DoxyCodeLine{01358\ }
+\DoxyCodeLine{01369\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ad2a77ab62ff52d6fceec9db6bceec323}{import\_multisig\_hex}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ multisig\_hexes,\ \textcolor{keywordtype}{bool}\ refresh\_after\_import\ =\ \textcolor{keyword}{true})\ \{}
+\DoxyCodeLine{01370\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}import\_multisig\_hex()\ not\ supported"{}});}
+\DoxyCodeLine{01371\ \ \ \ \ \}}
+\DoxyCodeLine{01372\ }
+\DoxyCodeLine{01379\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1monero__multisig__sign__result}{monero\_multisig\_sign\_result}}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a9dc726f96c121b28499e795a2c864134}{sign\_multisig\_tx\_hex}}(\textcolor{keyword}{const}\ std::string\&\ multisig\_tx\_hex)\ \{}
+\DoxyCodeLine{01380\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}sign\_multisig\_tx\_hex()\ not\ supported"{}});}
+\DoxyCodeLine{01381\ \ \ \ \ \}}
+\DoxyCodeLine{01382\ }
+\DoxyCodeLine{01389\ \ \ \ \ \textcolor{keyword}{virtual}\ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a06bbfcca05560738520bbb031d01cbbf}{submit\_multisig\_tx\_hex}}(\textcolor{keyword}{const}\ std::string\&\ signed\_multisig\_tx\_hex)\ \{}
+\DoxyCodeLine{01390\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}submit\_multisig\_tx\_hex()\ not\ supported"{}});}
+\DoxyCodeLine{01391\ \ \ \ \ \}}
+\DoxyCodeLine{01392\ }
+\DoxyCodeLine{01399\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a25f787c47fafa9da88335808d50dc5bc}{change\_password}}(\textcolor{keyword}{const}\ std::string\&\ old\_password,\ \textcolor{keyword}{const}\ std::string\&\ new\_password)\ \{}
+\DoxyCodeLine{01400\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}change\_password()\ not\ supported"{}});}
+\DoxyCodeLine{01401\ \ \ \ \ \}}
+\DoxyCodeLine{01402\ }
+\DoxyCodeLine{01409\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a85c3484ccfea43aa624c3c8f1bd3ab8b}{move\_to}}(\textcolor{keyword}{const}\ std::string\&\ path,\ \textcolor{keyword}{const}\ std::string\&\ password)\ \{}
+\DoxyCodeLine{01410\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}move\_to()\ not\ supported"{}});}
+\DoxyCodeLine{01411\ \ \ \ \ \}}
+\DoxyCodeLine{01412\ }
+\DoxyCodeLine{01416\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a0160f23ebba72ab5be52e6509c918a5e}{save}}()\ \{}
+\DoxyCodeLine{01417\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}save()\ not\ supported"{}});}
+\DoxyCodeLine{01418\ \ \ \ \ \}}
+\DoxyCodeLine{01419\ }
+\DoxyCodeLine{01425\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_ae89a5f2984886242c841b494276d79a7}{close}}(\textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a0160f23ebba72ab5be52e6509c918a5e}{save}}\ =\ \textcolor{keyword}{false})\ \{}
+\DoxyCodeLine{01426\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}close()\ not\ supported"{}});}
+\DoxyCodeLine{01427\ \ \ \ \ \}}
+\DoxyCodeLine{01428\ }
+\DoxyCodeLine{01432\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__wallet_a55555b01d8beea85545ed80737778048}{is\_closed}}()\textcolor{keyword}{\ const\ }\{}
+\DoxyCodeLine{01433\ \ \ \ \ \ \ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}is\_closed()\ not\ supported"{}});}
+\DoxyCodeLine{01434\ \ \ \ \ \}}
+\DoxyCodeLine{01435\ \ \ \};}
+\DoxyCodeLine{01436\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,73 @@
+\doxysection{monero\+::monero\+\_\+rpc\+\_\+payment\+\_\+info Struct Reference}
+\hypertarget{structmonero_1_1monero__rpc__payment__info}{}\label{structmonero_1_1monero__rpc__payment__info}\index{monero::monero\_rpc\_payment\_info@{monero::monero\_rpc\_payment\_info}}
+
+
+{\ttfamily \#include $<$monero\+\_\+daemon\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+rpc\+\_\+payment\+\_\+info\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=0.919540cm]{structmonero_1_1monero__rpc__payment__info}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info_aa32c5a06dc631470b2ebac0c92bd0166}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__rpc__payment__info_a3cd66ffd2d5b4815093b7cd2167efc02}\label{structmonero_1_1monero__rpc__payment__info_a3cd66ffd2d5b4815093b7cd2167efc02} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\+\_\+rpc\+\_\+payment\+\_\+info}} $>$ \&rpc\+\_\+payment\+\_\+info)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__rpc__payment__info_a95161dd6a7f3ed22da296013fb0de6d2}\label{structmonero_1_1monero__rpc__payment__info_a95161dd6a7f3ed22da296013fb0de6d2} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+credits}
+\item 
+\Hypertarget{structmonero_1_1monero__rpc__payment__info_af24640180ac54fb97d6c2bff177ce4d5}\label{structmonero_1_1monero__rpc__payment__info_af24640180ac54fb97d6c2bff177ce4d5} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+top\+\_\+block\+\_\+hash}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Models a Monero RPC payment information. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__rpc__payment__info_aa32c5a06dc631470b2ebac0c92bd0166}\index{monero::monero\_rpc\_payment\_info@{monero::monero\_rpc\_payment\_info}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_rpc\_payment\_info@{monero::monero\_rpc\_payment\_info}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__rpc__payment__info_aa32c5a06dc631470b2ebac0c92bd0166} 
+rapidjson\+::\+Value monero\+::monero\+\_\+rpc\+\_\+payment\+\_\+info\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{structmonero_1_1monero__submit__tx__result_a405e551797b12d3350fb79028d25e189}{monero\+::monero\+\_\+submit\+\_\+tx\+\_\+result}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+h\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,605 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: ClassName
+%%Creator: Doxygen
+%%CreationDate: Time
+%%For: 
+%Magnification: 1.00
+%%Orientation: Portrait
+%%BoundingBox: 0 0 500 3289.902344
+%%Pages: 0
+%%BeginSetup
+%%EndSetup
+%%EndComments
+
+% ----- variables -----
+
+/boxwidth 0 def
+/boxheight 40 def
+/fontheight 24 def
+/marginwidth 10 def
+/distx 20 def
+/disty 40 def
+/boundaspect 0.151980 def  % aspect ratio of the BoundingBox (width/height)
+/boundx 500 def
+/boundy boundx boundaspect div def
+/xspacing 0 def
+/yspacing 0 def
+/rows 101 def
+/cols 2 def
+/scalefactor 0 def
+/boxfont /Times-Roman findfont fontheight scalefont def
+
+% ----- procedures -----
+
+/dotted { [1 4] 0 setdash } def
+/dashed { [5] 0 setdash } def
+/solid  { [] 0 setdash } def
+
+/max % result = MAX(arg1,arg2)
+{
+  /a exch def
+  /b exch def
+  a b gt {a} {b} ifelse
+} def
+
+/xoffset % result = MAX(0,(scalefactor-(boxwidth*cols+distx*(cols-1)))/2)
+{
+  0 scalefactor boxwidth cols mul distx cols 1 sub mul add sub 2 div max
+} def
+
+/cw % boxwidth = MAX(boxwidth, stringwidth(arg1))
+{
+  /str exch def
+  /boxwidth boxwidth str stringwidth pop max def
+} def
+
+/box % draws a box with text 'arg1' at grid pos (arg2,arg3)
+{ gsave
+  2 setlinewidth
+  newpath
+  exch xspacing mul xoffset add
+  exch yspacing mul
+  moveto
+  boxwidth 0 rlineto 
+  0 boxheight rlineto 
+  boxwidth neg 0 rlineto 
+  0 boxheight neg rlineto 
+  closepath
+  dup stringwidth pop neg boxwidth add 2 div
+  boxheight fontheight 2 div sub 2 div
+  rmoveto show stroke
+  grestore
+} def  
+
+/mark
+{ newpath
+  exch xspacing mul xoffset add boxwidth add
+  exch yspacing mul
+  moveto
+  0 boxheight 4 div rlineto
+  boxheight neg 4 div boxheight neg 4 div rlineto
+  closepath
+  eofill
+  stroke
+} def
+
+/arrow
+{ newpath
+  moveto
+  3 -8 rlineto
+  -6 0 rlineto
+  3 8 rlineto
+  closepath
+  eofill
+  stroke
+} def
+
+/out % draws an output connector for the block at (arg1,arg2)
+{
+  newpath
+  exch xspacing mul xoffset add boxwidth 2 div add
+  exch yspacing mul boxheight add
+  /y exch def
+  /x exch def
+  x y moveto
+  0 disty 2 div rlineto 
+  stroke
+  1 eq { x y disty 2 div add arrow } if
+} def
+
+/in % draws an input connector for the block at (arg1,arg2)
+{
+  newpath
+  exch xspacing mul xoffset add boxwidth 2 div add
+  exch yspacing mul disty 2 div sub
+  /y exch def
+  /x exch def
+  x y moveto
+  0 disty 2 div rlineto
+  stroke
+  1 eq { x y disty 2 div add arrow } if
+} def
+
+/hedge
+{
+  exch xspacing mul xoffset add boxwidth 2 div add
+  exch yspacing mul boxheight 2 div sub
+  /y exch def
+  /x exch def
+  newpath
+  x y moveto
+  boxwidth 2 div distx add 0 rlineto
+  stroke
+  1 eq
+  { newpath x boxwidth 2 div distx add add y moveto
+    -8 3 rlineto
+    0 -6 rlineto
+    8 3 rlineto
+    closepath
+    eofill
+    stroke
+  } if
+} def
+
+/vedge
+{
+  /ye exch def
+  /ys exch def
+  /xs exch def
+  newpath
+  xs xspacing mul xoffset add boxwidth 2 div add dup
+  ys yspacing mul boxheight 2 div sub
+  moveto
+  ye yspacing mul boxheight 2 div sub
+  lineto
+  stroke
+} def
+
+/conn % connections the blocks from col 'arg1' to 'arg2' of row 'arg3'
+{
+  /ys exch def
+  /xe exch def
+  /xs exch def
+  newpath
+  xs xspacing mul xoffset add boxwidth 2 div add
+  ys yspacing mul disty 2 div sub
+  moveto
+  xspacing xe xs sub mul 0
+  rlineto
+  stroke
+} def
+
+% ----- main ------
+
+boxfont setfont
+1 boundaspect scale
+(monero::serializable_struct) cw
+(monero::key_value) cw
+(monero::monero_account) cw
+(monero::monero_account_tag) cw
+(monero::monero_account_tag_params) cw
+(monero::monero_add_aux_pow_params) cw
+(monero::monero_address_book_entry) cw
+(monero::monero_address_book_entry_params) cw
+(monero::monero_alt_chain) cw
+(monero::monero_auxiliary_pow) cw
+(monero::monero_ban) cw
+(monero::monero_bandwidth_limits) cw
+(monero::monero_banned_params) cw
+(monero::monero_block_header) cw
+(monero::monero_block_template) cw
+(monero::monero_calculate_pow_params) cw
+(monero::monero_change_wallet_password_params) cw
+(monero::monero_check) cw
+(monero::monero_check_tx_key_params) cw
+(monero::monero_close_wallet_params) cw
+(monero::monero_connection_span) cw
+(monero::monero_create_edit_subaddress_params) cw
+(monero::monero_create_open_wallet_params) cw
+(monero::monero_daemon_update_check_result) cw
+(monero::monero_decoded_address) cw
+(monero::monero_destination) cw
+(monero::monero_download_update_params) cw
+(monero::monero_fee_estimate) cw
+(monero::monero_flush_cache_params) cw
+(monero::monero_generate_blocks_params) cw
+(monero::monero_generate_blocks_result) cw
+(monero::monero_get_address_params) cw
+(monero::monero_get_balance_params) cw
+(monero::monero_get_block_hash_params) cw
+(monero::monero_get_block_hashes_result) cw
+(monero::monero_get_block_params) cw
+(monero::monero_get_blocks_by_hash_result) cw
+(monero::monero_get_fee_estimate_params) cw
+(monero::monero_get_incoming_transfers_params) cw
+(monero::monero_get_miner_tx_sum_params) cw
+(monero::monero_get_output_distribution_params) cw
+(monero::monero_get_output_histogram_params) cw
+(monero::monero_get_public_nodes_params) cw
+(monero::monero_get_transfers_params) cw
+(monero::monero_get_txs_params) cw
+(monero::monero_integrated_address) cw
+(monero::monero_integrated_address_params) cw
+(monero::monero_is_key_image_spent_params) cw
+(monero::monero_key_image) cw
+(monero::monero_key_image_export_result) cw
+(monero::monero_key_image_import_result) cw
+(monero::monero_message_signature_result) cw
+(monero::monero_miner_tx_sum) cw
+(monero::monero_mining_status) cw
+(monero::monero_multisig_info) cw
+(monero::monero_multisig_init_result) cw
+(monero::monero_multisig_params) cw
+(monero::monero_multisig_sign_result) cw
+(monero::monero_output) cw
+(monero::monero_output_distribution_entry) cw
+(monero::monero_output_histogram_entry) cw
+(monero::monero_payment_uri_params) cw
+(monero::monero_peer) cw
+(monero::monero_peer_limits_params) cw
+(monero::monero_pop_blocks_params) cw
+(monero::monero_prune_blockchain_params) cw
+(monero::monero_prune_result) cw
+(monero::monero_query_key_params) cw
+(monero::monero_query_output_params) cw
+(monero::monero_request_params) cw
+(monero::monero_reserve_proof_params) cw
+(monero::monero_rpc_connection) cw
+(monero::monero_rpc_payment_info) cw
+(monero::monero_rpc_request) cw
+(monero::monero_set_bans_params) cw
+(monero::monero_set_bootstrap_daemon_params) cw
+(monero::monero_set_daemon_params) cw
+(monero::monero_set_log_categories_params) cw
+(monero::monero_set_log_hash_rate_params) cw
+(monero::monero_set_log_level_params) cw
+(monero::monero_sign_describe_transfer_params) cw
+(monero::monero_start_mining_params) cw
+(monero::monero_subaddress) cw
+(monero::monero_submit_blocks_params) cw
+(monero::monero_submit_tx_params) cw
+(monero::monero_sweep_params) cw
+(monero::monero_sync_result) cw
+(monero::monero_transfer) cw
+(monero::monero_transfer_params) cw
+(monero::monero_tx) cw
+(monero::monero_tx_config) cw
+(monero::monero_tx_notes_params) cw
+(monero::monero_tx_pool_stats) cw
+(monero::monero_tx_set) cw
+(monero::monero_verify_sign_message_params) cw
+(monero::monero_version) cw
+(monero::monero_wallet_config) cw
+(monero::monero_wallet_data_params) cw
+(monero::monero_wallet_refresh_params) cw
+(monero::monero_wallet_relay_tx_params) cw
+(monero::ssl_options) cw
+/boxwidth boxwidth marginwidth 2 mul add def
+/xspacing boxwidth distx add def
+/yspacing boxheight disty add def
+/scalefactor 
+  boxwidth cols mul distx cols 1 sub mul add
+  boxheight rows mul disty rows 1 sub mul add boundaspect mul 
+  max def
+boundx scalefactor div boundy scalefactor div scale
+
+% ----- classes -----
+
+ (monero::serializable_struct) 0.000000 100.000000 box
+ (monero::key_value) 1.000000 99.000000 box
+ (monero::monero_account) 1.000000 98.000000 box
+ (monero::monero_account_tag) 1.000000 97.000000 box
+ (monero::monero_account_tag_params) 1.000000 96.000000 box
+ (monero::monero_add_aux_pow_params) 1.000000 95.000000 box
+ (monero::monero_address_book_entry) 1.000000 94.000000 box
+ (monero::monero_address_book_entry_params) 1.000000 93.000000 box
+ (monero::monero_alt_chain) 1.000000 92.000000 box
+ (monero::monero_auxiliary_pow) 1.000000 91.000000 box
+ (monero::monero_ban) 1.000000 90.000000 box
+1.000000 90.000000 mark
+ (monero::monero_bandwidth_limits) 1.000000 89.000000 box
+ (monero::monero_banned_params) 1.000000 88.000000 box
+ (monero::monero_block_header) 1.000000 87.000000 box
+1.000000 87.000000 mark
+ (monero::monero_block_template) 1.000000 86.000000 box
+ (monero::monero_calculate_pow_params) 1.000000 85.000000 box
+ (monero::monero_change_wallet_password_params) 1.000000 84.000000 box
+ (monero::monero_check) 1.000000 83.000000 box
+1.000000 83.000000 mark
+ (monero::monero_check_tx_key_params) 1.000000 82.000000 box
+ (monero::monero_close_wallet_params) 1.000000 81.000000 box
+ (monero::monero_connection_span) 1.000000 80.000000 box
+ (monero::monero_create_edit_subaddress_params) 1.000000 79.000000 box
+ (monero::monero_create_open_wallet_params) 1.000000 78.000000 box
+ (monero::monero_daemon_update_check_result) 1.000000 77.000000 box
+1.000000 77.000000 mark
+ (monero::monero_decoded_address) 1.000000 76.000000 box
+ (monero::monero_destination) 1.000000 75.000000 box
+ (monero::monero_download_update_params) 1.000000 74.000000 box
+ (monero::monero_fee_estimate) 1.000000 73.000000 box
+ (monero::monero_flush_cache_params) 1.000000 72.000000 box
+ (monero::monero_generate_blocks_params) 1.000000 71.000000 box
+ (monero::monero_generate_blocks_result) 1.000000 70.000000 box
+ (monero::monero_get_address_params) 1.000000 69.000000 box
+ (monero::monero_get_balance_params) 1.000000 68.000000 box
+ (monero::monero_get_block_hash_params) 1.000000 67.000000 box
+ (monero::monero_get_block_hashes_result) 1.000000 66.000000 box
+ (monero::monero_get_block_params) 1.000000 65.000000 box
+ (monero::monero_get_blocks_by_hash_result) 1.000000 64.000000 box
+ (monero::monero_get_fee_estimate_params) 1.000000 63.000000 box
+ (monero::monero_get_incoming_transfers_params) 1.000000 62.000000 box
+ (monero::monero_get_miner_tx_sum_params) 1.000000 61.000000 box
+ (monero::monero_get_output_distribution_params) 1.000000 60.000000 box
+ (monero::monero_get_output_histogram_params) 1.000000 59.000000 box
+ (monero::monero_get_public_nodes_params) 1.000000 58.000000 box
+ (monero::monero_get_transfers_params) 1.000000 57.000000 box
+ (monero::monero_get_txs_params) 1.000000 56.000000 box
+ (monero::monero_integrated_address) 1.000000 55.000000 box
+ (monero::monero_integrated_address_params) 1.000000 54.000000 box
+ (monero::monero_is_key_image_spent_params) 1.000000 53.000000 box
+ (monero::monero_key_image) 1.000000 52.000000 box
+1.000000 52.000000 mark
+ (monero::monero_key_image_export_result) 1.000000 51.000000 box
+ (monero::monero_key_image_import_result) 1.000000 50.000000 box
+ (monero::monero_message_signature_result) 1.000000 49.000000 box
+ (monero::monero_miner_tx_sum) 1.000000 48.000000 box
+ (monero::monero_mining_status) 1.000000 47.000000 box
+ (monero::monero_multisig_info) 1.000000 46.000000 box
+ (monero::monero_multisig_init_result) 1.000000 45.000000 box
+ (monero::monero_multisig_params) 1.000000 44.000000 box
+ (monero::monero_multisig_sign_result) 1.000000 43.000000 box
+ (monero::monero_output) 1.000000 42.000000 box
+1.000000 42.000000 mark
+ (monero::monero_output_distribution_entry) 1.000000 41.000000 box
+ (monero::monero_output_histogram_entry) 1.000000 40.000000 box
+ (monero::monero_payment_uri_params) 1.000000 39.000000 box
+ (monero::monero_peer) 1.000000 38.000000 box
+ (monero::monero_peer_limits_params) 1.000000 37.000000 box
+ (monero::monero_pop_blocks_params) 1.000000 36.000000 box
+ (monero::monero_prune_blockchain_params) 1.000000 35.000000 box
+ (monero::monero_prune_result) 1.000000 34.000000 box
+ (monero::monero_query_key_params) 1.000000 33.000000 box
+ (monero::monero_query_output_params) 1.000000 32.000000 box
+ (monero::monero_request_params) 1.000000 31.000000 box
+ (monero::monero_reserve_proof_params) 1.000000 30.000000 box
+ (monero::monero_rpc_connection) 1.000000 29.000000 box
+ (monero::monero_rpc_payment_info) 1.000000 28.000000 box
+1.000000 28.000000 mark
+ (monero::monero_rpc_request) 1.000000 27.000000 box
+1.000000 27.000000 mark
+ (monero::monero_set_bans_params) 1.000000 26.000000 box
+ (monero::monero_set_bootstrap_daemon_params) 1.000000 25.000000 box
+ (monero::monero_set_daemon_params) 1.000000 24.000000 box
+ (monero::monero_set_log_categories_params) 1.000000 23.000000 box
+ (monero::monero_set_log_hash_rate_params) 1.000000 22.000000 box
+ (monero::monero_set_log_level_params) 1.000000 21.000000 box
+ (monero::monero_sign_describe_transfer_params) 1.000000 20.000000 box
+ (monero::monero_start_mining_params) 1.000000 19.000000 box
+ (monero::monero_subaddress) 1.000000 18.000000 box
+ (monero::monero_submit_blocks_params) 1.000000 17.000000 box
+ (monero::monero_submit_tx_params) 1.000000 16.000000 box
+ (monero::monero_sweep_params) 1.000000 15.000000 box
+ (monero::monero_sync_result) 1.000000 14.000000 box
+ (monero::monero_transfer) 1.000000 13.000000 box
+1.000000 13.000000 mark
+ (monero::monero_transfer_params) 1.000000 12.000000 box
+ (monero::monero_tx) 1.000000 11.000000 box
+1.000000 11.000000 mark
+ (monero::monero_tx_config) 1.000000 10.000000 box
+ (monero::monero_tx_notes_params) 1.000000 9.000000 box
+ (monero::monero_tx_pool_stats) 1.000000 8.000000 box
+ (monero::monero_tx_set) 1.000000 7.000000 box
+ (monero::monero_verify_sign_message_params) 1.000000 6.000000 box
+ (monero::monero_version) 1.000000 5.000000 box
+ (monero::monero_wallet_config) 1.000000 4.000000 box
+ (monero::monero_wallet_data_params) 1.000000 3.000000 box
+ (monero::monero_wallet_refresh_params) 1.000000 2.000000 box
+ (monero::monero_wallet_relay_tx_params) 1.000000 1.000000 box
+ (monero::ssl_options) 1.000000 0.000000 box
+
+% ----- relations -----
+
+solid
+1 0.000000 99.250000 out
+solid
+0 0.000000 99.500000 hedge
+solid
+0 0.000000 98.500000 hedge
+solid
+0 0.000000 97.500000 hedge
+solid
+0 0.000000 96.500000 hedge
+solid
+0 0.000000 95.500000 hedge
+solid
+0 0.000000 94.500000 hedge
+solid
+0 0.000000 93.500000 hedge
+solid
+0 0.000000 92.500000 hedge
+solid
+0 0.000000 91.500000 hedge
+solid
+0 0.000000 90.500000 hedge
+solid
+0 0.000000 89.500000 hedge
+solid
+0 0.000000 88.500000 hedge
+solid
+0 0.000000 87.500000 hedge
+solid
+0 0.000000 86.500000 hedge
+solid
+0 0.000000 85.500000 hedge
+solid
+0 0.000000 84.500000 hedge
+solid
+0 0.000000 83.500000 hedge
+solid
+0 0.000000 82.500000 hedge
+solid
+0 0.000000 81.500000 hedge
+solid
+0 0.000000 80.500000 hedge
+solid
+0 0.000000 79.500000 hedge
+solid
+0 0.000000 78.500000 hedge
+solid
+0 0.000000 77.500000 hedge
+solid
+0 0.000000 76.500000 hedge
+solid
+0 0.000000 75.500000 hedge
+solid
+0 0.000000 74.500000 hedge
+solid
+0 0.000000 73.500000 hedge
+solid
+0 0.000000 72.500000 hedge
+solid
+0 0.000000 71.500000 hedge
+solid
+0 0.000000 70.500000 hedge
+solid
+0 0.000000 69.500000 hedge
+solid
+0 0.000000 68.500000 hedge
+solid
+0 0.000000 67.500000 hedge
+solid
+0 0.000000 66.500000 hedge
+solid
+0 0.000000 65.500000 hedge
+solid
+0 0.000000 64.500000 hedge
+solid
+0 0.000000 63.500000 hedge
+solid
+0 0.000000 62.500000 hedge
+solid
+0 0.000000 61.500000 hedge
+solid
+0 0.000000 60.500000 hedge
+solid
+0 0.000000 59.500000 hedge
+solid
+0 0.000000 58.500000 hedge
+solid
+0 0.000000 57.500000 hedge
+solid
+0 0.000000 56.500000 hedge
+solid
+0 0.000000 55.500000 hedge
+solid
+0 0.000000 54.500000 hedge
+solid
+0 0.000000 53.500000 hedge
+solid
+0 0.000000 52.500000 hedge
+solid
+0 0.000000 51.500000 hedge
+solid
+0 0.000000 50.500000 hedge
+solid
+0 0.000000 49.500000 hedge
+solid
+0 0.000000 48.500000 hedge
+solid
+0 0.000000 47.500000 hedge
+solid
+0 0.000000 46.500000 hedge
+solid
+0 0.000000 45.500000 hedge
+solid
+0 0.000000 44.500000 hedge
+solid
+0 0.000000 43.500000 hedge
+solid
+0 0.000000 42.500000 hedge
+solid
+0 0.000000 41.500000 hedge
+solid
+0 0.000000 40.500000 hedge
+solid
+0 0.000000 39.500000 hedge
+solid
+0 0.000000 38.500000 hedge
+solid
+0 0.000000 37.500000 hedge
+solid
+0 0.000000 36.500000 hedge
+solid
+0 0.000000 35.500000 hedge
+solid
+0 0.000000 34.500000 hedge
+solid
+0 0.000000 33.500000 hedge
+solid
+0 0.000000 32.500000 hedge
+solid
+0 0.000000 31.500000 hedge
+solid
+0 0.000000 30.500000 hedge
+solid
+0 0.000000 29.500000 hedge
+solid
+0 0.000000 28.500000 hedge
+solid
+0 0.000000 27.500000 hedge
+solid
+0 0.000000 26.500000 hedge
+solid
+0 0.000000 25.500000 hedge
+solid
+0 0.000000 24.500000 hedge
+solid
+0 0.000000 23.500000 hedge
+solid
+0 0.000000 22.500000 hedge
+solid
+0 0.000000 21.500000 hedge
+solid
+0 0.000000 20.500000 hedge
+solid
+0 0.000000 19.500000 hedge
+solid
+0 0.000000 18.500000 hedge
+solid
+0 0.000000 17.500000 hedge
+solid
+0 0.000000 16.500000 hedge
+solid
+0 0.000000 15.500000 hedge
+solid
+0 0.000000 14.500000 hedge
+solid
+0 0.000000 13.500000 hedge
+solid
+0 0.000000 12.500000 hedge
+solid
+0 0.000000 11.500000 hedge
+solid
+0 0.000000 10.500000 hedge
+solid
+0 0.000000 9.500000 hedge
+solid
+0 0.000000 8.500000 hedge
+solid
+0 0.000000 7.500000 hedge
+solid
+0 0.000000 6.500000 hedge
+solid
+0 0.000000 5.500000 hedge
+solid
+0 0.000000 4.500000 hedge
+solid
+0 0.000000 3.500000 hedge
+solid
+0 0.000000 2.500000 hedge
+solid
+0 0.000000 1.500000 hedge
+solid
+0 0.000000 0.500000 hedge
+solid
+0.000000 100.000000 0.500000 vedge

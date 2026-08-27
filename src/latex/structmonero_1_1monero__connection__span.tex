@@ -1,0 +1,84 @@
+\doxysection{monero\+::monero\+\_\+connection\+\_\+span Struct Reference}
+\hypertarget{structmonero_1_1monero__connection__span}{}\label{structmonero_1_1monero__connection__span}\index{monero::monero\_connection\_span@{monero::monero\_connection\_span}}
+
+
+{\ttfamily \#include $<$monero\+\_\+daemon\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+connection\+\_\+span\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__connection__span}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__connection__span_a5735f7f833505cf29e5aadfe40d69d73}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_af15a546f58ee84962049f86c1dde4a72}\label{structmonero_1_1monero__connection__span_af15a546f58ee84962049f86c1dde4a72} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__connection__span}{monero\+\_\+connection\+\_\+span}} $>$ \&span)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_ab28f518a6f4452938f2ae5103cc86365}\label{structmonero_1_1monero__connection__span_ab28f518a6f4452938f2ae5103cc86365} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+connection\+\_\+id}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_a72bca2bfc82a7b28f2ace2f4f75c066a}\label{structmonero_1_1monero__connection__span_a72bca2bfc82a7b28f2ace2f4f75c066a} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+remote\+\_\+address}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_a59858a1b0310689b7546cb3f4223845d}\label{structmonero_1_1monero__connection__span_a59858a1b0310689b7546cb3f4223845d} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+num\+\_\+blocks}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_a32423413a17941592ed3fc86ad1b79f5}\label{structmonero_1_1monero__connection__span_a32423413a17941592ed3fc86ad1b79f5} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+rate}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_a99eac4f14a8e7030216e62aae3b0bde6}\label{structmonero_1_1monero__connection__span_a99eac4f14a8e7030216e62aae3b0bde6} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+speed}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_a2b17492e59dd758201879365dd73d272}\label{structmonero_1_1monero__connection__span_a2b17492e59dd758201879365dd73d272} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+size}
+\item 
+\Hypertarget{structmonero_1_1monero__connection__span_add8077bcc60ec9446d9fc67ad35b930e}\label{structmonero_1_1monero__connection__span_add8077bcc60ec9446d9fc67ad35b930e} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+start\+\_\+height}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Monero daemon connection span. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__connection__span_a5735f7f833505cf29e5aadfe40d69d73}\index{monero::monero\_connection\_span@{monero::monero\_connection\_span}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_connection\_span@{monero::monero\_connection\_span}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__connection__span_a5735f7f833505cf29e5aadfe40d69d73} 
+rapidjson\+::\+Value monero\+::monero\+\_\+connection\+\_\+span\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+h\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+cpp\end{DoxyCompactItemize}

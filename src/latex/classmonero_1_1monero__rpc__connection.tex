@@ -1,0 +1,419 @@
+\doxysection{monero\+::monero\+\_\+rpc\+\_\+connection Class Reference}
+\hypertarget{classmonero_1_1monero__rpc__connection}{}\label{classmonero_1_1monero__rpc__connection}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+
+
+{\ttfamily \#include $<$monero\+\_\+rpc\+\_\+connection.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+rpc\+\_\+connection\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmonero_1_1monero__rpc__connection}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a858f5c75ee5b2061f28e355e5c9013fe}{monero\+\_\+rpc\+\_\+connection}} (const std\+::string \&uri="{}"{}, const std\+::string \&username="{}"{}, const std\+::string \&password="{}"{}, const std\+::string \&proxy\+\_\+uri="{}"{}, const std\+::string \&zmq\+\_\+uri="{}"{}, int priority=0, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none)
+\item 
+\mbox{\hyperlink{classmonero_1_1monero__rpc__connection_abd6f5a71704659103f6759f42cf62196}{monero\+\_\+rpc\+\_\+connection}} (const \mbox{\hyperlink{classmonero_1_1monero__rpc__connection}{monero\+\_\+rpc\+\_\+connection}} \&rpc)
+\item 
+bool \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a6a8fb7828bbe7d4881a984975593b29c}{is\+\_\+onion}} () const
+\item 
+bool \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a78af7752c0f75cf4d43b108e5f53b909}{is\+\_\+i2p}} () const
+\item 
+void \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a5d2b859865c3ad8f4415681461b6f0eb}{set\+\_\+credentials}} (const std\+::string \&username, const std\+::string \&password)
+\item 
+void \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a7e91af64b534175680b6ec5e52c16896}{set\+\_\+attribute}} (const std\+::string \&key, const std\+::string \&val)
+\item 
+std\+::string \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a7aca195f8de25c5059869f1c6238609a}{get\+\_\+attribute}} (const std\+::string \&key) const
+\item 
+boost\+::optional$<$ bool $>$ \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_af30d873536115a0cbfd8fb778cd0ba1d}{is\+\_\+online}} () const
+\item 
+boost\+::optional$<$ bool $>$ \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a72ebe5e95a41e1fd53a985b2894803d7}{is\+\_\+authenticated}} () const
+\item 
+boost\+::optional$<$ bool $>$ \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a954048bc566017a000cab286a1f14d40}{is\+\_\+connected}} () const
+\item 
+bool \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}{check\+\_\+connection}} (const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none)
+\item 
+boost\+::property\+\_\+tree\+::ptree \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a24c3231cea76a7cce5007cca96c38de3}{send\+\_\+json\+\_\+request}} (const std\+::string \&path, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\+\_\+struct}} $>$ \&params=nullptr, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none) const
+\item 
+\mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a11331a5faf74b7788ecd46f07c837897}{send\+\_\+json\+\_\+request}} (const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&request, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none) const
+\item 
+boost\+::property\+\_\+tree\+::ptree \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_a844ea0e30ba6ca671985ea6ef5d22f22}{send\+\_\+path\+\_\+request}} (const std\+::string \&path, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\+\_\+struct}} $>$ \&params=nullptr, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none) const
+\item 
+\mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_ace52bbfb463bea8e58580ea9a107967a}{send\+\_\+path\+\_\+request}} (const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&request, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none) const
+\item 
+\mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_aaa2796192402addbd0e80c26443b5514}{send\+\_\+binary\+\_\+request}} (const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&request, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none) const
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_aef91b1d36c45f33b2e3898e3d82820d7}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_aea8117f9441594a77c0f9bcc266fb754}\label{classmonero_1_1monero__rpc__connection_aea8117f9441594a77c0f9bcc266fb754} 
+static std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classmonero_1_1monero__rpc__connection}{monero\+\_\+rpc\+\_\+connection}} $>$ {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node)
+\item 
+static bool \mbox{\hyperlink{classmonero_1_1monero__rpc__connection_aaafd6f0884b9b0eb13abed7dd682eb49}{compare}} (int p1, int p2)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a7a56ca241ef1a626cd73e9d2242b68d9}\label{classmonero_1_1monero__rpc__connection_a7a56ca241ef1a626cd73e9d2242b68d9} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+uri}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a23300b1b9e7754f733aad4a25dfab1c7}\label{classmonero_1_1monero__rpc__connection_a23300b1b9e7754f733aad4a25dfab1c7} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+username}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_aec0a8dc36c383ae492aa11b014cec3ac}\label{classmonero_1_1monero__rpc__connection_aec0a8dc36c383ae492aa11b014cec3ac} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+password}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_ae62acede6fe751a6e90236e20ad2a5e5}\label{classmonero_1_1monero__rpc__connection_ae62acede6fe751a6e90236e20ad2a5e5} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+proxy\+\_\+uri}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_afd0e1584a0910f779e178d6bd8da3cf7}\label{classmonero_1_1monero__rpc__connection_afd0e1584a0910f779e178d6bd8da3cf7} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+zmq\+\_\+uri}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a61bc2f2333c8a316bd032eaae3a27c14}\label{classmonero_1_1monero__rpc__connection_a61bc2f2333c8a316bd032eaae3a27c14} 
+boost\+::optional$<$ uint32\+\_\+t $>$ {\bfseries m\+\_\+timeout\+\_\+ms}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a1cd06fd97bffa3c3644e54ef61c65c76}\label{classmonero_1_1monero__rpc__connection_a1cd06fd97bffa3c3644e54ef61c65c76} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+response\+\_\+time}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a52655ffea4d3e427d250a211624eef42}\label{classmonero_1_1monero__rpc__connection_a52655ffea4d3e427d250a211624eef42} 
+int {\bfseries m\+\_\+priority}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a70afad120c4f9e813ecdc8190b408121}\label{classmonero_1_1monero__rpc__connection_a70afad120c4f9e813ecdc8190b408121} 
+void {\bfseries ensure\+\_\+configured} () const
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a3bce2f428391ab2015844171140705fa}\label{classmonero_1_1monero__rpc__connection_a3bce2f428391ab2015844171140705fa} 
+std\+::string {\bfseries invoke\+\_\+post} (const boost\+::string\+\_\+ref uri, const std\+::string \&body, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none) const
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a813c26343c3d9404ef695073d4d02058}\label{classmonero_1_1monero__rpc__connection_a813c26343c3d9404ef695073d4d02058} 
+void {\bfseries send\+\_\+rpc\+\_\+request} (const boost\+::string\+\_\+ref uri, const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&request, \mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} \&response, const boost\+::optional$<$ uint32\+\_\+t $>$ \&timeout\+\_\+ms=boost\+::none, bool binary=false) const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_aa7d73bd9c5db476bfc18939ed911efe4}\label{classmonero_1_1monero__rpc__connection_aa7d73bd9c5db476bfc18939ed911efe4} 
+boost\+::recursive\+\_\+mutex {\bfseries m\+\_\+mutex}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_aa3433316d54a71921583a2f009ccb761}\label{classmonero_1_1monero__rpc__connection_aa3433316d54a71921583a2f009ccb761} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+online}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_aa9c9e982065c2c5d075ddd09792d772d}\label{classmonero_1_1monero__rpc__connection_aa9c9e982065c2c5d075ddd09792d772d} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+authenticated}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_a4cb869c233ee06cc1c7770209f2aeaaa}\label{classmonero_1_1monero__rpc__connection_a4cb869c233ee06cc1c7770209f2aeaaa} 
+std\+::unique\+\_\+ptr$<$ epee\+::net\+\_\+utils\+::http\+::abstract\+\_\+http\+\_\+client $>$ {\bfseries m\+\_\+http\+\_\+client}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_ac4b2e10a07c6f6e1ecb26a99e6405790}\label{classmonero_1_1monero__rpc__connection_ac4b2e10a07c6f6e1ecb26a99e6405790} 
+std\+::unordered\+\_\+map$<$ std\+::string, std\+::string $>$ {\bfseries m\+\_\+attributes}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__connection_ac35c6c65ed6f4a27aab13d1017fce416}\label{classmonero_1_1monero__rpc__connection_ac35c6c65ed6f4a27aab13d1017fce416} 
+std\+::tuple$<$ std\+::string, std\+::string, std\+::string, std\+::string $>$ {\bfseries m\+\_\+applied}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Maintains a connection and sends requests to a Monero RPC API. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a858f5c75ee5b2061f28e355e5c9013fe}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!monero\_rpc\_connection@{monero\_rpc\_connection}}
+\index{monero\_rpc\_connection@{monero\_rpc\_connection}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{monero\_rpc\_connection()}{monero\_rpc\_connection()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a858f5c75ee5b2061f28e355e5c9013fe} 
+monero\+::monero\+\_\+rpc\+\_\+connection\+::monero\+\_\+rpc\+\_\+connection (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{uri}{ = {\ttfamily "{}"{}}, }\item[{const std\+::string \&}]{username}{ = {\ttfamily "{}"{}}, }\item[{const std\+::string \&}]{password}{ = {\ttfamily "{}"{}}, }\item[{const std\+::string \&}]{proxy\+\_\+uri}{ = {\ttfamily "{}"{}}, }\item[{const std\+::string \&}]{zmq\+\_\+uri}{ = {\ttfamily "{}"{}}, }\item[{int}]{priority}{ = {\ttfamily 0}, }\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption})}
+
+Initialize a new RPC connection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em uri} & RPC connection uri \\
+\hline
+{\em username} & RPC connection authentication username \\
+\hline
+{\em password} & RPC connection authentication password \\
+\hline
+{\em proxy\+\_\+uri} & RPC connection proxy uri \\
+\hline
+{\em zmq\+\_\+uri} & RPC connection zmq uri \\
+\hline
+{\em priority} & RPC connection priority \\
+\hline
+{\em timeout\+\_\+ms} & RPC connection timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmonero_1_1monero__rpc__connection_abd6f5a71704659103f6759f42cf62196}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!monero\_rpc\_connection@{monero\_rpc\_connection}}
+\index{monero\_rpc\_connection@{monero\_rpc\_connection}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{monero\_rpc\_connection()}{monero\_rpc\_connection()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_abd6f5a71704659103f6759f42cf62196} 
+monero\+::monero\+\_\+rpc\+\_\+connection\+::monero\+\_\+rpc\+\_\+connection (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classmonero_1_1monero__rpc__connection}{monero\+\_\+rpc\+\_\+connection}} \&}]{rpc}{}\end{DoxyParamCaption})}
+
+Copy a RPC connection.
+
+
+\begin{DoxyParams}{Parameters}
+{\em rpc} & RPC connection to copy \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!check\_connection@{check\_connection}}
+\index{check\_connection@{check\_connection}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{check\_connection()}{check\_connection()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac} 
+bool monero\+::monero\+\_\+rpc\+\_\+connection\+::check\+\_\+connection (\begin{DoxyParamCaption}\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption})}
+
+Check the connection and update online, authentication, and response time status.
+
+
+\begin{DoxyParams}{Parameters}
+{\em timeout\+\_\+ms} & the maximum response time before considered offline \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_aaafd6f0884b9b0eb13abed7dd682eb49}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!compare@{compare}}
+\index{compare@{compare}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{compare()}{compare()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_aaafd6f0884b9b0eb13abed7dd682eb49} 
+bool monero\+::monero\+\_\+rpc\+\_\+connection\+::compare (\begin{DoxyParamCaption}\item[{int}]{p1}{, }\item[{int}]{p2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+Checks RPC connection priority order.
+
+
+\begin{DoxyParams}{Parameters}
+{\em c1} & first priority to compare \\
+\hline
+{\em c2} & second priority to compare \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a7aca195f8de25c5059869f1c6238609a}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!get\_attribute@{get\_attribute}}
+\index{get\_attribute@{get\_attribute}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{get\_attribute()}{get\_attribute()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a7aca195f8de25c5059869f1c6238609a} 
+std\+::string monero\+::monero\+\_\+rpc\+\_\+connection\+::get\+\_\+attribute (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{}\end{DoxyParamCaption}) const}
+
+Get connection attribute.
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & is the attribute to get the value of \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+key\textquotesingle{}s value if set 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a72ebe5e95a41e1fd53a985b2894803d7}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!is\_authenticated@{is\_authenticated}}
+\index{is\_authenticated@{is\_authenticated}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{is\_authenticated()}{is\_authenticated()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a72ebe5e95a41e1fd53a985b2894803d7} 
+boost\+::optional$<$ bool $>$ monero\+::monero\+\_\+rpc\+\_\+connection\+::is\+\_\+authenticated (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Indicates if the connection is authenticated, which is set automatically by calling \doxylink{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}{check\+\_\+connection()}.
+
+\begin{DoxyReturn}{Returns}
+true if authenticated or no authentication, false if not authenticated, or null if not set 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a954048bc566017a000cab286a1f14d40}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!is\_connected@{is\_connected}}
+\index{is\_connected@{is\_connected}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{is\_connected()}{is\_connected()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a954048bc566017a000cab286a1f14d40} 
+boost\+::optional$<$ bool $>$ monero\+::monero\+\_\+rpc\+\_\+connection\+::is\+\_\+connected (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Indicates if the connection is connected, which is set automatically by calling \doxylink{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}{check\+\_\+connection()}.
+
+\begin{DoxyReturn}{Returns}
+true or false to indicate if connected, or null if \doxylink{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}{check\+\_\+connection()} has not been called 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a78af7752c0f75cf4d43b108e5f53b909}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!is\_i2p@{is\_i2p}}
+\index{is\_i2p@{is\_i2p}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{is\_i2p()}{is\_i2p()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a78af7752c0f75cf4d43b108e5f53b909} 
+bool monero\+::monero\+\_\+rpc\+\_\+connection\+::is\+\_\+i2p (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Indicates if the connection uri is a I2P server.
+
+\begin{DoxyReturn}{Returns}
+true or false to indicate if connection uri is a I2P server 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a6a8fb7828bbe7d4881a984975593b29c}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!is\_onion@{is\_onion}}
+\index{is\_onion@{is\_onion}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{is\_onion()}{is\_onion()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a6a8fb7828bbe7d4881a984975593b29c} 
+bool monero\+::monero\+\_\+rpc\+\_\+connection\+::is\+\_\+onion (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Indicates if the connection uri is a TOR server.
+
+\begin{DoxyReturn}{Returns}
+true or false to indicate if connection uri is a TOR server 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_af30d873536115a0cbfd8fb778cd0ba1d}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!is\_online@{is\_online}}
+\index{is\_online@{is\_online}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{is\_online()}{is\_online()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_af30d873536115a0cbfd8fb778cd0ba1d} 
+boost\+::optional$<$ bool $>$ monero\+::monero\+\_\+rpc\+\_\+connection\+::is\+\_\+online (\begin{DoxyParamCaption}{}{}\end{DoxyParamCaption}) const}
+
+Indicates if the connection is online, which is set automatically by calling \doxylink{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}{check\+\_\+connection()}.
+
+\begin{DoxyReturn}{Returns}
+true or false to indicate if online, or null if \doxylink{classmonero_1_1monero__rpc__connection_a9aacb72c2b373f24b7798f34bc667dac}{check\+\_\+connection()} has not been called 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_aaa2796192402addbd0e80c26443b5514}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!send\_binary\_request@{send\_binary\_request}}
+\index{send\_binary\_request@{send\_binary\_request}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{send\_binary\_request()}{send\_binary\_request()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_aaa2796192402addbd0e80c26443b5514} 
+\mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} monero\+::monero\+\_\+rpc\+\_\+connection\+::send\+\_\+binary\+\_\+request (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&}]{request}{, }\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption}) const}
+
+Send a binary RPC request.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & specifies the method to request with paramesters \\
+\hline
+{\em timeout} & request timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the request\textquotesingle{}s deserialized response 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a11331a5faf74b7788ecd46f07c837897}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!send\_json\_request@{send\_json\_request}}
+\index{send\_json\_request@{send\_json\_request}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{send\_json\_request()}{send\_json\_request()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a11331a5faf74b7788ecd46f07c837897} 
+\mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} monero\+::monero\+\_\+rpc\+\_\+connection\+::send\+\_\+json\+\_\+request (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&}]{request}{, }\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption}) const}
+
+Send a request to the RPC API.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & specifies the method to request with parameters \\
+\hline
+{\em timeout} & request timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the RPC API response as a map 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a24c3231cea76a7cce5007cca96c38de3}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!send\_json\_request@{send\_json\_request}}
+\index{send\_json\_request@{send\_json\_request}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{send\_json\_request()}{send\_json\_request()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a24c3231cea76a7cce5007cca96c38de3} 
+boost\+::property\+\_\+tree\+::ptree monero\+::monero\+\_\+rpc\+\_\+connection\+::send\+\_\+json\+\_\+request (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{path}{, }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\+\_\+struct}} $>$ \&}]{params}{ = {\ttfamily nullptr}, }\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption}) const}
+
+Send a request to the RPC API.
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & specifies the method to request \\
+\hline
+{\em params} & are the request\textquotesingle{}s input parameters \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the RPC API response as a map 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_ace52bbfb463bea8e58580ea9a107967a}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!send\_path\_request@{send\_path\_request}}
+\index{send\_path\_request@{send\_path\_request}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{send\_path\_request()}{send\_path\_request()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_ace52bbfb463bea8e58580ea9a107967a} 
+\mbox{\hyperlink{structmonero_1_1monero__rpc__response}{monero\+\_\+rpc\+\_\+response}} monero\+::monero\+\_\+rpc\+\_\+connection\+::send\+\_\+path\+\_\+request (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structmonero_1_1monero__rpc__request}{monero\+\_\+rpc\+\_\+request}} \&}]{request}{, }\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption}) const}
+
+Send a RPC request to the given path and with the given paramters.
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & specifies the method to request with parameters \\
+\hline
+{\em timeout} & request timeout in milliseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the request\textquotesingle{}s deserialized response 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a844ea0e30ba6ca671985ea6ef5d22f22}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!send\_path\_request@{send\_path\_request}}
+\index{send\_path\_request@{send\_path\_request}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{send\_path\_request()}{send\_path\_request()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a844ea0e30ba6ca671985ea6ef5d22f22} 
+boost\+::property\+\_\+tree\+::ptree monero\+::monero\+\_\+rpc\+\_\+connection\+::send\+\_\+path\+\_\+request (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{path}{, }\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\+\_\+struct}} $>$ \&}]{params}{ = {\ttfamily nullptr}, }\item[{const boost\+::optional$<$ uint32\+\_\+t $>$ \&}]{timeout\+\_\+ms}{ = {\ttfamily boost\+:\+:none}}\end{DoxyParamCaption}) const}
+
+Send a RPC request to the given path and with the given paramters.
+
+E.\+g. "{}/get\+\_\+transactions"{} with params
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & is the url path of the request to invoke \\
+\hline
+{\em params} & are request parameters sent in the body \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the RPC API response as a map 
+\end{DoxyReturn}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a7e91af64b534175680b6ec5e52c16896}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!set\_attribute@{set\_attribute}}
+\index{set\_attribute@{set\_attribute}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{set\_attribute()}{set\_attribute()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a7e91af64b534175680b6ec5e52c16896} 
+void monero\+::monero\+\_\+rpc\+\_\+connection\+::set\+\_\+attribute (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{key}{, }\item[{const std\+::string \&}]{val}{}\end{DoxyParamCaption})}
+
+Set connection attribute.
+
+
+\begin{DoxyParams}{Parameters}
+{\em key} & is the attribute key \\
+\hline
+{\em val} & is the attribute value \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmonero_1_1monero__rpc__connection_a5d2b859865c3ad8f4415681461b6f0eb}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!set\_credentials@{set\_credentials}}
+\index{set\_credentials@{set\_credentials}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{set\_credentials()}{set\_credentials()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_a5d2b859865c3ad8f4415681461b6f0eb} 
+void monero\+::monero\+\_\+rpc\+\_\+connection\+::set\+\_\+credentials (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{username}{, }\item[{const std\+::string \&}]{password}{}\end{DoxyParamCaption})}
+
+Set connection credentials.
+
+
+\begin{DoxyParams}{Parameters}
+{\em username} & username to use in RPC authentication \\
+\hline
+{\em password} & password to use in RPC authentication \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmonero_1_1monero__rpc__connection_aef91b1d36c45f33b2e3898e3d82820d7}\index{monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_rpc\_connection@{monero::monero\_rpc\_connection}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__connection_aef91b1d36c45f33b2e3898e3d82820d7} 
+rapidjson\+::\+Value monero\+::monero\+\_\+rpc\+\_\+connection\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+common/monero\+\_\+rpc\+\_\+connection.\+h\item 
+common/monero\+\_\+rpc\+\_\+connection.\+cpp\end{DoxyCompactItemize}

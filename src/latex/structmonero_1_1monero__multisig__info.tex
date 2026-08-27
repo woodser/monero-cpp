@@ -1,0 +1,75 @@
+\doxysection{monero\+::monero\+\_\+multisig\+\_\+info Struct Reference}
+\hypertarget{structmonero_1_1monero__multisig__info}{}\label{structmonero_1_1monero__multisig__info}\index{monero::monero\_multisig\_info@{monero::monero\_multisig\_info}}
+
+
+{\ttfamily \#include $<$monero\+\_\+wallet\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+multisig\+\_\+info\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__multisig__info}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__multisig__info_a74b60f619cbb3bd5cc7e90962cf91305}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__multisig__info_a177dd5bf4fc105b997ca0e792b35a84b}\label{structmonero_1_1monero__multisig__info_a177dd5bf4fc105b997ca0e792b35a84b} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__multisig__info}{monero\+\_\+multisig\+\_\+info}} $>$ \&info)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__multisig__info_a337718f4e29684a65167f8b185d0c97c}\label{structmonero_1_1monero__multisig__info_a337718f4e29684a65167f8b185d0c97c} 
+bool {\bfseries m\+\_\+is\+\_\+multisig}
+\item 
+\Hypertarget{structmonero_1_1monero__multisig__info_a5e9fd709b9d676d81e8245bf7f147db2}\label{structmonero_1_1monero__multisig__info_a5e9fd709b9d676d81e8245bf7f147db2} 
+bool {\bfseries m\+\_\+is\+\_\+ready}
+\item 
+\Hypertarget{structmonero_1_1monero__multisig__info_a2a166dcf8c7fa21e1f48b5e0f50b33aa}\label{structmonero_1_1monero__multisig__info_a2a166dcf8c7fa21e1f48b5e0f50b33aa} 
+uint32\+\_\+t {\bfseries m\+\_\+threshold}
+\item 
+\Hypertarget{structmonero_1_1monero__multisig__info_af0f8bad94f133dafce3c3732c7e049be}\label{structmonero_1_1monero__multisig__info_af0f8bad94f133dafce3c3732c7e049be} 
+uint32\+\_\+t {\bfseries m\+\_\+num\+\_\+participants}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Models information about a multisig wallet. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__multisig__info_a74b60f619cbb3bd5cc7e90962cf91305}\index{monero::monero\_multisig\_info@{monero::monero\_multisig\_info}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_multisig\_info@{monero::monero\_multisig\_info}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__multisig__info_a74b60f619cbb3bd5cc7e90962cf91305} 
+rapidjson\+::\+Value monero\+::monero\+\_\+multisig\+\_\+info\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+h\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+cpp\end{DoxyCompactItemize}

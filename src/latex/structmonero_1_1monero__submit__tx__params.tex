@@ -1,0 +1,65 @@
+\doxysection{monero\+::monero\+\_\+submit\+\_\+tx\+\_\+params Struct Reference}
+\hypertarget{structmonero_1_1monero__submit__tx__params}{}\label{structmonero_1_1monero__submit__tx__params}\index{monero::monero\_submit\_tx\_params@{monero::monero\_submit\_tx\_params}}
+Inheritance diagram for monero\+::monero\+\_\+submit\+\_\+tx\+\_\+params\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__submit__tx__params}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__params_a86f7fdf5348b45ac6f076a2929bb38e8}\label{structmonero_1_1monero__submit__tx__params_a86f7fdf5348b45ac6f076a2929bb38e8} 
+{\bfseries monero\+\_\+submit\+\_\+tx\+\_\+params} (const std\+::vector$<$ std\+::string $>$ \&tx\+\_\+hashes)
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__params_a181631a106e315d882e396b28a7e0d90}\label{structmonero_1_1monero__submit__tx__params_a181631a106e315d882e396b28a7e0d90} 
+{\bfseries monero\+\_\+submit\+\_\+tx\+\_\+params} (const std\+::string \&tx\+\_\+hex, bool do\+\_\+not\+\_\+relay)
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__submit__tx__params_aba0a4b69d57cc051134227c7a7881cb3}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__params_afd04a9376d1ae2caac672df04cbcd659}\label{structmonero_1_1monero__submit__tx__params_afd04a9376d1ae2caac672df04cbcd659} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+tx\+\_\+hex}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__params_acbb872d93746e1ef733b0acb4e984d1b}\label{structmonero_1_1monero__submit__tx__params_acbb872d93746e1ef733b0acb4e984d1b} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+do\+\_\+not\+\_\+relay}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__params_ac47b0bb2c471c3f188b549a0897e1a5a}\label{structmonero_1_1monero__submit__tx__params_ac47b0bb2c471c3f188b549a0897e1a5a} 
+std\+::vector$<$ std\+::string $>$ {\bfseries m\+\_\+tx\+\_\+hashes}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__submit__tx__params_aba0a4b69d57cc051134227c7a7881cb3}\index{monero::monero\_submit\_tx\_params@{monero::monero\_submit\_tx\_params}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_submit\_tx\_params@{monero::monero\_submit\_tx\_params}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__submit__tx__params_aba0a4b69d57cc051134227c7a7881cb3} 
+rapidjson\+::\+Value monero\+::monero\+\_\+submit\+\_\+tx\+\_\+params\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+rpc\+\_\+model.\+h\item 
+daemon/monero\+\_\+daemon\+\_\+rpc\+\_\+model.\+cpp\end{DoxyCompactItemize}

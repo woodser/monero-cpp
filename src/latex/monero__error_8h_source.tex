@@ -1,0 +1,38 @@
+\doxysection{monero\+\_\+error.\+h}
+\hypertarget{monero__error_8h_source}{}\label{monero__error_8h_source}\index{common/monero\_error.h@{common/monero\_error.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#include\ <exception>}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ <string>}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00061\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacemonero}{monero}}\ \{}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00066\ \ \ \textcolor{keyword}{class\ }monero\_error\ :\ \textcolor{keyword}{public}\ std::exception\ \{}
+\DoxyCodeLine{00067\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00068\ \ \ \ \ std::string\ message;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \ \ monero\_error()\ \{\}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00077\ \ \ \ \ \mbox{\hyperlink{classmonero_1_1monero__error_aa0c6965b36202a1f1fdb1ccf8615f98a}{monero\_error}}(\textcolor{keyword}{const}\ std::string\&\ msg)\ :\ message(msg)\ \{\}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \ \ \ \ \textcolor{keyword}{const}\ \textcolor{keywordtype}{char}*\ what()\ const\ noexcept\textcolor{keyword}{\ override\ }\{}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \textcolor{keywordflow}{return}\ message.c\_str();}
+\DoxyCodeLine{00081\ \ \ \ \ \}}
+\DoxyCodeLine{00082\ \ \ \};}
+\DoxyCodeLine{00083\ }
+\DoxyCodeLine{00087\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classmonero_1_1monero__rpc__error_a4310efd1b065f134ddaae0dae407f814}{monero\_rpc\_error}}\ :\ \textcolor{keyword}{public}\ monero\_error\ \{}
+\DoxyCodeLine{00088\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00089\ \ \ \ \ \textcolor{keywordtype}{int}\ code;}
+\DoxyCodeLine{00090\ }
+\DoxyCodeLine{00097\ \ \ \ \ \mbox{\hyperlink{classmonero_1_1monero__rpc__error_a4310efd1b065f134ddaae0dae407f814}{monero\_rpc\_error}}(\textcolor{keywordtype}{int}\ error\_code,\ \textcolor{keyword}{const}\ std::string\&\ msg)\ :\ code(error\_code)\ \{\ message\ =\ msg;\ \}}
+\DoxyCodeLine{00098\ }
+\DoxyCodeLine{00104\ \ \ \ \ \mbox{\hyperlink{classmonero_1_1monero__rpc__error_aef417c90d61cf51b0039a6488b26d745}{monero\_rpc\_error}}(\textcolor{keyword}{const}\ std::string\&\ msg)\ :\ code(-\/1)\ \{\ message\ =\ msg;\ \}}
+\DoxyCodeLine{00105\ \ \ \};}
+\DoxyCodeLine{00106\ }
+\DoxyCodeLine{00107\ \}}
+
+\end{DoxyCode}

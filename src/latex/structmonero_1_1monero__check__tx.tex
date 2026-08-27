@@ -1,0 +1,77 @@
+\doxysection{monero\+::monero\+\_\+check\+\_\+tx Struct Reference}
+\hypertarget{structmonero_1_1monero__check__tx}{}\label{structmonero_1_1monero__check__tx}\index{monero::monero\_check\_tx@{monero::monero\_check\_tx}}
+
+
+{\ttfamily \#include $<$monero\+\_\+wallet\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+check\+\_\+tx\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{structmonero_1_1monero__check__tx}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__check__tx_aa58bcd6250ea88c7ab9298e4d70896a6}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__check__tx_a84613b80b9bb77ee3ee7f12ea2f470a8}\label{structmonero_1_1monero__check__tx_a84613b80b9bb77ee3ee7f12ea2f470a8} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__check__tx}{monero\+\_\+check\+\_\+tx}} $>$ \&check)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__check__tx_a4bb6d8166d3b3396fa152da4ef7ebcda}\label{structmonero_1_1monero__check__tx_a4bb6d8166d3b3396fa152da4ef7ebcda} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+in\+\_\+tx\+\_\+pool}
+\item 
+\Hypertarget{structmonero_1_1monero__check__tx_a4b895ad83eb24ba2a3ff0c2d00ae4dc2}\label{structmonero_1_1monero__check__tx_a4b895ad83eb24ba2a3ff0c2d00ae4dc2} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+num\+\_\+confirmations}
+\item 
+\Hypertarget{structmonero_1_1monero__check__tx_a01251c1f57d45153cc94a8401d12d417}\label{structmonero_1_1monero__check__tx_a01251c1f57d45153cc94a8401d12d417} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+received\+\_\+amount}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structmonero_1_1monero__check}{monero\+::monero\+\_\+check}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries m\+\_\+is\+\_\+good}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Results from checking a transaction key. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__check__tx_aa58bcd6250ea88c7ab9298e4d70896a6}\index{monero::monero\_check\_tx@{monero::monero\_check\_tx}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_check\_tx@{monero::monero\_check\_tx}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__check__tx_aa58bcd6250ea88c7ab9298e4d70896a6} 
+rapidjson\+::\+Value monero\+::monero\+\_\+check\+\_\+tx\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Reimplemented from \mbox{\hyperlink{structmonero_1_1monero__check_a405a6322e58b150cc3643e0569039ceb}{monero\+::monero\+\_\+check}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+h\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+cpp\end{DoxyCompactItemize}
