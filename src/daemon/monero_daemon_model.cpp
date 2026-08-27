@@ -1710,4 +1710,58 @@ namespace monero {
     return root;
   }
 
+  // --------------------------- MONERO BLOCKS BY HASH RESULT ---------------------------
+
+  void monero_get_blocks_by_hash_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_blocks_by_hash_result>& result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      // note: m_blocks is not round-tripped here; monero_block has no from_property_tree of its own yet
+      if (key == std::string("currentHeight")) result->m_current_height = it->second.get_value<uint64_t>();
+    }
+  }
+
+  rapidjson::Value monero_get_blocks_by_hash_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_current_height != boost::none) monero_utils::add_json_member("currentHeight", m_current_height.get(), allocator, root, value_num);
+
+    // set sub-arrays
+    if (!m_blocks.empty()) root.AddMember("blocks", monero_utils::to_rapidjson_val(allocator, m_blocks), allocator);
+
+    // return root
+    return root;
+  }
+
+  // --------------------------- MONERO BLOCK HASHES RESULT ---------------------------
+
+  void monero_get_block_hashes_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_block_hashes_result>& result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("hashes")) {
+        for (const auto& child : it->second) result->m_hashes.push_back(child.second.data());
+      }
+      else if (key == std::string("startHeight")) result->m_start_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("currentHeight")) result->m_current_height = it->second.get_value<uint64_t>();
+    }
+  }
+
+  rapidjson::Value monero_get_block_hashes_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    // create root
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    // set number values
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    if (m_start_height != boost::none) monero_utils::add_json_member("startHeight", m_start_height.get(), allocator, root, value_num);
+    if (m_current_height != boost::none) monero_utils::add_json_member("currentHeight", m_current_height.get(), allocator, root, value_num);
+
+    // set sub-arrays
+    if (!m_hashes.empty()) root.AddMember("hashes", monero_utils::to_rapidjson_val(allocator, m_hashes), allocator);
+
+    // return root
+    return root;
+  }
+
 }

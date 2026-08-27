@@ -96,6 +96,7 @@ namespace monero_utils
   void json_to_binary(const std::string &json, std::string &bin);
   void binary_to_json(const std::string &bin, std::string &json);
   void binary_blocks_to_json(const std::string &bin, std::string &json);
+  void binary_blocks_fast_to_json(const std::string &bin, std::string &json);
   uint64_t xmr_to_atomic_units(double amount_xmr);
   double atomic_units_to_xmr(uint64_t amount_atomic_units);
 
@@ -182,6 +183,7 @@ namespace monero_utils
   }
 
   void binary_blocks_to_property_tree(const std::string &bin, boost::property_tree::ptree &node);
+  void binary_blocks_fast_to_property_tree(const std::string &bin, boost::property_tree::ptree &node);
 
   /**
     * Merges a transaction into a unique set of transactions.

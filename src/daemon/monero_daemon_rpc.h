@@ -117,12 +117,12 @@ namespace monero {
     std::shared_ptr<monero_block_header> get_block_header_by_height(uint64_t height) override;
     std::vector<std::shared_ptr<monero_block_header>> get_block_headers_by_range(uint64_t start_height, uint64_t end_height) override;
     std::shared_ptr<monero_block> get_block_by_hash(const std::string& hash) override;
-    std::vector<std::shared_ptr<monero_block>> get_blocks_by_hash(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune) override;
+    std::shared_ptr<monero_get_blocks_by_hash_result> get_blocks_by_hash(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune, uint64_t max_block_count = 0) override;
     std::shared_ptr<monero_block> get_block_by_height(uint64_t height) override;
     std::vector<std::shared_ptr<monero_block>> get_blocks_by_height(const std::vector<uint64_t>& heights) override;
     std::vector<std::shared_ptr<monero_block>> get_blocks_by_range(boost::optional<uint64_t> start_height, boost::optional<uint64_t> end_height) override;
     std::vector<std::shared_ptr<monero_block>> get_blocks_by_range_chunked(boost::optional<uint64_t> start_height, boost::optional<uint64_t> end_height, boost::optional<uint64_t> max_chunk_size) override;
-    std::vector<std::string> get_block_hashes(const std::vector<std::string>& block_hashes, uint64_t start_height) override;
+    std::shared_ptr<monero_get_block_hashes_result> get_block_hashes(const std::vector<std::string>& block_hashes) override;
     std::vector<std::shared_ptr<monero_tx>> get_txs(const std::vector<std::string>& tx_hashes, bool prune = false) override;
     std::vector<std::string> get_tx_hexes(const std::vector<std::string>& tx_hashes, bool prune = false) override;
     std::shared_ptr<monero_miner_tx_sum> get_miner_tx_sum(uint64_t height, uint64_t num_blocks) override;

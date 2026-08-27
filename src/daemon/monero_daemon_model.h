@@ -699,4 +699,27 @@ namespace monero {
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
+  /**
+   * Models the result of getting blocks by hash.
+   */
+  struct monero_get_blocks_by_hash_result : public serializable_struct {
+    std::vector<std::shared_ptr<monero_block>> m_blocks;
+    boost::optional<uint64_t> m_current_height; // the daemon's chain height at request time
+
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_blocks_by_hash_result>& result);
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
+   * Models the result of getting block hashes.
+   */
+  struct monero_get_block_hashes_result : public serializable_struct {
+    std::vector<std::string> m_hashes;
+    boost::optional<uint64_t> m_start_height; // height of first hash in m_hashes
+    boost::optional<uint64_t> m_current_height; // the daemon's chain height at request time
+
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_block_hashes_result>& result);
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
 }

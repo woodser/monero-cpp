@@ -354,8 +354,17 @@ namespace monero {
     return found->second;
   }
 
-  std::vector<std::shared_ptr<monero_block>> monero_daemon_rpc::get_blocks_by_hash(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune) {
-    throw monero_error("monero_daemon_rpc::get_blocks_by_hash(): not implemented");
+  std::shared_ptr<monero_get_blocks_by_hash_result> monero_daemon_rpc::get_blocks_by_hash(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune, uint64_t max_block_count) {
+    monero_get_blocks_by_hash_request request(block_hashes, start_height, prune, max_block_count);
+    auto response = m_rpc->send_binary_request(request);
+    if (response.m_binary == boost::none) throw monero_error("Invalid Monero Binary response");
+    boost::property_tree::ptree node;
+    monero_utils::binary_blocks_fast_to_property_tree(response.m_binary.get(), node);
+    check_response_status(node);
+
+    auto result = std::make_shared<monero_get_blocks_by_hash_result>();
+    deserialize_get_blocks_by_hash_result(node, result);
+    return result;
   }
 
   std::shared_ptr<monero_block> monero_daemon_rpc::get_block_by_height(uint64_t height) {
@@ -457,8 +466,13 @@ namespace monero {
     return std::vector<std::shared_ptr<monero_block>>();
   }
 
-  std::vector<std::string> monero_daemon_rpc::get_block_hashes(const std::vector<std::string>& block_hashes, uint64_t start_height) {
-    throw monero_error("monero_daemon_rpc::get_block_hashes(): not implemented");
+  std::shared_ptr<monero_get_block_hashes_result> monero_daemon_rpc::get_block_hashes(const std::vector<std::string>& block_hashes) {
+    monero_get_block_hashes_request request(block_hashes);
+    auto response = m_rpc->send_binary_request(request);
+    if (response.m_binary == boost::none) throw monero_error("Invalid Monero Binary response");
+    auto result = std::make_shared<monero_get_block_hashes_result>();
+    deserialize_block_hashes(response.m_binary.get(), result);
+    return result;
   }
 
   std::vector<std::shared_ptr<monero_tx>> monero_daemon_rpc::get_txs(const std::vector<std::string>& tx_hashes, bool prune) {
