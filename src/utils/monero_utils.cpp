@@ -63,6 +63,116 @@
 using namespace cryptonote;
 using namespace monero_utils;
 
+// ----------------------- INTERNAL PRIVATE HELPERS -----------------------
+
+namespace {
+  // shared by monero_utils::binary_blocks_to_json() and monero_utils::binary_blocks_fast_to_json()
+  void add_blocks_and_txs_to_ptree(const std::vector<cryptonote::block_complete_entry>& blocks, boost::property_tree::ptree& root) {
+    boost::property_tree::ptree blocksNode; // array of block strings
+    boost::property_tree::ptree txsNodes;   // array of txs per block (array of array)
+    boost::property_tree::ptree hashesNode; // array of block hashes
+    for (int blockIdx = 0; blockIdx < blocks.size(); blockIdx++) {
+
+      // parse and validate block
+      cryptonote::block block;
+      if (cryptonote::parse_and_validate_block_from_blob(blocks[blockIdx].block, block)) {
+
+        // add block node to blocks node
+        boost::property_tree::ptree blockNode;
+        blockNode.put("", cryptonote::obj_to_json_str(block));  // TODO: no pretty print
+        blocksNode.push_back(std::make_pair("", blockNode));
+
+        // compute block's hash and add to hashes node in parallel
+        boost::property_tree::ptree hashNode;
+        hashNode.put("", epee::string_tools::pod_to_hex(cryptonote::get_block_hash(block)));
+        hashesNode.push_back(std::make_pair("", hashNode));
+      } else {
+        throw std::runtime_error("failed to parse block blob at index " + std::to_string(blockIdx));
+      }
+
+      // parse and validate txs: a pruned blob only has the base (no prunable section), so it
+      // must go through the base-only parser or the full parser fails on every non-miner tx
+      boost::property_tree::ptree txs_node;
+      for (int txIdx = 0; txIdx < blocks[blockIdx].txs.size(); txIdx++) {
+        cryptonote::transaction tx;
+        bool parsed = blocks[blockIdx].pruned
+          ? cryptonote::parse_and_validate_tx_base_from_blob(blocks[blockIdx].txs[txIdx].blob, tx)
+          : cryptonote::parse_and_validate_tx_from_blob(blocks[blockIdx].txs[txIdx].blob, tx);
+        if (parsed) {
+
+          // add tx node to txs node
+          boost::property_tree::ptree txNode;
+          //MTRACE("PRUNED:\n" << monero_utils::get_pruned_tx_json(tx));
+          txNode.put("", monero_utils::get_pruned_tx_json(tx)); // TODO: no pretty print
+          txs_node.push_back(std::make_pair("", txNode));
+        } else {
+          throw std::runtime_error("failed to parse tx blob at index " + std::to_string(txIdx));
+        }
+      }
+      txsNodes.push_back(std::make_pair("", txs_node)); // array of array of transactions, one array per block
+    }
+    root.add_child("blocks", blocksNode);
+    root.add_child("txs", txsNodes);
+    root.add_child("block_hashes", hashesNode);
+  }
+
+  // shared by monero_utils::binary_blocks_to_property_tree() and monero_utils::binary_blocks_fast_to_property_tree()
+  void bin_blocks_to_property_tree(const std::string &bin, boost::property_tree::ptree &node, bool is_fast) {
+    std::string response_json;
+    if (is_fast) monero_utils::binary_blocks_fast_to_json(bin, response_json);
+    else monero_utils::binary_blocks_to_json(bin, response_json);
+    std::istringstream iss(response_json);
+    boost::property_tree::read_json(iss, node);
+
+    auto blocks = node.get_child("blocks");
+    auto block_hashes = node.get_child("block_hashes"); // parallel to "blocks", see add_blocks_and_txs_to_ptree()
+    boost::property_tree::ptree parsed_blocks;
+
+    auto hash_it = block_hashes.begin();
+    for (auto &entry : blocks) {
+      const std::string &block_str = entry.second.get_value<std::string>();
+      boost::property_tree::ptree block_node;
+      gen_utils::deserialize(block_str, block_node);
+      if (hash_it != block_hashes.end()) {
+        block_node.put("hash", hash_it->second.get_value<std::string>());
+        ++hash_it;
+      }
+      parsed_blocks.push_back(std::make_pair("", block_node));
+    }
+
+    node.put_child("blocks", parsed_blocks);
+    node.erase("block_hashes"); // merged into each block above
+
+    auto txs = node.get_child("txs");
+    boost::property_tree::ptree all_txs;
+
+    for (auto &rpc_txs_entry : txs) {
+      boost::property_tree::ptree txs_for_block;
+      const auto &rpc_txs = rpc_txs_entry.second;
+
+      if (!rpc_txs.empty() || !rpc_txs.data().empty()) {
+        for (auto &tx_entry : rpc_txs) {
+          std::string tx_str = tx_entry.second.get_value<std::string>();
+
+          auto pos = tx_str.find(',');
+          if (pos != std::string::npos) {
+            tx_str.replace(pos, 1, "{");
+            tx_str += "}";
+          }
+
+          boost::property_tree::ptree tx_node;
+          gen_utils::deserialize(tx_str, tx_node);
+          txs_for_block.push_back(std::make_pair("", tx_node));
+        }
+      }
+
+      all_txs.push_back(std::make_pair("", txs_for_block));
+    }
+
+    node.put_child("txs", all_txs);
+  }
+}
+
 void monero_utils::set_log_level(int level) {
   mlog_set_log_level(level);
 }
@@ -248,47 +358,33 @@ void monero_utils::binary_blocks_to_json(const std::string &bin, std::string &js
 
   // load binary rpc response to struct
   cryptonote::COMMAND_RPC_GET_BLOCKS_BY_HEIGHT::response resp_struct;
-  epee::serialization::load_t_from_binary(resp_struct, bin);
+  if (!epee::serialization::load_t_from_binary(resp_struct, bin)) throw std::runtime_error("failed to parse get_blocks_by_height.bin response");
 
   // build property tree from deserialized blocks and transactions
   boost::property_tree::ptree root;
-  boost::property_tree::ptree blocksNode; // array of block strings
-  boost::property_tree::ptree txsNodes;   // array of txs per block (array of array)
-  for (int blockIdx = 0; blockIdx < resp_struct.blocks.size(); blockIdx++) {
-
-    // parse and validate block
-    cryptonote::block block;
-    if (cryptonote::parse_and_validate_block_from_blob(resp_struct.blocks[blockIdx].block, block)) {
-
-      // add block node to blocks node
-      boost::property_tree::ptree blockNode;
-      blockNode.put("", cryptonote::obj_to_json_str(block));  // TODO: no pretty print
-      blocksNode.push_back(std::make_pair("", blockNode));
-    } else {
-      throw std::runtime_error("failed to parse block blob at index " + std::to_string(blockIdx));
-    }
-
-    // parse and validate txs
-    boost::property_tree::ptree txs_node;
-    for (int txIdx = 0; txIdx < resp_struct.blocks[blockIdx].txs.size(); txIdx++) {
-      cryptonote::transaction tx;
-      if (cryptonote::parse_and_validate_tx_from_blob(resp_struct.blocks[blockIdx].txs[txIdx].blob, tx)) {
-
-        // add tx node to txs node
-        boost::property_tree::ptree txNode;
-        //MTRACE("PRUNED:\n" << monero_utils::get_pruned_tx_json(tx));
-        txNode.put("", monero_utils::get_pruned_tx_json(tx)); // TODO: no pretty print
-        txs_node.push_back(std::make_pair("", txNode));
-      } else {
-        throw std::runtime_error("failed to parse tx blob at index " + std::to_string(txIdx));
-      }
-    }
-    txsNodes.push_back(std::make_pair("", txs_node)); // array of array of transactions, one array per block
-  }
-  root.add_child("blocks", blocksNode);
-  root.add_child("txs", txsNodes);
+  add_blocks_and_txs_to_ptree(resp_struct.blocks, root);
   root.put("status", resp_struct.status);
   root.put("untrusted", resp_struct.untrusted); // TODO: loss of ints and bools
+
+  // convert root to string // TODO: common utility with serial_bridge
+  std::stringstream ss;
+  boost::property_tree::write_json(ss, root, false/*pretty*/);
+  json = ss.str();
+}
+
+void monero_utils::binary_blocks_fast_to_json(const std::string &bin, std::string &json) {
+
+  // load binary rpc response to struct
+  cryptonote::COMMAND_RPC_GET_BLOCKS_FAST::response resp_struct;
+  if (!epee::serialization::load_t_from_binary(resp_struct, bin)) throw std::runtime_error("failed to parse get_blocks.bin response");
+
+  // build property tree from deserialized blocks and transactions
+  boost::property_tree::ptree root;
+  add_blocks_and_txs_to_ptree(resp_struct.blocks, root);
+  root.put("status", resp_struct.status);
+  root.put("untrusted", resp_struct.untrusted); // TODO: loss of ints and bools
+  root.put("start_height", resp_struct.start_height);
+  root.put("current_height", resp_struct.current_height);
 
   // convert root to string // TODO: common utility with serial_bridge
   std::stringstream ss;
@@ -448,50 +544,11 @@ std::shared_ptr<monero_tx> monero_utils::cn_tx_to_tx(const cryptonote::transacti
 }
 
 void monero_utils::binary_blocks_to_property_tree(const std::string &bin, boost::property_tree::ptree &node) {
-  std::string response_json;
-  monero_utils::binary_blocks_to_json(bin, response_json);
-  std::istringstream iss(response_json);
-  boost::property_tree::read_json(iss, node);
+  bin_blocks_to_property_tree(bin, node, false);
+}
 
-  auto blocks = node.get_child("blocks");
-  boost::property_tree::ptree parsed_blocks;
-
-  for (auto &entry : blocks) {
-    const std::string &block_str = entry.second.get_value<std::string>();
-    boost::property_tree::ptree block_node;
-    gen_utils::deserialize(block_str, block_node);
-    parsed_blocks.push_back(std::make_pair("", block_node));
-  }
-
-  node.put_child("blocks", parsed_blocks);
-
-  auto txs = node.get_child("txs");
-  boost::property_tree::ptree all_txs;
-
-  for (auto &rpc_txs_entry : txs) {
-    boost::property_tree::ptree txs_for_block;
-    const auto &rpc_txs = rpc_txs_entry.second;
-
-    if (!rpc_txs.empty() || !rpc_txs.data().empty()) {
-      for (auto &tx_entry : rpc_txs) {
-        std::string tx_str = tx_entry.second.get_value<std::string>();
-
-        auto pos = tx_str.find(',');
-        if (pos != std::string::npos) {
-          tx_str.replace(pos, 1, "{");
-          tx_str += "}";
-        }
-
-        boost::property_tree::ptree tx_node;
-        gen_utils::deserialize(tx_str, tx_node);
-        txs_for_block.push_back(std::make_pair("", tx_node));
-      }
-    }
-
-    all_txs.push_back(std::make_pair("", txs_for_block));
-  }
-
-  node.put_child("txs", all_txs);
+void monero_utils::binary_blocks_fast_to_property_tree(const std::string &bin, boost::property_tree::ptree &node) {
+  bin_blocks_to_property_tree(bin, node, true);
 }
 
 void monero_utils::merge_tx(const std::shared_ptr<monero_tx_wallet>& tx, std::map<std::string, std::shared_ptr<monero_tx_wallet>>& tx_map, std::map<uint64_t, std::shared_ptr<monero_block>>& block_map) {

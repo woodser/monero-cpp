@@ -256,14 +256,24 @@ namespace monero {
     /**
      * Get blocks by hash.
      * 
-     * @param block_hashes are array of hashes; first 10 blocks hash goes sequential,
+     * @param block_hashes is a short chain history; first 10 blocks hash goes sequential,
      *        next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on,
      *        and the last one is always genesis block
-     * @param start_height is the start height to get blocks by hash
-     * @param prune specifies if returned blocks should be pruned (defaults to false)  // TODO: test default
-     * @return the retrieved blocks
+     * @param start_height is the start height to resume from; when non-zero, daemon skips the
+     *        search to find the last block and is used as-is, ignoring block_hashes — except when
+     *        block_hashes[0] already matches the daemon's tip, which short-circuits to an empty
+     *        result (see @return) before start_height is ever consulted
+     * @param prune specifies if returned blocks should be pruned (defaults to false)
+     * @param max_block_count caps how many blocks the daemon returns in one call (0 leaves it to
+     *        the daemon's own default limit); use this to chunk large ranges instead of taking
+     *        whatever the daemon hands back
+     * @return the retrieved blocks plus the daemon's current chain height; the blocks are not a
+     *        lookup of block_hashes, so their heights won't line up with block_hashes 1:1; the range
+     *        starts at and includes the resume point (the common block found, or start_height itself
+     *        when non-zero), not the block after it; if block_hashes[0] already matches the daemon's
+     *        tip, an empty block list comes back (this noop check runs before start_height is consulted)
      */
-    virtual std::vector<std::shared_ptr<monero_block>> get_blocks_by_hash(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune) {
+    virtual std::shared_ptr<monero_get_blocks_by_hash_result> get_blocks_by_hash(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune, uint64_t max_block_count = 0) {
       throw std::runtime_error("monero_daemon::get_blocks_by_hash(): not supported");
     }
 
@@ -312,14 +322,16 @@ namespace monero {
 
     /**
      * Get block hashes as a binary request to the daemon.
-     * 
-     * @param block_hashes specify block hashes to fetch; first 10 blocks hash goes
-     *        sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64
-     *        and so on, and the last one is always genesis block
-     * @param start_height is the starting height of block hashes to return
-     * @return the requested block hashes
+     *
+     * @param block_hashes is a short chain history; first 10 blocks hash goes sequential,
+     *        next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on,
+     *        and the last one is always genesis block which is required, or the request fails.
+     * @return the requested hashes plus their start height and the daemon's current chain height;
+     *        the hash range starts at and includes the last one the daemon has in common with
+     *        block_hashes (not the one after it); if block_hashes[0] already matches the daemon's tip,
+     *        exactly one hash (the tip itself) comes back
      */
-    virtual std::vector<std::string> get_block_hashes(const std::vector<std::string>& block_hashes, uint64_t start_height) {
+    virtual std::shared_ptr<monero_get_block_hashes_result> get_block_hashes(const std::vector<std::string>& block_hashes) {
       throw std::runtime_error("monero_daemon::get_block_hashes(): not supported");
     }
 

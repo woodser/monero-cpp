@@ -60,6 +60,22 @@
 
 namespace monero {
 
+  // ----------------------- INTERNAL PRIVATE HELPERS -----------------------
+
+  namespace {
+    // used by monero_get_blocks_by_hash_request and monero_get_block_hashes_request
+    std::string block_hashes_to_blob(const std::vector<std::string>& block_hashes) {
+      // concatenate raw block_hashes encoded in a single blob
+      std::string blob;
+      for (const std::string& hash : block_hashes) {
+        std::string raw_hash;
+        if (!epee::string_tools::parse_hexstr_to_binbuff(hash, raw_hash) || raw_hash.size() != sizeof(crypto::hash)) throw monero_error("Invalid block hash: " + hash);
+        blob += raw_hash;
+      }
+      return blob;
+    }
+  }
+
   // --------------------------- MONERO RPC BAN ---------------------------
 
   monero_rpc_ban::monero_rpc_ban(const std::shared_ptr<monero_ban> &ban) {
@@ -100,6 +116,39 @@ namespace monero {
   rapidjson::Value monero_get_blocks_by_height_request::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     rapidjson::Value root(rapidjson::kObjectType);
     if (!m_heights.empty()) root.AddMember("heights", monero_utils::to_rapidjson_val(allocator, m_heights), allocator);
+    return root;
+  }
+
+  // --------------------------- MONERO GET BLOCKS BY HASH REQUEST ---------------------------
+
+  rapidjson::Value monero_get_blocks_by_hash_request::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    rapidjson::Value value_str(rapidjson::kStringType);
+    monero_utils::add_json_member("block_ids", block_hashes_to_blob(m_block_hashes), allocator, root, value_str);
+
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    monero_utils::add_json_member("start_height", m_start_height, allocator, root, value_num);
+    if (m_max_block_count > 0) monero_utils::add_json_member("max_block_count", m_max_block_count, allocator, root, value_num);
+
+    monero_utils::add_json_member("prune", m_prune, allocator, root);
+
+    return root;
+  }
+
+  // --------------------------- MONERO GET BLOCK HASHES REQUEST ---------------------------
+
+  rapidjson::Value monero_get_block_hashes_request::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
+    rapidjson::Value root(rapidjson::kObjectType);
+
+    rapidjson::Value value_str(rapidjson::kStringType);
+    monero_utils::add_json_member("block_ids", block_hashes_to_blob(m_block_hashes), allocator, root, value_str);
+
+    // start_height is a required field on the wire but ignored by monerod for get_hashes.bin
+    // so it's sent as a fixed 0 rather than exposed here as a dead parameter.
+    rapidjson::Value value_num(rapidjson::kNumberType);
+    monero_utils::add_json_member("start_height", (uint64_t)0, allocator, root, value_num);
+
     return root;
   }
 
@@ -1011,6 +1060,27 @@ namespace monero {
         }
       }
     }
+  }
+
+  void deserialize_get_blocks_by_hash_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_blocks_by_hash_result>& result) {
+    // the daemon reports its own resume point, so the returned blocks are sequential from there
+    uint64_t start_height = node.get<uint64_t>("start_height");
+    size_t num_blocks = node.get_child("blocks").size();
+    std::vector<uint64_t> heights;
+    heights.reserve(num_blocks);
+    for (size_t i = 0; i < num_blocks; i++) heights.push_back(start_height + i);
+
+    deserialize_blocks(node, heights, result->m_blocks);
+    result->m_current_height = node.get<uint64_t>("current_height");
+  }
+
+  void deserialize_block_hashes(const std::string& bin, const std::shared_ptr<monero_get_block_hashes_result>& result) {
+    cryptonote::COMMAND_RPC_GET_HASHES_FAST::response resp_struct;
+    if (!epee::serialization::load_t_from_binary(resp_struct, bin)) throw monero_error("Failed to parse get_hashes.bin response");
+    if (resp_struct.status != CORE_RPC_STATUS_OK) throw monero_error("Failed to get block hashes from daemon: " + normalize_daemon_rpc_status(resp_struct.status));
+    result->m_start_height = resp_struct.start_height;
+    result->m_current_height = resp_struct.current_height;
+    for (const crypto::hash& hash : resp_struct.m_block_ids) result->m_hashes.push_back(epee::string_tools::pod_to_hex(hash));
   }
 
   void deserialize_alt_block_hashes(const boost::property_tree::ptree& node, std::vector<std::string>& block_hashes) {

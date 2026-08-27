@@ -84,6 +84,31 @@ namespace monero {
   };
 
   /**
+   * Models paramaters for monerod-rpc `/get_blocks.bin` method (fast sync by short chain history).
+   */
+  struct monero_get_blocks_by_hash_request : public monero_rpc_request {
+    std::vector<std::string> m_block_hashes;
+    uint64_t m_start_height;
+    bool m_prune;
+    uint64_t m_max_block_count;
+
+    monero_get_blocks_by_hash_request(const std::vector<std::string>& block_hashes, uint64_t start_height, bool prune, uint64_t max_block_count = 0): m_block_hashes(block_hashes), m_start_height(start_height), m_prune(prune), m_max_block_count(max_block_count) { m_method = "get_blocks.bin"; }
+
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
+   * Models paramaters for monerod-rpc `/get_hashes.bin` method.
+   */
+  struct monero_get_block_hashes_request : public monero_rpc_request {
+    std::vector<std::string> m_block_hashes;
+
+    monero_get_block_hashes_request(const std::vector<std::string>& block_hashes): m_block_hashes(block_hashes) { m_method = "get_hashes.bin"; }
+
+    rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+  };
+
+  /**
    * Models paramaters for monerod-rpc `/get_o_indexes.bin` method.
    */
   struct monero_get_output_indices_request : public monero_rpc_request {
@@ -372,6 +397,8 @@ namespace monero {
   void deserialize_block_headers(const boost::property_tree::ptree& node, std::vector<std::shared_ptr<monero_block_header>>& headers);
   void deserialize_block(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block>& block, bool is_nested = false);
   void deserialize_blocks(const boost::property_tree::ptree& node, const std::vector<uint64_t>& heights, std::vector<std::shared_ptr<monero_block>>& blocks);
+  void deserialize_get_blocks_by_hash_result(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_blocks_by_hash_result>& result);
+  void deserialize_block_hashes(const std::string& bin, const std::shared_ptr<monero_get_block_hashes_result>& result);
   void deserialize_alt_block_hashes(const boost::property_tree::ptree& node, std::vector<std::string>& block_hashes);
   void deserialize_txs(const boost::property_tree::ptree& node, std::vector<std::shared_ptr<monero_tx>>& txs);
   void deserialize_tx_hashes(const boost::property_tree::ptree& node, std::vector<std::string>& tx_hashes);
