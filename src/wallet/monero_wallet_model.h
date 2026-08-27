@@ -88,6 +88,7 @@ namespace monero {
     monero_wallet_config(const monero_wallet_config& config);
     monero_wallet_config copy() const;
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_wallet_config>& config);
     static std::shared_ptr<monero_wallet_config> deserialize(const std::string& config_json);
   };
 
@@ -101,6 +102,7 @@ namespace monero {
     monero_sync_result(const uint64_t num_blocks_fetched, const bool received_money) : m_num_blocks_fetched(num_blocks_fetched), m_received_money(received_money) {}
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_sync_result>& result);
   };
 
   /**
@@ -185,6 +187,7 @@ namespace monero {
     boost::optional<uint64_t> m_num_suggested_confirmations;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_incoming_transfer>& transfer);
     std::shared_ptr<monero_incoming_transfer> copy(const std::shared_ptr<monero_transfer>& src, const std::shared_ptr<monero_transfer>& tgt) const;
     std::shared_ptr<monero_incoming_transfer> copy(const std::shared_ptr<monero_incoming_transfer>& src, const std::shared_ptr<monero_incoming_transfer>& tgt) const;
     boost::optional<bool> is_incoming() const;
@@ -201,6 +204,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_destination>> m_destinations;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_outgoing_transfer>& transfer);
     std::shared_ptr<monero_outgoing_transfer> copy(const std::shared_ptr<monero_transfer>& src, const std::shared_ptr<monero_transfer>& tgt) const;
     std::shared_ptr<monero_outgoing_transfer> copy(const std::shared_ptr<monero_outgoing_transfer>& src, const std::shared_ptr<monero_outgoing_transfer>& tgt) const;
     boost::optional<bool> is_incoming() const;
@@ -413,6 +417,7 @@ namespace monero {
     monero_tx_config(const monero_tx_config& config);
     monero_tx_config copy() const;
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx_config>& config);
     static std::shared_ptr<monero_tx_config> deserialize(const std::string& config_json);
     std::vector<std::shared_ptr<monero_destination>> get_normalized_destinations() const;
   };
@@ -425,6 +430,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_key_image>> m_key_images;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_export_result>& result);
     static std::shared_ptr<monero_key_image_export_result> deserialize(const std::string& result_json);
   };
 
@@ -468,6 +474,7 @@ namespace monero {
     bool m_is_good;
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_check>& check);
   };
 
   /**
@@ -586,9 +593,11 @@ namespace monero {
     monero_address_type m_address_type;
     monero_network_type m_network_type;
 
+    monero_decoded_address(): m_address_type(monero_address_type::PRIMARY_ADDRESS), m_network_type(monero_network_type::MAINNET) {}
     monero_decoded_address(const std::string& address, monero_address_type address_type, monero_network_type network_type);
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_decoded_address>& address);
   };
 
   /**
