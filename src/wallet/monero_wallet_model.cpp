@@ -157,15 +157,7 @@ namespace monero {
     return root;
   }
 
-  std::shared_ptr<monero_wallet_config> monero_wallet_config::deserialize(const std::string& config_json) {
-
-    // deserialize config json to property node
-    std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
-    boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
-
-    // convert config property tree to monero_wallet_config
-    std::shared_ptr<monero_wallet_config> config = std::make_shared<monero_wallet_config>();
+  void monero_wallet_config::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_wallet_config>& config) {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("path")) config->m_path = it->second.data();
@@ -192,7 +184,18 @@ namespace monero {
       else if (key == std::string("isMultisig")) config->m_is_multisig = it->second.get_value<bool>();
       else if (key == std::string("regtest")) config->m_regtest = it->second.get_value<bool>();
     }
+  }
 
+  std::shared_ptr<monero_wallet_config> monero_wallet_config::deserialize(const std::string& config_json) {
+
+    // deserialize config json to property node
+    std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
+    boost::property_tree::ptree node;
+    boost::property_tree::read_json(iss, node);
+
+    // convert config property tree to monero_wallet_config
+    std::shared_ptr<monero_wallet_config> config = std::make_shared<monero_wallet_config>();
+    from_property_tree(node, config);
     return config;
   }
 
@@ -212,6 +215,14 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_sync_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_sync_result>& result) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("numBlocksFetched")) result->m_num_blocks_fetched = it->second.get_value<uint64_t>();
+      else if (key == std::string("receivedMoney")) result->m_received_money = it->second.get_value<bool>();
+    }
   }
 
   // -------------------------- MONERO ACCOUNT -----------------------------
@@ -949,6 +960,17 @@ namespace monero {
     return root;
   }
 
+  void monero_incoming_transfer::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_incoming_transfer>& transfer) {
+    monero_transfer::from_property_tree(node, transfer);
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("subaddressIndex")) transfer->m_subaddress_index = it->second.get_value<uint32_t>();
+      else if (key == std::string("numSuggestedConfirmations")) transfer->m_num_suggested_confirmations = it->second.get_value<uint64_t>();
+      else if (key == std::string("address")) transfer->m_address = it->second.data();
+    }
+  }
+
   std::shared_ptr<monero_incoming_transfer> monero_incoming_transfer::copy(const std::shared_ptr<monero_transfer>& src, const std::shared_ptr<monero_transfer>& tgt) const {
     return copy(std::static_pointer_cast<monero_incoming_transfer>(src), std::static_pointer_cast<monero_incoming_transfer>(tgt));
   }
@@ -990,6 +1012,27 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_outgoing_transfer::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_outgoing_transfer>& transfer) {
+    monero_transfer::from_property_tree(node, transfer);
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("subaddressIndices")) {
+        for (const auto& child : it->second) transfer->m_subaddress_indices.push_back(child.second.get_value<uint32_t>());
+      }
+      else if (key == std::string("addresses")) {
+        for (const auto& child : it->second) transfer->m_addresses.push_back(child.second.data());
+      }
+      else if (key == std::string("destinations")) {
+        for (const auto& child : it->second) {
+          auto destination = std::make_shared<monero_destination>();
+          monero_destination::from_property_tree(child.second, destination);
+          transfer->m_destinations.push_back(destination);
+        }
+      }
+    }
   }
 
   std::shared_ptr<monero_outgoing_transfer> monero_outgoing_transfer::copy(const std::shared_ptr<monero_transfer>& src, const std::shared_ptr<monero_transfer>& tgt) const {
@@ -1473,15 +1516,7 @@ namespace monero {
     return root;
   }
 
-  std::shared_ptr<monero_tx_config> monero_tx_config::deserialize(const std::string& config_json) {
-
-    // deserialize config json to property node
-    std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
-    boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
-
-    // convert config property tree to monero_tx_config
-    std::shared_ptr<monero_tx_config> config = std::make_shared<monero_tx_config>();
+  void monero_tx_config::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx_config>& config) {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("destinations")) {
@@ -1514,7 +1549,18 @@ namespace monero {
       else if (key == std::string("sweepEachSubaddress")) config->m_sweep_each_subaddress = it->second.get_value<bool>();
       else if (key == std::string("keyImage")) config->m_key_image = it->second.data();
     }
+  }
 
+  std::shared_ptr<monero_tx_config> monero_tx_config::deserialize(const std::string& config_json) {
+
+    // deserialize config json to property node
+    std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
+    boost::property_tree::ptree node;
+    boost::property_tree::read_json(iss, node);
+
+    // convert config property tree to monero_tx_config
+    std::shared_ptr<monero_tx_config> config = std::make_shared<monero_tx_config>();
+    from_property_tree(node, config);
     return config;
   }
 
@@ -1576,15 +1622,7 @@ namespace monero {
     return root;
   }
 
-  std::shared_ptr<monero_key_image_export_result> monero_key_image_export_result::deserialize(const std::string& result_json) {
-
-    // deserialize json to property node
-    std::istringstream iss = result_json.empty() ? std::istringstream() : std::istringstream(result_json);
-    boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
-
-    // convert property tree to export result
-    std::shared_ptr<monero_key_image_export_result> result = std::make_shared<monero_key_image_export_result>();
+  void monero_key_image_export_result::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image_export_result>& result) {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("offset")) result->m_offset = it->second.get_value<uint64_t>();
@@ -1596,6 +1634,18 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_key_image_export_result> monero_key_image_export_result::deserialize(const std::string& result_json) {
+
+    // deserialize json to property node
+    std::istringstream iss = result_json.empty() ? std::istringstream() : std::istringstream(result_json);
+    boost::property_tree::ptree node;
+    boost::property_tree::read_json(iss, node);
+
+    // convert property tree to export result
+    std::shared_ptr<monero_key_image_export_result> result = std::make_shared<monero_key_image_export_result>();
+    from_property_tree(node, result);
     return result;
   }
 
@@ -1675,6 +1725,13 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_check::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_check>& check) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("isGood")) check->m_is_good = it->second.get_value<bool>();
+    }
   }
 
   // --------------------------- MONERO CHECK TX ------------------------------
@@ -1936,6 +1993,15 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_decoded_address::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_decoded_address>& address) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("address")) address->m_address = it->second.data();
+      else if (key == std::string("addressType")) address->m_address_type = static_cast<monero_address_type>(it->second.get_value<uint32_t>());
+      else if (key == std::string("networkType")) address->m_network_type = static_cast<monero_network_type>(it->second.get_value<uint32_t>());
+    }
   }
 
   // --------------------------- MONERO ACCOUNT TAG ---------------------------

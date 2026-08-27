@@ -136,6 +136,19 @@ namespace monero {
     return root;
   }
 
+  void ssl_options::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<ssl_options>& options) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("sslPrivateKeyPath")) options->m_ssl_private_key_path = it->second.data();
+      else if (key == std::string("sslCertificatePath")) options->m_ssl_certificate_path = it->second.data();
+      else if (key == std::string("sslCaFile")) options->m_ssl_ca_file = it->second.data();
+      else if (key == std::string("sslAllowedFingerprints")) {
+        for (const auto& child : it->second) options->m_ssl_allowed_fingerprints.push_back(child.second.data());
+      }
+      else if (key == std::string("sslAllowAnyCert")) options->m_ssl_allow_any_cert = it->second.get_value<bool>();
+    }
+  }
+
   // ------------------------- MONERO BLOCK HEADER ----------------------------
 
   rapidjson::Value monero_block_header::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -173,6 +186,32 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_block_header::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block_header>& header) {
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("hash")) header->m_hash = it->second.data();
+      else if (key == std::string("height")) header->m_height = it->second.get_value<uint64_t>();
+      else if (key == std::string("timestamp")) header->m_timestamp = it->second.get_value<uint64_t>();
+      else if (key == std::string("size")) header->m_size = it->second.get_value<uint64_t>();
+      else if (key == std::string("weight")) header->m_weight = it->second.get_value<uint64_t>();
+      else if (key == std::string("longTermWeight")) header->m_long_term_weight = it->second.get_value<uint64_t>();
+      else if (key == std::string("depth")) header->m_depth = it->second.get_value<uint64_t>();
+      else if (key == std::string("difficultyLow")) header->m_difficulty_low = it->second.get_value<uint64_t>();
+      else if (key == std::string("difficultyHigh")) header->m_difficulty_high = it->second.get_value<uint64_t>();
+      else if (key == std::string("cumulativeDifficultyLow")) header->m_cumulative_difficulty_low = it->second.get_value<uint64_t>();
+      else if (key == std::string("cumulativeDifficultyHigh")) header->m_cumulative_difficulty_high = it->second.get_value<uint64_t>();
+      else if (key == std::string("majorVersion")) header->m_major_version = it->second.get_value<uint32_t>();
+      else if (key == std::string("minorVersion")) header->m_minor_version = it->second.get_value<uint32_t>();
+      else if (key == std::string("nonce")) header->m_nonce = it->second.get_value<uint32_t>();
+      else if (key == std::string("minerTxHash")) header->m_miner_tx_hash = it->second.data();
+      else if (key == std::string("numTxs")) header->m_num_txs = it->second.get_value<uint32_t>();
+      else if (key == std::string("orphanStatus")) header->m_orphan_status = it->second.get_value<bool>();
+      else if (key == std::string("prevHash")) header->m_prev_hash = it->second.data();
+      else if (key == std::string("reward")) header->m_reward = it->second.get_value<uint64_t>();
+      else if (key == std::string("powHash")) header->m_pow_hash = it->second.data();
+    }
   }
 
   std::shared_ptr<monero_block_header> monero_block_header::copy(const std::shared_ptr<monero_block_header>& src, const std::shared_ptr<monero_block_header>& tgt) const {
@@ -246,6 +285,33 @@ namespace monero {
 
     // return root
     return root;
+  }
+
+  void monero_block::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block>& block) {
+    monero_block_header::from_property_tree(node, block);
+
+    for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
+      std::string key = it->first;
+      if (key == std::string("hex")) block->m_hex = it->second.data();
+      else if (key == std::string("txHashes")) {
+        for (const auto& child : it->second) block->m_tx_hashes.push_back(child.second.data());
+      }
+      else if (key == std::string("txs")) {
+        for (const auto& child : it->second) {
+          auto tx = std::make_shared<monero_tx>();
+          monero_tx::from_property_tree(child.second, tx);
+          tx->m_block = block;
+          block->m_txs.push_back(tx);
+        }
+      }
+      else if (key == std::string("minerTx")) {
+        auto tx = std::make_shared<monero_tx>();
+        monero_tx::from_property_tree(it->second, tx);
+        tx->m_is_miner_tx = true;
+        tx->m_block = block;
+        block->m_miner_tx = tx;
+      }
+    }
   }
 
   std::shared_ptr<monero_block> monero_block::copy(const std::shared_ptr<monero_block>& src, const std::shared_ptr<monero_block>& tgt) const {
