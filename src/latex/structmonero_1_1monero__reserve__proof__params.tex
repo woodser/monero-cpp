@@ -1,0 +1,86 @@
+\doxysection{monero\+::monero\+\_\+reserve\+\_\+proof\+\_\+params Struct Reference}
+\hypertarget{structmonero_1_1monero__reserve__proof__params}{}\label{structmonero_1_1monero__reserve__proof__params}\index{monero::monero\_reserve\_proof\_params@{monero::monero\_reserve\_proof\_params}}
+Inheritance diagram for monero\+::monero\+\_\+reserve\+\_\+proof\+\_\+params\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__reserve__proof__params}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a7e46b00185b71be1051f485420ff7fd3}\label{structmonero_1_1monero__reserve__proof__params_a7e46b00185b71be1051f485420ff7fd3} 
+{\bfseries monero\+\_\+reserve\+\_\+proof\+\_\+params} (const std\+::string \&message, bool all=true)
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a0de4ec210ca204d57c29e4eba6981c81}\label{structmonero_1_1monero__reserve__proof__params_a0de4ec210ca204d57c29e4eba6981c81} 
+{\bfseries monero\+\_\+reserve\+\_\+proof\+\_\+params} (const std\+::string \&address, const std\+::string \&message, const std\+::string \&signature)
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_af052e85980144750f4231a2378463a8c}\label{structmonero_1_1monero__reserve__proof__params_af052e85980144750f4231a2378463a8c} 
+{\bfseries monero\+\_\+reserve\+\_\+proof\+\_\+params} (const std\+::string \&tx\+\_\+hash, const std\+::string \&address, const std\+::string \&message, const std\+::string \&signature)
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a583e1f5c287ab14162be681e4ffd410a}\label{structmonero_1_1monero__reserve__proof__params_a583e1f5c287ab14162be681e4ffd410a} 
+{\bfseries monero\+\_\+reserve\+\_\+proof\+\_\+params} (const std\+::string \&tx\+\_\+hash, const std\+::string \&message)
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_aa5f3957aaffdbd58cf5133ff4bd86889}\label{structmonero_1_1monero__reserve__proof__params_aa5f3957aaffdbd58cf5133ff4bd86889} 
+{\bfseries monero\+\_\+reserve\+\_\+proof\+\_\+params} (uint32\+\_\+t account\+\_\+index, uint64\+\_\+t amount, const std\+::string \&message)
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__reserve__proof__params_a0bd8344c0824c682eaf64006c52b2ca2}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_ad6160855f1201fae90acaa1d95344f9d}\label{structmonero_1_1monero__reserve__proof__params_ad6160855f1201fae90acaa1d95344f9d} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+all}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a56f095411045981d7baadbc2383529dc}\label{structmonero_1_1monero__reserve__proof__params_a56f095411045981d7baadbc2383529dc} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+message}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a41fb5384d636d305b03ed399777b3858}\label{structmonero_1_1monero__reserve__proof__params_a41fb5384d636d305b03ed399777b3858} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+tx\+\_\+hash}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a98894c4e0f31c6615ce4ef98b3dcb7c5}\label{structmonero_1_1monero__reserve__proof__params_a98894c4e0f31c6615ce4ef98b3dcb7c5} 
+boost\+::optional$<$ uint32\+\_\+t $>$ {\bfseries m\+\_\+account\+\_\+index}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a46a56d6fedb6c5439c24d4e621a08ba1}\label{structmonero_1_1monero__reserve__proof__params_a46a56d6fedb6c5439c24d4e621a08ba1} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+amount}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_ad5fa405cfa7f34cc9f8e8b82fc69dedd}\label{structmonero_1_1monero__reserve__proof__params_ad5fa405cfa7f34cc9f8e8b82fc69dedd} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+address}
+\item 
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a3ec95bd92722119f2df544963e748d7d}\label{structmonero_1_1monero__reserve__proof__params_a3ec95bd92722119f2df544963e748d7d} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+signature}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__reserve__proof__params_a0bd8344c0824c682eaf64006c52b2ca2}\index{monero::monero\_reserve\_proof\_params@{monero::monero\_reserve\_proof\_params}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_reserve\_proof\_params@{monero::monero\_reserve\_proof\_params}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__reserve__proof__params_a0bd8344c0824c682eaf64006c52b2ca2} 
+rapidjson\+::\+Value monero\+::monero\+\_\+reserve\+\_\+proof\+\_\+params\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+wallet/monero\+\_\+wallet\+\_\+rpc\+\_\+model.\+h\item 
+wallet/monero\+\_\+wallet\+\_\+rpc\+\_\+model.\+cpp\end{DoxyCompactItemize}

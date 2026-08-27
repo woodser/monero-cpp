@@ -1,0 +1,236 @@
+\doxysection{monero\+\_\+utils.\+h}
+\hypertarget{monero__utils_8h_source}{}\label{monero__utils_8h_source}\index{utils/monero\_utils.h@{utils/monero\_utils.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#ifndef\ monero\_utils\_h}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#define\ monero\_utils\_h}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#include\ "{}wallet/monero\_wallet\_model.h"{}}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#include\ "{}cryptonote\_basic/cryptonote\_basic.h"{}}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#include\ "{}serialization/keyvalue\_serialization.h"{}}\ \textcolor{comment}{//\ TODO:\ consolidate\ with\ other\ binary\ deps?}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#include\ "{}storages/portable\_storage.h"{}}}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00066\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacemonero__utils}{monero\_utils}}}
+\DoxyCodeLine{00067\ \{}
+\DoxyCodeLine{00068\ \ \ \textcolor{keyword}{using\ namespace\ }cryptonote;}
+\DoxyCodeLine{00069\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ CONSTANTS\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ \textcolor{keywordtype}{int}\ RING\_SIZE\ =\ 16;\ \ \textcolor{comment}{//\ network-\/enforced\ ring\ size}}
+\DoxyCodeLine{00073\ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ uint64\_t\ XMR\_AU\_MULTIPLIER\ =\ 1000000000000ULL;}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ UTILS\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordtype}{void}\ set\_log\_level(\textcolor{keywordtype}{int}\ level);}
+\DoxyCodeLine{00078\ \ \ \textcolor{keywordtype}{void}\ set\_log\_categories(\textcolor{keyword}{const}\ std::string\&\ categories);}
+\DoxyCodeLine{00079\ \ \ \textcolor{keywordtype}{void}\ configure\_logging(\textcolor{keyword}{const}\ std::string\&\ path,\ \textcolor{keywordtype}{bool}\ console);}
+\DoxyCodeLine{00080\ \ \ \mbox{\hyperlink{structmonero_1_1monero__integrated__address}{monero\_integrated\_address}}\ get\_integrated\_address(\mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\_network\_type}}\ network\_type,\ \textcolor{keyword}{const}\ std::string\&\ standard\_address,\ \textcolor{keyword}{const}\ std::string\&\ payment\_id);}
+\DoxyCodeLine{00081\ \ \ std::string\ get\_payment\_uri(\textcolor{keyword}{const}\ \mbox{\hyperlink{structmonero_1_1monero__tx__config}{monero\_tx\_config}}\&\ config,\ \mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\_network\_type}}\ network\_type);}
+\DoxyCodeLine{00082\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_address(\textcolor{keyword}{const}\ std::string\&\ address,\ \mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\_network\_type}}\ network\_type);}
+\DoxyCodeLine{00083\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_private\_view\_key(\textcolor{keyword}{const}\ std::string\&\ private\_view\_key);}
+\DoxyCodeLine{00084\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_private\_spend\_key(\textcolor{keyword}{const}\ std::string\&\ private\_spend\_key);}
+\DoxyCodeLine{00085\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_public\_view\_key(\textcolor{keyword}{const}\ std::string\&\ public\_view\_key);}
+\DoxyCodeLine{00086\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_public\_spend\_key(\textcolor{keyword}{const}\ std::string\&\ public\_spend\_key);}
+\DoxyCodeLine{00087\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_payment\_id(\textcolor{keyword}{const}\ std::string\&\ payment\_id);}
+\DoxyCodeLine{00088\ \ \ \textcolor{keywordtype}{bool}\ is\_valid\_mnemonic(\textcolor{keyword}{const}\ std::string\&\ mnemonic,\ \textcolor{keyword}{const}\ std::string\&\ language\ =\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00089\ \ \ \textcolor{keywordtype}{void}\ validate\_address(\textcolor{keyword}{const}\ std::string\&\ address,\ \mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\_network\_type}}\ network\_type);}
+\DoxyCodeLine{00090\ \ \ \textcolor{keywordtype}{void}\ validate\_private\_view\_key(\textcolor{keyword}{const}\ std::string\&\ private\_view\_key);}
+\DoxyCodeLine{00091\ \ \ \textcolor{keywordtype}{void}\ validate\_private\_spend\_key(\textcolor{keyword}{const}\ std::string\&\ private\_spend\_key);}
+\DoxyCodeLine{00092\ \ \ \textcolor{keywordtype}{void}\ validate\_public\_view\_key(\textcolor{keyword}{const}\ std::string\&\ public\_view\_key);}
+\DoxyCodeLine{00093\ \ \ \textcolor{keywordtype}{void}\ validate\_public\_spend\_key(\textcolor{keyword}{const}\ std::string\&\ public\_spend\_key);}
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{void}\ validate\_payment\_id(\textcolor{keyword}{const}\ std::string\&\ payment\_id);}
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordtype}{void}\ validate\_mnemonic(\textcolor{keyword}{const}\ std::string\&\ mnemonic,\ \textcolor{keyword}{const}\ std::string\&\ language\ =\ \textcolor{stringliteral}{"{}"{}});}
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{void}\ json\_to\_binary(\textcolor{keyword}{const}\ std::string\ \&json,\ std::string\ \&bin);}
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{void}\ binary\_to\_json(\textcolor{keyword}{const}\ std::string\ \&bin,\ std::string\ \&json);}
+\DoxyCodeLine{00098\ \ \ \textcolor{keywordtype}{void}\ binary\_blocks\_to\_json(\textcolor{keyword}{const}\ std::string\ \&bin,\ std::string\ \&json);}
+\DoxyCodeLine{00099\ \ \ \textcolor{keywordtype}{void}\ binary\_blocks\_fast\_to\_json(\textcolor{keyword}{const}\ std::string\ \&bin,\ std::string\ \&json);}
+\DoxyCodeLine{00100\ \ \ uint64\_t\ xmr\_to\_atomic\_units(\textcolor{keywordtype}{double}\ amount\_xmr);}
+\DoxyCodeLine{00101\ \ \ \textcolor{keywordtype}{double}\ atomic\_units\_to\_xmr(uint64\_t\ amount\_atomic\_units);}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00103\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ RAPIDJSON\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00110\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T>}
+\DoxyCodeLine{00111\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacemonero__utils_abc8108fdc0269db2f50c2ac24d7e5774}{add\_json\_member}}(std::string\ key,\ T\ val,\ rapidjson::Document::AllocatorType\&\ allocator,\ rapidjson::Value\&\ root,\ rapidjson::Value\&\ field)\ \{}
+\DoxyCodeLine{00112\ \ \ \ \ rapidjson::Value\ field\_key(key.c\_str(),\ key.size(),\ allocator);}
+\DoxyCodeLine{00113\ \ \ \ \ \textcolor{keywordflow}{if}\ (std::is\_signed<T>::value)\ field.SetInt64((int64\_t)\ val);}
+\DoxyCodeLine{00114\ \ \ \ \ \textcolor{keywordflow}{else}\ field.SetUint64((uint64\_t)\ val);}
+\DoxyCodeLine{00115\ \ \ \ \ root.AddMember(field\_key,\ field,\ allocator);}
+\DoxyCodeLine{00116\ \ \ \}}
+\DoxyCodeLine{00117\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacemonero__utils_abc8108fdc0269db2f50c2ac24d7e5774}{add\_json\_member}}(std::string\ key,\ std::string\ val,\ rapidjson::Document::AllocatorType\&\ allocator,\ rapidjson::Value\&\ root,\ rapidjson::Value\&\ field);}
+\DoxyCodeLine{00118\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacemonero__utils_abc8108fdc0269db2f50c2ac24d7e5774}{add\_json\_member}}(std::string\ key,\ \textcolor{keywordtype}{bool}\ val,\ rapidjson::Document::AllocatorType\&\ allocator,\ rapidjson::Value\&\ root);}
+\DoxyCodeLine{00119\ }
+\DoxyCodeLine{00120\ \ \ \textcolor{comment}{//\ TODO:\ template\ implementation\ here,\ could\ move\ to\ monero\_utils.hpp\ per\ https://stackoverflow.com/questions/3040480/c-\/template-\/function-\/compiles-\/in-\/header-\/but-\/not-\/implementation}}
+\DoxyCodeLine{00121\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T>\ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<std::shared\_ptr<T>>\&\ vals)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ rapidjson::Value\ value\_arr(rapidjson::kArrayType);}
+\DoxyCodeLine{00123\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ val\ :\ vals)\ \{}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ value\_arr.PushBack(val-\/>to\_rapidjson\_val(allocator),\ allocator);}
+\DoxyCodeLine{00125\ \ \ \ \ \}}
+\DoxyCodeLine{00126\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_arr;}
+\DoxyCodeLine{00127\ \ \ \}}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \ \ \textcolor{comment}{//\ TODO:\ template\ implementation\ here,\ could\ move\ to\ monero\_utils.hpp\ per\ https://stackoverflow.com/questions/3040480/c-\/template-\/function-\/compiles-\/in-\/header-\/but-\/not-\/implementation}}
+\DoxyCodeLine{00130\ \ \ \textcolor{keyword}{template}\ <\textcolor{keyword}{class}\ T>\ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<T>\&\ vals)\ \{}
+\DoxyCodeLine{00131\ \ \ \ \ rapidjson::Value\ value\_arr(rapidjson::kArrayType);}
+\DoxyCodeLine{00132\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ \textcolor{keyword}{auto}\&\ val\ :\ vals)\ \{}
+\DoxyCodeLine{00133\ \ \ \ \ \ \ value\_arr.PushBack(val.to\_rapidjson\_val(allocator),\ allocator);}
+\DoxyCodeLine{00134\ \ \ \ \ \}}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordflow}{return}\ value\_arr;}
+\DoxyCodeLine{00136\ \ \ \}}
+\DoxyCodeLine{00137\ }
+\DoxyCodeLine{00138\ \ \ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<std::string>\&\ strs);}
+\DoxyCodeLine{00139\ \ \ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<int>\&\ nums);}
+\DoxyCodeLine{00140\ \ \ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<uint8\_t>\&\ nums);}
+\DoxyCodeLine{00141\ \ \ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<uint32\_t>\&\ nums);}
+\DoxyCodeLine{00142\ \ \ rapidjson::Value\ to\_rapidjson\_val(rapidjson::Document::AllocatorType\&\ allocator,\ \textcolor{keyword}{const}\ std::vector<uint64\_t>\&\ nums);}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00145\ }
+\DoxyCodeLine{00152\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacemonero__utils_a3b9ee3d8bd81e28c3bbdf4e747300277}{is\_valid\_language}}(\textcolor{keyword}{const}\ std::string\&\ language);}
+\DoxyCodeLine{00153\ }
+\DoxyCodeLine{00160\ \ \ std::shared\_ptr<monero\_block>\ \mbox{\hyperlink{namespacemonero__utils_ab2fb8889ec17d02e54541e90a3ffd47f}{cn\_block\_to\_block}}(\textcolor{keyword}{const}\ cryptonote::block\&\ cn\_block);}
+\DoxyCodeLine{00161\ }
+\DoxyCodeLine{00169\ \ \ std::shared\_ptr<monero\_tx>\ \mbox{\hyperlink{namespacemonero__utils_ad4b5df3026350e762bfa40c6acdb6a0d}{cn\_tx\_to\_tx}}(\textcolor{keyword}{const}\ cryptonote::transaction\&\ cn\_tx,\ \textcolor{keywordtype}{bool}\ init\_as\_tx\_wallet\ =\ \textcolor{keyword}{false});}
+\DoxyCodeLine{00170\ }
+\DoxyCodeLine{00176\ \ \ \textcolor{keyword}{static}\ std::string\ get\_pruned\_tx\_json(cryptonote::transaction\ \&tx)}
+\DoxyCodeLine{00177\ \ \ \{}
+\DoxyCodeLine{00178\ \ \ \ \ std::stringstream\ ss;}
+\DoxyCodeLine{00179\ \ \ \ \ json\_archive<true>\ ar(ss);}
+\DoxyCodeLine{00180\ \ \ \ \ \textcolor{keywordtype}{bool}\ r\ =\ tx.serialize\_base(ar);}
+\DoxyCodeLine{00181\ \ \ \ \ CHECK\_AND\_ASSERT\_MES(r,\ std::string(),\ \textcolor{stringliteral}{"{}Failed\ to\ serialize\ rct\ signatures\ base"{}});}
+\DoxyCodeLine{00182\ \ \ \ \ \textcolor{keywordflow}{return}\ ss.str();}
+\DoxyCodeLine{00183\ \ \ \}}
+\DoxyCodeLine{00184\ }
+\DoxyCodeLine{00185\ \ \ \textcolor{keywordtype}{void}\ binary\_blocks\_to\_property\_tree(\textcolor{keyword}{const}\ std::string\ \&bin,\ boost::property\_tree::ptree\ \&node);}
+\DoxyCodeLine{00186\ \ \ \textcolor{keywordtype}{void}\ binary\_blocks\_fast\_to\_property\_tree(\textcolor{keyword}{const}\ std::string\ \&bin,\ boost::property\_tree::ptree\ \&node);}
+\DoxyCodeLine{00187\ }
+\DoxyCodeLine{00195\ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{namespacemonero__utils_a9f0526af992244f7ebe4c9db52eaf265}{merge\_tx}}(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx\_wallet>\&\ tx,\ std::map<std::string,\ std::shared\_ptr<monero\_tx\_wallet>>\&\ tx\_map,\ std::map<uint64\_t,\ std::shared\_ptr<monero\_block>>\&\ block\_map);}
+\DoxyCodeLine{00196\ }
+\DoxyCodeLine{00200\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacemonero__utils_a7d64cab2bf27d5549d2b60ebb19a0c2f}{tx\_height\_less\_than}}(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx>\&\ tx1,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx>\&\ tx2);}
+\DoxyCodeLine{00201\ }
+\DoxyCodeLine{00205\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacemonero__utils_a4d8861d6b6b891e739b489332e1ecd6b}{incoming\_transfer\_before}}(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_incoming\_transfer>\&\ transfer1,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_incoming\_transfer>\&\ transfer2);}
+\DoxyCodeLine{00206\ }
+\DoxyCodeLine{00210\ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{namespacemonero__utils_a84a97d3dce5cd38f9bfe3fe69295a051}{vout\_before}}(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ o1,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ o2);}
+\DoxyCodeLine{00211\ }
+\DoxyCodeLine{00212\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ GATHER\ BLOCKS\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00213\ }
+\DoxyCodeLine{00214\ \ \ \textcolor{keyword}{static}\ std::vector<std::shared\_ptr<monero\_block>>\ get\_blocks\_from\_txs(std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ txs)\ \{}
+\DoxyCodeLine{00215\ \ \ \ \ std::shared\_ptr<monero\_block>\ unconfirmed\_block\ =\ \textcolor{keyword}{nullptr};\ \textcolor{comment}{//\ placeholder\ for\ unconfirmed\ txs}}
+\DoxyCodeLine{00216\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ blocks;}
+\DoxyCodeLine{00217\ \ \ \ \ std::unordered\_set<std::shared\_ptr<monero\_block>>\ seen\_block\_ptrs;}
+\DoxyCodeLine{00218\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx\_wallet>\&\ tx\ :\ txs)\ \{}
+\DoxyCodeLine{00219\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx-\/>m\_block\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00220\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (unconfirmed\_block\ ==\ \textcolor{keyword}{nullptr})\ unconfirmed\_block\ =\ std::make\_shared<monero\_block>();}
+\DoxyCodeLine{00221\ \ \ \ \ \ \ \ \ tx-\/>m\_block\ =\ unconfirmed\_block;}
+\DoxyCodeLine{00222\ \ \ \ \ \ \ \ \ unconfirmed\_block-\/>m\_txs.push\_back(tx);}
+\DoxyCodeLine{00223\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00224\ \ \ \ \ \ \ std::unordered\_set<std::shared\_ptr<monero\_block>>::const\_iterator\ got\ =\ seen\_block\_ptrs.find(tx-\/>m\_block);}
+\DoxyCodeLine{00225\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (got\ ==\ seen\_block\_ptrs.end())\ \{}
+\DoxyCodeLine{00226\ \ \ \ \ \ \ \ \ seen\_block\_ptrs.insert(tx-\/>m\_block);}
+\DoxyCodeLine{00227\ \ \ \ \ \ \ \ \ blocks.push\_back(tx-\/>m\_block);}
+\DoxyCodeLine{00228\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00229\ \ \ \ \ \}}
+\DoxyCodeLine{00230\ \ \ \ \ \textcolor{keywordflow}{return}\ blocks;}
+\DoxyCodeLine{00231\ \ \ \}}
+\DoxyCodeLine{00232\ }
+\DoxyCodeLine{00233\ \ \ \textcolor{keyword}{static}\ std::vector<std::shared\_ptr<monero\_block>>\ get\_blocks\_from\_transfers(std::vector<std::shared\_ptr<monero\_transfer>>\ transfers)\ \{}
+\DoxyCodeLine{00234\ \ \ \ \ std::shared\_ptr<monero\_block>\ unconfirmed\_block\ =\ \textcolor{keyword}{nullptr};\ \textcolor{comment}{//\ placeholder\ for\ unconfirmed\ txs\ in\ return\ json}}
+\DoxyCodeLine{00235\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ blocks;}
+\DoxyCodeLine{00236\ \ \ \ \ std::unordered\_set<std::shared\_ptr<monero\_block>>\ seen\_block\_ptrs;}
+\DoxyCodeLine{00237\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ transfer\ :\ transfers)\ \{}
+\DoxyCodeLine{00238\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (transfer-\/>m\_tx\ ==\ \textcolor{keyword}{nullptr})\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Transfer\ has\ no\ tx"{}});}
+\DoxyCodeLine{00239\ \ \ \ \ \ \ std::shared\_ptr<monero\_tx\_wallet>\ tx\ =\ transfer-\/>m\_tx;}
+\DoxyCodeLine{00240\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx-\/>m\_block\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00241\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (unconfirmed\_block\ ==\ \textcolor{keyword}{nullptr})\ unconfirmed\_block\ =\ std::make\_shared<monero\_block>();}
+\DoxyCodeLine{00242\ \ \ \ \ \ \ \ \ tx-\/>m\_block\ =\ unconfirmed\_block;}
+\DoxyCodeLine{00243\ \ \ \ \ \ \ \ \ unconfirmed\_block-\/>m\_txs.push\_back(tx);}
+\DoxyCodeLine{00244\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00245\ \ \ \ \ \ \ std::unordered\_set<std::shared\_ptr<monero\_block>>::const\_iterator\ got\ =\ seen\_block\_ptrs.find(tx-\/>m\_block);}
+\DoxyCodeLine{00246\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (got\ ==\ seen\_block\_ptrs.end())\ \{}
+\DoxyCodeLine{00247\ \ \ \ \ \ \ \ \ seen\_block\_ptrs.insert(tx-\/>m\_block);}
+\DoxyCodeLine{00248\ \ \ \ \ \ \ \ \ blocks.push\_back(tx-\/>m\_block);}
+\DoxyCodeLine{00249\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00250\ \ \ \ \ \}}
+\DoxyCodeLine{00251\ \ \ \ \ \textcolor{keywordflow}{return}\ blocks;}
+\DoxyCodeLine{00252\ \ \ \}}
+\DoxyCodeLine{00253\ }
+\DoxyCodeLine{00254\ \ \ \textcolor{keyword}{static}\ std::vector<std::shared\_ptr<monero\_block>>\ get\_blocks\_from\_outputs(std::vector<std::shared\_ptr<monero\_output\_wallet>>\ outputs)\ \{}
+\DoxyCodeLine{00255\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ blocks;}
+\DoxyCodeLine{00256\ \ \ \ \ std::unordered\_set<std::shared\_ptr<monero\_block>>\ seen\_block\_ptrs;}
+\DoxyCodeLine{00257\ \ \ \ \ \textcolor{keywordflow}{for}\ (\textcolor{keyword}{auto}\ \textcolor{keyword}{const}\&\ output\ :\ outputs)\ \{}
+\DoxyCodeLine{00258\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (output-\/>m\_tx\ ==\ \textcolor{keyword}{nullptr})\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Output\ has\ no\ tx"{}});}
+\DoxyCodeLine{00259\ \ \ \ \ \ \ std::shared\_ptr<monero\_tx\_wallet>\ tx\ =\ std::static\_pointer\_cast<monero\_tx\_wallet>(output-\/>m\_tx);}
+\DoxyCodeLine{00260\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx-\/>m\_block\ ==\ \textcolor{keyword}{nullptr})\ \textcolor{keywordflow}{throw}\ std::runtime\_error(\textcolor{stringliteral}{"{}Need\ to\ handle\ unconfirmed\ output"{}});}
+\DoxyCodeLine{00261\ \ \ \ \ \ \ std::unordered\_set<std::shared\_ptr<monero\_block>>::const\_iterator\ got\ =\ seen\_block\_ptrs.find(tx-\/>m\_block);}
+\DoxyCodeLine{00262\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (got\ ==\ seen\_block\_ptrs.end())\ \{}
+\DoxyCodeLine{00263\ \ \ \ \ \ \ \ \ seen\_block\_ptrs.insert(tx-\/>m\_block);}
+\DoxyCodeLine{00264\ \ \ \ \ \ \ \ \ blocks.push\_back(tx-\/>m\_block);}
+\DoxyCodeLine{00265\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00266\ \ \ \ \ \}}
+\DoxyCodeLine{00267\ \ \ \ \ \textcolor{keywordflow}{return}\ blocks;}
+\DoxyCodeLine{00268\ \ \ \}}
+\DoxyCodeLine{00269\ }
+\DoxyCodeLine{00270\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ FREE\ MEMORY\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00271\ }
+\DoxyCodeLine{00272\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ free(std::shared\_ptr<monero\_block>\ block)\ \{}
+\DoxyCodeLine{00273\ \ \ \ \ \textcolor{keywordflow}{if}\ (block\ ==\ \textcolor{keyword}{nullptr})\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00274\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::shared\_ptr<monero\_tx>\&\ tx\ :\ block-\/>m\_txs)\ \{}
+\DoxyCodeLine{00275\ \ \ \ \ \ \ tx-\/>m\_block.reset();}
+\DoxyCodeLine{00276\ \ \ \ \ \ \ monero\_tx\_wallet*\ tx\_wallet\ =\ \textcolor{keyword}{dynamic\_cast<}monero\_tx\_wallet*\textcolor{keyword}{>}(tx.get());}
+\DoxyCodeLine{00277\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\_wallet\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00278\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\_wallet-\/>m\_tx\_set\ !=\ \textcolor{keyword}{nullptr})\ tx\_wallet-\/>m\_tx\_set.reset();}
+\DoxyCodeLine{00279\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\_wallet-\/>m\_outgoing\_transfer\ !=\ \textcolor{keyword}{nullptr})\ tx\_wallet-\/>m\_outgoing\_transfer-\/>m\_tx.reset();}
+\DoxyCodeLine{00280\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::shared\_ptr<monero\_transfer>\ transfer\ :\ tx\_wallet-\/>m\_incoming\_transfers)\ transfer-\/>m\_tx.reset();}
+\DoxyCodeLine{00281\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::shared\_ptr<monero\_output>\ output\ :\ tx\_wallet-\/>m\_outputs)\ output-\/>m\_tx.reset();}
+\DoxyCodeLine{00282\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{for}\ (std::shared\_ptr<monero\_output>\ input\ :\ tx\_wallet-\/>m\_inputs)\ \{}
+\DoxyCodeLine{00283\ \ \ \ \ \ \ \ \ \ \ input-\/>m\_key\_image.reset();}
+\DoxyCodeLine{00284\ \ \ \ \ \ \ \ \ \ \ input-\/>m\_tx.reset();}
+\DoxyCodeLine{00285\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00286\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00287\ \ \ \ \ \ \ monero\_tx\_query*\ tx\_query\ =\ \textcolor{keyword}{dynamic\_cast<}monero\_tx\_query*\textcolor{keyword}{>}(tx.get());}
+\DoxyCodeLine{00288\ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\_query\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\_query-\/>m\_transfer\_query\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00290\ \ \ \ \ \ \ \ \ \ \ tx\_query-\/>m\_transfer\_query-\/>m\_tx\_query.reset();}
+\DoxyCodeLine{00291\ \ \ \ \ \ \ \ \ \ \ tx\_query-\/>m\_transfer\_query.reset();}
+\DoxyCodeLine{00292\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00293\ \ \ \ \ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\_query-\/>m\_output\_query\ !=\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00294\ \ \ \ \ \ \ \ \ \ \ tx\_query-\/>m\_output\_query-\/>m\_tx\_query.reset();}
+\DoxyCodeLine{00295\ \ \ \ \ \ \ \ \ \ \ tx\_query-\/>m\_output\_query.reset();}
+\DoxyCodeLine{00296\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00297\ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00298\ \ \ \ \ \}}
+\DoxyCodeLine{00299\ \ \ \ \ block.reset();}
+\DoxyCodeLine{00300\ \ \ \}}
+\DoxyCodeLine{00301\ }
+\DoxyCodeLine{00302\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ free(std::vector<std::shared\_ptr<monero\_block>>\ blocks)\ \{}
+\DoxyCodeLine{00303\ \ \ \ \ \textcolor{keywordflow}{for}\ (std::shared\_ptr<monero\_block>\&\ block\ :\ blocks)\ monero\_utils::free(block);}
+\DoxyCodeLine{00304\ \ \ \}}
+\DoxyCodeLine{00305\ }
+\DoxyCodeLine{00306\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ free(std::shared\_ptr<monero\_tx>\ tx)\ \{}
+\DoxyCodeLine{00307\ \ \ \ \ \textcolor{keywordflow}{if}\ (tx\ ==\ \textcolor{keyword}{nullptr})\ \textcolor{keywordflow}{return};}
+\DoxyCodeLine{00308\ \ \ \ \ \textcolor{keywordflow}{if}\ (tx-\/>m\_block\ ==\ \textcolor{keyword}{nullptr})\ \{}
+\DoxyCodeLine{00309\ \ \ \ \ \ \ std::shared\_ptr<monero\_block>\ block\ =\ std::make\_shared<monero\_block>();}
+\DoxyCodeLine{00310\ \ \ \ \ \ \ tx-\/>m\_block\ =\ block;}
+\DoxyCodeLine{00311\ \ \ \ \ \ \ block-\/>m\_txs.push\_back(tx);}
+\DoxyCodeLine{00312\ \ \ \ \ \}}
+\DoxyCodeLine{00313\ \ \ \ \ monero\_utils::free(tx-\/>m\_block);}
+\DoxyCodeLine{00314\ \ \ \}}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ free(std::vector<std::shared\_ptr<monero\_tx\_wallet>>\ txs)\ \{}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keywordflow}{return}\ monero\_utils::free(monero\_utils::get\_blocks\_from\_txs(txs));}
+\DoxyCodeLine{00318\ \ \ \}}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00320\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ free(std::vector<std::shared\_ptr<monero\_transfer>>\ transfers)\ \{}
+\DoxyCodeLine{00321\ \ \ \ \ \textcolor{keywordflow}{return}\ monero\_utils::free(monero\_utils::get\_blocks\_from\_transfers(transfers));}
+\DoxyCodeLine{00322\ \ \ \}}
+\DoxyCodeLine{00323\ }
+\DoxyCodeLine{00324\ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ free(std::vector<std::shared\_ptr<monero\_output\_wallet>>\ outputs)\ \{}
+\DoxyCodeLine{00325\ \ \ \ \ \textcolor{keywordflow}{return}\ monero\_utils::free(monero\_utils::get\_blocks\_from\_outputs(outputs));}
+\DoxyCodeLine{00326\ \ \ \}}
+\DoxyCodeLine{00327\ \}}
+\DoxyCodeLine{00328\ \textcolor{preprocessor}{\#endif\ }\textcolor{comment}{/*\ monero\_utils\_h\ */}\textcolor{preprocessor}{}}
+
+\end{DoxyCode}

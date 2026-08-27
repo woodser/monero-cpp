@@ -1,0 +1,68 @@
+\doxysection{monero\+::monero\+\_\+get\+\_\+output\+\_\+histogram\+\_\+params Struct Reference}
+\hypertarget{structmonero_1_1monero__get__output__histogram__params}{}\label{structmonero_1_1monero__get__output__histogram__params}\index{monero::monero\_get\_output\_histogram\_params@{monero::monero\_get\_output\_histogram\_params}}
+Inheritance diagram for monero\+::monero\+\_\+get\+\_\+output\+\_\+histogram\+\_\+params\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__get__output__histogram__params}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_acd4f81d261b3867d7b19996aaee4b288}\label{structmonero_1_1monero__get__output__histogram__params_acd4f81d261b3867d7b19996aaee4b288} 
+{\bfseries monero\+\_\+get\+\_\+output\+\_\+histogram\+\_\+params} (const std\+::vector$<$ uint64\+\_\+t $>$ \&amounts, const boost\+::optional$<$ int $>$ \&min\+\_\+count, const boost\+::optional$<$ int $>$ \&max\+\_\+count, const boost\+::optional$<$ bool $>$ \&is\+\_\+unlocked, const boost\+::optional$<$ int $>$ \&recent\+\_\+cutoff)
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__get__output__histogram__params_a253fd18a3e344b7c089f41fb38ce7262}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_a04a357725f23d7568bf1c8b53632e56a}\label{structmonero_1_1monero__get__output__histogram__params_a04a357725f23d7568bf1c8b53632e56a} 
+std\+::vector$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+amounts}
+\item 
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_a75542713f738566a497423fb0ecd0f5e}\label{structmonero_1_1monero__get__output__histogram__params_a75542713f738566a497423fb0ecd0f5e} 
+boost\+::optional$<$ int $>$ {\bfseries m\+\_\+min\+\_\+count}
+\item 
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_a4bdb8abd3d955b1ffa9058cbf407f3a1}\label{structmonero_1_1monero__get__output__histogram__params_a4bdb8abd3d955b1ffa9058cbf407f3a1} 
+boost\+::optional$<$ int $>$ {\bfseries m\+\_\+max\+\_\+count}
+\item 
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_a80fbc93bf8fdf27f20628694ce1a13c9}\label{structmonero_1_1monero__get__output__histogram__params_a80fbc93bf8fdf27f20628694ce1a13c9} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+unlocked}
+\item 
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_a3eafd29454fef040319bd0dc5d0adea5}\label{structmonero_1_1monero__get__output__histogram__params_a3eafd29454fef040319bd0dc5d0adea5} 
+boost\+::optional$<$ int $>$ {\bfseries m\+\_\+recent\+\_\+cutoff}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__get__output__histogram__params_a253fd18a3e344b7c089f41fb38ce7262}\index{monero::monero\_get\_output\_histogram\_params@{monero::monero\_get\_output\_histogram\_params}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_get\_output\_histogram\_params@{monero::monero\_get\_output\_histogram\_params}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__get__output__histogram__params_a253fd18a3e344b7c089f41fb38ce7262} 
+rapidjson\+::\+Value monero\+::monero\+\_\+get\+\_\+output\+\_\+histogram\+\_\+params\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+rpc\+\_\+model.\+h\item 
+daemon/monero\+\_\+daemon\+\_\+rpc\+\_\+model.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,76 @@
+\doxysection{monero\+::monero\+\_\+rpc\+\_\+error Class Reference}
+\hypertarget{classmonero_1_1monero__rpc__error}{}\label{classmonero_1_1monero__rpc__error}\index{monero::monero\_rpc\_error@{monero::monero\_rpc\_error}}
+
+
+{\ttfamily \#include $<$monero\+\_\+error.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+rpc\+\_\+error\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classmonero_1_1monero__rpc__error}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmonero_1_1monero__rpc__error_a4310efd1b065f134ddaae0dae407f814}{monero\+\_\+rpc\+\_\+error}} (int error\+\_\+code, const std\+::string \&msg)
+\item 
+\mbox{\hyperlink{classmonero_1_1monero__rpc__error_aef417c90d61cf51b0039a6488b26d745}{monero\+\_\+rpc\+\_\+error}} (const std\+::string \&msg)
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{classmonero_1_1monero__error}{monero\+::monero\+\_\+error}}}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classmonero_1_1monero__error_aa0c6965b36202a1f1fdb1ccf8615f98a}{monero\+\_\+error}} (const std\+::string \&msg)
+\item 
+const char \texorpdfstring{$\ast$}{*} {\bfseries what} () const noexcept override
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmonero_1_1monero__rpc__error_a8f5e00764d48978ae47255b796b05f6f}\label{classmonero_1_1monero__rpc__error_a8f5e00764d48978ae47255b796b05f6f} 
+int {\bfseries code}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classmonero_1_1monero__error}{monero\+::monero\+\_\+error}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string {\bfseries message}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Exception when interacting with the Monero daemon or wallet RPC API. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{classmonero_1_1monero__rpc__error_a4310efd1b065f134ddaae0dae407f814}\index{monero::monero\_rpc\_error@{monero::monero\_rpc\_error}!monero\_rpc\_error@{monero\_rpc\_error}}
+\index{monero\_rpc\_error@{monero\_rpc\_error}!monero::monero\_rpc\_error@{monero::monero\_rpc\_error}}
+\doxysubsubsection{\texorpdfstring{monero\_rpc\_error()}{monero\_rpc\_error()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__error_a4310efd1b065f134ddaae0dae407f814} 
+monero\+::monero\+\_\+rpc\+\_\+error\+::monero\+\_\+rpc\+\_\+error (\begin{DoxyParamCaption}\item[{int}]{error\+\_\+code}{, }\item[{const std\+::string \&}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Construct the exception.
+
+
+\begin{DoxyParams}{Parameters}
+{\em error\+\_\+code} & is the error code (optional) \\
+\hline
+{\em msg} & is a human-\/readable description of the error \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classmonero_1_1monero__rpc__error_aef417c90d61cf51b0039a6488b26d745}\index{monero::monero\_rpc\_error@{monero::monero\_rpc\_error}!monero\_rpc\_error@{monero\_rpc\_error}}
+\index{monero\_rpc\_error@{monero\_rpc\_error}!monero::monero\_rpc\_error@{monero::monero\_rpc\_error}}
+\doxysubsubsection{\texorpdfstring{monero\_rpc\_error()}{monero\_rpc\_error()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \label{classmonero_1_1monero__rpc__error_aef417c90d61cf51b0039a6488b26d745} 
+monero\+::monero\+\_\+rpc\+\_\+error\+::monero\+\_\+rpc\+\_\+error (\begin{DoxyParamCaption}\item[{const std\+::string \&}]{msg}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Construct the exception.
+
+
+\begin{DoxyParams}{Parameters}
+{\em msg} & is a human-\/readable description of the error \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+common/monero\+\_\+error.\+h\end{DoxyCompactItemize}

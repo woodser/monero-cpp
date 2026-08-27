@@ -1,0 +1,72 @@
+\doxysection{monero\+::monero\+\_\+auxiliary\+\_\+pow Struct Reference}
+\hypertarget{structmonero_1_1monero__auxiliary__pow}{}\label{structmonero_1_1monero__auxiliary__pow}\index{monero::monero\_auxiliary\_pow@{monero::monero\_auxiliary\_pow}}
+
+
+{\ttfamily \#include $<$monero\+\_\+daemon\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+auxiliary\+\_\+pow\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1monero__auxiliary__pow}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__auxiliary__pow_ab752f602f431efc12f5eb5d7885453b2}\label{structmonero_1_1monero__auxiliary__pow_ab752f602f431efc12f5eb5d7885453b2} 
+{\bfseries monero\+\_\+auxiliary\+\_\+pow} (const std\+::string \&id, const std\+::string \&hash)
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__auxiliary__pow_a0a5e7b04e2c3905475ef29681c21eec2}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__auxiliary__pow_aa5ba5069bbd97d0cc3bb5731b5c61432}\label{structmonero_1_1monero__auxiliary__pow_aa5ba5069bbd97d0cc3bb5731b5c61432} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__auxiliary__pow}{monero\+\_\+auxiliary\+\_\+pow}} $>$ \&aux\+\_\+pow)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__auxiliary__pow_aecac1b4d0a9c31e880c727c6b301f0d8}\label{structmonero_1_1monero__auxiliary__pow_aecac1b4d0a9c31e880c727c6b301f0d8} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+id}
+\item 
+\Hypertarget{structmonero_1_1monero__auxiliary__pow_ac7e5bd0e60e1e511c17b2109da10d6b0}\label{structmonero_1_1monero__auxiliary__pow_ac7e5bd0e60e1e511c17b2109da10d6b0} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+hash}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Identifies an auxiliary chain\textquotesingle{}s block by id and proof-\/of-\/work hash for merge mining. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__auxiliary__pow_a0a5e7b04e2c3905475ef29681c21eec2}\index{monero::monero\_auxiliary\_pow@{monero::monero\_auxiliary\_pow}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_auxiliary\_pow@{monero::monero\_auxiliary\_pow}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__auxiliary__pow_a0a5e7b04e2c3905475ef29681c21eec2} 
+rapidjson\+::\+Value monero\+::monero\+\_\+auxiliary\+\_\+pow\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Implements \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{monero\+::serializable\+\_\+struct}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+h\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+cpp\end{DoxyCompactItemize}

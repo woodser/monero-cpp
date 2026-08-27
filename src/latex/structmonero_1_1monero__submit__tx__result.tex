@@ -1,0 +1,117 @@
+\doxysection{monero\+::monero\+\_\+submit\+\_\+tx\+\_\+result Struct Reference}
+\hypertarget{structmonero_1_1monero__submit__tx__result}{}\label{structmonero_1_1monero__submit__tx__result}\index{monero::monero\_submit\_tx\_result@{monero::monero\_submit\_tx\_result}}
+
+
+{\ttfamily \#include $<$monero\+\_\+daemon\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+submit\+\_\+tx\+\_\+result\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{structmonero_1_1monero__submit__tx__result}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__submit__tx__result_a405e551797b12d3350fb79028d25e189}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const override
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_ab167c7ed18cd189e4d5ddc84fb92ea33}\label{structmonero_1_1monero__submit__tx__result_ab167c7ed18cd189e4d5ddc84fb92ea33} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__submit__tx__result}{monero\+\_\+submit\+\_\+tx\+\_\+result}} $>$ \&result)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\+::monero\+\_\+rpc\+\_\+payment\+\_\+info}}}
+\begin{DoxyCompactItemize}
+\item 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\+\_\+rpc\+\_\+payment\+\_\+info}} $>$ \&rpc\+\_\+payment\+\_\+info)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a9b5517a493451d500144e542f613d909}\label{structmonero_1_1monero__submit__tx__result_a9b5517a493451d500144e542f613d909} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+has\+\_\+invalid\+\_\+input}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_aeaf8ea431dcb0d1e4539dff06a323328}\label{structmonero_1_1monero__submit__tx__result_aeaf8ea431dcb0d1e4539dff06a323328} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+has\+\_\+invalid\+\_\+output}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_acc88e5801e61e371e3e613e3b6a67410}\label{structmonero_1_1monero__submit__tx__result_acc88e5801e61e371e3e613e3b6a67410} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+has\+\_\+too\+\_\+few\+\_\+outputs}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a654769e3f23f52412dfe66c907598f16}\label{structmonero_1_1monero__submit__tx__result_a654769e3f23f52412dfe66c907598f16} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+good}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a34dc3880c07f14479d133a8b54f5c8d2}\label{structmonero_1_1monero__submit__tx__result_a34dc3880c07f14479d133a8b54f5c8d2} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+relayed}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_afa29a60371378565477ad504685fea47}\label{structmonero_1_1monero__submit__tx__result_afa29a60371378565477ad504685fea47} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+double\+\_\+spend}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_ac70b786e488e6f60874b6ebe6024e351}\label{structmonero_1_1monero__submit__tx__result_ac70b786e488e6f60874b6ebe6024e351} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+fee\+\_\+too\+\_\+low}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_afe0d9c2f678f89ed4e80ee7db9ea4500}\label{structmonero_1_1monero__submit__tx__result_afe0d9c2f678f89ed4e80ee7db9ea4500} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+mixin\+\_\+too\+\_\+low}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a5de3060a03e4d61d2c33c6912ca72aa8}\label{structmonero_1_1monero__submit__tx__result_a5de3060a03e4d61d2c33c6912ca72aa8} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+overspend}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_aee7f97d4e17bb89df617ddc9387551a6}\label{structmonero_1_1monero__submit__tx__result_aee7f97d4e17bb89df617ddc9387551a6} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+too\+\_\+big}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a2c5d302e7651d349f107fdc41e598ab7}\label{structmonero_1_1monero__submit__tx__result_a2c5d302e7651d349f107fdc41e598ab7} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+sanity\+\_\+check\+\_\+failed}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a3432dd1c562790b06a00ed020f126553}\label{structmonero_1_1monero__submit__tx__result_a3432dd1c562790b06a00ed020f126553} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+tx\+\_\+extra\+\_\+too\+\_\+big}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a5f126e25014329afdfc24b5013d38020}\label{structmonero_1_1monero__submit__tx__result_a5f126e25014329afdfc24b5013d38020} 
+boost\+::optional$<$ bool $>$ {\bfseries m\+\_\+is\+\_\+nonzero\+\_\+unlock\+\_\+time}
+\item 
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a22294430914df54c6447c67a97f196ec}\label{structmonero_1_1monero__submit__tx__result_a22294430914df54c6447c67a97f196ec} 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+reason}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\+::monero\+\_\+rpc\+\_\+payment\+\_\+info}}}
+\begin{DoxyCompactItemize}
+\item 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+credits}
+\item 
+boost\+::optional$<$ std\+::string $>$ {\bfseries m\+\_\+top\+\_\+block\+\_\+hash}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Models the result from submitting a tx to a daemon. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__submit__tx__result_a405e551797b12d3350fb79028d25e189}\index{monero::monero\_submit\_tx\_result@{monero::monero\_submit\_tx\_result}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_submit\_tx\_result@{monero::monero\_submit\_tx\_result}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__submit__tx__result_a405e551797b12d3350fb79028d25e189} 
+rapidjson\+::\+Value monero\+::monero\+\_\+submit\+\_\+tx\+\_\+result\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Reimplemented from \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info_aa32c5a06dc631470b2ebac0c92bd0166}{monero\+::monero\+\_\+rpc\+\_\+payment\+\_\+info}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+h\item 
+daemon/monero\+\_\+daemon\+\_\+model.\+cpp\end{DoxyCompactItemize}

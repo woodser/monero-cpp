@@ -1,0 +1,66 @@
+\doxysection{monero\+::wallet2\+\_\+listener Struct Reference}
+\hypertarget{structmonero_1_1wallet2__listener}{}\label{structmonero_1_1wallet2__listener}\index{monero::wallet2\_listener@{monero::wallet2\_listener}}
+Inheritance diagram for monero\+::wallet2\+\_\+listener\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{structmonero_1_1wallet2__listener}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{structmonero_1_1wallet2__listener_a7a2f518d6467b1f59cfb53e9faab8ba4}{wallet2\+\_\+listener}} (\mbox{\hyperlink{classmonero_1_1monero__wallet__full}{monero\+\_\+wallet\+\_\+full}} \&wallet, tools\+::wallet2 \&wallet2)
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_a0f11364138b0cc31ef414e4e82ca21cd}\label{structmonero_1_1wallet2__listener_a0f11364138b0cc31ef414e4e82ca21cd} 
+void {\bfseries update\+\_\+listening} ()
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_a3c101b7fea08ea40cad3d9cd1ac03ab0}\label{structmonero_1_1wallet2__listener_a3c101b7fea08ea40cad3d9cd1ac03ab0} 
+void {\bfseries on\+\_\+sync\+\_\+start} (uint64\+\_\+t start\+\_\+height, uint64\+\_\+t end\+\_\+height)
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_aad9ba433b530ad165ad8d5f7e3569883}\label{structmonero_1_1wallet2__listener_aad9ba433b530ad165ad8d5f7e3569883} 
+void {\bfseries on\+\_\+sync\+\_\+end} ()
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_a8a488e675685c55fa91b8408225ae741}\label{structmonero_1_1wallet2__listener_a8a488e675685c55fa91b8408225ae741} 
+void {\bfseries on\+\_\+new\+\_\+block} (uint64\+\_\+t height, const cryptonote\+::block \&cn\+\_\+block) override
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_afa32a65c7d452ca0e740dbaa8262ac06}\label{structmonero_1_1wallet2__listener_afa32a65c7d452ca0e740dbaa8262ac06} 
+void {\bfseries on\+\_\+unconfirmed\+\_\+money\+\_\+received} (uint64\+\_\+t height, const crypto\+::hash \&txid, const cryptonote\+::transaction \&cn\+\_\+tx, uint64\+\_\+t amount, const cryptonote\+::subaddress\+\_\+index \&subaddr\+\_\+index) override
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_a1829b134dbfeb0d177e8fbde4aec8d23}\label{structmonero_1_1wallet2__listener_a1829b134dbfeb0d177e8fbde4aec8d23} 
+void {\bfseries on\+\_\+money\+\_\+received} (uint64\+\_\+t height, const crypto\+::hash \&txid, const cryptonote\+::transaction \&cn\+\_\+tx, uint64\+\_\+t amount, uint64\+\_\+t burnt, const cryptonote\+::subaddress\+\_\+index \&subaddr\+\_\+index, bool is\+\_\+change, uint64\+\_\+t unlock\+\_\+time) override
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_adb44155c73587a7dd6c6c04fee44bae3}\label{structmonero_1_1wallet2__listener_adb44155c73587a7dd6c6c04fee44bae3} 
+void {\bfseries on\+\_\+money\+\_\+spent} (uint64\+\_\+t height, const crypto\+::hash \&txid, const cryptonote\+::transaction \&cn\+\_\+tx\+\_\+in, uint64\+\_\+t amount, const cryptonote\+::transaction \&cn\+\_\+tx\+\_\+out, const cryptonote\+::subaddress\+\_\+index \&subaddr\+\_\+index) override
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_afd3a2169af2a35597c078dc38a60e245}\label{structmonero_1_1wallet2__listener_afd3a2169af2a35597c078dc38a60e245} 
+void {\bfseries on\+\_\+spend\+\_\+tx\+\_\+hashes} (const std\+::vector$<$ std\+::string $>$ \&tx\+\_\+hashes)
+\item 
+\Hypertarget{structmonero_1_1wallet2__listener_a681e722f9967def33803905014f2ff68}\label{structmonero_1_1wallet2__listener_a681e722f9967def33803905014f2ff68} 
+void {\bfseries on\+\_\+spend\+\_\+txs} (const std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__tx__wallet}{monero\+\_\+tx\+\_\+wallet}} $>$ $>$ \&txs)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Listens to wallet2 notifications in order to notify external wallet listeners. 
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\Hypertarget{structmonero_1_1wallet2__listener_a7a2f518d6467b1f59cfb53e9faab8ba4}\index{monero::wallet2\_listener@{monero::wallet2\_listener}!wallet2\_listener@{wallet2\_listener}}
+\index{wallet2\_listener@{wallet2\_listener}!monero::wallet2\_listener@{monero::wallet2\_listener}}
+\doxysubsubsection{\texorpdfstring{wallet2\_listener()}{wallet2\_listener()}}
+{\footnotesize\ttfamily \label{structmonero_1_1wallet2__listener_a7a2f518d6467b1f59cfb53e9faab8ba4} 
+monero\+::wallet2\+\_\+listener\+::wallet2\+\_\+listener (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classmonero_1_1monero__wallet__full}{monero\+\_\+wallet\+\_\+full}} \&}]{wallet}{, }\item[{tools\+::wallet2 \&}]{wallet2}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+Constructs the listener.
+
+
+\begin{DoxyParams}{Parameters}
+{\em wallet} & provides context to notify external listeners \\
+\hline
+{\em wallet2} & provides source notifications which this listener propagates to external listeners \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+wallet/monero\+\_\+wallet\+\_\+full.\+cpp\end{DoxyCompactItemize}

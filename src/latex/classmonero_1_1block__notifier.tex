@@ -1,0 +1,50 @@
+\doxysection{monero\+::block\+\_\+notifier Class Reference}
+\hypertarget{classmonero_1_1block__notifier}{}\label{classmonero_1_1block__notifier}\index{monero::block\_notifier@{monero::block\_notifier}}
+Inheritance diagram for monero\+::block\+\_\+notifier\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classmonero_1_1block__notifier}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{classmonero_1_1block__notifier_a6f4a51472c3e2c66ce243e03df6f8eb4}\label{classmonero_1_1block__notifier_a6f4a51472c3e2c66ce243e03df6f8eb4} 
+{\bfseries block\+\_\+notifier} (boost\+::mutex \texorpdfstring{$\ast$}{*}temp, boost\+::condition\+\_\+variable \texorpdfstring{$\ast$}{*}cv, bool \texorpdfstring{$\ast$}{*}ready)
+\item 
+void \mbox{\hyperlink{classmonero_1_1block__notifier_a202665728b5d0898b798f26bcb26ad20}{on\+\_\+block\+\_\+header}} (const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__block__header}{monero\+\_\+block\+\_\+header}} $>$ \&header) override
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Additional Inherited Members}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{classmonero_1_1monero__daemon__listener}{monero\+::monero\+\_\+daemon\+\_\+listener}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__block__header}{monero\+\_\+block\+\_\+header}} $>$ {\bfseries m\+\_\+last\+\_\+header}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Sends a notification on a condition variable when a block is added to blockchain. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{classmonero_1_1block__notifier_a202665728b5d0898b798f26bcb26ad20}\index{monero::block\_notifier@{monero::block\_notifier}!on\_block\_header@{on\_block\_header}}
+\index{on\_block\_header@{on\_block\_header}!monero::block\_notifier@{monero::block\_notifier}}
+\doxysubsubsection{\texorpdfstring{on\_block\_header()}{on\_block\_header()}}
+{\footnotesize\ttfamily \label{classmonero_1_1block__notifier_a202665728b5d0898b798f26bcb26ad20} 
+void monero\+::block\+\_\+notifier\+::on\+\_\+block\+\_\+header (\begin{DoxyParamCaption}\item[{const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__block__header}{monero\+\_\+block\+\_\+header}} $>$ \&}]{header}{}\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+Called when a new block is added to the chain.
+
+
+\begin{DoxyParams}{Parameters}
+{\em header} & is the header of the block added to the chain \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented from \mbox{\hyperlink{classmonero_1_1monero__daemon__listener_a3ee39d641741a4fe6b75ba1b1d51af41}{monero\+::monero\+\_\+daemon\+\_\+listener}}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+daemon/monero\+\_\+daemon\+\_\+rpc.\+cpp\end{DoxyCompactItemize}

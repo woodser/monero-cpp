@@ -1,0 +1,74 @@
+\doxysection{monero\+::monero\+\_\+check\+\_\+reserve Struct Reference}
+\hypertarget{structmonero_1_1monero__check__reserve}{}\label{structmonero_1_1monero__check__reserve}\index{monero::monero\_check\_reserve@{monero::monero\_check\_reserve}}
+
+
+{\ttfamily \#include $<$monero\+\_\+wallet\+\_\+model.\+h$>$}
+
+Inheritance diagram for monero\+::monero\+\_\+check\+\_\+reserve\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{structmonero_1_1monero__check__reserve}
+\end{center}
+\end{figure}
+\doxysubsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+rapidjson\+::\+Value \mbox{\hyperlink{structmonero_1_1monero__check__reserve_ab86672fe20e03b108b101496b3ebe6f3}{to\+\_\+rapidjson\+\_\+val}} (rapidjson\+::\+Document\+::\+Allocator\+Type \&allocator) const
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions inherited from \mbox{\hyperlink{structmonero_1_1serializable__struct}{monero\+::serializable\+\_\+struct}}}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}} () const
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__check__reserve_a2260cf191f153a4dbbf0937265d0b807}\label{structmonero_1_1monero__check__reserve_a2260cf191f153a4dbbf0937265d0b807} 
+static void {\bfseries from\+\_\+property\+\_\+tree} (const boost\+::property\+\_\+tree\+::ptree \&node, const std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structmonero_1_1monero__check__reserve}{monero\+\_\+check\+\_\+reserve}} $>$ \&check)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{structmonero_1_1monero__check__reserve_a3e973e329c05a0488a64181c1ee2112c}\label{structmonero_1_1monero__check__reserve_a3e973e329c05a0488a64181c1ee2112c} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+total\+\_\+amount}
+\item 
+\Hypertarget{structmonero_1_1monero__check__reserve_aaef388d6fa845d607fadbecb33739300}\label{structmonero_1_1monero__check__reserve_aaef388d6fa845d607fadbecb33739300} 
+boost\+::optional$<$ uint64\+\_\+t $>$ {\bfseries m\+\_\+unconfirmed\+\_\+spent\+\_\+amount}
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Attributes inherited from \mbox{\hyperlink{structmonero_1_1monero__check}{monero\+::monero\+\_\+check}}}
+\begin{DoxyCompactItemize}
+\item 
+bool {\bfseries m\+\_\+is\+\_\+good}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Results from checking a reserve proof. 
+
+\doxysubsection{Member Function Documentation}
+\Hypertarget{structmonero_1_1monero__check__reserve_ab86672fe20e03b108b101496b3ebe6f3}\index{monero::monero\_check\_reserve@{monero::monero\_check\_reserve}!to\_rapidjson\_val@{to\_rapidjson\_val}}
+\index{to\_rapidjson\_val@{to\_rapidjson\_val}!monero::monero\_check\_reserve@{monero::monero\_check\_reserve}}
+\doxysubsubsection{\texorpdfstring{to\_rapidjson\_val()}{to\_rapidjson\_val()}}
+{\footnotesize\ttfamily \label{structmonero_1_1monero__check__reserve_ab86672fe20e03b108b101496b3ebe6f3} 
+rapidjson\+::\+Value monero\+::monero\+\_\+check\+\_\+reserve\+::to\+\_\+rapidjson\+\_\+val (\begin{DoxyParamCaption}\item[{rapidjson\+::\+Document\+::\+Allocator\+Type \&}]{allocator}{}\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [virtual]}}
+
+Converts the struct to a rapidjson Value.
+
+
+\begin{DoxyParams}{Parameters}
+{\em allocator} & is the rapidjson document allocator \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the struct as a rapidjson Value 
+\end{DoxyReturn}
+
+
+Reimplemented from \mbox{\hyperlink{structmonero_1_1monero__check_a405a6322e58b150cc3643e0569039ceb}{monero\+::monero\+\_\+check}}.
+
+
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+h\item 
+wallet/monero\+\_\+wallet\+\_\+model.\+cpp\end{DoxyCompactItemize}

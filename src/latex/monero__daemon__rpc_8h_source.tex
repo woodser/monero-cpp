@@ -1,0 +1,130 @@
+\doxysection{monero\+\_\+daemon\+\_\+rpc.\+h}
+\hypertarget{monero__daemon__rpc_8h_source}{}\label{monero__daemon__rpc_8h_source}\index{daemon/monero\_daemon\_rpc.h@{daemon/monero\_daemon\_rpc.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ "{}monero\_daemon.h"{}}}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00061\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacemonero}{monero}}\ \{}
+\DoxyCodeLine{00062\ }
+\DoxyCodeLine{00063\ \ \ \textcolor{comment}{//\ forward\ declaration\ of\ internal\ daemon\ poller}}
+\DoxyCodeLine{00064\ \ \ \textcolor{keyword}{class\ }\mbox{\hyperlink{classmonero_1_1monero__daemon__poller}{monero\_daemon\_poller}};}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00069\ \ \ \textcolor{keyword}{class\ }monero\_daemon\_rpc\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{classmonero_1_1monero__daemon}{monero\_daemon}}\ \{}
+\DoxyCodeLine{00070\ \ \ \textcolor{keyword}{public}:}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00075\ \ \ \ \ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ae64dd7d8ce4506c40a25f12c38a5e874}{\string~monero\_daemon\_rpc}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00076\ \ \ \ \ monero\_daemon\_rpc(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_rpc\_connection>\&\ rpc);}
+\DoxyCodeLine{00077\ \ \ \ \ monero\_daemon\_rpc(\textcolor{keyword}{const}\ std::string\&\ uri,\ \textcolor{keyword}{const}\ std::string\&\ username\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ password\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ proxy\_uri\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ zmq\_uri\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ boost::optional<uint32\_t>\&\ timeout\ =\ boost::none);}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00084\ \ \ \ \ std::shared\_ptr<monero\_rpc\_connection>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a96d799772d2349e87becf5c151f4a2e4}{get\_rpc\_connection}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00091\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aa8574c8df878aafbe35774c8758eddc6}{is\_connected}}();}
+\DoxyCodeLine{00092\ }
+\DoxyCodeLine{00098\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a739b3f1f059a35c24ea69f238b27954b}{set\_poll\_period\_in\_ms}}(uint64\_t\ period\_ms);}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00103\ \ \ \ \ std::set<monero\_daemon\_listener*>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a399236e652db5f2b2fd4acc3d19619ed}{get\_listeners}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00104\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ac7656d1792e4120a54e5120a83f513a3}{add\_listener}}(\mbox{\hyperlink{classmonero_1_1monero__daemon__listener}{monero\_daemon\_listener}}\ \&listener)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00105\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_abd2adcc9a88322172101bf47c032583f}{remove\_listener}}(\mbox{\hyperlink{classmonero_1_1monero__daemon__listener}{monero\_daemon\_listener}}\ \&listener)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00106\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a2b599fbc1eca94d6c6229af81bcb122b}{remove\_listeners}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00107\ \ \ \ \ \mbox{\hyperlink{structmonero_1_1monero__version}{monero\_version}}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ac87a35fb1ee9a040e9b42366c46081d6}{get\_version}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00108\ \ \ \ \ \textcolor{keywordtype}{bool}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a8022651ca294174e3c292a425979c1dc}{is\_trusted}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00109\ \ \ \ \ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_adccd7e655dc0496ce8977f9458a46228}{get\_height}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00110\ \ \ \ \ std::string\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aa039f8a8c194ac59a87759b8ad8e429e}{get\_block\_hash}}(uint64\_t\ height)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00111\ \ \ \ \ std::shared\_ptr<monero\_block\_template>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a1820ff92ea98840e3c90c5dce04f1924}{get\_block\_template}}(\textcolor{keyword}{const}\ std::string\&\ wallet\_address,\ \textcolor{keyword}{const}\ boost::optional<int>\&\ reserve\_size\ =\ boost::none)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00112\ \ \ \ \ std::shared\_ptr<monero\_miner\_data>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a7f9dbf62e98a7f4d732643a5a79d6160}{get\_miner\_data}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00113\ \ \ \ \ std::string\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a7daab72b7385c59c8cb82baf8884ac08}{calculate\_pow}}(uint32\_t\ major\_version,\ uint64\_t\ height,\ \textcolor{keyword}{const}\ std::string\&\ block\_blob,\ \textcolor{keyword}{const}\ std::string\&\ seed\_hash)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00114\ \ \ \ \ std::shared\_ptr<monero\_add\_auxiliary\_pow\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a2ceea04b28ca1e19bbb7e72ef3271ef5}{add\_auxiliary\_pow}}(\textcolor{keyword}{const}\ std::string\&\ block\_template\_blob,\ \textcolor{keyword}{const}\ std::vector<std::shared\_ptr<monero\_auxiliary\_pow>>\&\ aux\_pow)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00115\ \ \ \ \ std::shared\_ptr<monero\_block\_header>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a68edf71324b2c2cb9d5ae21746f28210}{get\_last\_block\_header}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00116\ \ \ \ \ std::shared\_ptr<monero\_block\_header>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a343b383ea97a1f86b9c09e40132efba5}{get\_block\_header\_by\_hash}}(\textcolor{keyword}{const}\ std::string\&\ hash)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00117\ \ \ \ \ std::shared\_ptr<monero\_block\_header>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ad2c1c9eb7a8af46b0bb719c5a32bc8e5}{get\_block\_header\_by\_height}}(uint64\_t\ height)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00118\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block\_header>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ab2aea269b641655f7ec2e0760c6847d2}{get\_block\_headers\_by\_range}}(uint64\_t\ start\_height,\ uint64\_t\ end\_height)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00119\ \ \ \ \ std::shared\_ptr<monero\_block>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aa91e400bdc3320bb0d02a29a8b9aa867}{get\_block\_by\_hash}}(\textcolor{keyword}{const}\ std::string\&\ hash)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00120\ \ \ \ \ std::shared\_ptr<monero\_get\_blocks\_by\_hash\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a773b3e98bf2be5598999827561a6b7f4}{get\_blocks\_by\_hash}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ block\_hashes,\ uint64\_t\ start\_height,\ \textcolor{keywordtype}{bool}\ prune,\ uint64\_t\ max\_block\_count\ =\ 0)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00121\ \ \ \ \ std::shared\_ptr<monero\_block>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ad72a05b37be0cf92ccfa96ac0c49f675}{get\_block\_by\_height}}(uint64\_t\ height)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00122\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a7533cc550e2e5a34eecd8c9157859dbd}{get\_blocks\_by\_height}}(\textcolor{keyword}{const}\ std::vector<uint64\_t>\&\ heights)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00123\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a10a8f5e9e1d692b2229b804e55ebdf2c}{get\_blocks\_by\_range}}(boost::optional<uint64\_t>\ start\_height,\ boost::optional<uint64\_t>\ end\_height)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00124\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aa32df272993a9bc106f18abe20782075}{get\_blocks\_by\_range\_chunked}}(boost::optional<uint64\_t>\ start\_height,\ boost::optional<uint64\_t>\ end\_height,\ boost::optional<uint64\_t>\ max\_chunk\_size)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00125\ \ \ \ \ std::shared\_ptr<monero\_get\_block\_hashes\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_af3a5ca07e9dddcb78d2ddf5a1c7d2484}{get\_block\_hashes}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ block\_hashes)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00126\ \ \ \ \ std::vector<std::shared\_ptr<monero\_tx>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a576a92e845201255d24f1f9c5f2272c7}{get\_txs}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_hashes,\ \textcolor{keywordtype}{bool}\ prune\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00127\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ac8fb76846a2bc1b5feb8e335ec6a2966}{get\_tx\_hexes}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_hashes,\ \textcolor{keywordtype}{bool}\ prune\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00128\ \ \ \ \ std::shared\_ptr<monero\_miner\_tx\_sum>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a6c2b7336c12743206508d4a7a01d39dc}{get\_miner\_tx\_sum}}(uint64\_t\ height,\ uint64\_t\ num\_blocks)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00129\ \ \ \ \ std::shared\_ptr<monero\_fee\_estimate>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ae2acfd9be48a31966843f5cdd9745a18}{get\_fee\_estimate}}(uint64\_t\ grace\_blocks\ =\ 0)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00130\ \ \ \ \ std::shared\_ptr<monero\_submit\_tx\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ad9c6cf6971c776cce91994e78fadffd8}{submit\_tx\_hex}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hex,\ \textcolor{keywordtype}{bool}\ do\_not\_relay\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00131\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a415bad8c915b2d5f192c1404356e76a5}{relay\_txs\_by\_hash}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ tx\_hashes)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00132\ \ \ \ \ std::shared\_ptr<monero\_tx\_pool\_stats>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aa00bbab99c4fdce6bd1548d3b7d34384}{get\_tx\_pool\_stats}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00133\ \ \ \ \ std::vector<std::shared\_ptr<monero\_tx>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a9993c65ad5f3c6d49cde51f0bb67832a}{get\_tx\_pool}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00134\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a05a778d375254cf25b4f0086c380ed25}{get\_tx\_pool\_hashes}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00135\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a0f8f06643a1c5e193198b5e3cb5c814a}{flush\_tx\_pool}}(\textcolor{keyword}{const}\ std::vector<std::string>\ \&hashes)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00136\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a0f8f06643a1c5e193198b5e3cb5c814a}{flush\_tx\_pool}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00137\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a0f8f06643a1c5e193198b5e3cb5c814a}{flush\_tx\_pool}}(\textcolor{keyword}{const}\ std::string\ \&hash)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00138\ \ \ \ \ std::vector<monero\_key\_image\_spent\_status>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a51df7be89d4f61bdd207ea9c0f97709a}{get\_key\_image\_spent\_statuses}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ key\_images)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00139\ \ \ \ \ std::vector<uint64\_t>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a344d9f91749b0c9a519381e1320d58d9}{get\_output\_indices}}(\textcolor{keyword}{const}\ std::string\&\ tx\_hash)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00140\ \ \ \ \ std::vector<std::shared\_ptr<monero\_output>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a27f4b7b6da941542895f172885227d50}{get\_outputs}}(\textcolor{keyword}{const}\ std::vector<monero\_output>\&\ outputs)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00141\ \ \ \ \ std::vector<std::shared\_ptr<monero\_output\_histogram\_entry>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a492a49f190ef5352e014f1b18a933ac2}{get\_output\_histogram}}(\textcolor{keyword}{const}\ std::vector<uint64\_t>\&\ amounts,\ \textcolor{keyword}{const}\ boost::optional<int>\&\ min\_count,\ \textcolor{keyword}{const}\ boost::optional<int>\&\ max\_count,\ \textcolor{keyword}{const}\ boost::optional<bool>\&\ is\_unlocked,\ \textcolor{keyword}{const}\ boost::optional<int>\&\ recent\_cutoff)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00142\ \ \ \ \ std::vector<std::shared\_ptr<monero\_output\_distribution\_entry>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a354cdd583b49fc1102fc6aab8103ca18}{get\_output\_distribution}}(\textcolor{keyword}{const}\ std::vector<uint64\_t>\&\ amounts,\ \textcolor{keyword}{const}\ boost::optional<bool>\&\ is\_cumulative\ =\ boost::none,\ \textcolor{keyword}{const}\ boost::optional<uint64\_t>\&\ start\_height\ =\ boost::none,\ \textcolor{keyword}{const}\ boost::optional<uint64\_t>\&\ end\_height\ =\ boost::none)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00143\ \ \ \ \ std::shared\_ptr<monero\_daemon\_info>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a0ed8065b0ec7f89b8d329011df8eb511}{get\_info}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00144\ \ \ \ \ std::shared\_ptr<monero\_daemon\_sync\_info>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a3b10ec60f1a0462b26d71cf00fa72de4}{get\_sync\_info}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00145\ \ \ \ \ std::shared\_ptr<monero\_daemon\_network\_stats>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a14b62c234ede10b33bda6f08826ed8a5}{get\_network\_stats}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00146\ \ \ \ \ std::shared\_ptr<monero\_hard\_fork\_info>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ac4255c034ea61866aed47edcf5a62305}{get\_hard\_fork\_info}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00147\ \ \ \ \ std::vector<std::shared\_ptr<monero\_alt\_chain>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a305a453643d39f2a076aa2f10c07a1ce}{get\_alt\_chains}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00148\ \ \ \ \ std::vector<std::string>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a58868a4d98d99189b4c48057e090dedb}{get\_alt\_block\_hashes}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00149\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a610c19c1f74b75b27caed352c70248cc}{get\_download\_limit}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00150\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a9cb7ccf0e5e8fea49cceec13ba56b428}{set\_download\_limit}}(\textcolor{keywordtype}{int}\ limit)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00151\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ae4ec9f47382fb7d071f7a7039a3e37d2}{reset\_download\_limit}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00152\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a7d3753aacc401c5e2931417c2968feb1}{get\_upload\_limit}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00153\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a535ed8047dcfa94d93e0639c6cc1d4d4}{set\_upload\_limit}}(\textcolor{keywordtype}{int}\ limit)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00154\ \ \ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_afd3d9485dcea31203b0b1b3d9405300c}{reset\_upload\_limit}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00155\ \ \ \ \ std::vector<std::shared\_ptr<monero\_peer>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ab8c244ce1fd423c7c3cc31ce97429705}{get\_peers}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00156\ \ \ \ \ std::vector<std::shared\_ptr<monero\_peer>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a15cdd217a9aeb9c202192f682586f4e4}{get\_known\_peers}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00157\ \ \ \ \ std::vector<std::shared\_ptr<monero\_peer>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a5fe12cc5d23baf8fd776989f1137bccb}{get\_public\_peers}}(\textcolor{keywordtype}{bool}\ include\_offline\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00158\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a56663366ba10a9810869251d8154a289}{set\_outgoing\_peer\_limit}}(\textcolor{keywordtype}{int}\ limit)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00159\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a9a03746aab7ca89a55293918869c906a}{set\_incoming\_peer\_limit}}(\textcolor{keywordtype}{int}\ limit)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00160\ \ \ \ \ std::vector<std::shared\_ptr<monero\_ban>>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ad50068607d406e6df9442b0e60b4cae7}{get\_peer\_bans}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00161\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a243f1b955f8feb277b244b339cd1d9cc}{set\_peer\_bans}}(\textcolor{keyword}{const}\ std::vector<std::shared\_ptr<monero\_ban>>\&\ bans)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00162\ \ \ \ \ std::shared\_ptr<monero\_ban>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a44bbebb6fd34d323a666076d51f64c23}{get\_peer\_ban}}(\textcolor{keyword}{const}\ std::string\&\ address)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00163\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a079b6f88c2dab22332b010e7b6f62655}{start\_mining}}(\textcolor{keyword}{const}\ std::string\ \&address,\ boost::optional<uint64\_t>\ num\_threads,\ boost::optional<bool>\ background\_mining,\ boost::optional<bool>\ ignore\_battery)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00164\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_acfedb89f32991a0f1fe130a0936d541f}{stop\_mining}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00165\ \ \ \ \ std::shared\_ptr<monero\_mining\_status>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_ae8f947f3495fc65f696f30f31b52073c}{get\_mining\_status}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00166\ \ \ \ \ std::shared\_ptr<monero\_generate\_blocks\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a742b6dc19d8ead1f746fa95d6a9c2043}{generate\_blocks}}(\textcolor{keyword}{const}\ std::string\&\ wallet\_address,\ uint64\_t\ num\_blocks,\ \textcolor{keyword}{const}\ boost::optional<std::string>\&\ prev\_block\_hash\ =\ boost::none,\ \textcolor{keyword}{const}\ boost::optional<uint32\_t>\&\ starting\_nonce\ =\ boost::none)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00167\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_acc4472bafaa6f4334cd1fe72b3ca9644}{submit\_blocks}}(\textcolor{keyword}{const}\ std::vector<std::string>\&\ block\_blobs)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00168\ \ \ \ \ std::shared\_ptr<monero\_prune\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a1b7b716d7be7402703dd8ed85473a909}{prune\_blockchain}}(\textcolor{keywordtype}{bool}\ check)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00169\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aee571be0312251eee19e63d9e77bc5d3}{save\_blockchain}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00170\ \ \ \ \ uint64\_t\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_aa73a859eaa06b8a2c6d7cac5340f56b8}{pop\_blocks}}(uint64\_t\ num\_blocks)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00171\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_af8eda96ce8480d882cd8aaa398d99927}{flush\_cache}}(\textcolor{keywordtype}{bool}\ bad\_blocks\ =\ \textcolor{keyword}{false})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00172\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a93b777ddea1fd174ace224ed37cc8a81}{set\_bootstrap\_daemon}}(\textcolor{keyword}{const}\ std::string\&\ address,\ \textcolor{keyword}{const}\ std::string\&\ username\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ password\ =\ \textcolor{stringliteral}{"{}"{}},\ \textcolor{keyword}{const}\ std::string\&\ proxy\ =\ \textcolor{stringliteral}{"{}"{}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00173\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a6d675ee9d232252f91522a31f39baf30}{set\_log\_hash\_rate}}(\textcolor{keywordtype}{bool}\ is\_visible)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00174\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a6f4bbcbb37ad75383c1e23a32b922f52}{set\_log\_level}}(\textcolor{keywordtype}{int}\ level)\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00175\ \ \ \ \ std::string\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a183d2250313f685979fcd8806eec84ab}{set\_log\_categories}}(\textcolor{keyword}{const}\ std::string\&\ categories\ =\ \textcolor{stringliteral}{"{}"{}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00176\ \ \ \ \ std::shared\_ptr<monero\_daemon\_update\_check\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a42c2c98ff2fb44a374dec983a0aabeb5}{check\_for\_update}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00177\ \ \ \ \ std::shared\_ptr<monero\_daemon\_update\_download\_result>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a4dee497d0313fb5b45db760a39880bce}{download\_update}}(\textcolor{keyword}{const}\ std::string\&\ path\ =\ \textcolor{stringliteral}{"{}"{}})\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00178\ \ \ \ \ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a6a0654f5003c61cb2be3c00707348457}{stop}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00179\ \ \ \ \ std::shared\_ptr<monero\_block\_header>\ \mbox{\hyperlink{classmonero_1_1monero__daemon__rpc_a4629e648c041c6bedbeb1e7b2a606653}{wait\_for\_next\_block\_header}}()\ \textcolor{keyword}{override};}
+\DoxyCodeLine{00180\ }
+\DoxyCodeLine{00181\ \ \ \textcolor{comment}{//\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/\ PRIVATE\ -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/}}
+\DoxyCodeLine{00182\ }
+\DoxyCodeLine{00183\ \ \ \textcolor{keyword}{private}:}
+\DoxyCodeLine{00184\ \ \ \ \ \textcolor{keyword}{friend}\ \textcolor{keyword}{class\ }monero\_daemon\_poller;}
+\DoxyCodeLine{00185\ \ \ \ \ \textcolor{keyword}{mutable}\ boost::recursive\_mutex\ m\_listeners\_mutex;}
+\DoxyCodeLine{00186\ \ \ \ \ std::set<monero\_daemon\_listener*>\ m\_listeners;}
+\DoxyCodeLine{00187\ \ \ \ \ std::shared\_ptr<monero\_rpc\_connection>\ m\_rpc;}
+\DoxyCodeLine{00188\ \ \ \ \ boost::mutex\ m\_poller\_mutex;}
+\DoxyCodeLine{00189\ \ \ \ \ std::unique\_ptr<monero\_daemon\_poller>\ m\_poller;}
+\DoxyCodeLine{00190\ }
+\DoxyCodeLine{00191\ \ \ \ \ \textcolor{comment}{//\ header\_cache\ is\ scoped\ to\ a\ single\ get\_blocks\_by\_range\_chunked()\ call\ (see\ below)\ rather\ than}}
+\DoxyCodeLine{00192\ \ \ \ \ \textcolor{comment}{//\ stored\ as\ a\ member:\ it\ only\ helps\ avoid\ re-\/fetching\ a\ header\ already\ seen\ earlier\ in\ that\ one}}
+\DoxyCodeLine{00193\ \ \ \ \ \textcolor{comment}{//\ chunking\ pass,\ and\ keeping\ it\ as\ instance\ state\ would\ let\ it\ grow\ unbounded\ over\ the\ connection's}}
+\DoxyCodeLine{00194\ \ \ \ \ \textcolor{comment}{//\ lifetime\ and\ serve\ stale\ headers\ across\ reorgs\ on\ later\ calls}}
+\DoxyCodeLine{00195\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ get\_max\_blocks(boost::optional<uint64\_t>\ start\_height,\ boost::optional<uint64\_t>\ max\_height,\ boost::optional<uint64\_t>\ chunk\_size,\ std::unordered\_map<uint64\_t,\ std::shared\_ptr<monero\_block\_header>>\&\ header\_cache);}
+\DoxyCodeLine{00196\ \ \ \ \ std::shared\_ptr<monero\_block\_header>\ get\_block\_header\_by\_height\_cached(uint64\_t\ height,\ uint64\_t\ max\_height,\ std::unordered\_map<uint64\_t,\ std::shared\_ptr<monero\_block\_header>>\&\ header\_cache);}
+\DoxyCodeLine{00197\ \ \ \ \ std::shared\_ptr<monero\_bandwidth\_limits>\ get\_bandwidth\_limits();}
+\DoxyCodeLine{00198\ \ \ \ \ std::shared\_ptr<monero\_bandwidth\_limits>\ set\_bandwidth\_limits(\textcolor{keywordtype}{int}\ up,\ \textcolor{keywordtype}{int}\ down);}
+\DoxyCodeLine{00199\ \ \ \ \ \textcolor{keywordtype}{void}\ refresh\_listening();}
+\DoxyCodeLine{00200\ \ \ \ \ \textcolor{keywordtype}{void}\ wait\_for\_listener\_callbacks\_idle();}
+\DoxyCodeLine{00201\ \ \ \};}
+\DoxyCodeLine{00202\ }
+\DoxyCodeLine{00203\ \}}
+
+\end{DoxyCode}

@@ -1,0 +1,547 @@
+\doxysection{monero\+\_\+daemon\+\_\+model.\+h}
+\hypertarget{monero__daemon__model_8h_source}{}\label{monero__daemon__model_8h_source}\index{daemon/monero\_daemon\_model.h@{daemon/monero\_daemon\_model.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#pragma\ once}}
+\DoxyCodeLine{00054\ }
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#include\ <map>}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#include\ <boost/property\_tree/ptree.hpp>}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#include\ <boost/property\_tree/json\_parser.hpp>}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#include\ "{}rapidjson/document.h"{}}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#include\ "{}rapidjson/writer.h"{}}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#include\ "{}rapidjson/stringbuffer.h"{}}}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00065\ \textcolor{keyword}{namespace\ }\mbox{\hyperlink{namespacemonero}{monero}}\ \{}
+\DoxyCodeLine{00066\ }
+\DoxyCodeLine{00070\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ \ \ \ \ \textcolor{keyword}{virtual}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{\string~serializable\_struct}}()\ =\ \textcolor{keywordflow}{default};}
+\DoxyCodeLine{00073\ }
+\DoxyCodeLine{00079\ \ \ \ \ std::string\ \mbox{\hyperlink{structmonero_1_1serializable__struct_a723e44b22962d02d3f78bc7c2043dc1e}{serialize}}()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00080\ }
+\DoxyCodeLine{00087\ \ \ \ \ \textcolor{keyword}{virtual}\ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1serializable__struct_a3c53ab95b12f02db20cf20cd6d69ad4b}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const}\ =\ 0;}
+\DoxyCodeLine{00088\ \ \ \};}
+\DoxyCodeLine{00089\ }
+\DoxyCodeLine{00093\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1ssl__options}{ssl\_options}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00094\ \ \ \ \ boost::optional<std::string>\ m\_ssl\_private\_key\_path;}
+\DoxyCodeLine{00095\ \ \ \ \ boost::optional<std::string>\ m\_ssl\_certificate\_path;}
+\DoxyCodeLine{00096\ \ \ \ \ boost::optional<std::string>\ m\_ssl\_ca\_file;}
+\DoxyCodeLine{00097\ \ \ \ \ std::vector<std::string>\ m\_ssl\_allowed\_fingerprints;}
+\DoxyCodeLine{00098\ \ \ \ \ boost::optional<bool>\ m\_ssl\_allow\_any\_cert;}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1ssl__options_ac525ee7fe565040571aeca13a5ce30bf}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00101\ \ \ \};}
+\DoxyCodeLine{00102\ }
+\DoxyCodeLine{00106\ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacemonero_a6db7952e9ddcaca95b2db8d6e897c82a}{monero\_connection\_type}}\ :\ uint8\_t\ \{}
+\DoxyCodeLine{00107\ \ \ \ \ INVALID\ =\ 0,}
+\DoxyCodeLine{00108\ \ \ \ \ IPV4,}
+\DoxyCodeLine{00109\ \ \ \ \ IPV6,}
+\DoxyCodeLine{00110\ \ \ \ \ TOR,}
+\DoxyCodeLine{00111\ \ \ \ \ I2P}
+\DoxyCodeLine{00112\ \ \ \};}
+\DoxyCodeLine{00113\ }
+\DoxyCodeLine{00117\ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacemonero_ac9023a1d513e2526775d1e061bb5beed}{monero\_network\_type}}\ :\ uint8\_t\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ MAINNET\ =\ 0,}
+\DoxyCodeLine{00119\ \ \ \ \ TESTNET,}
+\DoxyCodeLine{00120\ \ \ \ \ STAGENET}
+\DoxyCodeLine{00121\ \ \ \};}
+\DoxyCodeLine{00122\ }
+\DoxyCodeLine{00126\ \ \ \textcolor{keyword}{struct\ }monero\_bandwidth\_limits\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00127\ \ \ \ \ boost::optional<int>\ m\_up;}
+\DoxyCodeLine{00128\ \ \ \ \ boost::optional<int>\ m\_down;}
+\DoxyCodeLine{00129\ }
+\DoxyCodeLine{00130\ \ \ \ \ monero\_bandwidth\_limits()\ \{\ \}}
+\DoxyCodeLine{00131\ \ \ \ \ monero\_bandwidth\_limits(\textcolor{keywordtype}{int}\ up,\ \textcolor{keywordtype}{int}\ down):\ m\_up(up),\ m\_down(down)\ \{\ \}}
+\DoxyCodeLine{00132\ }
+\DoxyCodeLine{00133\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__bandwidth__limits_a56013b1b06071979dc0d015fe8d2ac6a}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00134\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_bandwidth\_limits>\&\ limits);}
+\DoxyCodeLine{00135\ \ \ \};}
+\DoxyCodeLine{00136\ }
+\DoxyCodeLine{00140\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__version}{monero\_version}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00141\ \ \ \ \ boost::optional<uint32\_t>\ m\_number;}
+\DoxyCodeLine{00142\ \ \ \ \ boost::optional<bool>\ m\_is\_release;}
+\DoxyCodeLine{00143\ }
+\DoxyCodeLine{00144\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__version_ad6f7ed41f9888f28b37a0a68498d0bd9}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00145\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_version>\&\ version);}
+\DoxyCodeLine{00146\ \ \ \};}
+\DoxyCodeLine{00147\ }
+\DoxyCodeLine{00148\ \ \ \textcolor{comment}{//\ forward\ declarations}}
+\DoxyCodeLine{00149\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__tx}{monero\_tx}};}
+\DoxyCodeLine{00150\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__output}{monero\_output}};}
+\DoxyCodeLine{00151\ }
+\DoxyCodeLine{00157\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__block__header}{monero\_block\_header}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00158\ \ \ \ \ boost::optional<std::string>\ m\_hash;}
+\DoxyCodeLine{00159\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00160\ \ \ \ \ boost::optional<uint64\_t>\ m\_timestamp;}
+\DoxyCodeLine{00161\ \ \ \ \ boost::optional<uint64\_t>\ m\_size;}
+\DoxyCodeLine{00162\ \ \ \ \ boost::optional<uint64\_t>\ m\_weight;}
+\DoxyCodeLine{00163\ \ \ \ \ boost::optional<uint64\_t>\ m\_long\_term\_weight;}
+\DoxyCodeLine{00164\ \ \ \ \ boost::optional<uint64\_t>\ m\_depth;}
+\DoxyCodeLine{00165\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_low;}
+\DoxyCodeLine{00166\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_high;}
+\DoxyCodeLine{00167\ \ \ \ \ boost::optional<uint64\_t>\ m\_cumulative\_difficulty\_low;}
+\DoxyCodeLine{00168\ \ \ \ \ boost::optional<uint64\_t>\ m\_cumulative\_difficulty\_high;}
+\DoxyCodeLine{00169\ \ \ \ \ boost::optional<uint32\_t>\ m\_major\_version;}
+\DoxyCodeLine{00170\ \ \ \ \ boost::optional<uint32\_t>\ m\_minor\_version;}
+\DoxyCodeLine{00171\ \ \ \ \ boost::optional<uint32\_t>\ m\_nonce;}
+\DoxyCodeLine{00172\ \ \ \ \ boost::optional<std::string>\ m\_miner\_tx\_hash;}
+\DoxyCodeLine{00173\ \ \ \ \ boost::optional<uint32\_t>\ m\_num\_txs;}
+\DoxyCodeLine{00174\ \ \ \ \ boost::optional<bool>\ m\_orphan\_status;}
+\DoxyCodeLine{00175\ \ \ \ \ boost::optional<std::string>\ m\_prev\_hash;}
+\DoxyCodeLine{00176\ \ \ \ \ boost::optional<uint64\_t>\ m\_reward;}
+\DoxyCodeLine{00177\ \ \ \ \ boost::optional<std::string>\ m\_pow\_hash;}
+\DoxyCodeLine{00178\ }
+\DoxyCodeLine{00179\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__block__header_a7d75c164db7b4b16c50bec984b32b134}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00180\ \ \ \ \ std::shared\_ptr<monero\_block\_header>\ copy(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_header>\&\ src,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_header>\&\ tgt)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00181\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ merge(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_header>\&\ self,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_header>\&\ other);}
+\DoxyCodeLine{00182\ \ \ \};}
+\DoxyCodeLine{00183\ }
+\DoxyCodeLine{00187\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__block}{monero\_block}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__block__header}{monero\_block\_header}}\ \{}
+\DoxyCodeLine{00188\ \ \ \ \ boost::optional<std::string>\ m\_hex;}
+\DoxyCodeLine{00189\ \ \ \ \ std::shared\_ptr<monero\_tx>\ m\_miner\_tx;}
+\DoxyCodeLine{00190\ \ \ \ \ std::vector<std::shared\_ptr<monero\_tx>>\ m\_txs;}
+\DoxyCodeLine{00191\ \ \ \ \ std::vector<std::string>\ m\_tx\_hashes;}
+\DoxyCodeLine{00192\ }
+\DoxyCodeLine{00193\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__block_aff7b5fbba400067c049aed9afaf8359b}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00194\ \ \ \ \ std::shared\_ptr<monero\_block>\ copy(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_block>\&\ src,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_block>\&\ tgt)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00195\ \ \ \ \ \textcolor{keywordtype}{void}\ merge(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_header>\&\ self,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_header>\&\ other);}
+\DoxyCodeLine{00196\ \ \ \ \ \textcolor{keywordtype}{void}\ merge(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_block>\&\ self,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_block>\&\ other);}
+\DoxyCodeLine{00197\ \ \ \};}
+\DoxyCodeLine{00198\ }
+\DoxyCodeLine{00202\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__tx}{monero\_tx}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00203\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::string\ DEFAULT\_PAYMENT\_ID;\ \ \textcolor{comment}{//\ default\ payment\ id\ "{}0000000000000000"{}}}
+\DoxyCodeLine{00204\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keyword}{const}\ std::string\ DEFAULT\_ID;}
+\DoxyCodeLine{00205\ }
+\DoxyCodeLine{00206\ \ \ \ \ std::shared\_ptr<monero\_block>\ m\_block;}
+\DoxyCodeLine{00207\ \ \ \ \ boost::optional<std::string>\ m\_hash;}
+\DoxyCodeLine{00208\ \ \ \ \ boost::optional<uint32\_t>\ m\_version;}
+\DoxyCodeLine{00209\ \ \ \ \ boost::optional<bool>\ m\_is\_miner\_tx;}
+\DoxyCodeLine{00210\ \ \ \ \ boost::optional<std::string>\ m\_payment\_id;}
+\DoxyCodeLine{00211\ \ \ \ \ boost::optional<uint64\_t>\ m\_fee;}
+\DoxyCodeLine{00212\ \ \ \ \ boost::optional<uint32\_t>\ m\_ring\_size;}
+\DoxyCodeLine{00213\ \ \ \ \ boost::optional<bool>\ m\_relay;}
+\DoxyCodeLine{00214\ \ \ \ \ boost::optional<bool>\ m\_is\_relayed;}
+\DoxyCodeLine{00215\ \ \ \ \ boost::optional<bool>\ m\_is\_confirmed;}
+\DoxyCodeLine{00216\ \ \ \ \ boost::optional<bool>\ m\_in\_tx\_pool;}
+\DoxyCodeLine{00217\ \ \ \ \ boost::optional<bool>\ m\_is\_locked;}
+\DoxyCodeLine{00218\ \ \ \ \ boost::optional<uint64\_t>\ m\_num\_confirmations;}
+\DoxyCodeLine{00219\ \ \ \ \ boost::optional<uint64\_t>\ m\_unlock\_time;}
+\DoxyCodeLine{00220\ \ \ \ \ boost::optional<uint64\_t>\ m\_last\_relayed\_timestamp;}
+\DoxyCodeLine{00221\ \ \ \ \ boost::optional<uint64\_t>\ m\_received\_timestamp;}
+\DoxyCodeLine{00222\ \ \ \ \ boost::optional<bool>\ m\_is\_double\_spend\_seen;}
+\DoxyCodeLine{00223\ \ \ \ \ boost::optional<std::string>\ m\_key;}
+\DoxyCodeLine{00224\ \ \ \ \ boost::optional<std::string>\ m\_full\_hex;}
+\DoxyCodeLine{00225\ \ \ \ \ boost::optional<std::string>\ m\_pruned\_hex;}
+\DoxyCodeLine{00226\ \ \ \ \ boost::optional<std::string>\ m\_prunable\_hex;}
+\DoxyCodeLine{00227\ \ \ \ \ boost::optional<std::string>\ m\_prunable\_hash;}
+\DoxyCodeLine{00228\ \ \ \ \ boost::optional<uint64\_t>\ m\_size;}
+\DoxyCodeLine{00229\ \ \ \ \ boost::optional<uint64\_t>\ m\_weight;}
+\DoxyCodeLine{00230\ \ \ \ \ std::vector<std::shared\_ptr<monero\_output>>\ m\_inputs;}
+\DoxyCodeLine{00231\ \ \ \ \ std::vector<std::shared\_ptr<monero\_output>>\ m\_outputs;}
+\DoxyCodeLine{00232\ \ \ \ \ std::vector<uint64\_t>\ m\_output\_indices;}
+\DoxyCodeLine{00233\ \ \ \ \ boost::optional<std::string>\ m\_metadata;}
+\DoxyCodeLine{00234\ \ \ \ \ boost::optional<std::string>\ m\_common\_tx\_sets;}
+\DoxyCodeLine{00235\ \ \ \ \ std::vector<uint8\_t>\ m\_extra;}
+\DoxyCodeLine{00236\ \ \ \ \ boost::optional<std::string>\ m\_rct\_signatures;\ \ \ \textcolor{comment}{//\ TODO:\ implement}}
+\DoxyCodeLine{00237\ \ \ \ \ boost::optional<std::string>\ m\_rct\_sig\_prunable;\ \ \textcolor{comment}{//\ TODO:\ implement}}
+\DoxyCodeLine{00238\ \ \ \ \ boost::optional<bool>\ m\_is\_kept\_by\_block;}
+\DoxyCodeLine{00239\ \ \ \ \ boost::optional<bool>\ m\_is\_failed;}
+\DoxyCodeLine{00240\ \ \ \ \ boost::optional<uint64\_t>\ m\_last\_failed\_height;}
+\DoxyCodeLine{00241\ \ \ \ \ boost::optional<std::string>\ m\_last\_failed\_hash;}
+\DoxyCodeLine{00242\ \ \ \ \ boost::optional<uint64\_t>\ m\_max\_used\_block\_height;}
+\DoxyCodeLine{00243\ \ \ \ \ boost::optional<std::string>\ m\_max\_used\_block\_hash;}
+\DoxyCodeLine{00244\ \ \ \ \ std::vector<std::string>\ m\_signatures;}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__tx_a17cef8cbfdb09e73ad48873db3095115}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00247\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ std::shared\_ptr<monero\_tx>\ tx);}
+\DoxyCodeLine{00248\ \ \ \ \ std::shared\_ptr<monero\_tx>\ copy(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx>\&\ src,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx>\&\ tgt)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00249\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ merge(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx>\&\ self,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx>\&\ other);}
+\DoxyCodeLine{00250\ \ \ \ \ boost::optional<uint64\_t>\ get\_height()\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00251\ \ \ \};}
+\DoxyCodeLine{00252\ }
+\DoxyCodeLine{00256\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__key__image}{monero\_key\_image}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00257\ \ \ \ \ boost::optional<std::string>\ m\_hex;}
+\DoxyCodeLine{00258\ \ \ \ \ boost::optional<std::string>\ m\_signature;}
+\DoxyCodeLine{00259\ }
+\DoxyCodeLine{00260\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__key__image_a66c0231759cad5692f90b731677e2127}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00261\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_key\_image>\&\ key\_image);}
+\DoxyCodeLine{00262\ \ \ \ \ \textcolor{keyword}{static}\ std::vector<std::shared\_ptr<monero\_key\_image>>\ deserialize\_key\_images(\textcolor{keyword}{const}\ std::string\&\ key\_images\_json);\ \ \textcolor{comment}{//\ TODO:\ remove\ this\ specialty\ util\ used\ once}}
+\DoxyCodeLine{00263\ \ \ \ \ std::shared\_ptr<monero\_key\_image>\ copy(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_key\_image>\&\ src,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_key\_image>\&\ tgt)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00264\ \ \ \ \ \textcolor{keywordtype}{void}\ merge(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_key\_image>\&\ self,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_key\_image>\&\ other);}
+\DoxyCodeLine{00265\ \ \ \};}
+\DoxyCodeLine{00266\ }
+\DoxyCodeLine{00270\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__output}{monero\_output}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00271\ \ \ \ \ std::shared\_ptr<monero\_tx>\ m\_tx;}
+\DoxyCodeLine{00272\ \ \ \ \ std::shared\_ptr<monero\_key\_image>\ m\_key\_image;}
+\DoxyCodeLine{00273\ \ \ \ \ boost::optional<uint64\_t>\ m\_amount;}
+\DoxyCodeLine{00274\ \ \ \ \ boost::optional<uint64\_t>\ m\_index;}
+\DoxyCodeLine{00275\ \ \ \ \ std::vector<uint64\_t>\ m\_ring\_output\_indices;}
+\DoxyCodeLine{00276\ \ \ \ \ boost::optional<std::string>\ m\_stealth\_public\_key;}
+\DoxyCodeLine{00277\ \ \ \ \ boost::optional<std::string>\ m\_mask;}
+\DoxyCodeLine{00278\ }
+\DoxyCodeLine{00279\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__output_a5a2d6361b4ca65dc0088f6c2efdabea7}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00280\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ output);}
+\DoxyCodeLine{00281\ \ \ \ \ std::shared\_ptr<monero\_output>\ copy(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ src,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ tgt)\ \textcolor{keyword}{const};}
+\DoxyCodeLine{00282\ \ \ \ \ \textcolor{keyword}{virtual}\ \textcolor{keywordtype}{void}\ merge(\textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ self,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_output>\&\ other);}
+\DoxyCodeLine{00283\ \ \ \};}
+\DoxyCodeLine{00284\ }
+\DoxyCodeLine{00288\ \ \ \textcolor{keyword}{enum}\ \mbox{\hyperlink{namespacemonero_a19a3f4124ff3d789de6988a285717af1}{monero\_key\_image\_spent\_status}}\ :\ uint8\_t\ \{}
+\DoxyCodeLine{00289\ \ \ \ \ NOT\_SPENT\ =\ 0,}
+\DoxyCodeLine{00290\ \ \ \ \ CONFIRMED,}
+\DoxyCodeLine{00291\ \ \ \ \ TX\_POOL}
+\DoxyCodeLine{00292\ \ \ \};}
+\DoxyCodeLine{00293\ }
+\DoxyCodeLine{00297\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00298\ \ \ \ \ boost::optional<uint64\_t>\ m\_credits;}
+\DoxyCodeLine{00299\ \ \ \ \ boost::optional<std::string>\ m\_top\_block\_hash;}
+\DoxyCodeLine{00300\ }
+\DoxyCodeLine{00301\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info_aa32c5a06dc631470b2ebac0c92bd0166}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00302\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_rpc\_payment\_info>\&\ rpc\_payment\_info);}
+\DoxyCodeLine{00303\ \ \ \};}
+\DoxyCodeLine{00304\ }
+\DoxyCodeLine{00308\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__alt__chain}{monero\_alt\_chain}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00309\ \ \ \ \ std::vector<std::string>\ m\_block\_hashes;}
+\DoxyCodeLine{00310\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_low;}
+\DoxyCodeLine{00311\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_high;}
+\DoxyCodeLine{00312\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00313\ \ \ \ \ boost::optional<uint64\_t>\ m\_length;}
+\DoxyCodeLine{00314\ \ \ \ \ boost::optional<std::string>\ m\_main\_chain\_parent\_block\_hash;}
+\DoxyCodeLine{00315\ }
+\DoxyCodeLine{00316\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__alt__chain_a02b5f1e7e71fea2aea870c3bcbc4a2aa}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00317\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_alt\_chain>\&\ alt\_chain);}
+\DoxyCodeLine{00318\ \ \ \};}
+\DoxyCodeLine{00319\ }
+\DoxyCodeLine{00323\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__ban}{monero\_ban}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00324\ \ \ \ \ boost::optional<std::string>\ m\_host;}
+\DoxyCodeLine{00325\ \ \ \ \ boost::optional<uint32\_t>\ m\_ip;}
+\DoxyCodeLine{00326\ \ \ \ \ boost::optional<bool>\ m\_is\_banned;}
+\DoxyCodeLine{00327\ \ \ \ \ boost::optional<uint64\_t>\ m\_seconds;}
+\DoxyCodeLine{00328\ }
+\DoxyCodeLine{00329\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__ban_a76c5d95b764312f95ce5329f73a64a59}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00330\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_ban>\&\ ban);}
+\DoxyCodeLine{00331\ \ \ \};}
+\DoxyCodeLine{00332\ }
+\DoxyCodeLine{00336\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__prune__result}{monero\_prune\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00337\ \ \ \ \ boost::optional<bool>\ m\_is\_pruned;}
+\DoxyCodeLine{00338\ \ \ \ \ boost::optional<int>\ m\_pruning\_seed;}
+\DoxyCodeLine{00339\ }
+\DoxyCodeLine{00340\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_prune\_result>\&\ result);}
+\DoxyCodeLine{00341\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__prune__result_ad02cc029d1bede413c9e3e8fb37c1ce5}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00342\ \ \ \};}
+\DoxyCodeLine{00343\ }
+\DoxyCodeLine{00347\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__mining__status}{monero\_mining\_status}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00348\ \ \ \ \ boost::optional<bool>\ m\_is\_active;}
+\DoxyCodeLine{00349\ \ \ \ \ boost::optional<bool>\ m\_is\_background;}
+\DoxyCodeLine{00350\ \ \ \ \ boost::optional<std::string>\ m\_address;}
+\DoxyCodeLine{00351\ \ \ \ \ boost::optional<uint64\_t>\ m\_speed;}
+\DoxyCodeLine{00352\ \ \ \ \ boost::optional<int>\ m\_num\_threads;}
+\DoxyCodeLine{00353\ }
+\DoxyCodeLine{00354\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_mining\_status>\&\ status);}
+\DoxyCodeLine{00355\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__mining__status_a5cf82389f7eebccf01e499a17d3142ad}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00356\ \ \ \};}
+\DoxyCodeLine{00357\ }
+\DoxyCodeLine{00361\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__miner__tx__sum}{monero\_miner\_tx\_sum}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00362\ \ \ \ \ boost::optional<uint64\_t>\ m\_emission\_sum\_low;}
+\DoxyCodeLine{00363\ \ \ \ \ boost::optional<uint64\_t>\ m\_emission\_sum\_high;}
+\DoxyCodeLine{00364\ \ \ \ \ boost::optional<uint64\_t>\ m\_fee\_sum\_low;}
+\DoxyCodeLine{00365\ \ \ \ \ boost::optional<uint64\_t>\ m\_fee\_sum\_high;}
+\DoxyCodeLine{00366\ }
+\DoxyCodeLine{00367\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_miner\_tx\_sum>\&\ sum);}
+\DoxyCodeLine{00368\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__miner__tx__sum_a4360c6687dfd89222152e1757532c236}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00369\ \ \ \};}
+\DoxyCodeLine{00370\ }
+\DoxyCodeLine{00374\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__block__template}{monero\_block\_template}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00375\ \ \ \ \ boost::optional<std::string>\ m\_block\_template\_blob;}
+\DoxyCodeLine{00376\ \ \ \ \ boost::optional<std::string>\ m\_block\_hashing\_blob;}
+\DoxyCodeLine{00377\ \ \ \ \ boost::optional<std::string>\ m\_prev\_hash;}
+\DoxyCodeLine{00378\ \ \ \ \ boost::optional<std::string>\ m\_seed\_hash;}
+\DoxyCodeLine{00379\ \ \ \ \ boost::optional<std::string>\ m\_next\_seed\_hash;}
+\DoxyCodeLine{00380\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_low;}
+\DoxyCodeLine{00381\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_high;}
+\DoxyCodeLine{00382\ \ \ \ \ boost::optional<uint64\_t>\ m\_expected\_reward;}
+\DoxyCodeLine{00383\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00384\ \ \ \ \ boost::optional<uint64\_t>\ m\_reserved\_offset;}
+\DoxyCodeLine{00385\ \ \ \ \ boost::optional<uint64\_t>\ m\_seed\_height;}
+\DoxyCodeLine{00386\ }
+\DoxyCodeLine{00387\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_block\_template>\&\ tmplt);}
+\DoxyCodeLine{00388\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__block__template_afdf5abac2d0cfe11f576494844a2f600}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00389\ \ \ \};}
+\DoxyCodeLine{00390\ }
+\DoxyCodeLine{00395\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__miner__data}{monero\_miner\_data}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00396\ \ \ \ \ boost::optional<uint32\_t>\ m\_major\_version;}
+\DoxyCodeLine{00397\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00398\ \ \ \ \ boost::optional<std::string>\ m\_prev\_hash;}
+\DoxyCodeLine{00399\ \ \ \ \ boost::optional<std::string>\ m\_seed\_hash;}
+\DoxyCodeLine{00400\ \ \ \ \ boost::optional<std::string>\ m\_difficulty;}
+\DoxyCodeLine{00401\ \ \ \ \ boost::optional<uint64\_t>\ m\_median\_weight;}
+\DoxyCodeLine{00402\ \ \ \ \ boost::optional<uint64\_t>\ m\_already\_generated\_coins;}
+\DoxyCodeLine{00403\ \ \ \ \ std::vector<std::shared\_ptr<monero\_tx>>\ m\_tx\_pool\_backlog;}
+\DoxyCodeLine{00404\ }
+\DoxyCodeLine{00405\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_miner\_data>\&\ data);}
+\DoxyCodeLine{00406\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__miner__data_ae75898235f9b5e6a01d529b82b067289}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00407\ \ \ \};}
+\DoxyCodeLine{00408\ }
+\DoxyCodeLine{00412\ \ \ \textcolor{keyword}{struct\ }monero\_auxiliary\_pow\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00413\ \ \ \ \ boost::optional<std::string>\ m\_id;}
+\DoxyCodeLine{00414\ \ \ \ \ boost::optional<std::string>\ m\_hash;}
+\DoxyCodeLine{00415\ }
+\DoxyCodeLine{00416\ \ \ \ \ monero\_auxiliary\_pow()\ \{\ \}}
+\DoxyCodeLine{00417\ \ \ \ \ monero\_auxiliary\_pow(\textcolor{keyword}{const}\ std::string\&\ \textcolor{keywordtype}{id},\ \textcolor{keyword}{const}\ std::string\&\ hash):\ m\_id(\textcolor{keywordtype}{id}),\ m\_hash(hash)\ \{\ \}}
+\DoxyCodeLine{00418\ }
+\DoxyCodeLine{00419\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_auxiliary\_pow>\&\ aux\_pow);}
+\DoxyCodeLine{00420\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__auxiliary__pow_a0a5e7b04e2c3905475ef29681c21eec2}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00421\ \ \ \};}
+\DoxyCodeLine{00422\ }
+\DoxyCodeLine{00426\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__add__auxiliary__pow__result}{monero\_add\_auxiliary\_pow\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00427\ \ \ \ \ boost::optional<std::string>\ m\_block\_template\_blob;}
+\DoxyCodeLine{00428\ \ \ \ \ boost::optional<std::string>\ m\_block\_hashing\_blob;}
+\DoxyCodeLine{00429\ \ \ \ \ boost::optional<std::string>\ m\_merkle\_root;}
+\DoxyCodeLine{00430\ \ \ \ \ boost::optional<uint32\_t>\ m\_merkle\_tree\_depth;}
+\DoxyCodeLine{00431\ \ \ \ \ std::vector<std::shared\_ptr<monero\_auxiliary\_pow>>\ m\_aux\_pow;}
+\DoxyCodeLine{00432\ }
+\DoxyCodeLine{00433\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_add\_auxiliary\_pow\_result>\&\ result);}
+\DoxyCodeLine{00434\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__add__auxiliary__pow__result_a8052ac59b4e6d61d1f1164c7fd590544}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00435\ \ \ \};}
+\DoxyCodeLine{00436\ }
+\DoxyCodeLine{00440\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__connection__span}{monero\_connection\_span}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00441\ \ \ \ \ boost::optional<std::string>\ m\_connection\_id;}
+\DoxyCodeLine{00442\ \ \ \ \ boost::optional<std::string>\ m\_remote\_address;}
+\DoxyCodeLine{00443\ \ \ \ \ boost::optional<uint64\_t>\ m\_num\_blocks;}
+\DoxyCodeLine{00444\ \ \ \ \ boost::optional<uint64\_t>\ m\_rate;}
+\DoxyCodeLine{00445\ \ \ \ \ boost::optional<uint64\_t>\ m\_speed;}
+\DoxyCodeLine{00446\ \ \ \ \ boost::optional<uint64\_t>\ m\_size;}
+\DoxyCodeLine{00447\ \ \ \ \ boost::optional<uint64\_t>\ m\_start\_height;}
+\DoxyCodeLine{00448\ }
+\DoxyCodeLine{00449\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_connection\_span>\&\ span);}
+\DoxyCodeLine{00450\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__connection__span_a5735f7f833505cf29e5aadfe40d69d73}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00451\ \ \ \};}
+\DoxyCodeLine{00452\ }
+\DoxyCodeLine{00456\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__peer}{monero\_peer}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00457\ \ \ \ \ boost::optional<std::string>\ m\_id;}
+\DoxyCodeLine{00458\ \ \ \ \ boost::optional<std::string>\ m\_address;}
+\DoxyCodeLine{00459\ \ \ \ \ boost::optional<std::string>\ m\_host;}
+\DoxyCodeLine{00460\ \ \ \ \ boost::optional<int>\ m\_port;}
+\DoxyCodeLine{00461\ \ \ \ \ boost::optional<bool>\ m\_is\_online;}
+\DoxyCodeLine{00462\ \ \ \ \ boost::optional<uint64\_t>\ m\_last\_seen\_timestamp;}
+\DoxyCodeLine{00463\ \ \ \ \ boost::optional<int>\ m\_pruning\_seed;}
+\DoxyCodeLine{00464\ \ \ \ \ boost::optional<int>\ m\_rpc\_port;}
+\DoxyCodeLine{00465\ \ \ \ \ boost::optional<uint64\_t>\ m\_rpc\_credits\_per\_hash;}
+\DoxyCodeLine{00466\ \ \ \ \ boost::optional<std::string>\ m\_hash;}
+\DoxyCodeLine{00467\ \ \ \ \ boost::optional<uint64\_t>\ m\_avg\_download;}
+\DoxyCodeLine{00468\ \ \ \ \ boost::optional<uint64\_t>\ m\_avg\_upload;}
+\DoxyCodeLine{00469\ \ \ \ \ boost::optional<uint64\_t>\ m\_current\_download;}
+\DoxyCodeLine{00470\ \ \ \ \ boost::optional<uint64\_t>\ m\_current\_upload;}
+\DoxyCodeLine{00471\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00472\ \ \ \ \ boost::optional<bool>\ m\_is\_incoming;}
+\DoxyCodeLine{00473\ \ \ \ \ boost::optional<uint64\_t>\ m\_live\_time;}
+\DoxyCodeLine{00474\ \ \ \ \ boost::optional<bool>\ m\_is\_local\_ip;}
+\DoxyCodeLine{00475\ \ \ \ \ boost::optional<bool>\ m\_is\_local\_host;}
+\DoxyCodeLine{00476\ \ \ \ \ boost::optional<uint64\_t>\ m\_num\_receives;}
+\DoxyCodeLine{00477\ \ \ \ \ boost::optional<uint64\_t>\ m\_num\_sends;}
+\DoxyCodeLine{00478\ \ \ \ \ boost::optional<uint64\_t>\ m\_receive\_idle\_time;}
+\DoxyCodeLine{00479\ \ \ \ \ boost::optional<uint64\_t>\ m\_send\_idle\_time;}
+\DoxyCodeLine{00480\ \ \ \ \ boost::optional<std::string>\ m\_state;}
+\DoxyCodeLine{00481\ \ \ \ \ boost::optional<int>\ m\_num\_support\_flags;}
+\DoxyCodeLine{00482\ \ \ \ \ boost::optional<monero\_connection\_type>\ m\_connection\_type;}
+\DoxyCodeLine{00483\ }
+\DoxyCodeLine{00484\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_peer>\&\ peer);}
+\DoxyCodeLine{00485\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__peer_a731e18856dc6d4f6f4c8428b4394c41c}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00486\ \ \ \};}
+\DoxyCodeLine{00487\ }
+\DoxyCodeLine{00491\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__submit__tx__result}{monero\_submit\_tx\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00492\ \ \ \ \ boost::optional<bool>\ m\_has\_invalid\_input;}
+\DoxyCodeLine{00493\ \ \ \ \ boost::optional<bool>\ m\_has\_invalid\_output;}
+\DoxyCodeLine{00494\ \ \ \ \ boost::optional<bool>\ m\_has\_too\_few\_outputs;}
+\DoxyCodeLine{00495\ \ \ \ \ boost::optional<bool>\ m\_is\_good;}
+\DoxyCodeLine{00496\ \ \ \ \ boost::optional<bool>\ m\_is\_relayed;}
+\DoxyCodeLine{00497\ \ \ \ \ boost::optional<bool>\ m\_is\_double\_spend;}
+\DoxyCodeLine{00498\ \ \ \ \ boost::optional<bool>\ m\_is\_fee\_too\_low;}
+\DoxyCodeLine{00499\ \ \ \ \ boost::optional<bool>\ m\_is\_mixin\_too\_low;}
+\DoxyCodeLine{00500\ \ \ \ \ boost::optional<bool>\ m\_is\_overspend;}
+\DoxyCodeLine{00501\ \ \ \ \ boost::optional<bool>\ m\_is\_too\_big;}
+\DoxyCodeLine{00502\ \ \ \ \ boost::optional<bool>\ m\_sanity\_check\_failed;}
+\DoxyCodeLine{00503\ \ \ \ \ boost::optional<bool>\ m\_is\_tx\_extra\_too\_big;}
+\DoxyCodeLine{00504\ \ \ \ \ boost::optional<bool>\ m\_is\_nonzero\_unlock\_time;}
+\DoxyCodeLine{00505\ \ \ \ \ boost::optional<std::string>\ m\_reason;}
+\DoxyCodeLine{00506\ }
+\DoxyCodeLine{00507\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_submit\_tx\_result>\&\ result);}
+\DoxyCodeLine{00508\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__submit__tx__result_a405e551797b12d3350fb79028d25e189}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00509\ \ \ \};}
+\DoxyCodeLine{00510\ }
+\DoxyCodeLine{00514\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__tx__backlog__entry}{monero\_tx\_backlog\_entry}}\ \{}
+\DoxyCodeLine{00515\ \ \ \ \ \textcolor{comment}{//\ TODO}}
+\DoxyCodeLine{00516\ \ \ \};}
+\DoxyCodeLine{00517\ }
+\DoxyCodeLine{00521\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__output__distribution__entry}{monero\_output\_distribution\_entry}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00522\ \ \ \ \ boost::optional<uint64\_t>\ m\_amount;}
+\DoxyCodeLine{00523\ \ \ \ \ boost::optional<uint64\_t>\ m\_base;}
+\DoxyCodeLine{00524\ \ \ \ \ std::vector<uint64\_t>\ m\_distribution;}
+\DoxyCodeLine{00525\ \ \ \ \ boost::optional<uint64\_t>\ m\_start\_height;}
+\DoxyCodeLine{00526\ }
+\DoxyCodeLine{00527\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_output\_distribution\_entry>\&\ entry);}
+\DoxyCodeLine{00528\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__output__distribution__entry_a0d9ff1df67a05cbb196879ace2d77be9}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00529\ \ \ \};}
+\DoxyCodeLine{00530\ }
+\DoxyCodeLine{00534\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__output__histogram__entry}{monero\_output\_histogram\_entry}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00535\ \ \ \ \ boost::optional<uint64\_t>\ m\_amount;}
+\DoxyCodeLine{00536\ \ \ \ \ boost::optional<uint64\_t>\ m\_num\_instances;}
+\DoxyCodeLine{00537\ \ \ \ \ boost::optional<uint64\_t>\ m\_unlocked\_instances;}
+\DoxyCodeLine{00538\ \ \ \ \ boost::optional<uint64\_t>\ m\_recent\_instances;}
+\DoxyCodeLine{00539\ }
+\DoxyCodeLine{00540\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_output\_histogram\_entry>\&\ entry);}
+\DoxyCodeLine{00541\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__output__histogram__entry_a092b3eceff5157a86bf37d52a5f888f4}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00542\ \ \ \};}
+\DoxyCodeLine{00543\ }
+\DoxyCodeLine{00547\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__tx__pool__stats}{monero\_tx\_pool\_stats}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00548\ \ \ \ \ boost::optional<int>\ m\_num\_txs;}
+\DoxyCodeLine{00549\ \ \ \ \ boost::optional<int>\ m\_num\_not\_relayed;}
+\DoxyCodeLine{00550\ \ \ \ \ boost::optional<int>\ m\_num\_failing;}
+\DoxyCodeLine{00551\ \ \ \ \ boost::optional<int>\ m\_num\_double\_spends;}
+\DoxyCodeLine{00552\ \ \ \ \ boost::optional<int>\ m\_num10m;}
+\DoxyCodeLine{00553\ \ \ \ \ boost::optional<uint64\_t>\ m\_fee\_total;}
+\DoxyCodeLine{00554\ \ \ \ \ boost::optional<uint64\_t>\ m\_bytes\_max;}
+\DoxyCodeLine{00555\ \ \ \ \ boost::optional<uint64\_t>\ m\_bytes\_med;}
+\DoxyCodeLine{00556\ \ \ \ \ boost::optional<uint64\_t>\ m\_bytes\_min;}
+\DoxyCodeLine{00557\ \ \ \ \ boost::optional<uint64\_t>\ m\_bytes\_total;}
+\DoxyCodeLine{00558\ \ \ \ \ std::map<uint64\_t,\ uint64\_t>\ m\_histo;}
+\DoxyCodeLine{00559\ \ \ \ \ boost::optional<uint64\_t>\ m\_histo98pc;}
+\DoxyCodeLine{00560\ \ \ \ \ boost::optional<uint64\_t>\ m\_oldest\_timestamp;}
+\DoxyCodeLine{00561\ }
+\DoxyCodeLine{00562\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__tx__pool__stats_a790fa619ed24eb6dc4375bd9ad212c42}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00563\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_tx\_pool\_stats>\&\ stats);}
+\DoxyCodeLine{00564\ \ \ \};}
+\DoxyCodeLine{00565\ }
+\DoxyCodeLine{00569\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__daemon__update__check__result}{monero\_daemon\_update\_check\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00570\ \ \ \ \ boost::optional<bool>\ m\_is\_update\_available;}
+\DoxyCodeLine{00571\ \ \ \ \ boost::optional<std::string>\ m\_version;}
+\DoxyCodeLine{00572\ \ \ \ \ boost::optional<std::string>\ m\_hash;}
+\DoxyCodeLine{00573\ \ \ \ \ boost::optional<std::string>\ m\_auto\_uri;}
+\DoxyCodeLine{00574\ \ \ \ \ boost::optional<std::string>\ m\_user\_uri;}
+\DoxyCodeLine{00575\ }
+\DoxyCodeLine{00576\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_daemon\_update\_check\_result>\&\ check);}
+\DoxyCodeLine{00577\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__daemon__update__check__result_ae5767b3d1470336f5f7e4c5043cbb42d}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00578\ \ \ \};}
+\DoxyCodeLine{00579\ }
+\DoxyCodeLine{00583\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__daemon__update__download__result}{monero\_daemon\_update\_download\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__daemon__update__check__result}{monero\_daemon\_update\_check\_result}}\ \{}
+\DoxyCodeLine{00584\ \ \ \ \ boost::optional<std::string>\ m\_download\_path;}
+\DoxyCodeLine{00585\ }
+\DoxyCodeLine{00586\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_daemon\_update\_download\_result>\&\ check);}
+\DoxyCodeLine{00587\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__daemon__update__download__result_a025a5e6350308eb48047c837f186d948}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00588\ \ \ \};}
+\DoxyCodeLine{00589\ }
+\DoxyCodeLine{00593\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__fee__estimate}{monero\_fee\_estimate}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00594\ \ \ \ \ boost::optional<uint64\_t>\ m\_quantization\_mask;}
+\DoxyCodeLine{00595\ \ \ \ \ boost::optional<uint64\_t>\ m\_fee;}
+\DoxyCodeLine{00596\ \ \ \ \ std::vector<uint64\_t>\ m\_fees;}
+\DoxyCodeLine{00597\ }
+\DoxyCodeLine{00598\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_fee\_estimate>\&\ estimate);}
+\DoxyCodeLine{00599\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__fee__estimate_afc344a01b12715c18daa5175a540fc6d}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00600\ \ \ \};}
+\DoxyCodeLine{00601\ }
+\DoxyCodeLine{00605\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__daemon__info}{monero\_daemon\_info}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00606\ \ \ \ \ boost::optional<std::string>\ m\_version;}
+\DoxyCodeLine{00607\ \ \ \ \ boost::optional<uint64\_t>\ m\_num\_alt\_blocks;}
+\DoxyCodeLine{00608\ \ \ \ \ boost::optional<uint64\_t>\ m\_block\_size\_limit;}
+\DoxyCodeLine{00609\ \ \ \ \ boost::optional<uint64\_t>\ m\_block\_size\_median;}
+\DoxyCodeLine{00610\ \ \ \ \ boost::optional<uint64\_t>\ m\_block\_weight\_limit;}
+\DoxyCodeLine{00611\ \ \ \ \ boost::optional<uint64\_t>\ m\_block\_weight\_median;}
+\DoxyCodeLine{00612\ \ \ \ \ boost::optional<std::string>\ m\_bootstrap\_daemon\_address;}
+\DoxyCodeLine{00613\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_low;}
+\DoxyCodeLine{00614\ \ \ \ \ boost::optional<uint64\_t>\ m\_difficulty\_high;}
+\DoxyCodeLine{00615\ \ \ \ \ boost::optional<uint64\_t>\ m\_cumulative\_difficulty\_low;}
+\DoxyCodeLine{00616\ \ \ \ \ boost::optional<uint64\_t>\ m\_cumulative\_difficulty\_high;}
+\DoxyCodeLine{00617\ \ \ \ \ boost::optional<uint64\_t>\ m\_free\_space;}
+\DoxyCodeLine{00618\ \ \ \ \ boost::optional<int>\ m\_num\_offline\_peers;}
+\DoxyCodeLine{00619\ \ \ \ \ boost::optional<int>\ m\_num\_online\_peers;}
+\DoxyCodeLine{00620\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00621\ \ \ \ \ boost::optional<uint64\_t>\ m\_height\_without\_bootstrap;}
+\DoxyCodeLine{00622\ \ \ \ \ boost::optional<monero\_network\_type>\ m\_network\_type;}
+\DoxyCodeLine{00623\ \ \ \ \ boost::optional<bool>\ m\_is\_offline;}
+\DoxyCodeLine{00624\ \ \ \ \ boost::optional<int>\ m\_num\_incoming\_connections;}
+\DoxyCodeLine{00625\ \ \ \ \ boost::optional<int>\ m\_num\_outgoing\_connections;}
+\DoxyCodeLine{00626\ \ \ \ \ boost::optional<int>\ m\_num\_rpc\_connections;}
+\DoxyCodeLine{00627\ \ \ \ \ boost::optional<uint64\_t>\ m\_start\_timestamp;}
+\DoxyCodeLine{00628\ \ \ \ \ boost::optional<uint64\_t>\ m\_adjusted\_timestamp;}
+\DoxyCodeLine{00629\ \ \ \ \ boost::optional<uint64\_t>\ m\_target;}
+\DoxyCodeLine{00630\ \ \ \ \ boost::optional<uint64\_t>\ m\_target\_height;}
+\DoxyCodeLine{00631\ \ \ \ \ boost::optional<int>\ m\_num\_txs;}
+\DoxyCodeLine{00632\ \ \ \ \ boost::optional<int>\ m\_num\_txs\_pool;}
+\DoxyCodeLine{00633\ \ \ \ \ boost::optional<bool>\ m\_was\_bootstrap\_ever\_used;}
+\DoxyCodeLine{00634\ \ \ \ \ boost::optional<uint64\_t>\ m\_database\_size;}
+\DoxyCodeLine{00635\ \ \ \ \ boost::optional<bool>\ m\_update\_available;}
+\DoxyCodeLine{00636\ \ \ \ \ boost::optional<bool>\ m\_is\_busy\_syncing;}
+\DoxyCodeLine{00637\ \ \ \ \ boost::optional<bool>\ m\_is\_synchronized;}
+\DoxyCodeLine{00638\ \ \ \ \ boost::optional<bool>\ m\_is\_restricted;}
+\DoxyCodeLine{00639\ \ \ \ \ boost::optional<bool>\ m\_is\_regtest;}
+\DoxyCodeLine{00640\ }
+\DoxyCodeLine{00641\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_daemon\_info>\&\ info);}
+\DoxyCodeLine{00642\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__daemon__info_a2ffebcc70b44307295cf30f5ec893ce8}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00643\ \ \ \};}
+\DoxyCodeLine{00644\ }
+\DoxyCodeLine{00648\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__daemon__sync__info}{monero\_daemon\_sync\_info}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00649\ \ \ \ \ boost::optional<std::string>\ m\_overview;}
+\DoxyCodeLine{00650\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00651\ \ \ \ \ boost::optional<uint64\_t>\ m\_target\_height;}
+\DoxyCodeLine{00652\ \ \ \ \ boost::optional<int>\ m\_next\_needed\_pruning\_seed;}
+\DoxyCodeLine{00653\ \ \ \ \ std::vector<std::shared\_ptr<monero\_peer>>\ m\_peers;}
+\DoxyCodeLine{00654\ \ \ \ \ std::vector<std::shared\_ptr<monero\_connection\_span>>\ m\_spans;}
+\DoxyCodeLine{00655\ }
+\DoxyCodeLine{00656\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_daemon\_sync\_info>\&\ info);}
+\DoxyCodeLine{00657\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__daemon__sync__info_a25fe8088a1e6bd5ebffaaa87ddb42185}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00658\ \ \ \};}
+\DoxyCodeLine{00659\ }
+\DoxyCodeLine{00663\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__daemon__network__stats}{monero\_daemon\_network\_stats}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00664\ \ \ \ \ boost::optional<uint64\_t>\ m\_start\_time;}
+\DoxyCodeLine{00665\ \ \ \ \ boost::optional<uint64\_t>\ m\_total\_packets\_in;}
+\DoxyCodeLine{00666\ \ \ \ \ boost::optional<uint64\_t>\ m\_total\_bytes\_in;}
+\DoxyCodeLine{00667\ \ \ \ \ boost::optional<uint64\_t>\ m\_total\_packets\_out;}
+\DoxyCodeLine{00668\ \ \ \ \ boost::optional<uint64\_t>\ m\_total\_bytes\_out;}
+\DoxyCodeLine{00669\ }
+\DoxyCodeLine{00670\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_daemon\_network\_stats>\&\ stats);}
+\DoxyCodeLine{00671\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__daemon__network__stats_acb9549b0192defe4961f4343823857da}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00672\ \ \ \};}
+\DoxyCodeLine{00673\ }
+\DoxyCodeLine{00677\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__hard__fork__info}{monero\_hard\_fork\_info}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1monero__rpc__payment__info}{monero\_rpc\_payment\_info}}\ \{}
+\DoxyCodeLine{00678\ \ \ \ \ boost::optional<bool>\ m\_is\_enabled;}
+\DoxyCodeLine{00679\ \ \ \ \ boost::optional<uint64\_t>\ m\_earliest\_height;}
+\DoxyCodeLine{00680\ \ \ \ \ boost::optional<int>\ m\_state;}
+\DoxyCodeLine{00681\ \ \ \ \ boost::optional<int>\ m\_threshold;}
+\DoxyCodeLine{00682\ \ \ \ \ boost::optional<int>\ m\_version;}
+\DoxyCodeLine{00683\ \ \ \ \ boost::optional<int>\ m\_num\_votes;}
+\DoxyCodeLine{00684\ \ \ \ \ boost::optional<int>\ m\_window;}
+\DoxyCodeLine{00685\ \ \ \ \ boost::optional<int>\ m\_voting;}
+\DoxyCodeLine{00686\ }
+\DoxyCodeLine{00687\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_hard\_fork\_info>\&\ info);}
+\DoxyCodeLine{00688\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__hard__fork__info_a02cb54aa0b9e6add9c2e8a168d69da18}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00689\ \ \ \};}
+\DoxyCodeLine{00690\ }
+\DoxyCodeLine{00694\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__generate__blocks__result}{monero\_generate\_blocks\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00695\ \ \ \ \ std::vector<std::string>\ m\_block\_hashes;}
+\DoxyCodeLine{00696\ \ \ \ \ boost::optional<uint64\_t>\ m\_height;}
+\DoxyCodeLine{00697\ }
+\DoxyCodeLine{00698\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_generate\_blocks\_result>\&\ result);}
+\DoxyCodeLine{00699\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__generate__blocks__result_a356844da581431ec85ca18bc58655fa5}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00700\ \ \ \};}
+\DoxyCodeLine{00701\ }
+\DoxyCodeLine{00705\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__get__blocks__by__hash__result}{monero\_get\_blocks\_by\_hash\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00706\ \ \ \ \ std::vector<std::shared\_ptr<monero\_block>>\ m\_blocks;}
+\DoxyCodeLine{00707\ \ \ \ \ boost::optional<uint64\_t>\ m\_current\_height;\ \textcolor{comment}{//\ the\ daemon's\ chain\ height\ at\ request\ time}}
+\DoxyCodeLine{00708\ }
+\DoxyCodeLine{00709\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_get\_blocks\_by\_hash\_result>\&\ result);}
+\DoxyCodeLine{00710\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__get__blocks__by__hash__result_a5ceb4e21eaff2ae57b1471e277708f5f}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00711\ \ \ \};}
+\DoxyCodeLine{00712\ }
+\DoxyCodeLine{00716\ \ \ \textcolor{keyword}{struct\ }\mbox{\hyperlink{structmonero_1_1monero__get__block__hashes__result}{monero\_get\_block\_hashes\_result}}\ :\ \textcolor{keyword}{public}\ \mbox{\hyperlink{structmonero_1_1serializable__struct}{serializable\_struct}}\ \{}
+\DoxyCodeLine{00717\ \ \ \ \ std::vector<std::string>\ m\_hashes;}
+\DoxyCodeLine{00718\ \ \ \ \ boost::optional<uint64\_t>\ m\_start\_height;\ \textcolor{comment}{//\ height\ of\ first\ hash\ in\ m\_hashes}}
+\DoxyCodeLine{00719\ \ \ \ \ boost::optional<uint64\_t>\ m\_current\_height;\ \textcolor{comment}{//\ the\ daemon's\ chain\ height\ at\ request\ time}}
+\DoxyCodeLine{00720\ }
+\DoxyCodeLine{00721\ \ \ \ \ \textcolor{keyword}{static}\ \textcolor{keywordtype}{void}\ from\_property\_tree(\textcolor{keyword}{const}\ boost::property\_tree::ptree\&\ node,\ \textcolor{keyword}{const}\ std::shared\_ptr<monero\_get\_block\_hashes\_result>\&\ result);}
+\DoxyCodeLine{00722\ \ \ \ \ rapidjson::Value\ \mbox{\hyperlink{structmonero_1_1monero__get__block__hashes__result_add01a7aeee909008506e738ba16e0379}{to\_rapidjson\_val}}(rapidjson::Document::AllocatorType\&\ allocator)\ \textcolor{keyword}{const\ override};}
+\DoxyCodeLine{00723\ \ \ \};}
+\DoxyCodeLine{00724\ }
+\DoxyCodeLine{00725\ \}}
+
+\end{DoxyCode}
