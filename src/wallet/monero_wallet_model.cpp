@@ -1740,7 +1740,7 @@ namespace monero {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("isGood")) check->m_is_good = it->second.get_value<bool>();
-      if (key == std::string("inTxPool")) check->m_in_tx_pool = it->second.get_value<bool>();
+      else if (key == std::string("inTxPool")) check->m_in_tx_pool = it->second.get_value<bool>();
       else if (key == std::string("numConfirmations")) check->m_num_confirmations = it->second.get_value<uint64_t>();
       else if (key == std::string("receivedAmount")) check->m_received_amount = it->second.get_value<uint64_t>();
     }
@@ -1999,8 +1999,16 @@ namespace monero {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("address")) address->m_address = it->second.data();
-      else if (key == std::string("addressType")) address->m_address_type = static_cast<monero_address_type>(it->second.get_value<uint32_t>());
-      else if (key == std::string("networkType")) address->m_network_type = static_cast<monero_network_type>(it->second.get_value<uint32_t>());
+      else if (key == std::string("addressType")) {
+        int64_t address_type_num = it->second.get_value<int64_t>();
+        if (address_type_num < 0 || address_type_num > monero_address_type::SUBADDRESS) throw std::runtime_error("Invalid address type, expected 0-2: " + std::to_string(address_type_num));
+        address->m_address_type = static_cast<monero_address_type>(address_type_num);
+      }
+      else if (key == std::string("networkType")) {
+        int64_t network_type_num = it->second.get_value<int64_t>();
+        if (network_type_num < 0 || network_type_num > monero_network_type::STAGENET) throw std::runtime_error("Invalid network type, expected 0-2: " + std::to_string(network_type_num));
+        address->m_network_type = static_cast<monero_network_type>(network_type_num);
+      }
     }
   }
 
