@@ -1249,7 +1249,6 @@ namespace monero {
     if (!m_w2->set_daemon(uri, login, trusted, std::move(ssl), proxy_uri)) {
       throw std::runtime_error("Failed to initialize wallet with daemon connection");
     }
-    is_connected_to_daemon(); // update m_is_connected cache // TODO: better naming?
   }
 
   void monero_wallet_full::set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted) {
@@ -1279,22 +1278,19 @@ namespace monero {
   bool monero_wallet_full::is_connected_to_daemon() const {
     assert_not_closed();
     uint32_t version = 0;
-    m_is_connected = m_w2->check_connection(&version, NULL, DEFAULT_CONNECTION_TIMEOUT_MILLIS); // TODO: should this be updated elsewhere?
-    if (!m_is_connected) return false;
-    //if (!m_w2->light_wallet() && (version >> 16) != CORE_RPC_VERSION_MAJOR) m_is_connected = false;  // wrong network type  // TODO: disallow rpc version mismatch by configuration
-    return m_is_connected;
+    if (!m_w2->check_connection(&version, NULL, DEFAULT_CONNECTION_TIMEOUT_MILLIS)) return false;
+    //if (!m_w2->light_wallet() && (version >> 16) != CORE_RPC_VERSION_MAJOR) return false;  // wrong network type  // TODO: disallow rpc version mismatch by configuration
+    return true;
   }
 
   bool monero_wallet_full::is_daemon_synced() const {
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     uint64_t daemonHeight = get_daemon_height();
     return daemonHeight >= get_daemon_max_peer_height() && daemonHeight > 1;
   }
 
   bool monero_wallet_full::is_daemon_trusted() const {
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     return m_w2->is_trusted_daemon();
   }
 
@@ -1462,7 +1458,6 @@ namespace monero {
 
   uint64_t monero_wallet_full::get_daemon_height() const {
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     std::string err;
     uint64_t result = m_w2->get_daemon_blockchain_height(err);
     if (!err.empty()) throw std::runtime_error(err);
@@ -1471,7 +1466,6 @@ namespace monero {
 
   uint64_t monero_wallet_full::get_daemon_max_peer_height() const {
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     std::string err;
     uint64_t result = m_w2->get_daemon_blockchain_target_height(err);
     if (!err.empty()) throw std::runtime_error(err);
@@ -1504,20 +1498,20 @@ namespace monero {
   monero_sync_result monero_wallet_full::sync() {
     MTRACE("sync()");
     assert_not_closed();
-    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
     return lock_and_sync();
   }
 
   monero_sync_result monero_wallet_full::sync(monero_wallet_listener& listener) {
     MTRACE("sync(listener)");
     assert_not_closed();
-    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
 
     // register listener
     add_listener(listener);
 
-    // sync wallet
-    monero_sync_result result = lock_and_sync(boost::none);
+    // sync wallet, unregistering listener on failure
+    monero_sync_result result;
+    try { result = lock_and_sync(boost::none); }
+    catch (...) { remove_listener(listener); throw; }
 
     // unregister listener
     remove_listener(listener);
@@ -1529,20 +1523,20 @@ namespace monero {
   monero_sync_result monero_wallet_full::sync(uint64_t start_height) {
     MTRACE("sync(" << start_height << ")");
     assert_not_closed();
-    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
     return lock_and_sync(start_height);
   }
 
   monero_sync_result monero_wallet_full::sync(uint64_t start_height, monero_wallet_listener& listener) {
     MTRACE("sync(" << start_height << ", listener)");
     assert_not_closed();
-    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
 
     // wrap and register sync listener as wallet listener
     add_listener(listener);
 
-    // sync wallet
-    monero_sync_result result = lock_and_sync(start_height);
+    // sync wallet, unregistering listener on failure
+    monero_sync_result result;
+    try { result = lock_and_sync(start_height); }
+    catch (...) { remove_listener(listener); throw; }
 
     // unregister sync listener
     remove_listener(listener);
@@ -1553,7 +1547,6 @@ namespace monero {
 
   void monero_wallet_full::start_syncing(uint64_t sync_period_in_ms) {
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     m_syncing_interval = sync_period_in_ms;
     if (!m_syncing_enabled) {
       m_syncing_enabled = true;
@@ -1571,7 +1564,7 @@ namespace monero {
   void monero_wallet_full::scan_txs(const std::vector<std::string>& tx_ids) {
     MTRACE("scan_txs()");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
+    if (tx_ids.empty()) throw std::runtime_error("No tx hashes given to scan"); // matches monero-wallet-rpc client validation
 
     // convert string ids to crypto hashes
     std::unordered_set<crypto::hash> tx_hashes;
@@ -1591,7 +1584,6 @@ namespace monero {
   void monero_wallet_full::rescan_spent() {
     MTRACE("rescan_spent()");
     assert_not_closed();
-    if (!m_is_connected && !is_connected_to_daemon()) throw std::runtime_error("Wallet is not connected to daemon");
     if (!is_daemon_trusted()) throw std::runtime_error("Rescan spent can only be used with a trusted daemon");
     sync_op_lock op_lock(*this); // do not refresh while rescanning spent
     m_w2->rescan_spent();
@@ -1601,7 +1593,6 @@ namespace monero {
   void monero_wallet_full::rescan_blockchain() {
     MTRACE("rescan_blockchain()");
     assert_not_closed();
-    if (!m_is_connected) throw std::runtime_error("Wallet is not connected to daemon");
     m_rescan_on_sync = true;
     lock_and_sync();
   }
@@ -3680,7 +3671,6 @@ namespace monero {
     m_w2->deinit();
     m_w2->callback(nullptr);  // unregister listener after sync
     m_w2_listener.reset();    // wait for queued notifications
-    m_is_connected = false;
     m_is_closed = true;
   }
 
@@ -3717,7 +3707,6 @@ namespace monero {
 
     // initialize internal state
     m_w2_listener = std::unique_ptr<wallet2_listener>(new wallet2_listener(*this, *m_w2));
-    if (get_daemon_connection() == nullptr) m_is_connected = false;
     m_is_synced = false;
     m_rescan_on_sync = false;
     m_syncing_enabled = false;
@@ -4016,7 +4005,7 @@ namespace monero {
     m_sync_in_progress = true;
     try {
       do {
-        // verify connection with a live check, healing cached state; error so callers cannot mistake a skipped sync for success
+        // verify connection with a live check; error so callers cannot mistake a skipped sync for success
         bool daemon_ready = is_connected_to_daemon();
         if (!daemon_ready && !background) throw std::runtime_error("Wallet is not connected to daemon");
 

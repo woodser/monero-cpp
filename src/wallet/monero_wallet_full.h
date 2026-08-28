@@ -294,7 +294,6 @@ namespace monero {
 
     // blockchain sync management
     mutable std::atomic<bool> m_is_synced;       // whether or not wallet is synced
-    mutable std::atomic<bool> m_is_connected;    // cache connection status to avoid unecessary RPC calls
     boost::condition_variable m_sync_cv;         // to make sync threads woke
     mutable boost::mutex m_sync_mutex;           // synchronize sync and other wallet operations
     mutable std::atomic<uint32_t> m_num_sync_pauses; // number of operations pausing background sync
