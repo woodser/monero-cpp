@@ -424,8 +424,7 @@ namespace monero {
     else deserialize_rpc_response(result, response, uri, request.m_method.get());
   }
 
-  std::shared_ptr<monero_rpc_connection> monero_rpc_connection::from_property_tree(const boost::property_tree::ptree& node) {
-    std::shared_ptr<monero_rpc_connection> connection = std::make_shared<monero_rpc_connection>();
+  void monero_rpc_connection::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_rpc_connection>& connection) {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("uri")) connection->m_uri = it->second.data();
@@ -436,6 +435,10 @@ namespace monero {
       else if (key == std::string("priority")) connection->m_priority = it->second.get_value<int>();
       else if (key == std::string("timeoutMs")) connection->m_timeout_ms = it->second.get_value<uint32_t>();
     }
-    return connection;
   }
+
+  std::shared_ptr<monero_rpc_connection> monero_rpc_connection::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_rpc_connection>(json);
+  }
+
 }

@@ -108,6 +108,15 @@ namespace gen_utils
   std::string serialize(const boost::property_tree::ptree& node);
   void deserialize(const std::string& json, boost::property_tree::ptree& root);
 
+  template<typename T>
+  std::shared_ptr<T> deserialize(const std::string& json) {
+    boost::property_tree::ptree root;
+    gen_utils::deserialize(json, root);
+    std::shared_ptr<T> obj = std::make_shared<T>();
+    T::from_property_tree(root, obj);
+    return obj;
+  }
+
   // ------------------------- VALUE RECONCILATION ----------------------------
 
   // TODO: refactor common template code

@@ -99,6 +99,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<ssl_options>& options);
+    static std::shared_ptr<ssl_options> deserialize(const std::string& json);
   };
 
   /**
@@ -144,6 +145,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_version>& version);
+    static std::shared_ptr<monero_version> deserialize(const std::string& json);
   };
 
   // forward declarations
@@ -179,6 +181,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block_header>& header);
+    static std::shared_ptr<monero_block_header> deserialize(const std::string& json);
     std::shared_ptr<monero_block_header> copy(const std::shared_ptr<monero_block_header>& src, const std::shared_ptr<monero_block_header>& tgt) const;
     virtual void merge(const std::shared_ptr<monero_block_header>& self, const std::shared_ptr<monero_block_header>& other);
   };
@@ -194,6 +197,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block>& block);
+    static std::shared_ptr<monero_block> deserialize(const std::string& json);
     std::shared_ptr<monero_block> copy(const std::shared_ptr<monero_block>& src, const std::shared_ptr<monero_block>& tgt) const;
     void merge(const std::shared_ptr<monero_block_header>& self, const std::shared_ptr<monero_block_header>& other);
     void merge(const std::shared_ptr<monero_block>& self, const std::shared_ptr<monero_block>& other);
@@ -248,6 +252,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, std::shared_ptr<monero_tx> tx);
+    static std::shared_ptr<monero_tx> deserialize(const std::string& json);
     std::shared_ptr<monero_tx> copy(const std::shared_ptr<monero_tx>& src, const std::shared_ptr<monero_tx>& tgt) const;
     virtual void merge(const std::shared_ptr<monero_tx>& self, const std::shared_ptr<monero_tx>& other);
     boost::optional<uint64_t> get_height() const;
@@ -262,6 +267,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_key_image>& key_image);
+    static std::shared_ptr<monero_key_image> deserialize(const std::string& json);
     static std::vector<std::shared_ptr<monero_key_image>> deserialize_key_images(const std::string& key_images_json);  // TODO: remove this specialty util used once
     std::shared_ptr<monero_key_image> copy(const std::shared_ptr<monero_key_image>& src, const std::shared_ptr<monero_key_image>& tgt) const;
     void merge(const std::shared_ptr<monero_key_image>& self, const std::shared_ptr<monero_key_image>& other);
@@ -281,6 +287,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_output>& output);
+    static std::shared_ptr<monero_output> deserialize(const std::string& json);
     std::shared_ptr<monero_output> copy(const std::shared_ptr<monero_output>& src, const std::shared_ptr<monero_output>& tgt) const;
     virtual void merge(const std::shared_ptr<monero_output>& self, const std::shared_ptr<monero_output>& other);
   };
@@ -303,6 +310,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_rpc_payment_info>& rpc_payment_info);
+    static std::shared_ptr<monero_rpc_payment_info> deserialize(const std::string& json);
   };
 
   /**
@@ -318,6 +326,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_alt_chain>& alt_chain);
+    static std::shared_ptr<monero_alt_chain> deserialize(const std::string& json);
   };
 
   /**
@@ -331,6 +340,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_ban>& ban);
+    static std::shared_ptr<monero_ban> deserialize(const std::string& json);
   };
 
   /**
@@ -341,6 +351,7 @@ namespace monero {
     boost::optional<int> m_pruning_seed;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_prune_result>& result);
+    static std::shared_ptr<monero_prune_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -355,6 +366,7 @@ namespace monero {
     boost::optional<int> m_num_threads;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_mining_status>& status);
+    static std::shared_ptr<monero_mining_status> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -368,6 +380,7 @@ namespace monero {
     boost::optional<uint64_t> m_fee_sum_high;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_miner_tx_sum>& sum);
+    static std::shared_ptr<monero_miner_tx_sum> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -388,6 +401,7 @@ namespace monero {
     boost::optional<uint64_t> m_seed_height;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_block_template>& tmplt);
+    static std::shared_ptr<monero_block_template> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -406,6 +420,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_tx>> m_tx_pool_backlog;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_miner_data>& data);
+    static std::shared_ptr<monero_miner_data> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -420,6 +435,7 @@ namespace monero {
     monero_auxiliary_pow(const std::string& id, const std::string& hash): m_id(id), m_hash(hash) { }
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_auxiliary_pow>& aux_pow);
+    static std::shared_ptr<monero_auxiliary_pow> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -434,6 +450,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_auxiliary_pow>> m_aux_pow;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_add_auxiliary_pow_result>& result);
+    static std::shared_ptr<monero_add_auxiliary_pow_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -450,6 +467,7 @@ namespace monero {
     boost::optional<uint64_t> m_start_height;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_connection_span>& span);
+    static std::shared_ptr<monero_connection_span> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -485,6 +503,7 @@ namespace monero {
     boost::optional<monero_connection_type> m_connection_type;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_peer>& peer);
+    static std::shared_ptr<monero_peer> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -508,6 +527,7 @@ namespace monero {
     boost::optional<std::string> m_reason;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_submit_tx_result>& result);
+    static std::shared_ptr<monero_submit_tx_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -528,6 +548,7 @@ namespace monero {
     boost::optional<uint64_t> m_start_height;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_output_distribution_entry>& entry);
+    static std::shared_ptr<monero_output_distribution_entry> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -541,6 +562,7 @@ namespace monero {
     boost::optional<uint64_t> m_recent_instances;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_output_histogram_entry>& entry);
+    static std::shared_ptr<monero_output_histogram_entry> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -564,6 +586,7 @@ namespace monero {
 
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx_pool_stats>& stats);
+    static std::shared_ptr<monero_tx_pool_stats> deserialize(const std::string& json);
   };
 
   /**
@@ -577,6 +600,7 @@ namespace monero {
     boost::optional<std::string> m_user_uri;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_update_check_result>& check);
+    static std::shared_ptr<monero_daemon_update_check_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -587,6 +611,7 @@ namespace monero {
     boost::optional<std::string> m_download_path;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_update_download_result>& check);
+    static std::shared_ptr<monero_daemon_update_download_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -599,6 +624,7 @@ namespace monero {
     std::vector<uint64_t> m_fees;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_fee_estimate>& estimate);
+    static std::shared_ptr<monero_fee_estimate> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -642,6 +668,7 @@ namespace monero {
     boost::optional<bool> m_is_regtest;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_info>& info);
+    static std::shared_ptr<monero_daemon_info> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -657,6 +684,7 @@ namespace monero {
     std::vector<std::shared_ptr<monero_connection_span>> m_spans;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_sync_info>& info);
+    static std::shared_ptr<monero_daemon_sync_info> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -671,6 +699,7 @@ namespace monero {
     boost::optional<uint64_t> m_total_bytes_out;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_daemon_network_stats>& stats);
+    static std::shared_ptr<monero_daemon_network_stats> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -688,6 +717,7 @@ namespace monero {
     boost::optional<int> m_voting;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_hard_fork_info>& info);
+    static std::shared_ptr<monero_hard_fork_info> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -699,6 +729,7 @@ namespace monero {
     boost::optional<uint64_t> m_height;
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_generate_blocks_result>& result);
+    static std::shared_ptr<monero_generate_blocks_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -710,6 +741,7 @@ namespace monero {
     boost::optional<uint64_t> m_current_height; // the daemon's chain height at request time
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_blocks_by_hash_result>& result);
+    static std::shared_ptr<monero_get_blocks_by_hash_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
@@ -722,6 +754,7 @@ namespace monero {
     boost::optional<uint64_t> m_current_height; // the daemon's chain height at request time
 
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_get_block_hashes_result>& result);
+    static std::shared_ptr<monero_get_block_hashes_result> deserialize(const std::string& json);
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
   };
 
