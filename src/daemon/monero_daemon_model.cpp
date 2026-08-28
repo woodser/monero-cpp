@@ -117,6 +117,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_version> monero_version::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_version>(json);
+  }
+
   // --------------------------- SSL OPTIONS ---------------------------
 
   rapidjson::Value ssl_options::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -147,6 +151,10 @@ namespace monero {
       }
       else if (key == std::string("sslAllowAnyCert")) options->m_ssl_allow_any_cert = it->second.get_value<bool>();
     }
+  }
+
+  std::shared_ptr<ssl_options> ssl_options::deserialize(const std::string& json) {
+    return gen_utils::deserialize<ssl_options>(json);
   }
 
   // ------------------------- MONERO BLOCK HEADER ----------------------------
@@ -212,6 +220,10 @@ namespace monero {
       else if (key == std::string("reward")) header->m_reward = it->second.get_value<uint64_t>();
       else if (key == std::string("powHash")) header->m_pow_hash = it->second.data();
     }
+  }
+
+  std::shared_ptr<monero_block_header> monero_block_header::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_block_header>(json);
   }
 
   std::shared_ptr<monero_block_header> monero_block_header::copy(const std::shared_ptr<monero_block_header>& src, const std::shared_ptr<monero_block_header>& tgt) const {
@@ -312,6 +324,10 @@ namespace monero {
         block->m_miner_tx = tx;
       }
     }
+  }
+
+  std::shared_ptr<monero_block> monero_block::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_block>(json);
   }
 
   std::shared_ptr<monero_block> monero_block::copy(const std::shared_ptr<monero_block>& src, const std::shared_ptr<monero_block>& tgt) const {
@@ -499,6 +515,10 @@ namespace monero {
       else if (key == std::string("maxUsedBlockHash")) tx->m_max_used_block_hash = it->second.data();
       else if (key == std::string("signatures")) throw std::runtime_error("signatures deserialization not implemented");
     }
+  }
+
+  std::shared_ptr<monero_tx> monero_tx::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_tx>(json);
   }
 
   std::shared_ptr<monero_tx> monero_tx::copy(const std::shared_ptr<monero_tx>& src, const std::shared_ptr<monero_tx>& tgt) const {
@@ -690,6 +710,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_key_image> monero_key_image::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_key_image>(json);
+  }
+
   std::vector<std::shared_ptr<monero_key_image>> monero_key_image::deserialize_key_images(const std::string& key_images_json) {
 
     // deserialize json to property node
@@ -776,6 +800,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_output> monero_output::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_output>(json);
+  }
+
   std::shared_ptr<monero_output> monero_output::copy(const std::shared_ptr<monero_output>& src, const std::shared_ptr<monero_output>& tgt) const {
     if (this != src.get()) throw std::runtime_error("this != src");
     tgt->m_tx = src->m_tx;  // reference same parent tx by default
@@ -818,6 +846,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_rpc_payment_info> monero_rpc_payment_info::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_rpc_payment_info>(json);
+  }
+
   rapidjson::Value monero_rpc_payment_info::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
@@ -848,6 +880,10 @@ namespace monero {
       else if (key == std::string("length")) alt_chain->m_length = it->second.get_value<uint64_t>();
       else if (key == std::string("mainChainParentBlockHash")) alt_chain->m_main_chain_parent_block_hash = it->second.data();
     }
+  }
+
+  std::shared_ptr<monero_alt_chain> monero_alt_chain::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_alt_chain>(json);
   }
 
   rapidjson::Value monero_alt_chain::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -884,6 +920,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_ban> monero_ban::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_ban>(json);
+  }
+
   rapidjson::Value monero_ban::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
@@ -912,6 +952,10 @@ namespace monero {
       if (key == std::string("isPruned")) result->m_is_pruned = it->second.get_value<bool>();
       else if (key == std::string("pruningSeed")) result->m_pruning_seed = it->second.get_value<int>();
     }
+  }
+
+  std::shared_ptr<monero_prune_result> monero_prune_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_prune_result>(json);
   }
 
   rapidjson::Value monero_prune_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -947,6 +991,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_mining_status> monero_mining_status::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_mining_status>(json);
+  }
+
   rapidjson::Value monero_mining_status::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
@@ -978,6 +1026,10 @@ namespace monero {
       else if (key == std::string("feeSumLow")) sum->m_fee_sum_low = it->second.get_value<uint64_t>();
       else if (key == std::string("feeSumHigh")) sum->m_fee_sum_high = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_miner_tx_sum> monero_miner_tx_sum::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_miner_tx_sum>(json);
   }
 
   rapidjson::Value monero_miner_tx_sum::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1012,6 +1064,10 @@ namespace monero {
       else if (key == std::string("seedHash")) tmplt->m_seed_hash = it->second.data();
       else if (key == std::string("nextSeedHash")) tmplt->m_next_seed_hash = it->second.data();
     }
+  }
+
+  std::shared_ptr<monero_block_template> monero_block_template::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_block_template>(json);
   }
 
   rapidjson::Value monero_block_template::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1063,6 +1119,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_miner_data> monero_miner_data::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_miner_data>(json);
+  }
+
   rapidjson::Value monero_miner_data::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
@@ -1095,6 +1155,10 @@ namespace monero {
       if (key == std::string("id")) aux_pow->m_id = it->second.data();
       else if (key == std::string("hash")) aux_pow->m_hash = it->second.data();
     }
+  }
+
+  std::shared_ptr<monero_auxiliary_pow> monero_auxiliary_pow::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_auxiliary_pow>(json);
   }
 
   rapidjson::Value monero_auxiliary_pow::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1131,6 +1195,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_add_auxiliary_pow_result> monero_add_auxiliary_pow_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_add_auxiliary_pow_result>(json);
+  }
+
   rapidjson::Value monero_add_auxiliary_pow_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
@@ -1165,6 +1233,10 @@ namespace monero {
       else if (key == std::string("size")) span->m_size = it->second.get_value<uint64_t>();
       else if (key == std::string("startHeight")) span->m_start_height = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_connection_span> monero_connection_span::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_connection_span>(json);
   }
 
   rapidjson::Value monero_connection_span::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1230,6 +1302,10 @@ namespace monero {
         else throw monero_error("Invalid RPC peer type, expected 0-4: " + std::to_string(rpc_type));
       }
     }
+  }
+
+  std::shared_ptr<monero_peer> monero_peer::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_peer>(json);
   }
 
   rapidjson::Value monero_peer::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1298,6 +1374,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_submit_tx_result> monero_submit_tx_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_submit_tx_result>(json);
+  }
+
   rapidjson::Value monero_submit_tx_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
@@ -1341,6 +1421,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_output_distribution_entry> monero_output_distribution_entry::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_output_distribution_entry>(json);
+  }
+
   rapidjson::Value monero_output_distribution_entry::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
@@ -1368,6 +1452,10 @@ namespace monero {
       else if (key == std::string("unlockedInstances")) entry->m_unlocked_instances = it->second.get_value<uint64_t>();
       else if (key == std::string("recentInstances")) entry->m_recent_instances = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_output_histogram_entry> monero_output_histogram_entry::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_output_histogram_entry>(json);
   }
 
   rapidjson::Value monero_output_histogram_entry::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1408,6 +1496,10 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_tx_pool_stats> monero_tx_pool_stats::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_tx_pool_stats>(json);
   }
 
   rapidjson::Value monero_tx_pool_stats::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1455,6 +1547,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_daemon_update_check_result> monero_daemon_update_check_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_daemon_update_check_result>(json);
+  }
+
   rapidjson::Value monero_daemon_update_check_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
@@ -1484,6 +1580,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_daemon_update_download_result> monero_daemon_update_download_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_daemon_update_download_result>(json);
+  }
+
   rapidjson::Value monero_daemon_update_download_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root = monero_daemon_update_check_result::to_rapidjson_val(allocator);
@@ -1511,6 +1611,10 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_fee_estimate> monero_fee_estimate::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_fee_estimate>(json);
   }
 
   rapidjson::Value monero_fee_estimate::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1577,6 +1681,10 @@ namespace monero {
       else if (key == std::string("isRestricted")) info->m_is_restricted = it->second.get_value<bool>();
       else if (key == std::string("isRegtest")) info->m_is_regtest = it->second.get_value<bool>();
     }
+  }
+
+  std::shared_ptr<monero_daemon_info> monero_daemon_info::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_daemon_info>(json);
   }
 
   rapidjson::Value monero_daemon_info::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1657,6 +1765,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_daemon_sync_info> monero_daemon_sync_info::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_daemon_sync_info>(json);
+  }
+
   rapidjson::Value monero_daemon_sync_info::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
@@ -1694,6 +1806,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_daemon_network_stats> monero_daemon_network_stats::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_daemon_network_stats>(json);
+  }
+
   rapidjson::Value monero_daemon_network_stats::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root = monero_rpc_payment_info::to_rapidjson_val(allocator);
@@ -1726,6 +1842,10 @@ namespace monero {
       else if (key == std::string("window")) info->m_window = it->second.get_value<int>();
       else if (key == std::string("voting")) info->m_voting = it->second.get_value<int>();
     }
+  }
+
+  std::shared_ptr<monero_hard_fork_info> monero_hard_fork_info::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_hard_fork_info>(json);
   }
 
   rapidjson::Value monero_hard_fork_info::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1761,6 +1881,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_generate_blocks_result> monero_generate_blocks_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_generate_blocks_result>(json);
+  }
+
   rapidjson::Value monero_generate_blocks_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
     // create root
     rapidjson::Value root(rapidjson::kObjectType);
@@ -1784,6 +1908,10 @@ namespace monero {
       // note: m_blocks is not round-tripped here; monero_block has no from_property_tree of its own yet
       if (key == std::string("currentHeight")) result->m_current_height = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_get_blocks_by_hash_result> monero_get_blocks_by_hash_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_get_blocks_by_hash_result>(json);
   }
 
   rapidjson::Value monero_get_blocks_by_hash_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1812,6 +1940,10 @@ namespace monero {
       else if (key == std::string("startHeight")) result->m_start_height = it->second.get_value<uint64_t>();
       else if (key == std::string("currentHeight")) result->m_current_height = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_get_block_hashes_result> monero_get_block_hashes_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_get_block_hashes_result>(json);
   }
 
   rapidjson::Value monero_get_block_hashes_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {

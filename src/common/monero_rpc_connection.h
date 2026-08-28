@@ -118,7 +118,8 @@ namespace monero {
     boost::optional<uint64_t> m_response_time;   // automatically set by calling check_connection()
     int m_priority;                              // priority relative to other connections where 1 is highest, then 2, etc, and 0 is lowest (default)
 
-    static std::shared_ptr<monero_rpc_connection> from_property_tree(const boost::property_tree::ptree& node);
+    static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_rpc_connection>& connection);
+    static std::shared_ptr<monero_rpc_connection> deserialize(const std::string& json);
 
     /**
      * Checks RPC connection priority order.

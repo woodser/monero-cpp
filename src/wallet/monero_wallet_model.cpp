@@ -169,7 +169,10 @@ namespace monero {
         else if (network_type_num == 2) config->m_network_type = monero_network_type::STAGENET;
         else throw std::runtime_error("Invalid network type, expected 0-2: " + std::to_string(network_type_num));
       }
-      else if (key == std::string("server")) config->m_server = monero_rpc_connection::from_property_tree(it->second);
+      else if (key == std::string("server")) {
+        config->m_server = std::make_shared<monero_rpc_connection>();
+        monero_rpc_connection::from_property_tree(it->second, config->m_server);
+      }
       else if (key == std::string("isTrustedDaemon")) config->m_is_trusted_daemon = it->second.get_value<bool>();
       else if (key == std::string("seed")) config->m_seed = it->second.data();
       else if (key == std::string("seedOffset")) config->m_seed_offset = it->second.data();
@@ -187,16 +190,7 @@ namespace monero {
   }
 
   std::shared_ptr<monero_wallet_config> monero_wallet_config::deserialize(const std::string& config_json) {
-
-    // deserialize config json to property node
-    std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
-    boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
-
-    // convert config property tree to monero_wallet_config
-    std::shared_ptr<monero_wallet_config> config = std::make_shared<monero_wallet_config>();
-    from_property_tree(node, config);
-    return config;
+    return gen_utils::deserialize<monero_wallet_config>(config_json);
   }
 
   // -------------------------- MONERO SYNC RESULT ----------------------------
@@ -225,6 +219,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_sync_result> monero_sync_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_sync_result>(json);
+  }
+
   // -------------------------- MONERO ACCOUNT -----------------------------
 
   void monero_account::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_account>& account) {
@@ -243,6 +241,10 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_account> monero_account::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_account>(json);
   }
 
   rapidjson::Value monero_account::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -283,6 +285,10 @@ namespace monero {
       else if (key == std::string("numUnspentOutputs")) subaddress->m_num_unspent_outputs = it->second.get_value<uint64_t>();
       else if (key == std::string("numBlocksToUnlock")) subaddress->m_num_blocks_to_unlock = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_subaddress> monero_subaddress::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_subaddress>(json);
   }
 
   rapidjson::Value monero_subaddress::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -382,6 +388,10 @@ namespace monero {
       else if (key == std::string("numDummyOutputs")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
       else if (key == std::string("extraHex")) throw std::runtime_error("monero_tx_wallet " + key + " deserialization not implemented");
     }
+  }
+
+  std::shared_ptr<monero_tx_wallet> monero_tx_wallet::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_tx_wallet>(json);
   }
 
   std::shared_ptr<monero_tx_wallet> monero_tx_wallet::copy(const std::shared_ptr<monero_tx>& src, const std::shared_ptr<monero_tx>& tgt) const {
@@ -638,6 +648,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_tx_query> monero_tx_query::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_tx_query>(json);
+  }
+
   std::shared_ptr<monero_tx_query> monero_tx_query::deserialize_from_block(const std::string& tx_query_json) {
 
     // deserialize tx query std::string to property rooted at block
@@ -813,6 +827,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_destination> monero_destination::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_destination>(json);
+  }
+
   std::shared_ptr<monero_destination> monero_destination::copy(const std::shared_ptr<monero_destination>& src, const std::shared_ptr<monero_destination>& tgt) const {
     if (this != src.get()) throw std::runtime_error("this destination!= src");
     tgt->m_address = src->m_address;
@@ -840,32 +858,8 @@ namespace monero {
     return root;
   }
 
-  monero_tx_set monero_tx_set::deserialize(const std::string& tx_set_json) {
-
-    // deserialize tx set to property
-    std::istringstream iss = tx_set_json.empty() ? std::istringstream() : std::istringstream(tx_set_json);
-    boost::property_tree::ptree tx_set_node;
-    boost::property_tree::read_json(iss, tx_set_node);
-
-    // initialize tx_set from property node
-    monero_tx_set tx_set;
-    for (boost::property_tree::ptree::const_iterator it = tx_set_node.begin(); it != tx_set_node.end(); ++it) {
-      std::string key = it->first;
-      if (key == std::string("unsignedTxHex")) tx_set.m_unsigned_tx_hex = it->second.data();
-      else if (key == std::string("multisigTxHex")) tx_set.m_multisig_tx_hex = it->second.data();
-      else if (key == std::string("signedTxHex")) tx_set.m_signed_tx_hex = it->second.data();
-      else if (key == std::string("txs")) {
-        boost::property_tree::ptree txs_node = it->second;
-        for (boost::property_tree::ptree::const_iterator it2 = txs_node.begin(); it2 != txs_node.end(); ++it2) {
-          std::shared_ptr<monero_tx_wallet> tx_wallet = std::make_shared<monero_tx_wallet>();
-          monero_tx_wallet::from_property_tree(it2->second, tx_wallet);
-          tx_set.m_txs.push_back(tx_wallet);
-        }
-      }
-      else throw std::runtime_error("monero_utils::deserialize_tx_set() field '" + key + "' not supported");
-    }
-
-    return tx_set;
+  std::shared_ptr<monero_tx_set> monero_tx_set::deserialize(const std::string& tx_set_json) {
+    return gen_utils::deserialize<monero_tx_set>(tx_set_json);
   }
 
   void monero_tx_set::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_tx_set>& set) {
@@ -971,6 +965,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_incoming_transfer> monero_incoming_transfer::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_incoming_transfer>(json);
+  }
+
   std::shared_ptr<monero_incoming_transfer> monero_incoming_transfer::copy(const std::shared_ptr<monero_transfer>& src, const std::shared_ptr<monero_transfer>& tgt) const {
     return copy(std::static_pointer_cast<monero_incoming_transfer>(src), std::static_pointer_cast<monero_incoming_transfer>(tgt));
   }
@@ -1033,6 +1031,10 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_outgoing_transfer> monero_outgoing_transfer::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_outgoing_transfer>(json);
   }
 
   std::shared_ptr<monero_outgoing_transfer> monero_outgoing_transfer::copy(const std::shared_ptr<monero_transfer>& src, const std::shared_ptr<monero_transfer>& tgt) const {
@@ -1126,6 +1128,10 @@ namespace monero {
       else if (key == std::string("hasDestinations")) transfer_query->m_has_destinations = it->second.get_value<bool>();
       else if (key == std::string("txQuery")) throw std::runtime_error("monero_transfer_query " + key + " deserialization not implemented");
     }
+  }
+
+  std::shared_ptr<monero_transfer_query> monero_transfer_query::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_transfer_query>(json);
   }
 
   std::shared_ptr<monero_transfer_query> monero_transfer_query::deserialize_from_block(const std::string& transfer_query_json) {
@@ -1294,6 +1300,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_output_wallet> monero_output_wallet::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_output_wallet>(json);
+  }
+
   std::shared_ptr<monero_output_wallet> monero_output_wallet::copy(const std::shared_ptr<monero_output>& src, const std::shared_ptr<monero_output>& tgt) const {
     MTRACE("monero_output_wallet::copy(output)");
     return monero_output_wallet::copy(std::static_pointer_cast<monero_output_wallet>(src), std::static_pointer_cast<monero_output_wallet>(tgt));
@@ -1363,6 +1373,10 @@ namespace monero {
       else if (key == std::string("maxAmount")) output_query->m_max_amount = it->second.get_value<uint64_t>();
       else if (key == std::string("txQuery")) {} // ignored
     }
+  }
+
+  std::shared_ptr<monero_output_query> monero_output_query::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_output_query>(json);
   }
 
   std::shared_ptr<monero_output_query> monero_output_query::deserialize_from_block(const std::string& output_query_json) {
@@ -1552,16 +1566,7 @@ namespace monero {
   }
 
   std::shared_ptr<monero_tx_config> monero_tx_config::deserialize(const std::string& config_json) {
-
-    // deserialize config json to property node
-    std::istringstream iss = config_json.empty() ? std::istringstream() : std::istringstream(config_json);
-    boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
-
-    // convert config property tree to monero_tx_config
-    std::shared_ptr<monero_tx_config> config = std::make_shared<monero_tx_config>();
-    from_property_tree(node, config);
-    return config;
+    return gen_utils::deserialize<monero_tx_config>(config_json);
   }
 
   std::vector<std::shared_ptr<monero_destination>> monero_tx_config::get_normalized_destinations() const {
@@ -1604,6 +1609,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_integrated_address> monero_integrated_address::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_integrated_address>(json);
+  }
+
   // -------------------- MONERO KEY IMAGE EXPORT RESULT ----------------------
 
   rapidjson::Value monero_key_image_export_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1637,16 +1646,7 @@ namespace monero {
   }
 
   std::shared_ptr<monero_key_image_export_result> monero_key_image_export_result::deserialize(const std::string& result_json) {
-
-    // deserialize json to property node
-    std::istringstream iss = result_json.empty() ? std::istringstream() : std::istringstream(result_json);
-    boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
-
-    // convert property tree to export result
-    std::shared_ptr<monero_key_image_export_result> result = std::make_shared<monero_key_image_export_result>();
-    from_property_tree(node, result);
-    return result;
+    return gen_utils::deserialize<monero_key_image_export_result>(result_json);
   }
 
   // -------------------- MONERO KEY IMAGE IMPORT RESULT ----------------------
@@ -1658,6 +1658,10 @@ namespace monero {
       else if (key == std::string("spentAmount")) result->m_spent_amount = it->second.get_value<uint64_t>();
       else if (key == std::string("unspentAmount")) result->m_unspent_amount = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_key_image_import_result> monero_key_image_import_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_key_image_import_result>(json);
   }
 
   rapidjson::Value monero_key_image_import_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1690,6 +1694,10 @@ namespace monero {
       }
       else if (key == std::string("version")) result->m_version = it->second.get_value<uint32_t>();
     }
+  }
+
+  std::shared_ptr<monero_message_signature_result> monero_message_signature_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_message_signature_result>(json);
   }
 
   rapidjson::Value monero_message_signature_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1734,6 +1742,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_check> monero_check::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_check>(json);
+  }
+
   // --------------------------- MONERO CHECK TX ------------------------------
 
   void monero_check_tx::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_check_tx>& check) {
@@ -1744,6 +1756,10 @@ namespace monero {
       else if (key == std::string("numConfirmations")) check->m_num_confirmations = it->second.get_value<uint64_t>();
       else if (key == std::string("receivedAmount")) check->m_received_amount = it->second.get_value<uint64_t>();
     }
+  }
+
+  std::shared_ptr<monero_check_tx> monero_check_tx::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_check_tx>(json);
   }
 
   rapidjson::Value monero_check_tx::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1788,6 +1804,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_check_reserve> monero_check_reserve::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_check_reserve>(json);
+  }
+
   // --------------------------- MONERO MULTISIG ------------------------------
 
   void monero_multisig_info::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_multisig_info>& info) {
@@ -1798,6 +1818,10 @@ namespace monero {
       else if (key == std::string("threshold")) info->m_threshold = it->second.get_value<uint32_t>();
       else if (key == std::string("numParticipants")) info->m_num_participants = it->second.get_value<uint32_t>();
     }
+  }
+
+  std::shared_ptr<monero_multisig_info> monero_multisig_info::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_multisig_info>(json);
   }
 
   rapidjson::Value monero_multisig_info::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1826,6 +1850,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_multisig_init_result> monero_multisig_init_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_multisig_init_result>(json);
+  }
+
   rapidjson::Value monero_multisig_init_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
     // create root
@@ -1850,6 +1878,10 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_multisig_sign_result> monero_multisig_sign_result::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_multisig_sign_result>(json);
   }
 
   rapidjson::Value monero_multisig_sign_result::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
@@ -1897,6 +1929,10 @@ namespace monero {
       else if (key == std::string("description")) entry->m_description = it->second.data();
       else if (key == std::string("paymentId")) entry->m_payment_id = it->second.data();
     }
+  }
+
+  std::shared_ptr<monero_address_book_entry> monero_address_book_entry::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_address_book_entry>(json);
   }
 
   // -------------------------- MONERO COMPARATORS ---------------------------
@@ -2012,6 +2048,10 @@ namespace monero {
     }
   }
 
+  std::shared_ptr<monero_decoded_address> monero_decoded_address::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_decoded_address>(json);
+  }
+
   // --------------------------- MONERO ACCOUNT TAG ---------------------------
 
   void monero_account_tag::from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_account_tag>& account_tag) {
@@ -2025,6 +2065,10 @@ namespace monero {
         }
       }
     }
+  }
+
+  std::shared_ptr<monero_account_tag> monero_account_tag::deserialize(const std::string& json) {
+    return gen_utils::deserialize<monero_account_tag>(json);
   }
 
   rapidjson::Value monero_account_tag::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
