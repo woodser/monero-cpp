@@ -163,7 +163,7 @@ namespace monero {
       if (key == std::string("path")) config->m_path = it->second.data();
       else if (key == std::string("password")) config->m_password = it->second.data();
       else if (key == std::string("networkType")) {
-        uint32_t network_type_num = it->second.get_value<uint32_t>();
+        int64_t network_type_num = it->second.get_value<int64_t>();
         if (network_type_num == 0) config->m_network_type = monero_network_type::MAINNET;
         else if (network_type_num == 1) config->m_network_type = monero_network_type::TESTNET;
         else if (network_type_num == 2) config->m_network_type = monero_network_type::STAGENET;
