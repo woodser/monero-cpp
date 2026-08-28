@@ -90,6 +90,7 @@ $(function(){ initResizable(false); });
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="structmonero_1_1monero__outgoing__transfer-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">monero::monero_outgoing_transfer Struct Reference</div></div>
@@ -142,6 +143,19 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>merge</b> (const std:
 <tr class="memitem:a723e44b22962d02d3f78bc7c2043dc1e inherit pub_methods_structmonero_1_1serializable__struct" id="r_a723e44b22962d02d3f78bc7c2043dc1e"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmonero_1_1serializable__struct.html#a723e44b22962d02d3f78bc7c2043dc1e">serialize</a> () const</td></tr>
 <tr class="separator:a723e44b22962d02d3f78bc7c2043dc1e inherit pub_methods_structmonero_1_1serializable__struct"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a797b82158702e2f19ce1eafc76b44cfb" id="r_a797b82158702e2f19ce1eafc76b44cfb"><td class="memItemLeft" align="right" valign="top"><a id="a797b82158702e2f19ce1eafc76b44cfb" name="a797b82158702e2f19ce1eafc76b44cfb"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>from_property_tree</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__outgoing__transfer.html">monero_outgoing_transfer</a> &gt; &amp;transfer)</td></tr>
+<tr class="separator:a797b82158702e2f19ce1eafc76b44cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac34fed4f0e5f6745b78536561636a633" id="r_ac34fed4f0e5f6745b78536561636a633"><td class="memItemLeft" align="right" valign="top"><a id="ac34fed4f0e5f6745b78536561636a633" name="ac34fed4f0e5f6745b78536561636a633"></a>
+static std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__outgoing__transfer.html">monero_outgoing_transfer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>deserialize</b> (const std::string &amp;json)</td></tr>
+<tr class="separator:ac34fed4f0e5f6745b78536561636a633"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_structmonero_1_1monero__transfer"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_static_methods_structmonero_1_1monero__transfer')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="structmonero_1_1monero__transfer.html">monero::monero_transfer</a></td></tr>
+<tr class="memitem:af911925165dfff164db015ae8783c8b9 inherit pub_static_methods_structmonero_1_1monero__transfer" id="r_af911925165dfff164db015ae8783c8b9"><td class="memItemLeft" align="right" valign="top">
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>from_property_tree</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__transfer.html">monero_transfer</a> &gt; &amp;transfer)</td></tr>
+<tr class="separator:af911925165dfff164db015ae8783c8b9 inherit pub_static_methods_structmonero_1_1monero__transfer"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:a70a0effef24d11c15d5dec658ff7e23d" id="r_a70a0effef24d11c15d5dec658ff7e23d"><td class="memItemLeft" align="right" valign="top"><a id="a70a0effef24d11c15d5dec658ff7e23d" name="a70a0effef24d11c15d5dec658ff7e23d"></a>
@@ -163,13 +177,6 @@ boost::optional&lt; uint64_t &gt;&#160;</td><td class="memItemRight" valign="bot
 <tr class="memitem:a121fc549ccc450ae81c0e8626fa81565 inherit pub_attribs_structmonero_1_1monero__transfer" id="r_a121fc549ccc450ae81c0e8626fa81565"><td class="memItemLeft" align="right" valign="top">
 boost::optional&lt; uint32_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_account_index</b></td></tr>
 <tr class="separator:a121fc549ccc450ae81c0e8626fa81565 inherit pub_attribs_structmonero_1_1monero__transfer"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="inherited" name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
-<tr class="inherit_header pub_static_methods_structmonero_1_1monero__transfer"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_static_methods_structmonero_1_1monero__transfer')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="structmonero_1_1monero__transfer.html">monero::monero_transfer</a></td></tr>
-<tr class="memitem:af911925165dfff164db015ae8783c8b9 inherit pub_static_methods_structmonero_1_1monero__transfer" id="r_af911925165dfff164db015ae8783c8b9"><td class="memItemLeft" align="right" valign="top">
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>from_property_tree</b> (const boost::property_tree::ptree &amp;node, const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__transfer.html">monero_transfer</a> &gt; &amp;transfer)</td></tr>
-<tr class="separator:af911925165dfff164db015ae8783c8b9 inherit pub_static_methods_structmonero_1_1monero__transfer"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Models an outgoing transfer of funds from the wallet. </p>
