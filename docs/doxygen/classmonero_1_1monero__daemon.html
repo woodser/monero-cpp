@@ -128,6 +128,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a171add741661a6c77faa654a5c18f789"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75f4d44f394601be4ae7adf67c225c0e" id="r_a75f4d44f394601be4ae7adf67c225c0e"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block__template.html">monero_block_template</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a75f4d44f394601be4ae7adf67c225c0e">get_block_template</a> (const std::string &amp;wallet_address, const boost::optional&lt; int &gt; &amp;reserve_size=boost::none)</td></tr>
 <tr class="separator:a75f4d44f394601be4ae7adf67c225c0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cca77d10038a037ff5bc82a64a29604" id="r_a3cca77d10038a037ff5bc82a64a29604"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__miner__data.html">monero_miner_data</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3cca77d10038a037ff5bc82a64a29604">get_miner_data</a> ()</td></tr>
+<tr class="separator:a3cca77d10038a037ff5bc82a64a29604"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e8de769fbf2a845b132fccb7c2aaf85" id="r_a5e8de769fbf2a845b132fccb7c2aaf85"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e8de769fbf2a845b132fccb7c2aaf85">calculate_pow</a> (uint32_t major_version, uint64_t height, const std::string &amp;block_blob, const std::string &amp;seed_hash)</td></tr>
+<tr class="separator:a5e8de769fbf2a845b132fccb7c2aaf85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeddcfe24a89774278c3a5b64f7c7f64c" id="r_aeddcfe24a89774278c3a5b64f7c7f64c"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__add__auxiliary__pow__result.html">monero_add_auxiliary_pow_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aeddcfe24a89774278c3a5b64f7c7f64c">add_auxiliary_pow</a> (const std::string &amp;block_template_blob, const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__auxiliary__pow.html">monero_auxiliary_pow</a> &gt; &gt; &amp;aux_pow)</td></tr>
+<tr class="separator:aeddcfe24a89774278c3a5b64f7c7f64c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b849ce1b5b54928bd83ac2ddf8c9043" id="r_a7b849ce1b5b54928bd83ac2ddf8c9043"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block__header.html">monero_block_header</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7b849ce1b5b54928bd83ac2ddf8c9043">get_last_block_header</a> ()</td></tr>
 <tr class="separator:a7b849ce1b5b54928bd83ac2ddf8c9043"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65dfeffb943e4a1b48b2263f8909246b" id="r_a65dfeffb943e4a1b48b2263f8909246b"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block__header.html">monero_block_header</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a65dfeffb943e4a1b48b2263f8909246b">get_block_header_by_hash</a> (const std::string &amp;block_hash)</td></tr>
@@ -138,8 +144,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2e3e1a54cdc39eb47dcd7f5feb2fb9c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afeb387e737981fd987dd033bfbc9f63e" id="r_afeb387e737981fd987dd033bfbc9f63e"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afeb387e737981fd987dd033bfbc9f63e">get_block_by_hash</a> (const std::string &amp;block_hash)</td></tr>
 <tr class="separator:afeb387e737981fd987dd033bfbc9f63e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf9cfa3ae94352907e1cd3afb194ad82" id="r_abf9cfa3ae94352907e1cd3afb194ad82"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#abf9cfa3ae94352907e1cd3afb194ad82">get_blocks_by_hash</a> (const std::vector&lt; std::string &gt; &amp;block_hashes, uint64_t start_height, bool prune)</td></tr>
-<tr class="separator:abf9cfa3ae94352907e1cd3afb194ad82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a928de3ff22b49deafa2d8be3c91e455f" id="r_a928de3ff22b49deafa2d8be3c91e455f"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__get__blocks__by__hash__result.html">monero_get_blocks_by_hash_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a928de3ff22b49deafa2d8be3c91e455f">get_blocks_by_hash</a> (const std::vector&lt; std::string &gt; &amp;block_hashes, uint64_t start_height, bool prune, uint64_t max_block_count=0)</td></tr>
+<tr class="separator:a928de3ff22b49deafa2d8be3c91e455f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab85fd79c9a2ac5b627a2450cb7b67897" id="r_ab85fd79c9a2ac5b627a2450cb7b67897"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab85fd79c9a2ac5b627a2450cb7b67897">get_block_by_height</a> (uint64_t height)</td></tr>
 <tr class="separator:ab85fd79c9a2ac5b627a2450cb7b67897"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab34cf2aeac561c2d47c82dfcb55a1ab2" id="r_ab34cf2aeac561c2d47c82dfcb55a1ab2"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab34cf2aeac561c2d47c82dfcb55a1ab2">get_blocks_by_height</a> (const std::vector&lt; uint64_t &gt; &amp;heights)</td></tr>
@@ -148,8 +154,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a35d77aee0a5715c6de969daf637f0221"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a89a5f9e32e560be27efa729ade1a40ba" id="r_a89a5f9e32e560be27efa729ade1a40ba"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89a5f9e32e560be27efa729ade1a40ba">get_blocks_by_range_chunked</a> (boost::optional&lt; uint64_t &gt; start_height, boost::optional&lt; uint64_t &gt; end_height, boost::optional&lt; uint64_t &gt; max_chunk_size)</td></tr>
 <tr class="separator:a89a5f9e32e560be27efa729ade1a40ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b87e9fe3ea6db4cd5faac51a4607c59" id="r_a9b87e9fe3ea6db4cd5faac51a4607c59"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b87e9fe3ea6db4cd5faac51a4607c59">get_block_hashes</a> (const std::vector&lt; std::string &gt; &amp;block_hashes, uint64_t start_height)</td></tr>
-<tr class="separator:a9b87e9fe3ea6db4cd5faac51a4607c59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a7c5bff8b97a4b4e10d01c71b3779e0" id="r_a0a7c5bff8b97a4b4e10d01c71b3779e0"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__get__block__hashes__result.html">monero_get_block_hashes_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a7c5bff8b97a4b4e10d01c71b3779e0">get_block_hashes</a> (const std::vector&lt; std::string &gt; &amp;block_hashes)</td></tr>
+<tr class="separator:a0a7c5bff8b97a4b4e10d01c71b3779e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca724f93d265cd8cc38f6bd322b5b95c" id="r_aca724f93d265cd8cc38f6bd322b5b95c"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx.html">monero_tx</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aca724f93d265cd8cc38f6bd322b5b95c">get_tx</a> (const std::string &amp;tx_hash, bool prune=false)</td></tr>
 <tr class="separator:aca724f93d265cd8cc38f6bd322b5b95c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73e6cacde7d1f68b219903f157ebab1f" id="r_a73e6cacde7d1f68b219903f157ebab1f"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx.html">monero_tx</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a73e6cacde7d1f68b219903f157ebab1f">get_txs</a> (const std::vector&lt; std::string &gt; &amp;tx_hashes, bool prune=false)</td></tr>
@@ -186,6 +192,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a6231d9be56134645cd61e27f40cc6d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f0032f9d9f44bc46a5000dc15011fed" id="r_a9f0032f9d9f44bc46a5000dc15011fed"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="namespacemonero.html#a19a3f4124ff3d789de6988a285717af1">monero_key_image_spent_status</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f0032f9d9f44bc46a5000dc15011fed">get_key_image_spent_statuses</a> (const std::vector&lt; std::string &gt; &amp;key_images)</td></tr>
 <tr class="separator:a9f0032f9d9f44bc46a5000dc15011fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66a939f31eaf62b1560f3a7100a6a585" id="r_a66a939f31eaf62b1560f3a7100a6a585"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; uint64_t &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a66a939f31eaf62b1560f3a7100a6a585">get_output_indices</a> (const std::string &amp;tx_hash)</td></tr>
+<tr class="separator:a66a939f31eaf62b1560f3a7100a6a585"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e4ff3934112afdb2db45fddfd824de7" id="r_a6e4ff3934112afdb2db45fddfd824de7"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__output.html">monero_output</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6e4ff3934112afdb2db45fddfd824de7">get_outputs</a> (const std::vector&lt; <a class="el" href="structmonero_1_1monero__output.html">monero_output</a> &gt; &amp;outputs)</td></tr>
 <tr class="separator:a6e4ff3934112afdb2db45fddfd824de7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6876dcd5ee34352f60ddb6a9f0b8d768" id="r_a6876dcd5ee34352f60ddb6a9f0b8d768"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__output__histogram__entry.html">monero_output_histogram_entry</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6876dcd5ee34352f60ddb6a9f0b8d768">get_output_histogram</a> (const std::vector&lt; uint64_t &gt; &amp;amounts, const boost::optional&lt; int &gt; &amp;min_count, const boost::optional&lt; int &gt; &amp;max_count, const boost::optional&lt; bool &gt; &amp;is_unlocked, const boost::optional&lt; int &gt; &amp;recent_cutoff)</td></tr>
@@ -196,6 +204,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a9e0af29f425b104a659c8b9ddd2bae3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3fe7522920559d7c8a3311edb666498" id="r_af3fe7522920559d7c8a3311edb666498"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__daemon__sync__info.html">monero_daemon_sync_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af3fe7522920559d7c8a3311edb666498">get_sync_info</a> ()</td></tr>
 <tr class="separator:af3fe7522920559d7c8a3311edb666498"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a272c2e370bfd2c5b95368b384c13f4c6" id="r_a272c2e370bfd2c5b95368b384c13f4c6"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__daemon__network__stats.html">monero_daemon_network_stats</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a272c2e370bfd2c5b95368b384c13f4c6">get_network_stats</a> ()</td></tr>
+<tr class="separator:a272c2e370bfd2c5b95368b384c13f4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3723fbc18eb5143a1b8e829897a5a2bd" id="r_a3723fbc18eb5143a1b8e829897a5a2bd"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__hard__fork__info.html">monero_hard_fork_info</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3723fbc18eb5143a1b8e829897a5a2bd">get_hard_fork_info</a> ()</td></tr>
 <tr class="separator:a3723fbc18eb5143a1b8e829897a5a2bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a968c8711b1182e95cb4c16fa9d40eef5" id="r_a968c8711b1182e95cb4c16fa9d40eef5"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__alt__chain.html">monero_alt_chain</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a968c8711b1182e95cb4c16fa9d40eef5">get_alt_chains</a> ()</td></tr>
@@ -218,6 +228,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ae383d5df1795c7691cb1cf063fd9e1cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf91c84a9189671d7f1454c075bded1b" id="r_adf91c84a9189671d7f1454c075bded1b"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__peer.html">monero_peer</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adf91c84a9189671d7f1454c075bded1b">get_known_peers</a> ()</td></tr>
 <tr class="separator:adf91c84a9189671d7f1454c075bded1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5c4e0b962963d0c6b814b170b3cf620" id="r_aa5c4e0b962963d0c6b814b170b3cf620"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__peer.html">monero_peer</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa5c4e0b962963d0c6b814b170b3cf620">get_public_peers</a> (bool include_offline=false)</td></tr>
+<tr class="separator:aa5c4e0b962963d0c6b814b170b3cf620"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af053b49084b3ce5a130563893b7aeda9" id="r_af053b49084b3ce5a130563893b7aeda9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af053b49084b3ce5a130563893b7aeda9">set_outgoing_peer_limit</a> (int limit)</td></tr>
 <tr class="separator:af053b49084b3ce5a130563893b7aeda9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab022ae08d1f250607aaa2a382c3dde4c" id="r_ab022ae08d1f250607aaa2a382c3dde4c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab022ae08d1f250607aaa2a382c3dde4c">set_incoming_peer_limit</a> (int limit)</td></tr>
@@ -228,6 +240,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a05f9e1381b4c0e2e86019a8d38647ff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ca3a8ac09a3f1b5ef58c637d37fc5e3" id="r_a5ca3a8ac09a3f1b5ef58c637d37fc5e3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5ca3a8ac09a3f1b5ef58c637d37fc5e3">set_peer_ban</a> (const std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__ban.html">monero_ban</a> &gt; &amp;ban)</td></tr>
 <tr class="separator:a5ca3a8ac09a3f1b5ef58c637d37fc5e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb325b392485792f91319761fbcdf376" id="r_afb325b392485792f91319761fbcdf376"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__ban.html">monero_ban</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afb325b392485792f91319761fbcdf376">get_peer_ban</a> (const std::string &amp;address)</td></tr>
+<tr class="separator:afb325b392485792f91319761fbcdf376"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaccd0daf305262b1f2020c4d3af9ce08" id="r_aaccd0daf305262b1f2020c4d3af9ce08"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaccd0daf305262b1f2020c4d3af9ce08">start_mining</a> (const std::string &amp;address, boost::optional&lt; uint64_t &gt; num_threads, boost::optional&lt; bool &gt; is_background, boost::optional&lt; bool &gt; ignore_battery)</td></tr>
 <tr class="separator:aaccd0daf305262b1f2020c4d3af9ce08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae312bd24390bd1a5bec659b9f0b1e17d" id="r_ae312bd24390bd1a5bec659b9f0b1e17d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae312bd24390bd1a5bec659b9f0b1e17d">stop_mining</a> ()</td></tr>
@@ -242,6 +256,22 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2ad4f35d4989fa36a35ee4bb31cb72f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcbcba5e6a02590ffb16318440cba063" id="r_afcbcba5e6a02590ffb16318440cba063"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__prune__result.html">monero_prune_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afcbcba5e6a02590ffb16318440cba063">prune_blockchain</a> (bool check)</td></tr>
 <tr class="separator:afcbcba5e6a02590ffb16318440cba063"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a372a3f2100e0db3a24af9ffe27763e6f" id="r_a372a3f2100e0db3a24af9ffe27763e6f"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a372a3f2100e0db3a24af9ffe27763e6f">save_blockchain</a> ()</td></tr>
+<tr class="separator:a372a3f2100e0db3a24af9ffe27763e6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab01481f8062a2d45a51d4d521eb87123" id="r_ab01481f8062a2d45a51d4d521eb87123"><td class="memItemLeft" align="right" valign="top">virtual uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab01481f8062a2d45a51d4d521eb87123">pop_blocks</a> (uint64_t num_blocks)</td></tr>
+<tr class="separator:ab01481f8062a2d45a51d4d521eb87123"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a733020a2e77edf55e6e4db661a73dcd7" id="r_a733020a2e77edf55e6e4db661a73dcd7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a733020a2e77edf55e6e4db661a73dcd7">flush_cache</a> (bool bad_blocks=false)</td></tr>
+<tr class="separator:a733020a2e77edf55e6e4db661a73dcd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac24f211f6ba6a3a978302c110ce93c98" id="r_ac24f211f6ba6a3a978302c110ce93c98"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac24f211f6ba6a3a978302c110ce93c98">set_bootstrap_daemon</a> (const std::string &amp;address, const std::string &amp;username=&quot;&quot;, const std::string &amp;password=&quot;&quot;, const std::string &amp;proxy=&quot;&quot;)</td></tr>
+<tr class="separator:ac24f211f6ba6a3a978302c110ce93c98"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a1a4c8e59af993ab5ad4eea05d461a3" id="r_a2a1a4c8e59af993ab5ad4eea05d461a3"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2a1a4c8e59af993ab5ad4eea05d461a3">remove_bootstrap_daemon</a> ()</td></tr>
+<tr class="separator:a2a1a4c8e59af993ab5ad4eea05d461a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3341683e8c62f382108d8cd2fa11505" id="r_aa3341683e8c62f382108d8cd2fa11505"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3341683e8c62f382108d8cd2fa11505">set_log_hash_rate</a> (bool is_visible)</td></tr>
+<tr class="separator:aa3341683e8c62f382108d8cd2fa11505"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a085e6b875b87fa7e214fcd054781a883" id="r_a085e6b875b87fa7e214fcd054781a883"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a085e6b875b87fa7e214fcd054781a883">set_log_level</a> (int level)</td></tr>
+<tr class="separator:a085e6b875b87fa7e214fcd054781a883"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a148741c47a930f60f2a13c3943138ee5" id="r_a148741c47a930f60f2a13c3943138ee5"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a148741c47a930f60f2a13c3943138ee5">set_log_categories</a> (const std::string &amp;categories=&quot;&quot;)</td></tr>
+<tr class="separator:a148741c47a930f60f2a13c3943138ee5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64875b44879edd67e85b28f745ea1754" id="r_a64875b44879edd67e85b28f745ea1754"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__daemon__update__check__result.html">monero_daemon_update_check_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64875b44879edd67e85b28f745ea1754">check_for_update</a> ()</td></tr>
 <tr class="separator:a64875b44879edd67e85b28f745ea1754"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ea2e833edcf79b302e1e55b175497e2" id="r_a4ea2e833edcf79b302e1e55b175497e2"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__daemon__update__download__result.html">monero_daemon_update_download_result</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ea2e833edcf79b302e1e55b175497e2">download_update</a> (const std::string &amp;path=&quot;&quot;)</td></tr>
@@ -281,6 +311,46 @@ Public Member Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="aeddcfe24a89774278c3a5b64f7c7f64c" name="aeddcfe24a89774278c3a5b64f7c7f64c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeddcfe24a89774278c3a5b64f7c7f64c">&#9670;&#160;</a></span>add_auxiliary_pow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__add__auxiliary__pow__result.html">monero_add_auxiliary_pow_result</a> &gt; monero::monero_daemon::add_auxiliary_pow </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>block_template_blob</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__auxiliary__pow.html">monero_auxiliary_pow</a> &gt; &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>aux_pow</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Add auxiliary proof-of-work to a block template for merge mining, returning an updated block template whose Merkle root commits to the given auxiliary blocks.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">block_template_blob</td><td>is the block template blob to add auxiliary PoW to </td></tr>
+    <tr><td class="paramname">aux_pow</td><td>identifies each auxiliary chain by id and its block's PoW hash </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the updated block template along with the (possibly reordered) auxiliary PoW </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a2ceea04b28ca1e19bbb7e72ef3271ef5">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
 <a id="a6ab57190f279282a80736148bef75acc" name="a6ab57190f279282a80736148bef75acc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6ab57190f279282a80736148bef75acc">&#9670;&#160;</a></span>add_listener()</h2>
 
@@ -312,6 +382,58 @@ Public Member Functions</h2></td></tr>
 </dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#ac7656d1792e4120a54e5120a83f513a3">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a5e8de769fbf2a845b132fccb7c2aaf85" name="a5e8de769fbf2a845b132fccb7c2aaf85"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e8de769fbf2a845b132fccb7c2aaf85">&#9670;&#160;</a></span>calculate_pow()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string monero::monero_daemon::calculate_pow </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t</td>          <td class="paramname"><span class="paramname"><em>major_version</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>height</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>block_blob</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>seed_hash</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Calculate the proof-of-work hash of a mined block.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">major_version</td><td>is the block's major version </td></tr>
+    <tr><td class="paramname">height</td><td>is the block's height </td></tr>
+    <tr><td class="paramname">block_blob</td><td>is the block's blob to hash </td></tr>
+    <tr><td class="paramname">seed_hash</td><td>is the seed hash used to select the RandomX dataset/cache </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the block's proof-of-work hash </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a7daab72b7385c59c8cb82baf8884ac08">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -376,6 +498,40 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>the result of the update download </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a4dee497d0313fb5b45db760a39880bce">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a733020a2e77edf55e6e4db661a73dcd7" name="a733020a2e77edf55e6e4db661a73dcd7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a733020a2e77edf55e6e4db661a73dcd7">&#9670;&#160;</a></span>flush_cache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_daemon::flush_cache </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>bad_blocks</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Flush the daemon's invalid block and transaction caches.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">bad_blocks</td><td>specifies to flush the bad blocks cache (default false) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#af8eda96ce8480d882cd8aaa398d99927">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -690,8 +846,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="a9b87e9fe3ea6db4cd5faac51a4607c59" name="a9b87e9fe3ea6db4cd5faac51a4607c59"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b87e9fe3ea6db4cd5faac51a4607c59">&#9670;&#160;</a></span>get_block_hashes()</h2>
+<a id="a0a7c5bff8b97a4b4e10d01c71b3779e0" name="a0a7c5bff8b97a4b4e10d01c71b3779e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a7c5bff8b97a4b4e10d01c71b3779e0">&#9670;&#160;</a></span>get_block_hashes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -700,14 +856,10 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt; std::string &gt; monero::monero_daemon::get_block_hashes </td>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__get__block__hashes__result.html">monero_get_block_hashes_result</a> &gt; monero::monero_daemon::get_block_hashes </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>block_hashes</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>block_hashes</em></span></td><td>)</td>
           <td></td>
-          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>start_height</em></span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -719,14 +871,13 @@ Public Member Functions</h2></td></tr>
 <p>Get block hashes as a binary request to the daemon.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">block_hashes</td><td>specify block hashes to fetch; first 10 blocks hash goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block </td></tr>
-    <tr><td class="paramname">start_height</td><td>is the starting height of block hashes to return </td></tr>
+    <tr><td class="paramname">block_hashes</td><td>is a short chain history; first 10 blocks hash goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block which is required, or the request fails. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the requested block hashes </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the requested hashes plus their start height and the daemon's current chain height; the hash range starts at and includes the last one the daemon has in common with block_hashes (not the one after it); if block_hashes[0] already matches the daemon's tip, exactly one hash (the tip itself) comes back </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#aefb7ea8886d1d9d30b75594d65776617">monero::monero_daemon_rpc</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#af3a5ca07e9dddcb78d2ddf5a1c7d2484">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -880,8 +1031,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="abf9cfa3ae94352907e1cd3afb194ad82" name="abf9cfa3ae94352907e1cd3afb194ad82"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf9cfa3ae94352907e1cd3afb194ad82">&#9670;&#160;</a></span>get_blocks_by_hash()</h2>
+<a id="a928de3ff22b49deafa2d8be3c91e455f" name="a928de3ff22b49deafa2d8be3c91e455f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a928de3ff22b49deafa2d8be3c91e455f">&#9670;&#160;</a></span>get_blocks_by_hash()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -890,7 +1041,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt; &gt; monero::monero_daemon::get_blocks_by_hash </td>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__get__blocks__by__hash__result.html">monero_get_blocks_by_hash_result</a> &gt; monero::monero_daemon::get_blocks_by_hash </td>
           <td>(</td>
           <td class="paramtype">const std::vector&lt; std::string &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>block_hashes</em></span>, </td>
         </tr>
@@ -902,7 +1053,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>prune</em></span>&#160;)</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>prune</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>max_block_count</em></span><span class="paramdefsep"> = </span><span class="paramdefval">0</span>&#160;)</td>
         </tr>
       </table>
   </td>
@@ -914,15 +1070,22 @@ Public Member Functions</h2></td></tr>
 <p>Get blocks by hash.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">block_hashes</td><td>are array of hashes; first 10 blocks hash goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block </td></tr>
-    <tr><td class="paramname">start_height</td><td>is the start height to get blocks by hash </td></tr>
-    <tr><td class="paramname">prune</td><td>specifies if returned blocks should be pruned (defaults to false) // TODO: test default </td></tr>
+    <tr><td class="paramname">block_hashes</td><td>is a short chain history; first 10 blocks hash goes sequential, next goes in pow(2,n) offset, like 2, 4, 8, 16, 32, 64 and so on, and the last one is always genesis block </td></tr>
+    <tr><td class="paramname">start_height</td><td>is the start height to resume from; when non-zero, daemon skips the search to find the last block and is used as-is, ignoring block_hashes — except when block_hashes[0] already matches the daemon's tip, which short-circuits to an empty result (see </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the retrieved blocks </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>) before start_height is ever consulted </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">prune</td><td>specifies if returned blocks should be pruned (defaults to false) </td></tr>
+    <tr><td class="paramname">max_block_count</td><td>caps how many blocks the daemon returns in one call (0 leaves it to the daemon's own default limit); use this to chunk large ranges instead of taking whatever the daemon hands back </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the retrieved blocks plus the daemon's current chain height; the blocks are not a lookup of block_hashes, so their heights won't line up with block_hashes 1:1; the range starts at and includes the resume point (the common block found, or start_height itself when non-zero), not the block after it; if block_hashes[0] already matches the daemon's tip, an empty block list comes back (this noop check runs before start_height is consulted) </dd></dl>
 
-<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a0c0c75049e32fea02c0da66c7fe43d48">monero::monero_daemon_rpc</a>.</p>
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a773b3e98bf2be5598999827561a6b7f4">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -1351,6 +1514,35 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a3cca77d10038a037ff5bc82a64a29604" name="a3cca77d10038a037ff5bc82a64a29604"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cca77d10038a037ff5bc82a64a29604">&#9670;&#160;</a></span>get_miner_data()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__miner__data.html">monero_miner_data</a> &gt; monero::monero_daemon::get_miner_data </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the data needed to construct a block template for mining, e.g. for use by a pool that assembles its own block templates.</p>
+<dl class="section return"><dt>Returns</dt><dd>the current data for mining a new block </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a7f9dbf62e98a7f4d732643a5a79d6160">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
 <a id="a3c9c2c78389db0e948218902ebd630fb" name="a3c9c2c78389db0e948218902ebd630fb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c9c2c78389db0e948218902ebd630fb">&#9670;&#160;</a></span>get_miner_tx_sum()</h2>
 
@@ -1417,6 +1609,35 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>the daemon's mining status </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#ae8f947f3495fc65f696f30f31b52073c">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a272c2e370bfd2c5b95368b384c13f4c6" name="a272c2e370bfd2c5b95368b384c13f4c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a272c2e370bfd2c5b95368b384c13f4c6">&#9670;&#160;</a></span>get_network_stats()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__daemon__network__stats.html">monero_daemon_network_stats</a> &gt; monero::monero_daemon::get_network_stats </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get network (bandwidth) statistics since the daemon started.</p>
+<dl class="section return"><dt>Returns</dt><dd>the daemon's network statistics </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a14b62c234ede10b33bda6f08826ed8a5">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -1530,6 +1751,41 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a66a939f31eaf62b1560f3a7100a6a585" name="a66a939f31eaf62b1560f3a7100a6a585"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a66a939f31eaf62b1560f3a7100a6a585">&#9670;&#160;</a></span>get_output_indices()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt; uint64_t &gt; monero::monero_daemon::get_output_indices </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tx_hash</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the global output index of each output in a transaction.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tx_hash</td><td>is the hash of the transaction to get output indices for </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the global output index of each output in the transaction, in order </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a344d9f91749b0c9a519381e1320d58d9">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
 <a id="a6e4ff3934112afdb2db45fddfd824de7" name="a6e4ff3934112afdb2db45fddfd824de7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6e4ff3934112afdb2db45fddfd824de7">&#9670;&#160;</a></span>get_outputs()</h2>
 
@@ -1562,6 +1818,41 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>the identified outputs </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a27f4b7b6da941542895f172885227d50">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="afb325b392485792f91319761fbcdf376" name="afb325b392485792f91319761fbcdf376"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afb325b392485792f91319761fbcdf376">&#9670;&#160;</a></span>get_peer_ban()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__ban.html">monero_ban</a> &gt; monero::monero_daemon::get_peer_ban </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>address</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get the ban status of a peer node.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>is the address of the peer node to check, e.g. "1.2.3.4" or "1.2.3.4:18080" </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the peer's ban status </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a44bbebb6fd34d323a666076d51f64c23">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -1620,6 +1911,41 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>the daemon's peers </dd></dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#ab8c244ce1fd423c7c3cc31ce97429705">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="aa5c4e0b962963d0c6b814b170b3cf620" name="aa5c4e0b962963d0c6b814b170b3cf620"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5c4e0b962963d0c6b814b170b3cf620">&#9670;&#160;</a></span>get_public_peers()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__peer.html">monero_peer</a> &gt; &gt; monero::monero_daemon::get_public_peers </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>include_offline</em></span><span class="paramdefsep"> = </span><span class="paramdefval">false</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Get public nodes known to the daemon.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">include_offline</td><td>specifies if offline nodes should be included (default false) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the daemon's known public nodes </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a5fe12cc5d23baf8fd776989f1137bccb">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
@@ -2009,6 +2335,41 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ab01481f8062a2d45a51d4d521eb87123" name="ab01481f8062a2d45a51d4d521eb87123"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab01481f8062a2d45a51d4d521eb87123">&#9670;&#160;</a></span>pop_blocks()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual uint64_t monero::monero_daemon::pop_blocks </td>
+          <td>(</td>
+          <td class="paramtype">uint64_t</td>          <td class="paramname"><span class="paramname"><em>num_blocks</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Pop (remove) blocks from the top of the blockchain.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">num_blocks</td><td>is the number of blocks to pop </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the blockchain height after popping the blocks </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#aa73a859eaa06b8a2c6d7cac5340f56b8">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
 <a id="afcbcba5e6a02590ffb16318440cba063" name="afcbcba5e6a02590ffb16318440cba063"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#afcbcba5e6a02590ffb16318440cba063">&#9670;&#160;</a></span>prune_blockchain()</h2>
 
@@ -2107,6 +2468,32 @@ Public Member Functions</h2></td></tr>
 </dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a415bad8c915b2d5f192c1404356e76a5">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a2a1a4c8e59af993ab5ad4eea05d461a3" name="a2a1a4c8e59af993ab5ad4eea05d461a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a1a4c8e59af993ab5ad4eea05d461a3">&#9670;&#160;</a></span>remove_bootstrap_daemon()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_daemon::remove_bootstrap_daemon </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Disable the bootstrap daemon so the daemon no longer falls back to it. </p>
 
 </div>
 </div>
@@ -2230,6 +2617,85 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a372a3f2100e0db3a24af9ffe27763e6f" name="a372a3f2100e0db3a24af9ffe27763e6f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a372a3f2100e0db3a24af9ffe27763e6f">&#9670;&#160;</a></span>save_blockchain()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_daemon::save_blockchain </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Save (flush) the blockchain to disk. </p>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#aee571be0312251eee19e63d9e77bc5d3">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="ac24f211f6ba6a3a978302c110ce93c98" name="ac24f211f6ba6a3a978302c110ce93c98"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac24f211f6ba6a3a978302c110ce93c98">&#9670;&#160;</a></span>set_bootstrap_daemon()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_daemon::set_bootstrap_daemon </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>address</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>username</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>password</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>proxy</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the bootstrap daemon used by the daemon to serve requests while it is not fully synced, e.g. a remote node.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">address</td><td>is the bootstrap daemon's address (host:port), "auto" to select a public node automatically, or an empty string to disable the bootstrap daemon </td></tr>
+    <tr><td class="paramname">username</td><td>is the username to authenticate with the bootstrap daemon (optional) </td></tr>
+    <tr><td class="paramname">password</td><td>is the password to authenticate with the bootstrap daemon (optional) </td></tr>
+    <tr><td class="paramname">proxy</td><td>is the proxy used to reach the bootstrap daemon, e.g. a SOCKS proxy (optional) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a93b777ddea1fd174ace224ed37cc8a81">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
 <a id="ab611bcf44ec324cbb07464788b5632b6" name="ab611bcf44ec324cbb07464788b5632b6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab611bcf44ec324cbb07464788b5632b6">&#9670;&#160;</a></span>set_download_limit()</h2>
 
@@ -2296,6 +2762,109 @@ Public Member Functions</h2></td></tr>
 </dl>
 
 <p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a9a03746aab7ca89a55293918869c906a">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a148741c47a930f60f2a13c3943138ee5" name="a148741c47a930f60f2a13c3943138ee5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a148741c47a930f60f2a13c3943138ee5">&#9670;&#160;</a></span>set_log_categories()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual std::string monero::monero_daemon::set_log_categories </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>categories</em></span><span class="paramdefsep"> = </span><span class="paramdefval">&quot;&quot;</span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the daemon's log categories.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">categories</td><td>are the log categories to set, e.g. "*:WARNING,net.p2p:DEBUG" (an empty string resets categories to the default) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the daemon's resulting log categories </dd></dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a183d2250313f685979fcd8806eec84ab">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="aa3341683e8c62f382108d8cd2fa11505" name="aa3341683e8c62f382108d8cd2fa11505"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3341683e8c62f382108d8cd2fa11505">&#9670;&#160;</a></span>set_log_hash_rate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_daemon::set_log_hash_rate </td>
+          <td>(</td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>is_visible</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Show or hide the mining hash rate in the daemon's console log.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">is_visible</td><td>specifies if the hash rate should be logged </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a6d675ee9d232252f91522a31f39baf30">monero::monero_daemon_rpc</a>.</p>
+
+</div>
+</div>
+<a id="a085e6b875b87fa7e214fcd054781a883" name="a085e6b875b87fa7e214fcd054781a883"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a085e6b875b87fa7e214fcd054781a883">&#9670;&#160;</a></span>set_log_level()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void monero::monero_daemon::set_log_level </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>level</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel inline">inline</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Set the daemon's log level.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">level</td><td>is the log level to set, from 0 (least verbose) to 4 (most verbose) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented in <a class="el" href="classmonero_1_1monero__daemon__rpc.html#a6f4bbcbb37ad75383c1e23a32b922f52">monero::monero_daemon_rpc</a>.</p>
 
 </div>
 </div>
