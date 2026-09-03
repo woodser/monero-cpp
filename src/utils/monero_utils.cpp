@@ -659,6 +659,95 @@ std::string monero_utils::get_payment_uri(const monero_tx_config& config, monero
   return uri;
 }
 
+// implementation based on monero-project's wallet2::parse_uri()
+static bool parse_uri(const std::string &uri, std::string &address, monero_network_type network_type, std::string &payment_id, uint64_t &amount, std::string &tx_description, std::string &recipient_name, std::vector<std::string> &unknown_parameters, std::string &error) {
+  if (uri.substr(0, 7) != "monero:") {
+    error = std::string("URI has wrong scheme (expected \"monero:\"): ") + uri;
+    return false;
+  }
+
+  std::string remainder = uri.substr(7);
+  const char *ptr = strchr(remainder.c_str(), '?');
+  address = ptr ? remainder.substr(0, ptr-remainder.c_str()) : remainder;
+
+  cryptonote::address_parse_info info;
+  if(!get_account_address_from_str(info, static_cast<cryptonote::network_type>(network_type), address)) {
+    error = std::string("URI has wrong address: ") + address;
+    return false;
+  }
+  if (!strchr(remainder.c_str(), '?')) return true;
+
+  std::vector<std::string> arguments;
+  std::string body = remainder.substr(address.size() + 1);
+  if (body.empty()) return true;
+
+  boost::split(arguments, body, boost::is_any_of("&"));
+  std::set<std::string> have_arg;
+  for (const auto &arg: arguments) {
+    std::vector<std::string> kv;
+    boost::split(kv, arg, boost::is_any_of("="));
+    if (kv.size() != 2) {
+      error = std::string("URI has wrong parameter: ") + arg;
+      return false;
+    }
+    if (have_arg.find(kv[0]) != have_arg.end()) {
+      error = std::string("URI has more than one instance of " + kv[0]);
+      return false;
+    }
+    have_arg.insert(kv[0]);
+
+    if (kv[0] == "tx_amount") {
+      amount = 0;
+      if (!cryptonote::parse_amount(amount, kv[1])) {
+        error = std::string("URI has invalid amount: ") + kv[1];
+        return false;
+      }
+    }
+    else if (kv[0] == "tx_payment_id") {
+      if (info.has_payment_id) {
+        error = "Separate payment id given with an integrated address";
+        return false;
+      }
+      crypto::hash hash;
+      if (!monero_utils::parse_payment_id_long(kv[1], hash)) {
+        error = "Invalid payment id: " + kv[1];
+        return false;
+      }
+      payment_id = kv[1];
+    }
+    else if (kv[0] == "recipient_name") recipient_name = epee::net_utils::convert_from_url_format(kv[1]);
+    else if (kv[0] == "tx_description") tx_description = epee::net_utils::convert_from_url_format(kv[1]);
+    else unknown_parameters.push_back(arg);
+  }
+  return true;
+}
+
+std::shared_ptr<monero_tx_config> monero_utils::parse_payment_uri(const std::string& uri, monero_network_type network_type) {
+  // decode uri to parameters
+  std::string address;
+  std::string payment_id;
+  uint64_t amount = 0;
+  std::string note;
+  std::string recipient_name;
+  std::vector<std::string> unknown_parameters;
+  std::string error;
+  if (!parse_uri(uri, address, network_type, payment_id, amount, note, recipient_name, unknown_parameters, error)) {
+    throw std::runtime_error("Error parsing URI: " + error);
+  }
+
+  // initialize config
+  std::shared_ptr<monero_tx_config> config = std::make_shared<monero_tx_config>();
+  std::shared_ptr<monero_destination> destination = std::make_shared<monero_destination>();
+  config->m_destinations.push_back(destination);
+  if (!address.empty()) destination->m_address = address;
+  destination->m_amount = amount;
+  if (!payment_id.empty()) config->m_payment_id = payment_id;
+  if (!note.empty()) config->m_note = note;
+  if (!recipient_name.empty()) config->m_recipient_name = recipient_name;
+  if (!unknown_parameters.empty()) MWARNING("monero_utils::parse_payment_uri: URI contains unknown parameters which are discarded"); // TODO: return unknown parameters?
+  return config;
+}
+
 uint64_t monero_utils::xmr_to_atomic_units(double amount_xmr) {
   if (!std::isfinite(amount_xmr) || amount_xmr < 0) throw std::invalid_argument("amount must be a finite, non-negative number");
 

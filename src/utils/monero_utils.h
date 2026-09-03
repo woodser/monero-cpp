@@ -79,6 +79,7 @@ namespace monero_utils
   void configure_logging(const std::string& path, bool console);
   monero_integrated_address get_integrated_address(monero_network_type network_type, const std::string& standard_address, const std::string& payment_id);
   std::string get_payment_uri(const monero_tx_config& config, monero_network_type network_type);
+  std::shared_ptr<monero_tx_config> parse_payment_uri(const std::string& uri, monero_network_type network_type);
   bool is_valid_address(const std::string& address, monero_network_type network_type);
   bool is_valid_private_view_key(const std::string& private_view_key);
   bool is_valid_private_spend_key(const std::string& private_spend_key);
