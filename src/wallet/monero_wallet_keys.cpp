@@ -547,6 +547,18 @@ namespace monero {
     return result;
   }
 
+  std::string monero_wallet_keys::get_payment_uri(const monero_tx_config& config) const {
+    MTRACE("get_payment_uri()");
+    assert_not_closed();
+    return monero_utils::get_payment_uri(config, m_network_type);
+  }
+
+  std::shared_ptr<monero_tx_config> monero_wallet_keys::parse_payment_uri(const std::string& uri) const {
+    MTRACE("parse_payment_uri(" << uri << ")");
+    assert_not_closed();
+    return monero_utils::parse_payment_uri(uri, m_network_type);
+  }
+
   void monero_wallet_keys::close(bool save) {
     if (m_is_closed) return; // closing a closed wallet has no effect
     if (save) throw std::runtime_error("MoneroWalletKeys does not support saving");

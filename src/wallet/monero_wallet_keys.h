@@ -127,6 +127,8 @@ namespace monero {
     std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const override;
     std::string sign_message(const std::string& msg, monero_message_signature_type signature_type, uint32_t account_idx = 0, uint32_t subaddress_idx = 0) const override;
     monero_message_signature_result verify_message(const std::string& msg, const std::string& address, const std::string& signature) const override;
+    std::string get_payment_uri(const monero_tx_config& config) const override;
+    std::shared_ptr<monero_tx_config> parse_payment_uri(const std::string& uri) const override;
     void close(bool save = false) override;
     bool is_closed() const override { return m_is_closed; }
 
