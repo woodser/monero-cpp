@@ -3298,54 +3298,13 @@ namespace monero {
   std::string monero_wallet_full::get_payment_uri(const monero_tx_config& config) const {
     MTRACE("get_payment_uri()");
     assert_not_closed();
-
-    // validate config
-    std::vector<std::shared_ptr<monero_destination>> destinations = config.get_normalized_destinations();
-    if (destinations.size() != 1) throw std::runtime_error("Cannot make URI from supplied parameters: must provide exactly one destination to send funds");
-    if (destinations.at(0)->m_address == boost::none) throw std::runtime_error("Cannot make URI from supplied parameters: must provide destination address");
-    if (destinations.at(0)->m_amount == boost::none) throw std::runtime_error("Cannot make URI from supplied parameters: must provide destination amount");
-
-    // prepare wallet2 params
-    std::string address = destinations.at(0)->m_address.get();
-    std::string payment_id = config.m_payment_id == boost::none ? "" : config.m_payment_id.get();
-    uint64_t amount = destinations.at(0)->m_amount.get();
-    std::string note = config.m_note == boost::none ? "" : config.m_note.get();
-    std::string m_recipient_name = config.m_recipient_name == boost::none ? "" : config.m_recipient_name.get();
-
-    // make uri using wallet2
-    std::string error;
-    std::string uri = m_w2->make_uri(address, payment_id, amount, note, m_recipient_name, error);
-    if (uri.empty()) throw std::runtime_error("Cannot make URI from supplied parameters: " + error);
-    return uri;
+    return monero_utils::get_payment_uri(config, get_network_type());
   }
 
   std::shared_ptr<monero_tx_config> monero_wallet_full::parse_payment_uri(const std::string& uri) const {
     MTRACE("parse_payment_uri(" << uri << ")");
     assert_not_closed();
-
-    // decode uri to parameters
-    std::string address;
-    std::string payment_id;
-    uint64_t amount = 0;
-    std::string note;
-    std::string m_recipient_name;
-    std::vector<std::string> unknown_parameters;
-    std::string error;
-    if (!m_w2->parse_uri(uri, address, payment_id, amount, note, m_recipient_name, unknown_parameters, error)) {
-      throw std::runtime_error("Error parsing URI: " + error);
-    }
-
-    // initialize config
-    std::shared_ptr<monero_tx_config> config = std::make_shared<monero_tx_config>();
-    std::shared_ptr<monero_destination> destination = std::make_shared<monero_destination>();
-    config->m_destinations.push_back(destination);
-    if (!address.empty()) destination->m_address = address;
-    destination->m_amount = amount;
-    if (!payment_id.empty()) config->m_payment_id = payment_id;
-    if (!note.empty()) config->m_note = note;
-    if (!m_recipient_name.empty()) config->m_recipient_name = m_recipient_name;
-    if (!unknown_parameters.empty()) MWARNING("WARNING in monero_wallet_full::parse_payment_uri: URI contains unknown parameters which are discarded"); // TODO: return unknown parameters?
-    return config;
+    return monero_utils::parse_payment_uri(uri, get_network_type());
   }
 
   bool monero_wallet_full::get_attribute(const std::string& key, std::string& value) const {

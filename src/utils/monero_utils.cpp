@@ -612,14 +612,20 @@ bool monero_utils::vout_before(const std::shared_ptr<monero_output>& o1, const s
   return false;
 }
 
-static std::string make_uri(const std::string &address, const std::string &payment_id, uint64_t amount, const std::string &tx_description, const std::string &recipient_name, monero_network_type network_type) {
+static std::string make_uri(const std::string &address, const std::string &payment_id, uint64_t amount, const std::string &tx_description, const std::string &recipient_name, monero_network_type network_type, std::string &error) {
   cryptonote::address_parse_info info;
 
   if(!get_account_address_from_str(info, static_cast<cryptonote::network_type>(network_type), address)) {
-    throw std::runtime_error(std::string("Invalid address: ") + address);
+    error = std::string("wrong address: ") + address;
+    return std::string();
+  }
+  if (info.has_payment_id && !payment_id.empty()) {
+    error = "A single payment id is allowed";
+    return std::string();
   }
   if (!payment_id.empty()) {
-    throw std::runtime_error("Standalone payment id deprecated, use integrated address instead");
+    error = "Standalone payment id deprecated, use integrated address instead";
+    return std::string();
   }
 
   std::string uri = "monero:" + address;
@@ -654,8 +660,9 @@ std::string monero_utils::get_payment_uri(const monero_tx_config& config, monero
   std::string m_recipient_name = config.m_recipient_name == boost::none ? "" : config.m_recipient_name.get();
 
   // make uri
-  std::string uri = make_uri(address, payment_id, amount, note, m_recipient_name, network_type);
-  if (uri.empty()) throw std::runtime_error("Cannot make URI from supplied parameters");
+  std::string error;
+  std::string uri = make_uri(address, payment_id, amount, note, m_recipient_name, network_type, error);
+  if (uri.empty()) throw std::runtime_error("Cannot make URI from supplied parameters: " + error);
   return uri;
 }
 
