@@ -152,6 +152,24 @@ namespace monero_utils
   bool is_valid_language(const std::string& language);
 
   /**
+   * Parses a long payment ID from a string.
+   *
+   * @param payment_id_str is the string to parse
+   * @param payment_id is the parsed payment ID
+   * @return true if the payment ID is valid, false otherwise
+   */
+  bool parse_payment_id_long(const std::string& payment_id_str, crypto::hash& payment_id);
+
+  /**
+   * Parses a short payment ID from a string.
+   *
+   * @param payment_id_str is the string to parse
+   * @param payment_id is the parsed payment ID
+   * @return true if the payment ID is valid, false otherwise
+   */
+  bool parse_payment_id_short(const std::string& payment_id_str, crypto::hash8& payment_id);
+
+  /**
    * Convert a cryptonote::block to a block in this library's native model.
    *
    * @param cn_block is the block to convert
