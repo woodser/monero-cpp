@@ -679,3 +679,19 @@ uint64_t monero_utils::xmr_to_atomic_units(double amount_xmr) {
 double monero_utils::atomic_units_to_xmr(uint64_t amount_atomic_units) {
   return static_cast<double>(amount_atomic_units) / static_cast<double>(XMR_AU_MULTIPLIER);
 }
+
+// implementation based on monero-project's wallet2::parse_long_payment_id()
+bool monero_utils::parse_payment_id_long(const std::string& payment_id_str, crypto::hash& payment_id) {
+  cryptonote::blobdata payment_id_data;
+  if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id_str, payment_id_data) || sizeof(crypto::hash) != payment_id_data.size()) return false;
+  payment_id = *reinterpret_cast<const crypto::hash*>(payment_id_data.data());
+  return true;
+}
+
+// implementation based on monero-project's wallet2::parse_short_payment_id()
+bool monero_utils::parse_payment_id_short(const std::string& payment_id_str, crypto::hash8& payment_id) {
+  cryptonote::blobdata payment_id_data;
+  if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id_str, payment_id_data) || sizeof(crypto::hash8) != payment_id_data.size()) return false;
+  payment_id = *reinterpret_cast<const crypto::hash8*>(payment_id_data.data());
+  return true;
+}
