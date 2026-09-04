@@ -105,6 +105,55 @@ namespace monero {
     return hash;
   }
 
+  // ------------------------------- MONERO KEY IMAGE CACHE -------------------------------
+
+  std::shared_ptr<monero_key_image> monero_key_image_cache::get(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx) {
+    crypto::public_key _tx_public_key;
+    string_tools::hex_to_pod(tx_public_key, _tx_public_key);
+    cryptonote::subaddress_index received_subaddr{account_idx, subaddress_idx};
+
+    boost::lock_guard<boost::mutex> lock(m_mutex);
+    auto it_pubkey = m_cache.find(_tx_public_key);
+    if (it_pubkey != m_cache.end()) {
+        auto it_out_index = it_pubkey->second.find(out_index);
+        if (it_out_index != it_pubkey->second.end()) {
+            auto it_subaddr = it_out_index->second.find(received_subaddr);
+            if (it_subaddr != it_out_index->second.end()) {
+                return std::get<0>(it_subaddr->second);
+            }
+        }
+    }
+    return nullptr;
+  }
+
+  void monero_key_image_cache::set(const std::shared_ptr<monero_key_image>& key_image, const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx, bool request) {
+    crypto::public_key _tx_public_key;
+    string_tools::hex_to_pod(tx_public_key, _tx_public_key);
+    cryptonote::subaddress_index received_subaddr{account_idx, subaddress_idx};
+
+    boost::lock_guard<boost::mutex> lock(m_mutex);
+    m_cache[_tx_public_key][out_index][received_subaddr] = std::make_pair(key_image, request);
+  }
+
+  bool monero_key_image_cache::request(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx) {
+    crypto::public_key _tx_public_key;
+    string_tools::hex_to_pod(tx_public_key, _tx_public_key);
+    cryptonote::subaddress_index received_subaddr{account_idx, subaddress_idx};
+
+    boost::lock_guard<boost::mutex> lock(m_mutex);
+    auto it_pubkey = m_cache.find(_tx_public_key);
+    if (it_pubkey != m_cache.end()) {
+        auto it_out_index = it_pubkey->second.find(out_index);
+        if (it_out_index != it_pubkey->second.end()) {
+            auto it_subaddr = it_out_index->second.find(received_subaddr);
+            if (it_subaddr != it_out_index->second.end()) {
+                return std::get<1>(it_subaddr->second);
+            }
+        }
+    }
+    return false;
+  }
+
   // ---------------------------- WALLET MANAGEMENT ---------------------------
 
   monero_wallet_keys* monero_wallet_keys::create_wallet_random(const monero_wallet_config& config) {
@@ -152,13 +201,13 @@ namespace monero {
     // initialize wallet account
     monero_wallet_keys* wallet = new monero_wallet_keys();
     wallet->m_account = cryptonote::account_base{};
-    wallet->m_account.generate(spend_key_sk, true, false);
+    crypto::secret_key spend_key_value = wallet->m_account.generate(spend_key_sk, true, false);
 
     // initialize remaining wallet
     wallet->m_network_type = config.m_network_type.get();
     wallet->m_language = language;
     epee::wipeable_string wipeable_mnemonic;
-    if (!crypto::ElectrumWords::bytes_to_words(spend_key_sk, wipeable_mnemonic, wallet->m_language)) {
+    if (!crypto::ElectrumWords::bytes_to_words(spend_key_value, wipeable_mnemonic, wallet->m_language)) {
       throw std::runtime_error("Failed to create mnemonic from private spend key for language: " + std::string(wallet->m_language));
     }
     wallet->m_seed = std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
@@ -568,6 +617,27 @@ namespace monero {
 
   // ------------------------------- PRIVATE HELPERS ----------------------------
 
+  std::shared_ptr<monero_key_image> monero_wallet_keys::generate_key_image(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx) const {
+    auto found = m_key_image_cache->get(tx_public_key, out_index, account_idx, subaddress_idx);
+    if (found != nullptr) return found;
+
+    if (is_view_only()) throw std::runtime_error("Cannot generate key image: wallet is view only");
+    crypto::public_key tx_pub_key;
+    string_tools::hex_to_pod(tx_public_key, tx_pub_key);
+    cryptonote::subaddress_index received_subaddr{account_idx, subaddress_idx};
+    std::shared_ptr<monero_key_image> key_image = monero_utils::generate_key_image(tx_pub_key, out_index, received_subaddr, m_account);
+    m_key_image_cache->set(key_image, tx_public_key, out_index, account_idx, subaddress_idx);
+    return key_image;
+  }
+
+  bool monero_wallet_keys::is_key_image_ours(const std::string &key_image_hex, const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx) const {
+    std::shared_ptr<monero_key_image> cached_key_image = m_key_image_cache->get(tx_public_key, out_index, account_idx, subaddress_idx);
+    if (cached_key_image != nullptr) return cached_key_image->m_hex.get() == key_image_hex;
+    if (is_view_only()) return false;
+    std::shared_ptr<monero_key_image> key_image = generate_key_image(tx_public_key, out_index, account_idx, subaddress_idx);
+    return key_image_hex == key_image->m_hex.get();
+  }
+
   void monero_wallet_keys::init_common() {
     m_primary_address = m_account.get_public_address_str(static_cast<cryptonote::network_type>(m_network_type));
     const cryptonote::account_keys& keys = m_account.get_keys();
@@ -575,6 +645,7 @@ namespace monero {
     m_prv_view_key = epee::string_tools::pod_to_hex(unwrap(unwrap(keys.m_view_secret_key)));
     m_pub_spend_key = epee::string_tools::pod_to_hex(keys.m_account_address.m_spend_public_key);
     m_prv_spend_key = epee::string_tools::pod_to_hex(unwrap(unwrap(keys.m_spend_secret_key)));
+    m_key_image_cache = std::make_shared<monero_key_image_cache>();
     if (m_prv_spend_key == "0000000000000000000000000000000000000000000000000000000000000000") m_prv_spend_key = "";
     m_is_closed = false;
   }

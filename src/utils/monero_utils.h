@@ -56,7 +56,10 @@
 #define monero_utils_h
 
 #include "wallet/monero_wallet_model.h"
+#include "wallet/monero_wallet.h"
 #include "cryptonote_basic/cryptonote_basic.h"
+#include "cryptonote_core/cryptonote_tx_utils.h"
+#include "wallet/wallet2.h"
 #include "serialization/keyvalue_serialization.h" // TODO: consolidate with other binary deps?
 #include "storages/portable_storage.h"
 
@@ -71,6 +74,9 @@ namespace monero_utils
 
   static const int RING_SIZE = 16;  // network-enforced ring size
   static const uint64_t XMR_AU_MULTIPLIER = 1000000000000ULL;
+  static const uint64_t TAIL_EMISSION_REWARD = 600000000000;
+
+  typedef std::tuple<uint64_t, uint64_t, std::vector<tools::wallet2::exported_transfer_details>> wallet2_exported_outputs;
 
   // -------------------------------- UTILS -----------------------------------
 
@@ -188,6 +194,103 @@ namespace monero_utils
   std::shared_ptr<monero_tx> cn_tx_to_tx(const cryptonote::transaction& cn_tx, bool init_as_tx_wallet = false);
 
   /**
+   * Estimate the network fee for a transaction with the given shape (v8 fork rule).
+   *
+   * Based on monero-project's wallet2::estimate_fee().
+   *
+   * @param n_inputs is the number of inputs the tx will spend
+   * @param mixin is the ring size minus one (number of decoys per input)
+   * @param n_outputs is the number of outputs the tx will create
+   * @param extra_size is the size in bytes of the tx's "extra" field (e.g. tx pub key, payment id)
+   * @param base_fee is the daemon's per-byte base fee
+   * @param fee_multiplier scales the fee according to priority, see get_fee_multiplier()
+   * @param fee_quantization_mask rounds the fee up to a multiple of this mask, see calculate_fee_from_weight()
+   * @return the estimated fee in atomic units
+   */
+  uint64_t estimate_fee(int n_inputs, int mixin, int n_outputs, size_t extra_size, uint64_t base_fee, uint64_t fee_multiplier, uint64_t fee_quantization_mask);
+
+  /**
+   * Estimate the serialized size in bytes of a RingCT transaction with the given shape (v8 fork rule).
+   *
+   * Based on monero-project's wallet2.cpp estimate_rct_tx_size().
+   *
+   * @param n_inputs is the number of inputs the tx will spend
+   * @param mixin is the ring size minus one (number of decoys per input)
+   * @param n_outputs is the number of outputs the tx will create
+   * @param extra_size is the size in bytes of the tx's "extra" field
+   * @return the estimated tx size in bytes
+   */
+  size_t estimate_rct_tx_size(int n_inputs, int mixin, int n_outputs, size_t extra_size);
+
+  /**
+   * Compute a tx fee from its weight, quantized so the fee doesn't reveal the tx's exact weight (v8 fork rule).
+   *
+   * Based on monero-project's wallet2.cpp calculate_fee_from_weight().
+   *
+   * @param base_fee is the daemon's per-byte base fee
+   * @param weight is the tx weight in bytes, see estimate_tx_weight()
+   * @param fee_multiplier scales the fee according to priority, see get_fee_multiplier()
+   * @param fee_quantization_mask rounds the fee up to a multiple of this mask
+   * @return the quantized fee in atomic units
+   */
+  uint64_t calculate_fee_from_weight(uint64_t base_fee, uint64_t weight, uint64_t fee_multiplier, uint64_t fee_quantization_mask);
+
+  /**
+   * Estimate the weight of a RingCT transaction with the given shape (v8 fork rule).
+   *
+   * Based on monero-project's wallet2.cpp estimate_tx_weight() v8 enforced.
+   *
+   * @param n_inputs is the number of inputs the tx will spend
+   * @param mixin is the ring size minus one (number of decoys per input)
+   * @param n_outputs is the number of outputs the tx will create
+   * @param extra_size is the size in bytes of the tx's "extra" field
+   * @return the estimated tx weight in bytes
+   */
+  uint64_t estimate_tx_weight(int n_inputs, int mixin, int n_outputs, size_t extra_size);
+
+  /**
+   * Get the maximum tx weight allowed to be relayed by the network (v8 fork rule).
+   *
+   * Based on monero-project's wallet2::get_upper_transaction_weight_limit().
+   *
+   * @param default_limit overrides the computed limit when non-zero (default 0, i.e. not overridden)
+   * @return the tx weight limit in bytes
+   */
+  uint64_t get_tx_weight_limit(uint64_t default_limit = 0);
+
+  /**
+   * Get the fee multiplier applied to the base fee for a given tx priority (fee algorithm 3).
+   *
+   * Based on monero-project's wallet2::get_fee_multiplier().
+   *
+   * @param priority is the tx priority: 1 (or 0, which defaults to 1) is normal, 2 is elevated, 3 is priority, 4 is flash
+   * @return the fee multiplier for the given priority
+   */
+  uint64_t get_fee_multiplier(uint32_t priority);
+
+  /**
+   * Validates a cryptonote::transaction.
+   *
+   * @param cn_tx is the transaction to validate
+   */
+  void validate_cn_tx(const cryptonote::transaction &cn_tx);
+
+  /**
+   * Convert a wallet2::pending_tx to a transaction in this library's
+   * native model.
+   *
+   * @param cn_tx is the wallet2 pending transaction to convert
+   * @param nettype cryptonote's network type
+   * @param monero_wallet wallet that created the pending transaction
+   * @param out_change_pubkey if non-null, receives the change output's stealth public key (hex), or an
+   *        empty string if there was no change output. The change output is otherwise stripped out of
+   *        the returned tx's outputs, so this is the only way to identify it unambiguously afterward
+   *        (its amount alone isn't a safe identifier: another output could coincidentally match it).
+   * @return a wallet transaction in this library's native model
+   */
+  std::shared_ptr<monero_tx_wallet> ptx_to_tx(const tools::wallet2::pending_tx &ptx, cryptonote::network_type nettype, monero_wallet* wallet, std::string* out_change_pubkey = nullptr);
+
+  /**
    * Modified from core_rpc_server.cpp to return a std::string.
    *
    * TODO: remove this duplicate, use core_rpc_server instead
@@ -227,6 +330,169 @@ namespace monero_utils
     * Returns true iff wallet vout1 is ordered before vout2 by ascending account and subaddress indices then index.
     */
   bool vout_before(const std::shared_ptr<monero_output>& o1, const std::shared_ptr<monero_output>& o2);
+
+  /**
+   * Encode a payment id into a tx's "extra" field.
+   *
+   * Based on mymonero-core-cpp's monero_transfer_utils.cpp
+   * internal helper _add_pid_to_tx_extra().
+   *
+   * @param payment_id_string is the payment id to encode, as a 16 or 64 char hex string; a none or empty value is a no-op
+   * @param extra is the tx's extra field to append the encoded payment id nonce to
+   * @throws std::runtime_error if payment_id_string is neither a valid long nor short payment id, or if it could not be added to extra
+   */
+  void add_pid_to_tx_extra(const boost::optional<std::string>& payment_id_string, std::vector<uint8_t> &extra);
+
+  /**
+   * Decrypt an output's hex-econded RingCT commitment mask.
+   *
+   * Based on mymonero-core-cpp's monero_transfer_utils.cpp
+   * internal helper _rct_hex_to_decrypted_mask().
+   *
+   * @param rct_str is the output's hex-encoded rct field
+   * @param view_secret_key is the wallet's private view key, used to derive the shared secret with the tx
+   * @param tx_pub_key is the transaction's public key
+   * @param internal_output_index is the output's index within the transaction, used as the derivation index
+   * @param decrypted_mask is set to the output's decrypted commitment mask
+   * @return true if a mask was resolved (including the non-RCT and coinbase cases), false if rct_str is empty
+   * @throws std::runtime_error if rct_str carries a malformed encrypted mask, or if the key derivation fails
+   */
+  bool rct_hex_to_decrypted_mask(const std::string &rct_str, const crypto::secret_key &view_secret_key, const crypto::public_key& tx_pub_key, uint64_t internal_output_index, rct::key &decrypted_mask);
+
+  /**
+   * Parse a hex-encoded RingCT commitment.
+   *
+   * Based on mymonero-core-cpp's monero_transfer_utils.cpp
+   * internal helper _rct_hex_to_rct_commit().
+   *
+   * @param rct_str is the output's hex-encoded rct field
+   * @param rct_commit is set to the output's parsed commitment
+   * @return true if a commitment was parsed, false otherwise
+   * @throws std::runtime_error if the commitment substring is not valid hex
+   */
+  bool rct_hex_to_rct_commit(const std::string &rct_str, rct::key &rct_commit);
+
+  /**
+   * Indicates if a hex-encoded rct field describes a coinbase output,
+   * validating its commitment via rct::zeroCommit() rather than trusted.
+   *
+   * 1. "coinbase" (mymonero/openmonero-style).
+   * 2. "<commitment><mask><amount>", where the commitment is left zeroed
+   * and the mask is the identity element.
+   *
+   * @param rct_str is the output's hex-encoded rct field
+   * @return true if rct_str describes an unblinded coinbase output under either convention
+   */
+  bool is_rct_hex_unblinded_coinbase(const std::string &rct_str);
+
+  /**
+   * Encrypt a string with chacha20, optionally signing the result so tampering can be detected on decryption.
+   *
+   * Based on monero-project's wallet2::encrypt().
+   *
+   * @param plaintext_str is the data to encrypt
+   * @param skey is the secret key used to derive the chacha20 key and, if authenticated, to sign the ciphertext
+   * @param authenticated specifies if a signature is appended to the ciphertext to allow monero_utils::decrypt() to verify its integrity (default true)
+   * @return the ciphertext, prefixed with a random chacha20 IV and, if authenticated, suffixed with a signature
+   */
+  std::string encrypt(const std::string &plaintext_str, const crypto::secret_key &skey, bool authenticated = true);
+
+  /**
+   * Decrypt a string previously encrypted with monero_utils::encrypt().
+   *
+   * Based on wallet2::decrypt().
+   *
+   * @tparam T is the type to return the decrypted data as (e.g. std::string), constructed from a (const char*, size_t) buffer
+   * @param ciphertext is the encrypted data to decrypt, as produced by monero_utils::encrypt()
+   * @param skey is the secret key used to derive the chacha20 key and, if authenticated, to verify the ciphertext's signature
+   * @param authenticated specifies if the ciphertext carries a signature that must be verified before decrypting (default true); must match the value used to encrypt
+   * @return T the decrypted data
+   * @throws std::runtime_error if the ciphertext is smaller than the expected prefix, or if authenticated and its signature fails to verify
+   */
+  template<typename T=std::string>
+  T decrypt(const std::string &ciphertext, const crypto::secret_key &skey, bool authenticated = true) {
+    const size_t prefix_size = sizeof(crypto::chacha_iv) + (authenticated ? sizeof(crypto::signature) : 0);
+    if(ciphertext.size() < prefix_size) throw std::runtime_error("Unexpected ciphertext size");
+    uint64_t kdf_rounds = 1;
+    crypto::chacha_key key;
+    crypto::generate_chacha_key(&skey, sizeof(skey), key, kdf_rounds);
+    const crypto::chacha_iv &iv = *(const crypto::chacha_iv*)&ciphertext[0];
+    if (authenticated) {
+      crypto::hash hash;
+      crypto::cn_fast_hash(ciphertext.data(), ciphertext.size() - sizeof(crypto::signature), hash);
+      crypto::public_key pkey;
+      crypto::secret_key_to_public_key(skey, pkey);
+      const crypto::signature &signature = *(const crypto::signature*)&ciphertext[ciphertext.size() - sizeof(crypto::signature)];
+      if(!crypto::check_signature(hash, pkey, signature)) throw std::runtime_error("Failed to authenticate ciphertext");
+    }
+    std::unique_ptr<char[]> buffer{new char[ciphertext.size() - prefix_size]};
+    auto wiper = epee::misc_utils::create_scope_leave_handler([&]() { memwipe(buffer.get(), ciphertext.size() - prefix_size); });
+    crypto::chacha20(ciphertext.data() + sizeof(iv), ciphertext.size() - prefix_size, key, iv, buffer.get());
+    return T(buffer.get(), ciphertext.size() - prefix_size);
+  }
+
+  /**
+   * Parse signed tx hex to wallet2's internal data model pending_tx.
+   *
+   * Based on wallet2::parse_tx_from_str().
+   *
+   * @param unsigned_tx_st unsigned tx hex
+   * @param view_secret_key private view key
+   * @return pending txs from wallet2's internal data model
+   */
+  std::vector<tools::wallet2::pending_tx> parse_signed_tx(const std::string &signed_tx_st, const crypto::secret_key &view_secret_key);
+
+  /**
+   * Parse unsigned tx hex to wallet2's internal data model unsigned_tx_set.
+   *
+   * Based on wallet2::parse_unsigned_tx_from_str().
+   *
+   * @param unsigned_tx_st unsigned tx hex
+   * @param view_secret_key private view key
+   * @return unsigned tx set from wallet2's internal data model
+   */
+  tools::wallet2::unsigned_tx_set parse_unsigned_tx(const std::string &unsigned_tx_st, const crypto::secret_key &view_secret_key);
+
+  /**
+   * Dump wallet2's tx construction data.
+   *
+   * Based on wallet2::dump_tx_to_str().
+   *
+   * @param construction_data
+   * @param paymend_id
+   * @param outputs
+   * @param view_secret_key
+   * @return unsigned tx hex
+   */
+  std::string dump_unsigned_tx(std::vector<tools::wallet2::tx_construction_data>& construction_data, const boost::optional<std::string>& payment_id, const wallet2_exported_outputs& outputs, const crypto::secret_key &view_secret_key);
+
+  /**
+   * Signs wallet2's unsigned tx set with wallet account.
+   *
+   * Based on wallet2::sign_tx().
+   *
+   * @param exported_txs
+   * @param txs
+   * @param signed_txs
+   * @param signed_kis
+   * @param account
+   * @param subaddresses
+   * @return signed tx hex (ciphertext)
+   */
+  std::string sign_tx(tools::wallet2::unsigned_tx_set &exported_txs, std::vector<tools::wallet2::pending_tx> &txs, tools::wallet2::signed_tx_set &signed_txes, std::vector<std::string> &signed_kis, const cryptonote::account_base& account, const serializable_unordered_map<crypto::public_key, cryptonote::subaddress_index>& subaddresses);
+
+  /**
+   * Generates a key image for an output note (enote) in a simplified manner.
+   *
+   * This function already assumes that we checked that the onetime address was addressed to `received_subaddr`.
+   *
+   * @param ephem_pubkey is the tx main pubkey or an additional pubkey
+   * @param tx_output_index is the index of the enote in the local output set of the tx
+   * @param received_subaddr is the index of the recipient's subaddress
+   * @param account recipient's account
+   * @return the generated key image
+   */
+  std::shared_ptr<monero_key_image> generate_key_image(const crypto::public_key &ephem_pubkey, const size_t tx_output_index, const cryptonote::subaddress_index &received_subaddr, const cryptonote::account_base& account);
 
   // ----------------------------- GATHER BLOCKS ------------------------------
 
@@ -284,6 +550,19 @@ namespace monero_utils
       }
     }
     return blocks;
+  }
+
+  // compute m_num_suggested_confirmations  TODO monero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
+  static void set_num_suggested_confirmations(std::shared_ptr<monero_incoming_transfer>& incoming_transfer, uint64_t blockchain_height, uint64_t block_reward, uint64_t unlock_time) {
+    if (block_reward == 0) incoming_transfer->m_num_suggested_confirmations = 0;
+    else incoming_transfer->m_num_suggested_confirmations = (incoming_transfer->m_amount.get() + block_reward - 1) / block_reward;
+
+    if (unlock_time < CRYPTONOTE_MAX_BLOCK_NUMBER) {
+      if (unlock_time > blockchain_height) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), unlock_time - blockchain_height);
+    } else {
+      const uint64_t now = time(NULL);
+      if (unlock_time > now) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), (unlock_time - now + DIFFICULTY_TARGET_V2 - 1) / DIFFICULTY_TARGET_V2);
+    }
   }
 
   // ------------------------------ FREE MEMORY -------------------------------
