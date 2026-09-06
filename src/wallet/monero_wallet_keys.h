@@ -54,7 +54,9 @@
 
 #include "monero_wallet.h"
 #include "cryptonote_basic/account.h"
+#include "cryptonote_basic/subaddress_index.h"
 #include <atomic>
+#include <boost/thread/mutex.hpp>
 
 using namespace monero;
 
@@ -62,6 +64,18 @@ using namespace monero;
  * Public library interface.
  */
 namespace monero {
+
+  class monero_key_image_cache {
+  public:
+
+    std::shared_ptr<monero_key_image> get(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0);
+    void set(const std::shared_ptr<monero_key_image>& key_image, const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx = 0, uint32_t subaddress_idx = 0, bool requested = false);
+    bool request(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx);
+
+  private:
+    mutable boost::mutex m_mutex;
+    serializable_unordered_map<crypto::public_key, serializable_unordered_map<uint64_t, serializable_unordered_map<cryptonote::subaddress_index, std::pair<std::shared_ptr<monero_key_image>, bool>>>> m_cache;
+  };
 
   /**
    * Implements a Monero wallet to provide basic key management.
@@ -134,7 +148,7 @@ namespace monero {
 
     // --------------------------------- PRIVATE --------------------------------
 
-  private:
+  protected:
     bool m_is_view_only = false;
     monero_network_type m_network_type;
     cryptonote::account_base m_account;
@@ -146,8 +160,11 @@ namespace monero {
     std::string m_prv_spend_key;
     std::string m_primary_address;
     std::atomic<bool> m_is_closed{false};
+    std::shared_ptr<monero_key_image_cache> m_key_image_cache;
 
-    void init_common();
+    virtual void init_common();
     void assert_not_closed() const;
+    std::shared_ptr<monero_key_image> generate_key_image(const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx) const;
+    bool is_key_image_ours(const std::string &key_image_hex, const std::string& tx_public_key, uint64_t out_index, uint32_t account_idx, uint32_t subaddress_idx) const;
   };
 }
