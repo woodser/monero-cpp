@@ -16,8 +16,7 @@ jobs:
   ubuntu:
     name: ${{ matrix.arch }}
     runs-on: ${{ matrix.os }}
-    # build in old-distro containers so the libraries run on older glibc;
-    # arm64 uses debian:12 for a binutils that can link randomx aarch64 relocations
+    # debian:12 provides a supported build environment with a glibc 2.36 baseline
     container: ${{ matrix.container }}
 
     strategy:
@@ -25,11 +24,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-24.04
-            container: debian:11
+            container: debian:12
             arch: linux-x86_64
             march: x86-64
             filearch: x86-64
-            glibc_floor: GLIBC_2.31
+            glibc_floor: GLIBC_2.36
           - os: ubuntu-24.04-arm
             container: debian:12
             arch: linux-arm64
@@ -40,8 +39,8 @@ jobs:
     steps:
       - name: Install git
         run: |
-          apt update
-          apt install -y git ca-certificates
+          apt-get update
+          apt-get install -y git ca-certificates
           git config --global --add safe.directory '*'
 
       - name: Checkout repository
@@ -51,13 +50,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          apt install -y build-essential cmake pkg-config file perl wget libzmq3-dev libunbound-dev libsodium-dev libunwind-dev liblzma-dev libreadline-dev libexpat1-dev libpgm-dev libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev python3 ccache git curl autoconf libtool gperf bison flex nettle-dev libevent-dev
+          apt-get install -y build-essential cmake pkg-config file perl wget libzmq3-dev libunbound-dev libsodium-dev libunwind-dev liblzma-dev libreadline-dev libexpat1-dev libpgm-dev libhidapi-dev libusb-1.0-0-dev libprotobuf-dev protobuf-compiler libudev-dev python3 ccache git curl autoconf libtool gperf bison flex nettle-dev libevent-dev
           # record versions of the distro libraries that get statically linked into the shipped binary
           dpkg -s libsodium-dev libprotobuf-dev | grep -E '^(Package|Version)'
 
       - name: Install openssl
         run: |
-          # distro openssl 1.1 is near end of life; build the current LTS statically (/etc/ssl matches most distros' CA layout)
+          # build the current openssl LTS statically (/etc/ssl matches most distros' CA layout)
           wget https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz
           echo "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8  openssl-3.5.7.tar.gz" | sha256sum -c
           tar xzf openssl-3.5.7.tar.gz
