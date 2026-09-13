@@ -54,9 +54,11 @@
 
 #include <boost/optional.hpp>
 #include <boost/thread/mutex.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <atomic>
+#include <functional>
 
 #include "monero_wallet.h"
 #include "wallet/wallet2.h"
@@ -167,6 +169,7 @@ namespace monero {
     uint64_t get_daemon_max_peer_height() const override;
     uint64_t get_height_by_date(uint16_t year, uint8_t month, uint8_t day) const override;
     void add_listener(monero_wallet_listener& listener) override;
+    // waits for active callbacks and permits cleanup after close; callers must not hold locks needed by those callbacks
     void remove_listener(monero_wallet_listener& listener) override;
     std::set<monero_wallet_listener*> get_listeners() override;
     monero_sync_result sync() override;
@@ -252,6 +255,12 @@ namespace monero {
     bool is_closed() const override { return m_is_closed; }
 
     /**
+     * Permanently cancels daemon requests and syncing in preparation for close().
+     * The caller must prevent new operations and keep the wallet alive until active calls finish.
+     */
+    void request_shutdown();
+
+    /**
      * Wallet import and export using buffers and not the file system.
      */
     std::string get_keys_file_buffer(const epee::wipeable_string& password, bool view_only) const;
@@ -270,6 +279,8 @@ namespace monero {
     friend struct wallet2_listener;
     std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
     std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
+    boost::recursive_mutex m_listeners_mutex;       // serialize notifications with listener removal, including removal from a callback
+    void notify_listeners(const std::function<void(monero_wallet_listener*)>& notify);
     std::atomic<bool> m_is_closed;
 
     static monero_wallet_full* create_wallet_from_seed(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);

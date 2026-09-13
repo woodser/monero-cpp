@@ -615,22 +615,6 @@ namespace monero {
       m_notification_pool->recycle();
     }
 
-    void update_listening() {
-      boost::lock_guard<boost::mutex> guarg(m_listener_mutex);
-
-      // update callback
-      m_w2.callback(m_wallet.get_listeners().empty() ? nullptr : this);
-
-      // if starting to listen, cache locked txs for later comparison
-      if (!m_wallet.get_listeners().empty() && m_w2.callback() == nullptr) {
-        tools::threadpool::waiter waiter(*m_notification_pool);
-        m_notification_pool->submit(&waiter, [this]() {
-          check_for_changed_unlocked_txs();
-        });
-        waiter.wait();
-      }
-    }
-
     void on_sync_start(uint64_t start_height, uint64_t end_height) {
       tools::threadpool::waiter waiter(*m_notification_pool);
       m_notification_pool->submit(&waiter, [this, start_height, end_height]() {
@@ -642,9 +626,9 @@ namespace monero {
         // notify listeners of sync progress before the first block arrives when skipping ahead to the start height
         uint64_t wallet_height = m_wallet.get_height();
         if (wallet_height < start_height && start_height < *m_sync_end_height) {
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
             listener->on_sync_progress(wallet_height, start_height, *m_sync_end_height, 0.0, "Synchronizing");
-          }
+          });
         }
       });
       waiter.wait(); // TODO: this processes notification on thread, process off thread
@@ -690,9 +674,9 @@ namespace monero {
 
         // notify listeners of every scanned block, preserving the per-block contract
         if (!skip_phase) {
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
             listener->on_new_block(height);
-          }
+          });
         }
 
         // notify listeners of throttled sync progress
@@ -700,9 +684,9 @@ namespace monero {
           if (height >= *m_sync_end_height) m_sync_end_height = height + 1; // increase end height if necessary
           double percent_done = (double) (height - *m_sync_progress_base + 1) / (double) (*m_sync_end_height - *m_sync_progress_base);
           std::string message = std::string("Synchronizing");
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
             listener->on_sync_progress(height, *m_sync_progress_base, *m_sync_end_height, percent_done, message);
-          }
+          });
 
           // notify if balances change, skipping the hash skip which cannot change them
           if (!skip_phase) {
@@ -737,9 +721,9 @@ namespace monero {
           output->m_subaddress_index = subaddr_index.minor;
 
           // notify listeners of output
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
             listener->on_output_received(*output);
-          }
+          });
 
           // notify if balances changed
           check_for_changed_balances();
@@ -782,9 +766,9 @@ namespace monero {
           output->m_subaddress_index = subaddr_index.minor;
 
           // notify listeners of output
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
             listener->on_output_received(*output);
-          }
+          });
 
           // watch for unlock
           m_prev_locked_tx_hashes.insert(tx->m_hash.get());
@@ -824,9 +808,9 @@ namespace monero {
           output->m_subaddress_index = subaddr_index.minor;
 
           // notify listeners of output
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
             listener->on_output_spent(*output);
-          }
+          });
 
           // watch for unlock
           m_prev_locked_tx_hashes.insert(tx->m_hash.get());
@@ -866,7 +850,6 @@ namespace monero {
     boost::optional<uint64_t> m_sync_end_height;
     boost::optional<uint64_t> m_sync_progress_base; // sync start height rebased down to report the hash skip as progress
     uint64_t m_last_sync_notify_ms = 0; // last time block notifications were announced during sync
-    boost::mutex m_listener_mutex;
     uint64_t m_prev_balance;
     uint64_t m_prev_unlocked_balance;
     std::set<std::string> m_prev_locked_tx_hashes;
@@ -878,9 +861,9 @@ namespace monero {
       if (balance != m_prev_balance || unlocked_balance != m_prev_unlocked_balance) {
         m_prev_balance = balance;
         m_prev_unlocked_balance = unlocked_balance;
-        for (monero_wallet_listener* listener : m_wallet.get_listeners()) {
+        m_wallet.notify_listeners([&](monero_wallet_listener* listener) {
           listener->on_balances_changed(balance, unlocked_balance);
-        }
+        });
         return true;
       }
       return false;
@@ -958,14 +941,14 @@ namespace monero {
         }
         
         // notify listeners and free memory
-        for (monero_wallet_listener* listener : m_wallet.get_listeners()) listener->on_output_spent(*input);
+        m_wallet.notify_listeners([&](monero_wallet_listener* listener) { listener->on_output_spent(*input); });
         monero_utils::free(tx_notify);
       }
 
       // notify received outputs
       if (!tx->m_incoming_transfers.empty()) {
         for (const std::shared_ptr<monero_output_wallet>& output : tx->get_outputs_wallet()) {
-          for (monero_wallet_listener* listener : m_wallet.get_listeners()) listener->on_output_received(*output);
+          m_wallet.notify_listeners([&](monero_wallet_listener* listener) { listener->on_output_received(*output); });
         }
       }
     }
@@ -1479,20 +1462,28 @@ namespace monero {
   }
 
   void monero_wallet_full::add_listener(monero_wallet_listener& listener) {
+    boost::lock_guard<boost::recursive_mutex> guard(m_listeners_mutex);
     assert_not_closed();
     m_listeners.insert(&listener);
-    m_w2_listener->update_listening();
   }
 
   void monero_wallet_full::remove_listener(monero_wallet_listener& listener) {
-    assert_not_closed();
-    m_listeners.erase(&listener);
-    if (!m_sync_loop_running) m_w2_listener->update_listening(); // listener is unregistered after sync to avoid segfault
+    boost::lock_guard<boost::recursive_mutex> guard(m_listeners_mutex);
+    m_listeners.erase(&listener); // cleanup can finish after close has drained sync
   }
 
   std::set<monero_wallet_listener*> monero_wallet_full::get_listeners() {
+    boost::lock_guard<boost::recursive_mutex> guard(m_listeners_mutex);
     assert_not_closed();
     return m_listeners;
+  }
+
+  void monero_wallet_full::notify_listeners(const std::function<void(monero_wallet_listener*)>& notify) {
+    boost::lock_guard<boost::recursive_mutex> guard(m_listeners_mutex);
+    auto listeners = m_listeners;
+    for (monero_wallet_listener* listener : listeners) {
+      if (m_listeners.count(listener)) notify(listener); // a preceding callback may have removed this listener
+    }
   }
 
   monero_sync_result monero_wallet_full::sync() {
@@ -3615,19 +3606,26 @@ namespace monero {
     return buf;
   }
 
+  void monero_wallet_full::request_shutdown() {
+    if (m_is_closed) return;
+    stop_syncing();
+    m_w2->shutdown(); // abort daemon I/O before waiting for active calls or saving
+    boost::lock_guard<boost::mutex> lock(m_syncing_mutex);
+    m_sync_cv.notify_one(); // synchronize with the idle sync loop so the wake cannot be missed
+  }
+
   void monero_wallet_full::close(bool save) {
     MTRACE("close()");
     if (m_is_closed) return; // closing a closed wallet has no effect
-    stop_syncing(); // prevent sync thread from starting again and interrupt refresh
-    m_w2->shutdown(); // teardown: refresh cannot re-arm, and an in-flight daemon request is aborted
-    if (m_sync_loop_running) {
-      m_sync_cv.notify_one();
+    request_shutdown();
+    if (m_syncing_thread.joinable()) {
       std::this_thread::sleep_for(std::chrono::milliseconds(1));  // TODO: in emscripten, m_sync_cv.notify_one() returns without waiting, so sleep; bug in emscripten upstream llvm?
       m_syncing_thread.join(); // join before locking because the sync loop holds the sync mutex
     }
     boost::lock_guard<boost::mutex> guarg(m_sync_mutex); // wait for external sync to finish before saving or tearing down
     if (save) m_w2->store(); // store directly since save() locks m_sync_mutex
     m_w2->deinit();
+    boost::lock_guard<boost::recursive_mutex> listener_guard(m_listeners_mutex);
     m_w2->callback(nullptr);  // unregister listener after sync
     m_w2_listener.reset();    // wait for queued notifications
     m_is_closed = true;
@@ -3675,6 +3673,7 @@ namespace monero {
     m_interrupt_sync = false;
     m_sync_in_progress = false;
     m_is_closed = false;
+    m_w2->callback(m_w2_listener.get()); // keep the callback stable until close has drained sync
   }
 
   std::vector<std::shared_ptr<monero_transfer>> monero_wallet_full::get_transfers_aux(const monero_transfer_query& query) const {
@@ -3941,10 +3940,10 @@ namespace monero {
         }
 
         // only wait if syncing still enabled
-        if (m_syncing_enabled) {
+        {
           boost::mutex::scoped_lock lock(m_syncing_mutex);
           boost::posix_time::milliseconds wait_for_ms(m_syncing_interval.load());
-          m_sync_cv.timed_wait(lock, wait_for_ms);
+          m_sync_cv.timed_wait(lock, wait_for_ms, [this]() { return !m_syncing_enabled; });
         }
       }
 
@@ -4040,7 +4039,6 @@ namespace monero {
         }
       }
       if (!m_is_synced) m_is_synced = true;
-      m_w2_listener->update_listening();  // cannot unregister during sync which would segfault
     } catch (std::exception& e) {
       m_w2_listener->on_sync_end(); // signal end of sync to reset listener's start and end heights
       throw;
