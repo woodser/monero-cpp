@@ -144,8 +144,6 @@ namespace monero {
     if (m_private_view_key != boost::none) monero_utils::add_json_member("privateViewKey", m_private_view_key.get(), allocator, root, value_str);
     if (m_private_spend_key != boost::none) monero_utils::add_json_member("privateSpendKey", m_private_spend_key.get(), allocator, root, value_str);
     if (m_language != boost::none) monero_utils::add_json_member("language", m_language.get(), allocator, root, value_str);
-    if (m_account_lookahead != boost::none) monero_utils::add_json_member("accountLookahead", m_account_lookahead.get(), allocator, root, value_str);
-    if (m_subaddress_lookahead != boost::none) monero_utils::add_json_member("subaddressLookahead", m_subaddress_lookahead.get(), allocator, root, value_str);
 
     // set bool values
     if (m_is_trusted_daemon != boost::none) monero_utils::add_json_member("isTrustedDaemon", m_is_trusted_daemon.get(), allocator, root);
