@@ -662,6 +662,9 @@ namespace monero {
     // convert query property tree to block
     std::shared_ptr<monero_block> block = node_to_block_query(block_node);
 
+    // empty query if no txs
+    if (block->m_txs.empty()) return std::make_shared<monero_tx_query>();
+
     // get tx query
     std::shared_ptr<monero_tx_query> tx_query = std::static_pointer_cast<monero_tx_query>(block->m_txs[0]);
 
