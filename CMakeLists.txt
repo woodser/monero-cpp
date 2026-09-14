@@ -330,6 +330,7 @@ set(
     src/common/monero_rpc_connection.cpp
     src/utils/gen_utils.cpp
     src/utils/monero_utils.cpp
+    src/utils/monero_wallet_utils.cpp
     src/daemon/monero_daemon_model.cpp
     src/daemon/monero_daemon.cpp
     src/daemon/monero_daemon_rpc_model.cpp
@@ -337,8 +338,10 @@ set(
     src/wallet/monero_wallet_model.cpp
     src/wallet/monero_wallet_keys.cpp
     src/wallet/monero_wallet_rpc_model.cpp
+    src/wallet/monero_wallet_light_model.cpp
     src/wallet/monero_wallet_rpc.cpp
     src/wallet/monero_wallet_full.cpp
+    src/wallet/monero_wallet_light.cpp
 )
 
 if (BUILD_LIBRARY)
@@ -446,13 +449,16 @@ endif()
           DESTINATION include/daemon)
   INSTALL(FILES src/utils/gen_utils.h
           src/utils/monero_utils.h
+          src/utils/monero_wallet_utils.h
           DESTINATION include/utils)
   INSTALL(FILES src/wallet/monero_wallet_full.h
           src/wallet/monero_wallet_rpc.h
+          src/wallet/monero_wallet_light.h
           src/wallet/monero_wallet.h
           src/wallet/monero_wallet_keys.h
           src/wallet/monero_wallet_model.h
           src/wallet/monero_wallet_rpc_model.h
+          src/wallet/monero_wallet_light_model.h
           DESTINATION include/wallet)
   INSTALL(TARGETS monero-cpp monero-cpp-static
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} COMPONENT Runtime
