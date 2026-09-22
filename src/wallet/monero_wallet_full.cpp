@@ -69,6 +69,7 @@
 #include "serialization/binary_utils.h"
 #include "serialization/string.h"
 #include "common/threadpool.h"
+#include "misc_language.h"
 
 using namespace tools;
 
@@ -159,6 +160,8 @@ namespace monero {
 
   std::shared_ptr<monero_tx_wallet> build_tx_with_outgoing_transfer(tools::wallet2& m_w2, uint64_t height, const crypto::hash &txid, const tools::wallet2::confirmed_transfer_details &pd) {
 
+    uint64_t change = pd.m_change == (uint64_t)-1 ? 0 : pd.m_change; // change may not be known
+
     // construct block
     std::shared_ptr<monero_block> block = std::make_shared<monero_block>();
     block->m_height = pd.m_block_height;
@@ -175,7 +178,7 @@ namespace monero {
     if (tx->m_payment_id == monero_tx::DEFAULT_PAYMENT_ID) tx->m_payment_id = boost::none;  // clear default payment id
     tx->m_unlock_time = pd.m_unlock_time;
     tx->m_is_locked = !m_w2.is_transfer_unlocked(pd.m_unlock_time, pd.m_block_height);
-    tx->m_fee = pd.m_amount_in - pd.m_amount_out;
+    if (pd.m_amount_in >= pd.m_amount_out) tx->m_fee = pd.m_amount_in - pd.m_amount_out; // partial scans may not know all spent inputs
     tx->m_note = m_w2.get_tx_note(txid);
     if (tx->m_note->empty()) tx->m_note = boost::none; // clear empty note
     tx->m_is_miner_tx = false;
@@ -191,8 +194,7 @@ namespace monero {
     std::shared_ptr<monero_outgoing_transfer> outgoing_transfer = std::make_shared<monero_outgoing_transfer>();
     outgoing_transfer->m_tx = tx;
     tx->m_outgoing_transfer = outgoing_transfer;
-    uint64_t change = pd.m_change == (uint64_t)-1 ? 0 : pd.m_change; // change may not be known
-    outgoing_transfer->m_amount = pd.m_amount_in - change - *tx->m_fee;
+    if (pd.m_amount_in >= pd.m_amount_out && pd.m_amount_out >= change) outgoing_transfer->m_amount = pd.m_amount_out - change;
     outgoing_transfer->m_account_index = pd.m_subaddr_account;
     std::vector<uint32_t> subaddress_indices;
     std::vector<std::string> addresses;
@@ -211,9 +213,9 @@ namespace monero {
       outgoing_transfer->m_destinations.push_back(destination);
     }
 
-    // replace transfer amount with destination sum
+    // use cached destinations when the amount is unknown or zero
     // TODO monero-project: confirmed tx from/to same account has amount 0 but cached transfer destinations
-    if (*outgoing_transfer->m_amount == 0 && !outgoing_transfer->m_destinations.empty()) {
+    if ((outgoing_transfer->m_amount == boost::none || *outgoing_transfer->m_amount == 0) && !outgoing_transfer->m_destinations.empty()) {
       uint64_t amount = 0;
       for (const std::shared_ptr<monero_destination>& destination : outgoing_transfer->m_destinations) amount += *destination->m_amount;
       outgoing_transfer->m_amount = amount;
@@ -273,7 +275,7 @@ namespace monero {
     if (tx->m_payment_id == monero_tx::DEFAULT_PAYMENT_ID) tx->m_payment_id = boost::none;  // clear default payment id
     tx->m_unlock_time = pd.m_tx.unlock_time;
     tx->m_is_locked = true;
-    tx->m_fee = pd.m_amount_in - pd.m_amount_out;
+    if (pd.m_amount_in >= pd.m_amount_out) tx->m_fee = pd.m_amount_in - pd.m_amount_out; // partial scans may not know all spent inputs
     tx->m_note = m_w2.get_tx_note(txid);
     if (tx->m_note->empty()) tx->m_note = boost::none; // clear empty note
     tx->m_is_miner_tx = false;
@@ -288,7 +290,7 @@ namespace monero {
     std::shared_ptr<monero_outgoing_transfer> outgoing_transfer = std::make_shared<monero_outgoing_transfer>();
     outgoing_transfer->m_tx = tx;
     tx->m_outgoing_transfer = outgoing_transfer;
-    outgoing_transfer->m_amount = pd.m_amount_in - pd.m_change - tx->m_fee.get();
+    if (pd.m_amount_in >= pd.m_amount_out && pd.m_amount_out >= pd.m_change) outgoing_transfer->m_amount = pd.m_amount_out - pd.m_change;
     outgoing_transfer->m_account_index = pd.m_subaddr_account;
     std::vector<uint32_t> subaddress_indices;
     std::vector<std::string> addresses;
@@ -307,9 +309,9 @@ namespace monero {
       outgoing_transfer->m_destinations.push_back(destination);
     }
 
-    // replace transfer amount with destination sum
+    // use cached destinations when the amount is unknown or zero
     // TODO monero-project: confirmed tx from/to same account has amount 0 but cached transfer destinations
-    if (*outgoing_transfer->m_amount == 0 && !outgoing_transfer->m_destinations.empty()) {
+    if ((outgoing_transfer->m_amount == boost::none || *outgoing_transfer->m_amount == 0) && !outgoing_transfer->m_destinations.empty()) {
       uint64_t amount = 0;
       for (const std::shared_ptr<monero_destination>& destination : outgoing_transfer->m_destinations) amount += *destination->m_amount;
       outgoing_transfer->m_amount = amount;
@@ -637,11 +639,13 @@ namespace monero {
     void on_sync_end() {
       tools::threadpool::waiter waiter(*m_notification_pool);
       m_notification_pool->submit(&waiter, [this]() {
+        auto reset_sync_state = epee::misc_utils::create_scope_leave_handler([this]() {
+          m_sync_start_height = boost::none;
+          m_sync_end_height = boost::none;
+          m_sync_progress_base = boost::none;
+        });
         check_for_changed_balances();
         if (m_prev_locked_tx_hashes.size() > 0) check_for_changed_unlocked_txs();
-        m_sync_start_height = boost::none;
-        m_sync_end_height = boost::none;
-        m_sync_progress_base = boost::none;
       });
       m_notification_pool->recycle();
       waiter.wait();
@@ -919,8 +923,8 @@ namespace monero {
 
     void notify_outputs(const std::shared_ptr<monero_tx_wallet>& tx) {
 
-      // notify spent outputs
-      if (tx->m_outgoing_transfer != nullptr) {
+      // notify spent outputs when the aggregate amount is known
+      if (tx->m_outgoing_transfer != nullptr && tx->m_outgoing_transfer->m_amount != boost::none && tx->m_fee != boost::none) {
         
         // build dummy input for notification // TODO: this provides one input with outgoing amount like monero-wallet-rpc client, use real inputs instead
         std::shared_ptr<monero_output_wallet> input = std::make_shared<monero_output_wallet>();
@@ -1756,6 +1760,12 @@ namespace monero {
     std::shared_ptr<monero_transfer_query> transfer_query = _query->m_transfer_query;
     std::shared_ptr<monero_output_query> input_query = _query->m_input_query;
     std::shared_ptr<monero_output_query> output_query = _query->m_output_query;
+    auto free_query = epee::misc_utils::create_scope_leave_handler([&]() {
+      if (transfer_query != nullptr) transfer_query->m_tx_query.reset();
+      if (input_query != nullptr) input_query->m_tx_query.reset();
+      if (output_query != nullptr) output_query->m_tx_query.reset();
+      monero_utils::free(_query);
+    });
     _query->m_transfer_query = nullptr;
     _query->m_input_query = nullptr;
     _query->m_output_query = nullptr;
@@ -1764,8 +1774,10 @@ namespace monero {
     std::shared_ptr<monero_transfer_query> temp_transfer_query = std::make_shared<monero_transfer_query>();
     temp_transfer_query->m_tx_query = monero_tx_query::decontextualize(_query->copy(_query, std::make_shared<monero_tx_query>()));
     temp_transfer_query->m_tx_query->m_transfer_query = temp_transfer_query;
+    auto free_transfer_query = epee::misc_utils::create_scope_leave_handler([&]() {
+      monero_utils::free(temp_transfer_query->m_tx_query);
+    });
     std::vector<std::shared_ptr<monero_transfer>> transfers = get_transfers_aux(*temp_transfer_query);
-    monero_utils::free(temp_transfer_query->m_tx_query);
 
     // collect unique txs from transfers while retaining order
     std::vector<std::shared_ptr<monero_tx_wallet>> txs = std::vector<std::shared_ptr<monero_tx_wallet>>();
@@ -1830,12 +1842,10 @@ namespace monero {
         monero_utils::free(txs);
         txs.clear();
         if (max_attempts <= 1) {
-          monero_utils::free(_query);
           throw std::runtime_error("Unable to build consistent txs from multiple wallet calls");
         }
         MWARNING("Inconsistency detected building txs from multiple wallet2 calls, re-fetching");
         txs = get_txs_aux(*_query, max_attempts - 1);
-        monero_utils::free(_query);
         return txs;
       }
     }
@@ -1849,8 +1859,6 @@ namespace monero {
       }
     }
 
-    // free query and return
-    monero_utils::free(_query);
     return txs;
   }
 
@@ -3730,6 +3738,12 @@ namespace monero {
     uint64_t height = get_height();
     std::map<std::string, std::shared_ptr<monero_tx_wallet>> tx_map;
     std::map<uint64_t, std::shared_ptr<monero_block>> block_map;
+    bool success = false;
+    auto free_on_error = epee::misc_utils::create_scope_leave_handler([&]() {
+      if (success) return;
+      monero_utils::free(tx_query);
+      for (const auto& entry : tx_map) monero_utils::free(entry.second);
+    });
 
     // get unconfirmed or failed outgoing transfers
     if (is_pending || is_failed) {
@@ -3812,6 +3826,7 @@ namespace monero {
 
     // free query and return transfers
     monero_utils::free(tx_query);
+    success = true;
     return transfers;
   }
 
