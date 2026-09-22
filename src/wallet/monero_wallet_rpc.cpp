@@ -88,6 +88,10 @@ namespace monero {
       set_is_polling(false);
     }
 
+    void reset() {
+      ++m_generation; // invalidate in-flight polls without waiting on their callbacks
+    }
+
     void poll() override {
       // skip if next poll is queued
       if (m_num_polling.fetch_add(1) > 1) {
@@ -103,27 +107,40 @@ namespace monero {
       // synchronize polls
       boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
       gen_utils::thread_poller::announce_scope announce_guard(*this); // see wait_for_callbacks_idle()
+      const uint64_t generation = m_generation.load();
       try {
         // skip if wallet is closed
-        if (m_wallet->is_closed()) {
-          return;
+        if (m_wallet->is_closed() || generation != m_generation) return;
+
+        // reset snapshots only inside the serialized poll
+        if (m_snapshot_generation != generation) {
+          m_prev_height = boost::none;
+          m_prev_balances.reset();
+          m_prev_locked_txs.clear();
+          m_prev_unconfirmed_notifications.clear();
+          m_prev_confirmed_notifications.clear();
+          m_snapshot_generation = generation;
         }
 
         // take initial snapshot
         if (m_prev_balances == nullptr) {
           m_prev_height = m_wallet->get_height();
+          if (generation != m_generation) return;
           monero_tx_query tx_query;
           tx_query.m_is_locked = true;
           m_prev_locked_txs = m_wallet->get_txs(tx_query);
+          if (generation != m_generation) return;
           m_prev_balances = m_wallet->get_balances(boost::none, boost::none);
           return;
         }
 
         // announce height changes
         uint64_t height = m_wallet->get_height();
+        if (generation != m_generation) return;
         if (m_prev_height.get() != height) {
           for (uint64_t i = m_prev_height.get(); i < height; i++) {
-            on_new_block(i);
+            on_new_block(i, generation);
+            if (generation != m_generation) return;
           }
 
           m_prev_height = height;
@@ -138,6 +155,7 @@ namespace monero {
         tx_query.m_include_outputs = true;
 
         auto locked_txs = m_wallet->get_txs(tx_query);
+        if (generation != m_generation) return;
 
         // collect hashes of txs no longer locked
         std::vector<std::string> no_longer_locked_hashes;
@@ -159,6 +177,7 @@ namespace monero {
           tx_query.m_hashes = no_longer_locked_hashes;
           tx_query.m_include_outputs = true;
           unlocked_txs = m_wallet->get_txs(tx_query);
+          if (generation != m_generation) return;
         }
 
         // announce new unconfirmed and confirmed txs
@@ -178,7 +197,8 @@ namespace monero {
             }
           }
 
-          if (announced) notify_outputs(locked_tx);
+          if (announced) notify_outputs(locked_tx, generation);
+          if (generation != m_generation) return;
         }
 
         // announce new unlocked outputs
@@ -187,19 +207,20 @@ namespace monero {
           // stop tracking tx notifications
           m_prev_confirmed_notifications.erase(std::remove_if(m_prev_confirmed_notifications.begin(), m_prev_confirmed_notifications.end(), [&tx_hash](const std::string& iter){ return iter == tx_hash; }), m_prev_confirmed_notifications.end());
           m_prev_unconfirmed_notifications.erase(std::remove_if(m_prev_unconfirmed_notifications.begin(), m_prev_unconfirmed_notifications.end(), [&tx_hash](const std::string& iter){ return iter == tx_hash; }), m_prev_unconfirmed_notifications.end());
-          notify_outputs(unlocked_tx);
+          notify_outputs(unlocked_tx, generation);
+          if (generation != m_generation) return;
         }
 
         // announce balance changes
-        check_for_changed_balances();
+        check_for_changed_balances(generation);
       }
       catch (const std::exception &e) {
-        if (m_is_polling) {
+        if (generation == m_generation && m_is_polling) {
           MERROR("Failed to background poll wallet " << m_wallet->get_path() << ": " << e.what());
         }
       }
       catch (...) {
-        if (m_is_polling) {
+        if (generation == m_generation && m_is_polling) {
           MERROR("Failed to background poll wallet " << m_wallet->get_path());
         }
       }
@@ -208,6 +229,8 @@ namespace monero {
   private:
     monero_wallet_rpc *m_wallet;
     std::atomic<int> m_num_polling;
+    std::atomic<uint64_t> m_generation{0};
+    uint64_t m_snapshot_generation = 0;
 
     std::vector<std::string> m_prev_unconfirmed_notifications;
     std::vector<std::string> m_prev_confirmed_notifications;
@@ -223,11 +246,12 @@ namespace monero {
       return nullptr;
     }
 
-    void on_new_block(uint64_t height) {
-      announce_new_block(height);
+    void on_new_block(uint64_t height, uint64_t generation) {
+      announce_new_block(height, generation);
     }
 
-    void notify_outputs(const std::shared_ptr<monero_tx_wallet> &tx) {
+    void notify_outputs(const std::shared_ptr<monero_tx_wallet> &tx, uint64_t generation) {
+      if (generation != m_generation) return;
       // notify spent outputs
       // TODO (monero-project): monero-wallet-rpc does not allow scrape of tx inputs so providing one input with outgoing amount
       if (tx->m_outgoing_transfer != nullptr) {
@@ -243,7 +267,8 @@ namespace monero {
         }
         tx->m_inputs.clear();
         tx->m_inputs.push_back(output);
-        announce_output_spent(output);
+        announce_output_spent(output, generation);
+        if (generation != m_generation) return;
       }
 
       // notify received outputs
@@ -251,7 +276,8 @@ namespace monero {
         if (!tx->m_outputs.empty()) {
           // TODO (monero-project): outputs only returned for confirmed txs
           for(const auto &output : tx->get_outputs_wallet()) {
-            announce_output_received(output);
+            announce_output_received(output, generation);
+            if (generation != m_generation) return;
           }
         }
         else {
@@ -267,25 +293,28 @@ namespace monero {
           }
 
           for (const auto &output : tx->get_outputs_wallet()) {
-            announce_output_received(output);
+            announce_output_received(output, generation);
+            if (generation != m_generation) return;
           }
         }
       }
     }
 
-    bool check_for_changed_balances() {
+    bool check_for_changed_balances(uint64_t generation) {
       std::shared_ptr<monero_subaddress> balances = m_wallet->get_balances(boost::none, boost::none);
+      if (generation != m_generation) return false;
       if (balances->m_balance != m_prev_balances->m_balance || balances->m_unlocked_balance != m_prev_balances->m_unlocked_balance) {
         m_prev_balances = balances;
-        announce_balances_changed(balances->m_balance.get(), balances->m_unlocked_balance.get());
+        announce_balances_changed(balances->m_balance.get(), balances->m_unlocked_balance.get(), generation);
         return true;
       }
       return false;
     }
 
     // mirrors monero_daemon_poller
-    void announce_new_block(uint64_t height) {
+    void announce_new_block(uint64_t height, uint64_t generation) {
       for (const auto &listener : m_wallet->get_listeners()) {
+        if (generation != m_generation) return;
         try {
           listener->on_new_block(height);
         } catch (const std::exception &e) {
@@ -294,8 +323,9 @@ namespace monero {
       }
     }
 
-    void announce_balances_changed(uint64_t balance, uint64_t unlocked_balance) {
+    void announce_balances_changed(uint64_t balance, uint64_t unlocked_balance, uint64_t generation) {
       for (const auto &listener : m_wallet->get_listeners()) {
+        if (generation != m_generation) return;
         try {
           listener->on_balances_changed(balance, unlocked_balance);
         } catch (const std::exception &e) {
@@ -304,8 +334,9 @@ namespace monero {
       }
     }
 
-    void announce_output_spent(const std::shared_ptr<monero_output_wallet> &output) {
+    void announce_output_spent(const std::shared_ptr<monero_output_wallet> &output, uint64_t generation) {
       for (const auto &listener : m_wallet->get_listeners()) {
+        if (generation != m_generation) return;
         try {
           listener->on_output_spent(*output);
         } catch (const std::exception &e) {
@@ -314,8 +345,9 @@ namespace monero {
       }
     }
 
-    void announce_output_received(const std::shared_ptr<monero_output_wallet> &output) {
+    void announce_output_received(const std::shared_ptr<monero_output_wallet> &output, uint64_t generation) {
       for (const auto &listener : m_wallet->get_listeners()) {
+        if (generation != m_generation) return;
         try {
           listener->on_output_received(*output);
         } catch (const std::exception &e) {
@@ -1818,6 +1850,10 @@ namespace monero {
   }
 
   void monero_wallet_rpc::clear() {
+    {
+      boost::lock_guard<boost::mutex> poller_lock(m_poller_mutex);
+      if (m_poller) m_poller->reset();
+    }
     {
       boost::lock_guard<boost::recursive_mutex> lock(m_listeners_mutex);
       m_listeners.clear();
