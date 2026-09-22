@@ -1194,7 +1194,7 @@ namespace monero {
     // filter on common fields
     if (is_incoming() != boost::none && *is_incoming() != *transfer->is_incoming()) return false;
     if (is_outgoing() != boost::none && *is_outgoing() != *transfer->is_outgoing()) return false;
-    if (m_amount != boost::none && *m_amount != *transfer->m_amount) return false;
+    if (m_amount != boost::none && (transfer->m_amount == boost::none || *m_amount != *transfer->m_amount)) return false;
     if (m_account_index != boost::none && *m_account_index != *transfer->m_account_index) return false;
 
     // filter on incoming fields
