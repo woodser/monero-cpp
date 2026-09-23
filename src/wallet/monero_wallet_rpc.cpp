@@ -117,6 +117,7 @@ namespace monero {
           m_prev_height = boost::none;
           m_prev_balances.reset();
           m_prev_locked_txs.clear();
+          m_prev_locked_txs_min_height = 0;
           m_prev_unconfirmed_notifications.clear();
           m_prev_confirmed_notifications.clear();
           m_snapshot_generation = generation;
@@ -166,14 +167,16 @@ namespace monero {
         }
 
         // save locked txs for next comparison
+        uint64_t prev_min_height = m_prev_locked_txs_min_height;
         m_prev_locked_txs = locked_txs;
+        m_prev_locked_txs_min_height = min_height;
         std::vector<std::shared_ptr<monero_tx_wallet>> unlocked_txs;
 
         if (!no_longer_locked_hashes.empty()) {
-          // fetch txs which are no longer locked
+          // use the previous snapshot's bound so tracked txs do not age out between polls
           monero_tx_query tx_query;
           tx_query.m_is_locked = false;
-          tx_query.m_min_height = min_height;
+          tx_query.m_min_height = prev_min_height;
           tx_query.m_hashes = no_longer_locked_hashes;
           tx_query.m_include_outputs = true;
           unlocked_txs = m_wallet->get_txs(tx_query);
@@ -237,6 +240,7 @@ namespace monero {
     std::shared_ptr<monero_subaddress> m_prev_balances;
     boost::optional<uint64_t> m_prev_height;
     std::vector<std::shared_ptr<monero_tx_wallet>> m_prev_locked_txs;
+    uint64_t m_prev_locked_txs_min_height = 0;
 
     std::shared_ptr<monero_tx_wallet> get_tx(const std::vector<std::shared_ptr<monero_tx_wallet>>& txs, const std::string& tx_hash){
       for (const auto& tx : txs) {
