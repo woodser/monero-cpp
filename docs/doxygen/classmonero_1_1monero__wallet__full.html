@@ -336,6 +336,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:adac59b1d628e75ccd4d02411fe5019b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af276845716a876280a62cb92a489a292" id="r_af276845716a876280a62cb92a489a292"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af276845716a876280a62cb92a489a292">is_closed</a> () const override</td></tr>
 <tr class="separator:af276845716a876280a62cb92a489a292"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69d280a8b3eea9e01529a1137ae76ade" id="r_a69d280a8b3eea9e01529a1137ae76ade"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69d280a8b3eea9e01529a1137ae76ade">request_shutdown</a> ()</td></tr>
+<tr class="separator:a69d280a8b3eea9e01529a1137ae76ade"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae390264c0859ec63698380b6c804ea7" id="r_aae390264c0859ec63698380b6c804ea7"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aae390264c0859ec63698380b6c804ea7">get_keys_file_buffer</a> (const epee::wipeable_string &amp;password, bool view_only) const</td></tr>
 <tr class="separator:aae390264c0859ec63698380b6c804ea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4778ad3489ef88a280111c5ffbe4e27f" id="r_a4778ad3489ef88a280111c5ffbe4e27f"><td class="memItemLeft" align="right" valign="top"><a id="a4778ad3489ef88a280111c5ffbe4e27f" name="a4778ad3489ef88a280111c5ffbe4e27f"></a>
@@ -3490,6 +3492,24 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 </dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a64b939b0afe3969b3e3c2163b4a5914e">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
+<a id="a69d280a8b3eea9e01529a1137ae76ade" name="a69d280a8b3eea9e01529a1137ae76ade"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69d280a8b3eea9e01529a1137ae76ade">&#9670;&#160;</a></span>request_shutdown()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void monero::monero_wallet_full::request_shutdown </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Permanently cancels daemon requests and syncing in preparation for <a class="el" href="#adac59b1d628e75ccd4d02411fe5019b4">close()</a>. The caller must prevent new operations and keep the wallet alive until active calls finish. </p>
 
 </div>
 </div>

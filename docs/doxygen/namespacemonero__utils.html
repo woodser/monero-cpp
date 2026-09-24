@@ -107,6 +107,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>configure_logging</b>
 <tr class="memitem:a4ae54024e953fe446029375483205792" id="r_a4ae54024e953fe446029375483205792"><td class="memItemLeft" align="right" valign="top"><a id="a4ae54024e953fe446029375483205792" name="a4ae54024e953fe446029375483205792"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_payment_uri</b> (const <a class="el" href="structmonero_1_1monero__tx__config.html">monero_tx_config</a> &amp;config, <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a> network_type)</td></tr>
 <tr class="separator:a4ae54024e953fe446029375483205792"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eca4f3f631b544c5c136110833aa6d6" id="r_a4eca4f3f631b544c5c136110833aa6d6"><td class="memItemLeft" align="right" valign="top"><a id="a4eca4f3f631b544c5c136110833aa6d6" name="a4eca4f3f631b544c5c136110833aa6d6"></a>
+std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__config.html">monero_tx_config</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>parse_payment_uri</b> (const std::string &amp;uri, <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a> network_type)</td></tr>
+<tr class="separator:a4eca4f3f631b544c5c136110833aa6d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11d2a1e6abd4cb53fe843e45436beb06" id="r_a11d2a1e6abd4cb53fe843e45436beb06"><td class="memItemLeft" align="right" valign="top"><a id="a11d2a1e6abd4cb53fe843e45436beb06" name="a11d2a1e6abd4cb53fe843e45436beb06"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>is_valid_address</b> (const std::string &amp;address, <a class="el" href="namespacemonero.html#ac9023a1d513e2526775d1e061bb5beed">monero_network_type</a> network_type)</td></tr>
 <tr class="separator:a11d2a1e6abd4cb53fe843e45436beb06"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -201,6 +204,10 @@ rapidjson::Value&#160;</td><td class="memItemRight" valign="bottom"><b>to_rapidj
 <tr class="separator:aa78d122ad53b7c880c17ff684a6248da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b9ee3d8bd81e28c3bbdf4e747300277" id="r_a3b9ee3d8bd81e28c3bbdf4e747300277"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3b9ee3d8bd81e28c3bbdf4e747300277">is_valid_language</a> (const std::string &amp;language)</td></tr>
 <tr class="separator:a3b9ee3d8bd81e28c3bbdf4e747300277"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10cccd94d49782acd705873f49d1c7ac" id="r_a10cccd94d49782acd705873f49d1c7ac"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a10cccd94d49782acd705873f49d1c7ac">parse_payment_id_long</a> (const std::string &amp;payment_id_str, crypto::hash &amp;payment_id)</td></tr>
+<tr class="separator:a10cccd94d49782acd705873f49d1c7ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a904e26d0bda1dd0938da01117fb589cf" id="r_a904e26d0bda1dd0938da01117fb589cf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a904e26d0bda1dd0938da01117fb589cf">parse_payment_id_short</a> (const std::string &amp;payment_id_str, crypto::hash8 &amp;payment_id)</td></tr>
+<tr class="separator:a904e26d0bda1dd0938da01117fb589cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2fb8889ec17d02e54541e90a3ffd47f" id="r_ab2fb8889ec17d02e54541e90a3ffd47f"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__block.html">monero_block</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab2fb8889ec17d02e54541e90a3ffd47f">cn_block_to_block</a> (const cryptonote::block &amp;cn_block)</td></tr>
 <tr class="separator:ab2fb8889ec17d02e54541e90a3ffd47f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4b5df3026350e762bfa40c6acdb6a0d" id="r_ad4b5df3026350e762bfa40c6acdb6a0d"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx.html">monero_tx</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad4b5df3026350e762bfa40c6acdb6a0d">cn_tx_to_tx</a> (const cryptonote::transaction &amp;cn_tx, bool init_as_tx_wallet=false)</td></tr>
@@ -396,6 +403,66 @@ template&lt;class T&gt; </div>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a10cccd94d49782acd705873f49d1c7ac" name="a10cccd94d49782acd705873f49d1c7ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10cccd94d49782acd705873f49d1c7ac">&#9670;&#160;</a></span>parse_payment_id_long()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool monero_utils::parse_payment_id_long </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>payment_id_str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">crypto::hash &amp;</td>          <td class="paramname"><span class="paramname"><em>payment_id</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Parses a long payment ID from a string.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payment_id_str</td><td>is the string to parse </td></tr>
+    <tr><td class="paramname">payment_id</td><td>is the parsed payment ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the payment ID is valid, false otherwise </dd></dl>
+
+</div>
+</div>
+<a id="a904e26d0bda1dd0938da01117fb589cf" name="a904e26d0bda1dd0938da01117fb589cf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a904e26d0bda1dd0938da01117fb589cf">&#9670;&#160;</a></span>parse_payment_id_short()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool monero_utils::parse_payment_id_short </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>payment_id_str</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">crypto::hash8 &amp;</td>          <td class="paramname"><span class="paramname"><em>payment_id</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Parses a short payment ID from a string.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">payment_id_str</td><td>is the string to parse </td></tr>
+    <tr><td class="paramname">payment_id</td><td>is the parsed payment ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the payment ID is valid, false otherwise </dd></dl>
 
 </div>
 </div>
