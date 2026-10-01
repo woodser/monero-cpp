@@ -1217,8 +1217,16 @@ namespace monero {
   }
 
   void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri, const boost::optional<bool>& is_trusted) {
+    set_daemon_connection(uri, username, password, proxy_uri, is_trusted, true);
+  }
+
+  void monero_wallet_full::set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri, const boost::optional<bool>& is_trusted, bool ssl_verify) {
     MTRACE("set_daemon_connection(" << uri << ", " << username << ", " << "***" << ", " << proxy_uri << ")");
     assert_not_closed();
+
+    // validate before wallet2 changes its daemon and proxy
+    epee::net_utils::http::url_content parsed{};
+    if (!epee::net_utils::parse_url(uri, parsed)) throw std::runtime_error("Failed to initialize wallet with daemon connection");
 
     // prepare uri, login, and trusted for wallet2
     boost::optional<epee::net_utils::http::login> login{};
@@ -1231,27 +1239,32 @@ namespace monero {
     }
 
     // detect ssl TODO: wallet2 does not detect ssl from uri
-    epee::net_utils::ssl_support_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
+    epee::net_utils::ssl_options_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
+    if (!ssl_verify) ssl.verification = epee::net_utils::ssl_verification_t::none;
 
+    boost::lock_guard<boost::mutex> lock(m_daemon_connection_mutex);
     if (!m_w2->set_daemon(uri, login, trusted, std::move(ssl), proxy_uri)) {
       throw std::runtime_error("Failed to initialize wallet with daemon connection");
     }
+    m_daemon_proxy_uri = proxy_uri;
+    m_daemon_ssl_verify = ssl_verify;
   }
 
   void monero_wallet_full::set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted) {
     assert_not_closed();
     if (connection == nullptr) set_daemon_connection("", "", "", "", is_trusted);
-    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get(), connection->m_proxy_uri == boost::none ? "" : connection->m_proxy_uri.get(), is_trusted);
+    else set_daemon_connection(connection->m_uri == boost::none ? "" : connection->m_uri.get(), connection->m_username == boost::none ? "" : connection->m_username.get(), connection->m_password == boost::none ? "" : connection->m_password.get(), connection->m_proxy_uri == boost::none ? "" : connection->m_proxy_uri.get(), is_trusted, connection->m_ssl_verify);
   }
 
   std::shared_ptr<monero_rpc_connection> monero_wallet_full::get_daemon_connection() const {
     MTRACE("monero_wallet_full::get_daemon_connection()");
     assert_not_closed();
+    boost::lock_guard<boost::mutex> lock(m_daemon_connection_mutex);
     if (m_w2->get_daemon_address().empty()) return nullptr;
     std::shared_ptr<monero_rpc_connection> connection = std::make_shared<monero_rpc_connection>();
     connection->m_uri = m_w2->get_daemon_address();
-    std::string proxy_uri = m_w2->get_daemon_proxy();
-    if (!proxy_uri.empty()) connection->m_proxy_uri = proxy_uri;
+    connection->m_ssl_verify = m_daemon_ssl_verify;
+    if (!m_daemon_proxy_uri.empty()) connection->m_proxy_uri = m_daemon_proxy_uri;
     if (m_w2->get_daemon_login()) {
       if (!m_w2->get_daemon_login()->username.empty()) connection->m_username = m_w2->get_daemon_login()->username;
       epee::wipeable_string wipeablePassword = m_w2->get_daemon_login()->password;

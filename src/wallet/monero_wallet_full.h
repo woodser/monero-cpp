@@ -277,6 +277,10 @@ namespace monero {
 
   private:
     friend struct wallet2_listener;
+    mutable boost::mutex m_daemon_connection_mutex; // serialize daemon changes and connection snapshots
+    std::string m_daemon_proxy_uri;
+    bool m_daemon_ssl_verify = true;
+    void set_daemon_connection(const std::string& uri, const std::string& username, const std::string& password, const std::string& proxy_uri, const boost::optional<bool>& is_trusted, bool ssl_verify);
     std::unique_ptr<wallet2_listener> m_w2_listener; // internal wallet implementation listener
     std::set<monero_wallet_listener*> m_listeners;   // external wallet listeners
     boost::recursive_mutex m_listeners_mutex;       // serialize notifications with listener removal, including removal from a callback

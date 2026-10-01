@@ -98,6 +98,7 @@ namespace monero {
     boost::lock_guard<boost::recursive_mutex> src_lock(rpc.m_mutex);
     m_uri = rpc.m_uri;
     m_proxy_uri = rpc.m_proxy_uri;
+    m_ssl_verify = rpc.m_ssl_verify;
     m_zmq_uri = rpc.m_zmq_uri;
     m_priority = rpc.m_priority;
     m_timeout_ms = rpc.m_timeout_ms;
@@ -129,6 +130,7 @@ namespace monero {
     if (m_response_time != boost::none) monero_utils::add_json_member("responseTime", m_response_time.get(), allocator, root, value_num);
 
     // set bool values
+    monero_utils::add_json_member("sslVerify", m_ssl_verify, allocator, root);
     if (m_is_online != boost::none) monero_utils::add_json_member("isOnline", m_is_online.get(), allocator, root);
     if (m_is_authenticated != boost::none) monero_utils::add_json_member("isAuthenticated", m_is_authenticated.get(), allocator, root);
 
@@ -328,12 +330,12 @@ namespace monero {
       m_http_client->set_auto_connect(true);
     }
 
-    // only reconfigure when uri/creds/proxy changed since last apply
+    // only reconfigure when uri/creds/proxy/ssl changed since last apply
     std::string uri = m_uri.value_or("");
     std::string username = m_username.value_or("");
     std::string password = m_password.value_or("");
     std::string proxy_uri = m_proxy_uri.value_or("");
-    auto key = std::make_tuple(uri, username, password, proxy_uri);
+    auto key = std::make_tuple(uri, username, password, proxy_uri, m_ssl_verify);
 
     if (m_applied == key) return; // unchanged, so reuse live connection
 
@@ -346,7 +348,8 @@ namespace monero {
     }
 
     // detect ssl
-    epee::net_utils::ssl_support_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
+    epee::net_utils::ssl_options_t ssl = uri.rfind("https", 0) == 0 ? epee::net_utils::ssl_support_t::e_ssl_support_enabled : epee::net_utils::ssl_support_t::e_ssl_support_disabled;
+    if (!m_ssl_verify) ssl.verification = epee::net_utils::ssl_verification_t::none;
 
     if (!m_http_client->set_proxy(proxy_uri)) throw monero_error("Could not set proxy uri: " + proxy_uri);
     if (!m_http_client->set_server(uri, login, std::move(ssl))) throw monero_error("Could not set uri: " + uri);
@@ -431,6 +434,7 @@ namespace monero {
       else if (key == std::string("username")) connection->m_username = it->second.data();
       else if (key == std::string("password")) connection->m_password = it->second.data();
       else if (key == std::string("proxyUri") || key == std::string("proxy_uri")) connection->m_proxy_uri = it->second.data();
+      else if (key == std::string("sslVerify")) connection->m_ssl_verify = it->second.get_value<bool>();
       else if (key == std::string("zmqUri")) connection->m_zmq_uri = it->second.data();
       else if (key == std::string("priority")) connection->m_priority = it->second.get_value<int>();
       else if (key == std::string("timeoutMs")) connection->m_timeout_ms = it->second.get_value<uint32_t>();
