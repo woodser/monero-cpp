@@ -531,15 +531,18 @@ namespace monero {
     params->m_trusted = is_trusted;
     params->m_ssl_support = "autodetect";
     params->m_ssl_options = ssl_options;
+    if (ssl_options == boost::none && connection != nullptr) {
+      params->m_ssl_options = monero::ssl_options();
+      params->m_ssl_options->m_ssl_allow_any_cert = !connection->m_ssl_verify;
+    }
 
+    std::shared_ptr<monero_rpc_connection> daemon_connection;
+    if (connection != nullptr && connection->m_uri != boost::none && !connection->m_uri->empty()) {
+      daemon_connection = std::make_shared<monero_rpc_connection>(*connection);
+      daemon_connection->m_ssl_verify = !params->m_ssl_options->m_ssl_allow_any_cert.value_or(false);
+    }
     m_rpc->send_json_request("set_daemon", params);
-
-    if (connection == nullptr || connection->m_uri == boost::none || connection->m_uri->empty()) {
-      m_daemon_connection = nullptr;
-    }
-    else {
-      m_daemon_connection = connection;
-    }
+    m_daemon_connection = daemon_connection;
   }
 
   void monero_wallet_rpc::set_daemon_connection(const std::shared_ptr<monero_rpc_connection>& connection, const boost::optional<bool>& is_trusted) {

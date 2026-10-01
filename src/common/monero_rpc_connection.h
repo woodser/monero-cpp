@@ -113,6 +113,7 @@ namespace monero {
     boost::optional<std::string> m_username;
     boost::optional<std::string> m_password;
     boost::optional<std::string> m_proxy_uri;
+    bool m_ssl_verify = true;                    // verify TLS certificates and hostnames
     boost::optional<std::string> m_zmq_uri;      // TODO: implement zmq listener
     boost::optional<uint32_t> m_timeout_ms;      // RPC request timeout in milliseconds
     boost::optional<uint64_t> m_response_time;   // automatically set by calling check_connection()
@@ -272,7 +273,7 @@ namespace monero {
     boost::optional<bool> m_is_authenticated;
     mutable std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
     std::unordered_map<std::string, std::string> m_attributes;
-    mutable std::tuple<std::string, std::string, std::string, std::string> m_applied;
+    mutable std::tuple<std::string, std::string, std::string, std::string, bool> m_applied{"", "", "", "", true};
 
     void ensure_configured() const;
     std::string invoke_post(const boost::string_ref uri, const std::string& body, const boost::optional<uint32_t>& timeout_ms = boost::none) const;
