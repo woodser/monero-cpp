@@ -175,6 +175,9 @@ boost::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="
 <tr class="memitem:ae62acede6fe751a6e90236e20ad2a5e5" id="r_ae62acede6fe751a6e90236e20ad2a5e5"><td class="memItemLeft" align="right" valign="top"><a id="ae62acede6fe751a6e90236e20ad2a5e5" name="ae62acede6fe751a6e90236e20ad2a5e5"></a>
 boost::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_proxy_uri</b></td></tr>
 <tr class="separator:ae62acede6fe751a6e90236e20ad2a5e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a705e0beefa76f5327dbbf1633210d133" id="r_a705e0beefa76f5327dbbf1633210d133"><td class="memItemLeft" align="right" valign="top"><a id="a705e0beefa76f5327dbbf1633210d133" name="a705e0beefa76f5327dbbf1633210d133"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>m_ssl_verify</b> = true</td></tr>
+<tr class="separator:a705e0beefa76f5327dbbf1633210d133"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afd0e1584a0910f779e178d6bd8da3cf7" id="r_afd0e1584a0910f779e178d6bd8da3cf7"><td class="memItemLeft" align="right" valign="top"><a id="afd0e1584a0910f779e178d6bd8da3cf7" name="afd0e1584a0910f779e178d6bd8da3cf7"></a>
 boost::optional&lt; std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_zmq_uri</b></td></tr>
 <tr class="separator:afd0e1584a0910f779e178d6bd8da3cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -217,9 +220,9 @@ std::unique_ptr&lt; epee::net_utils::http::abstract_http_client &gt;&#160;</td><
 <tr class="memitem:ac4b2e10a07c6f6e1ecb26a99e6405790" id="r_ac4b2e10a07c6f6e1ecb26a99e6405790"><td class="memItemLeft" align="right" valign="top"><a id="ac4b2e10a07c6f6e1ecb26a99e6405790" name="ac4b2e10a07c6f6e1ecb26a99e6405790"></a>
 std::unordered_map&lt; std::string, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_attributes</b></td></tr>
 <tr class="separator:ac4b2e10a07c6f6e1ecb26a99e6405790"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac35c6c65ed6f4a27aab13d1017fce416" id="r_ac35c6c65ed6f4a27aab13d1017fce416"><td class="memItemLeft" align="right" valign="top"><a id="ac35c6c65ed6f4a27aab13d1017fce416" name="ac35c6c65ed6f4a27aab13d1017fce416"></a>
-std::tuple&lt; std::string, std::string, std::string, std::string &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_applied</b></td></tr>
-<tr class="separator:ac35c6c65ed6f4a27aab13d1017fce416"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abda0f9cc4c3af39902bc3bba8af11785" id="r_abda0f9cc4c3af39902bc3bba8af11785"><td class="memItemLeft" align="right" valign="top"><a id="abda0f9cc4c3af39902bc3bba8af11785" name="abda0f9cc4c3af39902bc3bba8af11785"></a>
+std::tuple&lt; std::string, std::string, std::string, std::string, bool &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>m_applied</b> {&quot;&quot;, &quot;&quot;, &quot;&quot;, &quot;&quot;, true}</td></tr>
+<tr class="separator:abda0f9cc4c3af39902bc3bba8af11785"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Maintains a connection and sends requests to a Monero RPC API. </p>
