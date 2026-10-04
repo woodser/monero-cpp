@@ -1,6 +1,6 @@
 # Monero C++ Library
 
-A C++ library for creating Monero applications using RPC or native bindings to [monero v0.18.5.1 'Fluorine Fermi'](https://github.com/monero-project/monero/tree/v0.18.5.1).
+A C++ library for creating Monero applications using RPC or native bindings to [monero v0.18.5.3 'Fluorine Fermi'](https://github.com/monero-project/monero/tree/v0.18.5.3).
 
 * Supports fully client-side wallets by wrapping [wallet2.h](https://github.com/monero-project/monero/blob/master/src/wallet/wallet2.h).
 * Supports wallet and daemon RPC clients.
