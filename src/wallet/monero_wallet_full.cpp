@@ -1197,9 +1197,9 @@ namespace monero {
     wallet->m_w2->set_seed_language(config.m_language.get());
     crypto::secret_key secret_key;
     if (config.m_account_lookahead != boost::none) wallet->m_w2->set_subaddress_lookahead(config.m_account_lookahead.get(), config.m_subaddress_lookahead.get());
+    if (wallet->is_connected_to_daemon()) wallet->m_w2->set_refresh_from_block_height(wallet->get_daemon_height()); // must be set before generate so the height is written to the keys file
     wallet->m_w2->generate(config.m_path.get(), config.m_password.get(), secret_key, false, false);
     wallet->init_common();
-    if (wallet->is_connected_to_daemon()) wallet->m_w2->set_refresh_from_block_height(wallet->get_daemon_height());
     return wallet;
   }
 
