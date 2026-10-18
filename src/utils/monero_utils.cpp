@@ -601,10 +601,16 @@ bool monero_utils::vout_before(const std::shared_ptr<monero_output>& o1, const s
   if (tx_height_less_than(ow1->m_tx, ow2->m_tx)) return true;
 
   // compare by account index, subaddress index, output index, then key image hex
-  if (ow1->m_account_index.get() < ow2->m_account_index.get()) return true;
-  if (ow1->m_account_index.get() == ow2->m_account_index.get()) {
-    if (ow1->m_subaddress_index.get() < ow2->m_subaddress_index.get()) return true;
-    if (ow1->m_subaddress_index.get() == ow2->m_subaddress_index.get()) {
+  static const uint32_t EXTERNAL_SENTINEL = std::numeric_limits<uint32_t>::max();
+  uint32_t account1 = ow1->m_account_index.value_or(EXTERNAL_SENTINEL);
+  uint32_t account2 = ow2->m_account_index.value_or(EXTERNAL_SENTINEL);
+
+  if (account1 < account2) return true;
+  if (account1 == account2) {
+    uint32_t subaddress1 = ow1->m_subaddress_index.value_or(EXTERNAL_SENTINEL);
+    uint32_t subaddress2 = ow2->m_subaddress_index.value_or(EXTERNAL_SENTINEL);
+    if (subaddress1 < subaddress2) return true;
+    if (subaddress1 == subaddress2) {
       if (ow1->m_index.get() < ow2->m_index.get()) return true;
       if (ow1->m_index.get() == ow2->m_index.get()) throw std::runtime_error("Should never sort outputs with duplicate indices");
     }
@@ -790,4 +796,76 @@ bool monero_utils::parse_payment_id_short(const std::string& payment_id_str, cry
   if (!epee::string_tools::parse_hexstr_to_binbuff(payment_id_str, payment_id_data) || sizeof(crypto::hash8) != payment_id_data.size()) return false;
   payment_id = *reinterpret_cast<const crypto::hash8*>(payment_id_data.data());
   return true;
+}
+
+std::shared_ptr<monero_key_image> monero_utils::generate_key_image(const crypto::public_key &ephem_pubkey, const size_t tx_output_index, const cryptonote::subaddress_index &received_subaddr, const cryptonote::account_base& account, const boost::optional<crypto::public_key>& expected_output_pubkey) {
+  //   - R: ephem_pubkey
+  //   - a: ack.m_view_secret_key [private viewkey]
+  //   - b: ack.m_spend_secret_key [private spendkey]
+  //   - idx: tx_output_index
+  //   - index_major: received_subaddr.major
+  //   - index_minor: received_subaddr.minor
+  //   - Hs() [hash-to-scalar]
+  //   - Hp() [hash-to-point]
+
+  const cryptonote::account_keys &ack = account.get_keys();
+  hw::device &hwdev = account.get_device();
+
+  // 1. Diffie-Helman derived secret D = a R
+  crypto::key_derivation recv_derivation;
+  CHECK_AND_ASSERT_THROW_MES(hwdev.generate_key_derivation(ephem_pubkey, ack.m_view_secret_key, recv_derivation), "Failed to perform Diffie-Helman exchange against tx ephem pubkey");
+
+  // 2. Non-address-extended onetime key secret u = Hs(D || idx) + b
+  crypto::secret_key onetime_privkey_unextended;
+  hwdev.derive_secret_key(recv_derivation, tx_output_index, ack.m_spend_secret_key, onetime_privkey_unextended);
+
+  // 3. Subaddress key extension s = Hs(a || index_major || index_minor) if is subaddress, else s = 0
+  const crypto::secret_key subaddr_ext{received_subaddr.is_zero() ? crypto::secret_key{} : hwdev.get_subaddress_secret_key(ack.m_view_secret_key, received_subaddr)};
+
+  // 4. Onetime address private key x = u + s
+  crypto::secret_key onetime_privkey;
+  hwdev.sc_secret_add(onetime_privkey, onetime_privkey_unextended, subaddr_ext);
+
+  // 5. Onetime address K = x G
+  crypto::public_key onetime_pubkey;
+  CHECK_AND_ASSERT_THROW_MES(hwdev.secret_key_to_public_key(onetime_privkey, onetime_pubkey), "Failed to make public key");
+
+  if (expected_output_pubkey != boost::none && onetime_pubkey != *expected_output_pubkey) throw monero_output_ownership_error();
+
+  // 6. Key image I = x Hp(K)
+  crypto::key_image ki;
+  hwdev.generate_key_image(onetime_pubkey, onetime_privkey, ki);
+
+  // sign the key image with the output secret key
+  crypto::signature signature;
+  std::vector<const crypto::public_key*> key_ptrs;
+  key_ptrs.push_back(&onetime_pubkey);
+
+  crypto::generate_ring_signature((const crypto::hash&)ki, ki, key_ptrs, onetime_privkey, 0, &signature);
+
+  std::shared_ptr<monero_key_image> key_image = std::make_shared<monero_key_image>();
+  key_image->m_hex = epee::string_tools::pod_to_hex(ki);
+  key_image->m_signature = epee::string_tools::pod_to_hex(signature);
+  return key_image;
+}
+
+void monero_utils::verify_output_ownership(const crypto::public_key &ephem_pubkey, const size_t tx_output_index, const cryptonote::subaddress_index &received_subaddr, const cryptonote::account_base& account, const crypto::public_key &expected_output_pubkey) {
+  const cryptonote::account_keys &ack = account.get_keys();
+  hw::device &hwdev = account.get_device();
+
+  crypto::key_derivation recv_derivation;
+  CHECK_AND_ASSERT_THROW_MES(hwdev.generate_key_derivation(ephem_pubkey, ack.m_view_secret_key, recv_derivation), "Failed to perform Diffie-Helman exchange against tx ephem pubkey");
+
+  crypto::secret_key onetime_privkey_unextended;
+  hwdev.derive_secret_key(recv_derivation, tx_output_index, ack.m_spend_secret_key, onetime_privkey_unextended);
+
+  const crypto::secret_key subaddr_ext{received_subaddr.is_zero() ? crypto::secret_key{} : hwdev.get_subaddress_secret_key(ack.m_view_secret_key, received_subaddr)};
+
+  crypto::secret_key onetime_privkey;
+  hwdev.sc_secret_add(onetime_privkey, onetime_privkey_unextended, subaddr_ext);
+
+  crypto::public_key onetime_pubkey;
+  CHECK_AND_ASSERT_THROW_MES(hwdev.secret_key_to_public_key(onetime_privkey, onetime_pubkey), "Failed to make public key");
+
+  if (onetime_pubkey != expected_output_pubkey) throw monero_output_ownership_error();
 }

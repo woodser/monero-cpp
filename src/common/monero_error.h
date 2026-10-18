@@ -82,6 +82,14 @@ namespace monero {
   };
 
   /**
+   * Exception when a derived one-time output key does not match the output's claimed public key.
+   */
+  class monero_output_ownership_error : public monero_error {
+  public:
+    monero_output_ownership_error() { message = "Derived one-time output key does not match the output's public key"; }
+  };
+
+  /**
    * Exception when interacting with the Monero daemon or wallet RPC API.
    */
   class monero_rpc_error : public monero_error {

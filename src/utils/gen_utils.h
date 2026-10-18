@@ -67,8 +67,13 @@
 #include <chrono>
 #include <thread>
 #include <atomic>
+#include <cstdlib>
+#include <cstdio>
+#include <cctype>
+#include <algorithm>
 #include "include_base_utils.h"
 #include "common/util.h"
+#include "crypto/crypto.h"
 
 /**
  * Collection of generic utilities.
@@ -85,6 +90,39 @@ namespace gen_utils
     boost::uuids::random_generator generator;
     boost::uuids::uuid uuid = generator();
     return boost::uuids::to_string(uuid);
+  }
+
+  static bool is_uint64_t(const std::string& str) {
+    if (str.empty() || !std::all_of(str.begin(), str.end(), [](unsigned char c) { return std::isdigit(c) != 0; })) return false;
+    errno = 0;
+    char* end = nullptr;
+    std::strtoull(str.c_str(), &end, 10);
+    if (errno == ERANGE) return false;
+    return end == str.c_str() + str.size();
+  }
+
+  static uint64_t uint64_t_cast(const std::string& str) {
+    if (!is_uint64_t(str)) throw std::out_of_range("String provided is not a valid uint64_t");
+    return static_cast<uint64_t>(std::strtoull(str.c_str(), nullptr, 10));
+  }
+
+  // based on Howard Hinnant's days_from_civil algorithm (http://howardhinnant.github.io/date_algorithms.html)
+  static uint64_t timestamp_to_epoch(const std::string& iso_timestamp) {
+    int year, month, day, hour, minute, second;
+    if (std::sscanf(iso_timestamp.c_str(), "%d-%d-%d%*[T ]%d:%d:%d", &year, &month, &day, &hour, &minute, &second) != 6) {
+      throw std::runtime_error("Invalid ISO 8601 timestamp: " + iso_timestamp);
+    }
+
+    int64_t y = year - (month <= 2 ? 1 : 0);
+    int64_t era = (y >= 0 ? y : y - 399) / 400;
+    uint64_t yoe = static_cast<uint64_t>(y - era * 400);
+    uint64_t doy = (153 * (month + (month > 2 ? -3 : 9)) + 2) / 5 + day - 1;
+    uint64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    int64_t days = era * 146097 + static_cast<int64_t>(doe) - 719468;
+
+    int64_t seconds = days * 86400 + hour * 3600 + minute * 60 + second;
+    if (seconds < 0) throw std::out_of_range("Timestamp is before the Unix epoch");
+    return static_cast<uint64_t>(seconds);
   }
 
   /**
@@ -177,6 +215,26 @@ namespace gen_utils
 
     // otherwise cannot reconcile
     throw std::runtime_error("Cannot reconcile vectors" + (!err_msg.empty() ? std::string(". ") + err_msg : std::string("")));
+  }
+
+  template<typename T>
+  T pop_index(std::vector<T>& vec, size_t idx) {
+    CHECK_AND_ASSERT_MES(!vec.empty(), T(), "Vector must be non-empty");
+    CHECK_AND_ASSERT_MES(idx < vec.size(), T(), "idx out of bounds");
+
+    T res = std::move(vec[idx]);
+    if (idx + 1 != vec.size()) vec[idx] = std::move(vec.back());
+    vec.resize(vec.size() - 1);
+
+    return res;
+  }
+
+  template<typename T>
+  T pop_random_value(std::vector<T>& vec) {
+    CHECK_AND_ASSERT_MES(!vec.empty(), T(), "Vector must be non-empty");
+
+    size_t idx = crypto::rand<size_t>() % vec.size();
+    return pop_index(vec, idx);
   }
 
   // ------------------------- THREAD POLLER ----------------------------
