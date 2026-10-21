@@ -286,6 +286,7 @@ namespace monero {
     boost::recursive_mutex m_listeners_mutex;       // serialize notifications with listener removal, including removal from a callback
     void notify_listeners(const std::function<void(monero_wallet_listener*)>& notify);
     std::atomic<bool> m_is_closed;
+    mutable boost::mutex m_tx_notes_mutex;         // synchronize tx notes with cache serialization
 
     static monero_wallet_full* create_wallet_from_seed(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
     static monero_wallet_full* create_wallet_from_keys(monero_wallet_config& config, std::unique_ptr<epee::net_utils::http::http_client_factory> http_client_factory);
