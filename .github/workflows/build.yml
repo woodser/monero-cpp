@@ -370,10 +370,178 @@ jobs:
           name: libmonero-cpp-${{ matrix.arch }}-static
           path: build/libmonero-cpp.a
 
+  android:
+    name: ${{ matrix.arch }}
+    runs-on: ubuntu-24.04
+
+    env:
+      # the NDK of the runner image changes with the image, so this one is installed
+      NDK_VERSION: 30.0.16248370
+      # where the dependencies are installed, and where the toolchain of cmake looks for them
+      PREFIX: ${{ github.workspace }}/android-prefix
+      # the compilers of the NDK, for the dependencies that are built with autotools and with Boost.Build
+      CC: ${{ matrix.triple }}${{ matrix.api }}-clang
+      CXX: ${{ matrix.triple }}${{ matrix.api }}-clang++
+      AR: llvm-ar
+      RANLIB: llvm-ranlib
+
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [android-arm64, android-x86_64]
+        # Android 9 is the first with the iconv that boost.locale uses
+        api: [28]
+        # the entries add their values to the combination of their arch
+        include:
+          - arch: android-arm64
+            abi: arm64-v8a
+            triple: aarch64-linux-android
+            openssl: android-arm64
+            boost_arch: arm
+            march: armv8-a
+            filearch: aarch64
+          - arch: android-x86_64
+            abi: x86_64
+            triple: x86_64-linux-android
+            openssl: android-x86_64
+            boost_arch: x86
+            march: x86-64
+            filearch: x86-64
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          submodules: recursive
+
+      - name: Install the NDK
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION"
+          ndk="$ANDROID_HOME/ndk/$NDK_VERSION"
+          echo "$ndk/toolchains/llvm/prebuilt/linux-x86_64/bin" >> "$GITHUB_PATH"
+          # openssl finds the NDK with this one
+          echo "ANDROID_NDK_ROOT=$ndk" >> "$GITHUB_ENV"
+          # the arguments that the projects built with cmake share: the dependencies are found in the prefix only, and the headers there are on the path
+          echo "CMAKE_ANDROID=-DCMAKE_TOOLCHAIN_FILE=$ndk/build/cmake/android.toolchain.cmake -DANDROID_ABI=${{ matrix.abi }} -DANDROID_PLATFORM=android-${{ matrix.api }} -DANDROID_STL=c++_static -DCMAKE_FIND_ROOT_PATH=$PREFIX -DCMAKE_C_FLAGS=-I$PREFIX/include -DCMAKE_CXX_FLAGS=-I$PREFIX/include" >> "$GITHUB_ENV"
+
+      - name: Install openssl
+        run: |
+          # Android keeps its certificates in /system/etc/security/cacerts, which the caller points SSL_CERT_DIR at
+          wget https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz
+          echo "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8  openssl-3.5.7.tar.gz" | sha256sum -c
+          tar xzf openssl-3.5.7.tar.gz
+          cd openssl-3.5.7
+          ./Configure ${{ matrix.openssl }} -D__ANDROID_API__=${{ matrix.api }} --prefix="$PREFIX" --libdir=lib no-shared no-tests no-docs -fPIC
+          make -j3
+          make install_sw
+
+      - name: Install expat
+        run: |
+          wget https://github.com/libexpat/libexpat/releases/download/R_2_7_1/expat-2.7.1.tar.bz2
+          echo "45c98ae1e9b5127325d25186cf8c511fa814078e9efeae7987a574b482b79b3d  expat-2.7.1.tar.bz2" | sha256sum -c
+          tar -xf expat-2.7.1.tar.bz2
+          cd expat-2.7.1
+          ./configure --host=${{ matrix.triple }} --prefix="$PREFIX" --enable-static --disable-shared --with-pic --without-docbook --without-examples --without-tests
+          make -j3
+          make install
+
+      - name: Install unbound
+        run: |
+          wget https://www.nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz
+          echo "c5dd1bdef5d5685b2cedb749158dd152c52d44f65529a34ac15cd88d4b1b3d43  unbound-1.22.0.tar.gz" | sha256sum -c
+          tar xzf unbound-1.22.0.tar.gz
+          cd unbound-1.22.0
+          ./configure --host=${{ matrix.triple }} --prefix="$PREFIX" --with-libexpat="$PREFIX" --with-ssl="$PREFIX" --with-libunbound-only --with-libevent=no --enable-static --disable-shared --with-pic --disable-flto --disable-systemd --without-pythonmodule --without-pyunbound
+          make -j3
+          make install
+
+      - name: Install libsodium
+        run: |
+          wget https://github.com/jedisct1/libsodium/releases/download/1.0.20-RELEASE/libsodium-1.0.20.tar.gz
+          echo "ebb65ef6ca439333c2bb41a0c1990587288da07f6c7fd07cb3a18cc18d30ce19  libsodium-1.0.20.tar.gz" | sha256sum -c
+          tar xzf libsodium-1.0.20.tar.gz
+          cd libsodium-1.0.20
+          ./configure --host=${{ matrix.triple }} --prefix="$PREFIX" --enable-static --disable-shared --with-pic
+          make -j3
+          make install
+
+      - name: Install zeromq
+        run: |
+          wget https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz
+          echo "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43  zeromq-4.3.5.tar.gz" | sha256sum -c
+          tar xzf zeromq-4.3.5.tar.gz
+          cd zeromq-4.3.5
+          cmake -B build $CMAKE_ANDROID -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX="$PREFIX" -DBUILD_SHARED=OFF -DBUILD_STATIC=ON -DZMQ_BUILD_TESTS=OFF -DWITH_LIBSODIUM=OFF -DWITH_LIBBSD=OFF -DWITH_DOCS=OFF -DWITH_PERF_TOOL=OFF -DENABLE_DRAFTS=OFF -DENABLE_CPACK=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build build -j3
+          cmake --install build
+
+      - name: Install boost
+        run: |
+          # PIC static boost, same version on all platforms (no distro boost so headers and archives match)
+          wget https://archives.boost.io/release/1.85.0/source/boost_1_85_0.tar.bz2
+          echo "7009fe1faa1697476bdc7027703a2badb84e849b7b0baad5086b087b971f8617  boost_1_85_0.tar.bz2" | sha256sum -c
+          tar xf boost_1_85_0.tar.bz2
+          cd boost_1_85_0
+          # b2 runs on the runner, so it is built with the compiler of the runner and not the one of the NDK
+          CC=cc CXX=c++ ./bootstrap.sh --with-libraries=chrono,date_time,filesystem,locale,program_options,regex,serialization,system,thread
+          echo "using clang : android : $CXX : <archiver>$AR <ranlib>$RANLIB ;" > user-config.jam
+          ./b2 -j3 --user-config=user-config.jam --prefix="$PREFIX" toolset=clang-android target-os=android architecture=${{ matrix.boost_arch }} address-model=64 cxxflags=-fPIC cflags=-fPIC link=static runtime-link=shared boost.locale.icu=off install
+
+      - name: Build monero-project
+        run: |
+          cd external/monero-project
+          mkdir -p build/release
+          cd build/release
+          # monero-project builds a tool of its own that runs on the runner, and it takes the compilers from the environment
+          unset CC CXX AR RANLIB
+          # BUILD_GUI_DEPS keeps -fPIE, which monero-project adds for the executables of Android, out of a shared library.
+          # STACK_TRACE is off by itself on ARM, but on x86_64 monero-project finds a libunwind that does not build with the c++ library of the NDK
+          cmake $CMAKE_ANDROID -DSTATIC=ON -DBUILD_64=ON -DARCH="${{ matrix.march }}" -DCMAKE_BUILD_TYPE=Release -DUSE_DEVICE_TREZOR=OFF -DUSE_READLINE=OFF -DBUILD_GUI_DEPS=ON -DSTACK_TRACE=OFF -DBOOST_ROOT="$PREFIX" -DBoost_NO_SYSTEM_PATHS=ON ../../
+          make -j3 wallet cryptonote_protocol
+          cd ../../../../
+
+      - name: Build monero-cpp libraries
+        run: |
+          mkdir -p build
+          cd build
+          cmake $CMAKE_ANDROID -DSTATIC=ON -DBOOST_ROOT="$PREFIX" -DBoost_NO_SYSTEM_PATHS=ON ..
+          cmake --build . --target monero-cpp monero-cpp-static -j3
+          cd ..
+
+      - name: Verify libraries
+        run: |
+          file build/libmonero-cpp.so | grep -q '${{ matrix.filearch }}' || { echo "wrong architecture: $(file build/libmonero-cpp.so)"; exit 1; }
+          llvm-readelf -d build/libmonero-cpp.so | grep NEEDED
+          # apps that target Android 15 run on devices with 16 KB pages, which map only a library that is aligned to them
+          if llvm-readelf -lW build/libmonero-cpp.so | awk '$1 == "LOAD" { print $NF }' | grep -vx '0x4000'; then
+            echo "a segment is not aligned to 16 KB"; exit 1
+          fi
+          if llvm-readelf -d build/libmonero-cpp.so | grep NEEDED | grep -vE 'lib(c|m|dl|log)\.so'; then
+            echo "library is not standalone: unexpected dynamic dependencies above"; exit 1
+          fi
+          llvm-nm -D --defined-only build/libmonero-cpp.so | grep -q monero_wallet_full || { echo "missing monero-cpp api exports"; exit 1; }
+          # --exclude-libs hides the static closure; check for leaked dependency symbols
+          if llvm-nm -D --defined-only build/libmonero-cpp.so | grep -E ' (SSL_|EVP_|BN_)'; then
+            echo "static closure symbols are exported"; exit 1
+          fi
+          llvm-nm build/libmonero-cpp.a | grep -q monero_wallet_full || { echo "missing api in static library"; exit 1; }
+
+      - name: Upload monero-cpp shared library
+        uses: actions/upload-artifact@v7
+        with:
+          name: libmonero-cpp-${{ matrix.arch }}
+          path: build/libmonero-cpp.so
+
+      - name: Upload monero-cpp static library
+        uses: actions/upload-artifact@v7
+        with:
+          name: libmonero-cpp-${{ matrix.arch }}-static
+          path: build/libmonero-cpp.a
+
   release:
     name: release
     runs-on: ubuntu-24.04
-    needs: [ubuntu, windows, mac-os]
+    needs: [ubuntu, windows, mac-os, android]
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
@@ -388,7 +556,7 @@ jobs:
       - name: Package platform archives
         run: |
           mkdir release
-          for arch in linux-x86_64 linux-arm64 mac-arm64 mac-x86_64 windows-x86_64; do
+          for arch in linux-x86_64 linux-arm64 mac-arm64 mac-x86_64 windows-x86_64 android-arm64 android-x86_64; do
             staging="monero-cpp-$GITHUB_REF_NAME-$arch"
             mkdir "$staging"
             cp "artifacts/libmonero-cpp-$arch"/* "artifacts/libmonero-cpp-$arch-static"/* "$staging"/
