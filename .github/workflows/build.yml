@@ -426,7 +426,6 @@ jobs:
 
       - name: Install openssl
         run: |
-          # Android keeps its certificates in /system/etc/security/cacerts, which the caller points SSL_CERT_DIR at
           wget https://github.com/openssl/openssl/releases/download/openssl-3.5.7/openssl-3.5.7.tar.gz
           echo "a8c0d28a529ca480f9f36cf5792e2cd21984552a3c8e4aa11a24aa31aeac98e8  openssl-3.5.7.tar.gz" | sha256sum -c
           tar xzf openssl-3.5.7.tar.gz
