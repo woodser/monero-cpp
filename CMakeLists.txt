@@ -83,7 +83,8 @@ message(STATUS EXTRA_LIBRARIES: ${EXTRA_LIBRARIES})
 # Protobuf
 ############
 
-if (NOT APPLE)
+# Android builds monero-project without Trezor, the only user of protobuf
+if (NOT APPLE AND NOT ANDROID)
   include(FindProtobuf)
   find_package(Protobuf)
   message(STATUS "Protobuf lib: ${Protobuf_LIBRARY}, inc: ${Protobuf_INCLUDE_DIR}, protoc: ${Protobuf_PROTOC_EXECUTABLE}")
@@ -93,8 +94,11 @@ endif()
 # LibUSB
 ############
 
-find_library(usb_LIBRARY NAMES usb-1.0 libusb usb)
-set(LibUSB_LIBRARIES ${usb_LIBRARY})
+# an Android app reaches USB devices through the Java API, so monero-project is built without libusb and hidapi there
+if (NOT ANDROID)
+  find_library(usb_LIBRARY NAMES usb-1.0 libusb usb)
+  set(LibUSB_LIBRARIES ${usb_LIBRARY})
+endif()
 
 ############
 # Boost
@@ -165,9 +169,11 @@ if(APPLE)
   endif()
 endif()
 
-find_package(HIDAPI REQUIRED)
-message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
-add_definitions(-DHAVE_HIDAPI)
+if (NOT ANDROID)
+  find_package(HIDAPI REQUIRED)
+  message(STATUS "Using HIDAPI include dir at ${HIDAPI_INCLUDE_DIR}")
+  add_definitions(-DHAVE_HIDAPI)
+endif()
 
 #############
 # Monero
@@ -420,8 +426,14 @@ if (WIN32)
     endif()
 endif()
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR ANDROID)
     target_link_options(monero-cpp PRIVATE "-z" "noexecstack")
+endif()
+
+if (ANDROID)
+    # devices with 16 KB pages, which Google Play requires of apps that target Android 15, map only a library aligned to them.
+    # The NDK aligns to 16 KB from r28, and to 4 KB before it unless it is told to
+    target_link_options(monero-cpp PRIVATE "-Wl,-z,max-page-size=16384")
 endif()
 
 if (STATIC)
@@ -431,7 +443,7 @@ if (STATIC)
     # export only the monero-cpp api, not the static closure
     target_link_options(monero-cpp PRIVATE "-Wl,--exclude-libs,ALL")
   endif()
-  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR ANDROID)
     target_link_options(monero-cpp PRIVATE "-Wl,--no-undefined") # fail at link if static closure is incomplete
   endif()
 endif()
