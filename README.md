@@ -195,6 +195,12 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     For 32-bit: `make release-static-win32`
 8. Link to this library's source files in your application, or build monero-cpp to a shared library (libmonero-cpp.dll) in ./build: `./bin/build_libmonero_cpp.sh`
 
+### Android
+
+The build workflow produces shared and static libraries for `arm64-v8a` and `x86_64` (Android 9/API 28 or later), without hardware wallet support.
+
+For HTTPS daemon connections, set `SSL_CERT_FILE` to the absolute path of a trusted PEM CA bundle in app-private storage before creating wallet or RPC clients. Bundled OpenSSL does not use Android's Java trust store.
+
 ## Running sample code and tests
 
 1. Download and install [Monero CLI](https://web.getmonero.org/downloads/).
