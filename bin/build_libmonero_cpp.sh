@@ -43,9 +43,18 @@ else
         arm64|aarch64) ARCH="armv8-a";;
         *) ARCH="native";;
     esac
+    # on macOS monero-project takes brew's openssl, which is OpenSSL 4 on newer systems and does not
+    # build with boost 1.85: use openssl@3 when it is installed
+    OPENSSL_ARGS=()
+    if [[ $(uname -s) == "Darwin" ]] && command -v brew > /dev/null 2>&1; then
+        OPENSSL_PREFIX=$(brew --prefix openssl@3 2>/dev/null)
+        if [ -d "$OPENSSL_PREFIX/include/openssl" ]; then
+            OPENSSL_ARGS=(-D OPENSSL_ROOT_DIR="$OPENSSL_PREFIX")
+        fi
+    fi
     ( mkdir -p build/release &&
       cd build/release &&
-      cmake -D STATIC=ON -D ARCH="$ARCH" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D USE_DEVICE_TREZOR=OFF ../../ &&
+      cmake -D STATIC=ON -D ARCH="$ARCH" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D USE_DEVICE_TREZOR=OFF "${OPENSSL_ARGS[@]}" ../../ &&
       make -j$HOST_NCORES wallet cryptonote_protocol ) || exit 1
 fi
 cd ../../

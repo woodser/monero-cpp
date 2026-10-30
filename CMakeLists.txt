@@ -133,9 +133,19 @@ message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIR}")
 if (APPLE AND NOT IOS)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -std=c++14")
   if (NOT OPENSSL_ROOT_DIR)
-      EXECUTE_PROCESS(COMMAND brew --prefix openssl
-        OUTPUT_VARIABLE OPENSSL_ROOT_DIR
+    # brew's openssl is OpenSSL 4 on newer systems, which the boost.asio that monero uses
+    # does not build with: take openssl@3 when it is installed, then openssl
+    foreach (formula openssl@3 openssl)
+      EXECUTE_PROCESS(COMMAND brew --prefix ${formula}
+        OUTPUT_VARIABLE brew_prefix
+        RESULT_VARIABLE brew_result
+        ERROR_QUIET
         OUTPUT_STRIP_TRAILING_WHITESPACE)
+      if (brew_result EQUAL 0 AND EXISTS "${brew_prefix}/include/openssl")
+        set(OPENSSL_ROOT_DIR "${brew_prefix}")
+        break()
+      endif()
+    endforeach()
     message(STATUS "Using OpenSSL found at ${OPENSSL_ROOT_DIR}")
   endif()
 endif()

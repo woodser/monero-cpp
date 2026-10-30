@@ -156,7 +156,9 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     sudo make install
     ```
 3. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with e.g.: `make release-static -j6`
-4. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh`
+
+    Install `openssl@3` and not `openssl`: brew's `openssl` is OpenSSL 4 on newer systems, which boost 1.85 does not build with. monero-cpp picks `openssl@3` by itself, monero-project takes brew's `openssl` unless you pass it `-DOPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"`.
+4. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh` (it passes `openssl@3` to monero-project)
 
 ### Windows
 
