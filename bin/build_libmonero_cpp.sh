@@ -1,5 +1,21 @@
 #!/bin/bash
 
+# use the same OpenSSL for monero-project and monero-cpp on macOS
+OPENSSL_ARGS=()
+if [[ $(uname -s) == "Darwin" ]]; then
+    OPENSSL_PREFIX=${OPENSSL_ROOT_DIR:-}
+    if [ -z "$OPENSSL_PREFIX" ] && command -v brew >/dev/null 2>&1; then
+        OPENSSL_PREFIX=$(brew --prefix openssl@3) || exit 1
+        if [ ! -d "$OPENSSL_PREFIX/include/openssl" ]; then
+            echo "Install openssl@3 with Homebrew or set OPENSSL_ROOT_DIR to a compatible OpenSSL installation" >&2
+            exit 1
+        fi
+    fi
+    if [ -n "$OPENSSL_PREFIX" ]; then
+        OPENSSL_ARGS=(-DOPENSSL_ROOT_DIR="$OPENSSL_PREFIX")
+    fi
+fi
+
 # build monero-project dependencies
 cd ./external/monero-project/ || exit 1
 git submodule update --init --force || exit 1
@@ -45,7 +61,7 @@ else
     esac
     ( mkdir -p build/release &&
       cd build/release &&
-      cmake -D STATIC=ON -D ARCH="$ARCH" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D USE_DEVICE_TREZOR=OFF ../../ &&
+      cmake -D STATIC=ON -D ARCH="$ARCH" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=Release -D USE_DEVICE_TREZOR=OFF "${OPENSSL_ARGS[@]}" ../../ &&
       make -j$HOST_NCORES wallet cryptonote_protocol ) || exit 1
 fi
 cd ../../
@@ -53,5 +69,5 @@ cd ../../
 # build libmonero-cpp shared library; extra args go to cmake, e.g. -D BUILD_SAMPLE=ON
 mkdir -p build &&
 cd build &&
-cmake "$@" .. &&
+cmake "${OPENSSL_ARGS[@]}" "$@" .. &&
 cmake --build . -j$HOST_NCORES

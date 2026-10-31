@@ -143,20 +143,30 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
 ### macOS
 
 1. Clone the project repository if applicable: `git clone --recurse-submodules https://github.com/woodser/monero-cpp.git`
-2. Follow instructions to install [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) for macOS to your home directory (e.g. `~/unbound-1.22.0`).
+2. Build [unbound](https://unbound.docs.nlnetlabs.nl/en/latest/getting-started/installation.html) against OpenSSL 3. Boost 1.85 is incompatible with OpenSSL 4, and Homebrew's current unbound requires OpenSSL 4. If Homebrew's unbound is installed, run `brew unlink unbound` before installing the source build below.
 
     For example:
     ```
+    brew install openssl@3 expat
     cd ~
     wget https://nlnetlabs.nl/downloads/unbound/unbound-1.22.0.tar.gz
     tar xzf unbound-1.22.0.tar.gz
     cd ~/unbound-1.22.0
-    ./configure --with-ssl=/opt/homebrew/Cellar/openssl@3/3.4.0/ --with-libexpat=/opt/homebrew/Cellar/expat/2.6.4
+    ./configure --with-ssl="$(brew --prefix openssl@3)" --with-libexpat="$(brew --prefix expat)" --with-libunbound-only --with-libevent=no --enable-static --disable-shared --with-pic
     make
     sudo make install
     ```
-3. Build monero-project, located as a submodule at ./external/monero-project. Install [dependencies](https://github.com/monero-project/monero#dependencies) as needed for your system, then build with e.g.: `make release-static -j6`
-4. Link to this library's source files in your application, or build monero-cpp to a shared library in ./build: `./bin/build_libmonero_cpp.sh`
+3. Install any remaining [dependencies](https://github.com/monero-project/monero#dependencies), using `openssl@3` for OpenSSL. When switching OpenSSL installations, remove the old `build` and `external/monero-project/build/release` directories first so CMake does not reuse cached headers and libraries.
+4. From the monero-cpp directory, build both monero-project and monero-cpp: `./bin/build_libmonero_cpp.sh`. On macOS this selects Homebrew's `openssl@3` for both builds. To use another compatible OpenSSL installation, set the `OPENSSL_ROOT_DIR` environment variable when running the script; extra CMake arguments apply only to monero-cpp.
+
+    To build monero-project separately before linking this library's source files into your application:
+
+    ```
+    cmake -S external/monero-project -B external/monero-project/build/release \
+      -DSTATIC=ON -DBUILD_64=ON -DCMAKE_BUILD_TYPE=Release -DUSE_DEVICE_TREZOR=OFF \
+      -DOPENSSL_ROOT_DIR="$(brew --prefix openssl@3)"
+    cmake --build external/monero-project/build/release -j6
+    ```
 
 ### Windows
 
