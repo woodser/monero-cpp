@@ -1845,6 +1845,8 @@ namespace monero {
         tx_map.erase(tx->m_hash.get());
         tx_iter = txs.erase(tx_iter);
         if (tx->m_block != nullptr) tx->m_block->m_txs.erase(std::remove(tx->m_block->m_txs.begin(), tx->m_block->m_txs.end(), tx), tx->m_block->m_txs.end()); // TODO, no way to use tx_iter?
+        tx->m_block = nullptr; // free this tx alone, not its block, which can hold txs that stay in the result
+        monero_utils::free(tx);
       }
     }
     txs = queried_txs;
