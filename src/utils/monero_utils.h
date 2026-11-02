@@ -57,6 +57,7 @@
 
 #include "wallet/monero_wallet_model.h"
 #include "cryptonote_basic/cryptonote_basic.h"
+#include "cryptonote_core/cryptonote_tx_utils.h"
 #include "serialization/keyvalue_serialization.h" // TODO: consolidate with other binary deps?
 #include "storages/portable_storage.h"
 
@@ -228,6 +229,19 @@ namespace monero_utils
     */
   bool vout_before(const std::shared_ptr<monero_output>& o1, const std::shared_ptr<monero_output>& o2);
 
+  /**
+   * Generates a key image for an output note (enote) in a simplified manner.
+   *
+   * This function already assumes that we checked that the onetime address was addressed to `received_subaddr`.
+   *
+   * @param ephem_pubkey is the tx main pubkey or an additional pubkey
+   * @param tx_output_index is the index of the enote in the local output set of the tx
+   * @param received_subaddr is the index of the recipient's subaddress
+   * @param account recipient's account
+   * @return the generated key image
+   */
+  std::shared_ptr<monero_key_image> generate_key_image(const crypto::public_key &ephem_pubkey, const size_t tx_output_index, const cryptonote::subaddress_index &received_subaddr, const cryptonote::account_base& account);
+
   // ----------------------------- GATHER BLOCKS ------------------------------
 
   static std::vector<std::shared_ptr<monero_block>> get_blocks_from_txs(std::vector<std::shared_ptr<monero_tx_wallet>> txs) {
@@ -284,6 +298,19 @@ namespace monero_utils
       }
     }
     return blocks;
+  }
+
+  // compute m_num_suggested_confirmations  TODO monero-project: this logic is based on wallet_rpc_server.cpp `set_confirmations` but it should be encapsulated in wallet2
+  static void set_num_suggested_confirmations(std::shared_ptr<monero_incoming_transfer>& incoming_transfer, uint64_t blockchain_height, uint64_t block_reward, uint64_t unlock_time) {
+    if (block_reward == 0) incoming_transfer->m_num_suggested_confirmations = 0;
+    else incoming_transfer->m_num_suggested_confirmations = (incoming_transfer->m_amount.get() + block_reward - 1) / block_reward;
+
+    if (unlock_time < CRYPTONOTE_MAX_BLOCK_NUMBER) {
+      if (unlock_time > blockchain_height) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), unlock_time - blockchain_height);
+    } else {
+      const uint64_t now = time(NULL);
+      if (unlock_time > now) incoming_transfer->m_num_suggested_confirmations = std::max(incoming_transfer->m_num_suggested_confirmations.get(), (unlock_time - now + DIFFICULTY_TARGET_V2 - 1) / DIFFICULTY_TARGET_V2);
+    }
   }
 
   // ------------------------------ FREE MEMORY -------------------------------
