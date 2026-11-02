@@ -3885,6 +3885,13 @@ namespace monero {
     if (_query->m_tx_query == nullptr) _query->m_tx_query = std::make_shared<monero_tx_query>();
     std::shared_ptr<monero_tx_query> tx_query = _query->m_tx_query;
 
+    // the copied query is local, so release its links when the call ends, on the path that
+    // returns and the path that throws, or the copy of an input query points back at the copy
+    // of the tx query and keeps the whole query alive
+    auto free_copied_query = epee::misc_utils::create_scope_leave_handler([&]() {
+      monero_utils::free(tx_query);
+    });
+
     // get output data from wallet2
     tools::wallet2::transfer_container outputs_w2;
     m_w2->get_transfers(outputs_w2);
@@ -3919,8 +3926,7 @@ namespace monero {
       if (tx->m_outputs.empty() && tx->m_block != nullptr) tx->m_block->m_txs.erase(std::remove(tx->m_block->m_txs.begin(), tx->m_block->m_txs.end(), tx), tx->m_block->m_txs.end()); // TODO, no way to use const_iterator?
     }
 
-    // free query and return outputs
-    monero_utils::free(tx_query);
+    // return outputs
     return outputs;
   }
 
