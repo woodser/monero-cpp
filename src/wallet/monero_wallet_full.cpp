@@ -3957,7 +3957,7 @@ namespace monero {
       cryptonote::subaddress_index index = {account_idx, subaddress_idx};
       subaddress.m_num_unspent_outputs = count_if(transfers.begin(), transfers.end(), [&](const tools::wallet2::transfer_details& td) { return !td.m_spent && td.m_subaddr_index == index; });
       subaddress.m_is_used = find_if(transfers.begin(), transfers.end(), [&](const tools::wallet2::transfer_details& td) { return td.m_subaddr_index == index; }) != transfers.end();
-      subaddress.m_num_blocks_to_unlock = iter1 == balance_per_subaddress.end() ? 0 : iter2->second.second.first;
+      subaddress.m_num_blocks_to_unlock = iter2 == unlocked_balance_per_subaddress.end() ? 0 : iter2->second.second.first;
       subaddresses.push_back(subaddress);
     }
 
