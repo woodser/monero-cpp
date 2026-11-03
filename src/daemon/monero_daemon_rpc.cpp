@@ -58,6 +58,10 @@
 #include "utils/monero_utils.h"
 
 static const uint64_t MAX_REQ_SIZE = 3000000;
+
+// the number of heights that get_blocks_by_range() asks for in one request: bounded like the byte
+// budget of get_blocks_by_range_chunked(), so that the request and its answer stay small
+static const uint64_t MAX_HEIGHTS_PER_REQUEST = 1000;
 static const uint64_t NUM_HEADERS_PER_REQ = 750;
 
 namespace monero {
@@ -391,15 +395,26 @@ namespace monero {
 
   std::vector<std::shared_ptr<monero_block>> monero_daemon_rpc::get_blocks_by_range(boost::optional<uint64_t> start_height, boost::optional<uint64_t> end_height) {
     if (start_height == boost::none) start_height = 0;
-    if (end_height == boost::none) {
-      uint64_t block_height = get_height();
-      end_height = block_height == 0 ? 0 : block_height - 1;
+
+    // the end can not be past the top of the chain: an end beyond it, UINT64_MAX among them, would
+    // make the range below never end
+    uint64_t block_height = get_height();
+    uint64_t chain_end = block_height == 0 ? 0 : block_height - 1;
+    if (end_height == boost::none || end_height.get() > chain_end) end_height = chain_end;
+
+    std::vector<std::shared_ptr<monero_block>> blocks;
+    if (start_height.get() > end_height.get()) return blocks;
+
+    // fetch the heights in chunks, so that no vector of every height of the range is built before
+    // the first request, the way get_blocks_by_range_chunked() chunks its fetch
+    for (uint64_t height = start_height.get(); height <= end_height.get();) {
+      std::vector<uint64_t> heights;
+      while (heights.size() < MAX_HEIGHTS_PER_REQUEST && height <= end_height.get()) heights.push_back(height++);
+      auto chunk = get_blocks_by_height(heights);
+      blocks.insert(blocks.end(), chunk.begin(), chunk.end());
     }
 
-    std::vector<uint64_t> heights;
-    for (uint64_t height = start_height.get(); height <= end_height.get(); height++) heights.push_back(height);
-
-    return get_blocks_by_height(heights);
+    return blocks;
   }
 
   std::vector<std::shared_ptr<monero_block>> monero_daemon_rpc::get_blocks_by_range_chunked(boost::optional<uint64_t> start_height, boost::optional<uint64_t> end_height, boost::optional<uint64_t> max_chunk_size) {
