@@ -3679,8 +3679,8 @@ namespace monero {
   }
 
   monero_wallet_full::sync_op_lock::~sync_op_lock() {
+    m_wallet.m_num_sync_pauses--; // resume background sync before unlocking so the sync does not yield to a finished operation
     m_wallet.m_sync_mutex.unlock();
-    m_wallet.m_num_sync_pauses--; // resume background sync
   }
 
   void monero_wallet_full::init_common() {
@@ -3972,13 +3972,11 @@ namespace monero {
     // TODO: use global threadpool, background sync wasm wallet in c++ thread
     m_syncing_thread = boost::thread([this]() {
 
-      // sync while enabled and not paused by a wallet operation
+      // sync while enabled, waiting behind wallet operations rather than skipping the cycle so periodic operations cannot starve sync
       while (m_syncing_enabled) {
-        if (m_num_sync_pauses == 0) {
-          try { lock_and_sync(boost::none, true); }
-          catch (std::exception const& e) { MERROR("monero_wallet_full failed to background synchronize: " << std::string(e.what())); }
-          catch (...) { MERROR("monero_wallet_full failed to background synchronize"); }
-        }
+        try { lock_and_sync(boost::none, true); }
+        catch (std::exception const& e) { MERROR("monero_wallet_full failed to background synchronize: " << std::string(e.what())); }
+        catch (...) { MERROR("monero_wallet_full failed to background synchronize"); }
 
         // only wait if syncing still enabled
         {
@@ -3998,7 +3996,17 @@ namespace monero {
     monero_sync_result result;
     result.m_num_blocks_fetched = 0;
     result.m_received_money = false;
-    if (background && m_num_sync_pauses > 0) return result; // skip background sync while a wallet operation waits
+    if (background) {
+
+      // yield to waiting wallet operations for up to a sync interval, then sync so operations cannot starve the sync
+      auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(m_syncing_interval.load());
+      while (m_num_sync_pauses > 0 && m_syncing_enabled && std::chrono::steady_clock::now() < deadline) {
+        lock.unlock();
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
+        lock.lock();
+      }
+      if (!m_syncing_enabled || m_sync_in_progress) return result; // stopped while waiting, or a foreground sync yielded to an operation
+    }
     bool rescan = m_rescan_on_sync.exchange(false);
     m_background_syncing = background; // set under mutex so interrupts only target background sync
     m_sync_in_progress = true;
