@@ -73,6 +73,25 @@ std::string gen_utils::serialize(const boost::property_tree::ptree& node) {
 }
 
 void gen_utils::deserialize(const std::string& json, boost::property_tree::ptree& root) {
+
+  // scan the nesting before parsing: boost's json parser recurses per level, so a document that
+  // nests deeply enough, which a malicious daemon can send as "[[[[...", overflows the stack of
+  // the thread that parses it. the limit matches the one monero-c checks at its boundary and is
+  // far above the depth of any model the daemon and the wallet exchange
+  constexpr int MAX_JSON_DEPTH = 64;
+  int depth = 0;
+  bool in_string = false;
+  for (size_t i = 0; i < json.size(); i++) {
+    char c = json[i];
+    if (in_string) {
+      if (c == '\\') i++;
+      else if (c == '"') in_string = false;
+    } else if (c == '"') in_string = true;
+    else if (c == '[' || c == '{') {
+      if (++depth > MAX_JSON_DEPTH) throw std::runtime_error("Invalid JSON");
+    } else if ((c == ']' || c == '}') && depth > 0) depth--;
+  }
+
   std::istringstream iss = json.empty() ? std::istringstream() : std::istringstream(json);
   try {
     boost::property_tree::read_json(iss, root);

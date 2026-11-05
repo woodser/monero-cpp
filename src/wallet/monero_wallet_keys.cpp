@@ -116,7 +116,7 @@ namespace monero {
     if (!monero_utils::is_valid_language(config_normalized.m_language.get())) throw std::runtime_error("Unknown language: " + config_normalized.m_language.get());
 
     // initialize random wallet account
-    monero_wallet_keys* wallet = new monero_wallet_keys();
+    std::unique_ptr<monero_wallet_keys> wallet(new monero_wallet_keys());
     crypto::secret_key spend_key_sk = wallet->m_account.generate();
 
     // initialize remaining wallet
@@ -129,7 +129,7 @@ namespace monero {
     wallet->m_seed = std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
     wallet->init_common();
 
-    return wallet;
+    return wallet.release();
   }
 
   monero_wallet_keys* monero_wallet_keys::create_wallet_from_seed(const monero_wallet_config& config) {
@@ -150,7 +150,7 @@ namespace monero {
     if (config.m_seed_offset != boost::none && !config.m_seed_offset.get().empty()) spend_key_sk = cryptonote::decrypt_key(spend_key_sk, config.m_seed_offset.get());
 
     // initialize wallet account
-    monero_wallet_keys* wallet = new monero_wallet_keys();
+    std::unique_ptr<monero_wallet_keys> wallet(new monero_wallet_keys());
     wallet->m_account = cryptonote::account_base{};
     wallet->m_account.generate(spend_key_sk, true, false);
 
@@ -164,7 +164,7 @@ namespace monero {
     wallet->m_seed = std::string(wipeable_mnemonic.data(), wipeable_mnemonic.size());
     wallet->init_common();
 
-    return wallet;
+    return wallet.release();
   }
 
   monero_wallet_keys* monero_wallet_keys::create_wallet_from_keys(const monero_wallet_config& config) {
@@ -225,7 +225,7 @@ namespace monero {
     }
 
     // initialize wallet account
-    monero_wallet_keys* wallet = new monero_wallet_keys();
+    std::unique_ptr<monero_wallet_keys> wallet(new monero_wallet_keys());
     if (has_spend_key && has_view_key) {
       wallet->m_account.create_from_keys(address_info.address, spend_key_sk, view_key_sk);
     } else if (has_spend_key) {
@@ -247,7 +247,7 @@ namespace monero {
     }
     wallet->init_common();
 
-    return wallet;
+    return wallet.release();
   }
 
   std::vector<std::string> monero_wallet_keys::get_seed_languages() {
