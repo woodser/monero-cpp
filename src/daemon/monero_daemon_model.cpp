@@ -717,9 +717,8 @@ namespace monero {
   std::vector<std::shared_ptr<monero_key_image>> monero_key_image::deserialize_key_images(const std::string& key_images_json) {
 
     // deserialize json to property node
-    std::istringstream iss = key_images_json.empty() ? std::istringstream() : std::istringstream(key_images_json);
     boost::property_tree::ptree node;
-    boost::property_tree::read_json(iss, node);
+    gen_utils::deserialize(key_images_json, node);
 
     // convert property tree to key images
     std::vector<std::shared_ptr<monero_key_image>> key_images;
