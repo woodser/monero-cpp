@@ -59,8 +59,8 @@
 
 static const uint64_t MAX_REQ_SIZE = 3000000;
 
-// the number of heights that get_blocks_by_range() asks for in one request: bounded like the byte
-// budget of get_blocks_by_range_chunked(), so that the request and its answer stay small
+// the number of heights that get_blocks_by_range() asks for in one request: the daemon's restricted
+// rpc refuses a request for more than a thousand blocks, which the chunk size matches
 static const uint64_t MAX_HEIGHTS_PER_REQUEST = 1000;
 static const uint64_t NUM_HEADERS_PER_REQ = 750;
 
@@ -397,10 +397,13 @@ namespace monero {
     if (start_height == boost::none) start_height = 0;
 
     // the end can not be past the top of the chain: an end beyond it, UINT64_MAX among them, would
-    // make the range below never end
-    uint64_t block_height = get_height();
-    uint64_t chain_end = block_height == 0 ? 0 : block_height - 1;
-    if (end_height == boost::none || end_height.get() > chain_end) end_height = chain_end;
+    // make the range below never end. An explicit end that fits one request is passed through as it
+    // is, the way it was before the chunking, so that the common small range pays no extra call
+    if (end_height == boost::none || end_height.get() - start_height.get() >= MAX_HEIGHTS_PER_REQUEST) {
+      uint64_t block_height = get_height();
+      uint64_t chain_end = block_height == 0 ? 0 : block_height - 1;
+      if (end_height == boost::none || end_height.get() > chain_end) end_height = chain_end;
+    }
 
     std::vector<std::shared_ptr<monero_block>> blocks;
     if (start_height.get() > end_height.get()) return blocks;
