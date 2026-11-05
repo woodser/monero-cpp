@@ -121,8 +121,7 @@ namespace {
     std::string response_json;
     if (is_fast) monero_utils::binary_blocks_fast_to_json(bin, response_json);
     else monero_utils::binary_blocks_to_json(bin, response_json);
-    std::istringstream iss(response_json);
-    boost::property_tree::read_json(iss, node);
+    gen_utils::deserialize(response_json, node);
 
     auto blocks = node.get_child("blocks");
     auto block_hashes = node.get_child("block_hashes"); // parallel to "blocks", see add_blocks_and_txs_to_ptree()
