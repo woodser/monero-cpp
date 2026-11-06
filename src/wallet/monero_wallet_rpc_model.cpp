@@ -1093,7 +1093,7 @@ namespace monero {
       else if (key == std::string("amount_out")) tx->m_output_sum = it->second.get_value<uint64_t>();
       else if (key == std::string("change_address") && !it->second.data().empty()) tx->m_change_address = it->second.data();
       else if (key == std::string("change_amount")) tx->m_change_amount = it->second.get_value<uint64_t>();
-      else if (key == std::string("dummy_outputs")) tx->m_num_dummy_outputs = it->second.get_value<uint64_t>();
+      else if (key == std::string("dummy_outputs")) tx->m_num_dummy_outputs = it->second.get_value<uint32_t>();
       else if (key == std::string("extra")) tx->m_extra_hex = it->second.data();
       else if (key == std::string("ring_size")) tx->m_ring_size = it->second.get_value<uint32_t>();
       else if (key == std::string("sources")) {
