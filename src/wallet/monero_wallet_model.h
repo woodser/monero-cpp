@@ -335,7 +335,7 @@ namespace monero {
     boost::optional<uint64_t> m_height;
     boost::optional<uint64_t> m_min_height;
     boost::optional<uint64_t> m_max_height;
-    boost::optional<uint64_t> m_include_outputs;
+    boost::optional<bool> m_include_outputs;
     std::shared_ptr<monero_transfer_query> m_transfer_query;
     std::shared_ptr<monero_output_query> m_input_query;
     std::shared_ptr<monero_output_query> m_output_query;
