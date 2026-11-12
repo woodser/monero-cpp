@@ -592,6 +592,11 @@ bool monero_utils::incoming_transfer_before(const std::shared_ptr<monero_incomin
   else return false;
 }
 
+// returns the output's key image hex, or an empty string if unknown
+static std::string get_key_image_hex(const std::shared_ptr<monero_output_wallet>& output) {
+  return output->m_key_image == nullptr ? std::string() : output->m_key_image->m_hex.value_or("");
+}
+
 bool monero_utils::vout_before(const std::shared_ptr<monero_output>& o1, const std::shared_ptr<monero_output>& o2) {
   if (o1 == o2) return false; // ignore equal references
   std::shared_ptr<monero_output_wallet> ow1 = std::static_pointer_cast<monero_output_wallet>(o1);
@@ -606,7 +611,7 @@ bool monero_utils::vout_before(const std::shared_ptr<monero_output>& o1, const s
     if (ow1->m_subaddress_index.get() < ow2->m_subaddress_index.get()) return true;
     if (ow1->m_subaddress_index.get() == ow2->m_subaddress_index.get()) {
       if (ow1->m_index.get() < ow2->m_index.get()) return true;
-      if (ow1->m_index.get() == ow2->m_index.get()) throw std::runtime_error("Should never sort outputs with duplicate indices");
+      if (ow1->m_index.get() == ow2->m_index.get()) return get_key_image_hex(ow1) < get_key_image_hex(ow2); // indices are per amount before RingCT
     }
   }
   return false;
