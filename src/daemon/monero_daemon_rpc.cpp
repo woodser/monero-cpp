@@ -56,6 +56,8 @@
 #include "common/monero_error.h"
 #include "utils/gen_utils.h"
 #include "utils/monero_utils.h"
+#include "serialization/keyvalue_serialization.h"
+#include "storages/portable_storage_template_helper.h"
 
 static const uint64_t MAX_REQ_SIZE = 3000000;
 static const uint64_t NUM_HEADERS_PER_REQ = 750;
@@ -63,36 +65,173 @@ static const uint64_t NUM_HEADERS_PER_REQ = 750;
 namespace monero {
 
   /**
-   * Polls daemon and sends notifications in order to notify external daemon listeners.
+   * Payload of monerod's "json-minimal-chain_main" zmq publication.
+   */
+  struct zmq_chain_main {
+    std::vector<std::string> ids;
+
+    BEGIN_KV_SERIALIZE_MAP()
+      KV_SERIALIZE(ids)
+    END_KV_SERIALIZE_MAP()
+  };
+
+  /**
+   * Notifies daemon listeners of new blocks from the daemon's zmq publications (monerod --zmq-pub),
+   * polling the daemon if zmq is not configured or not connected.
    */
   class monero_daemon_poller : public gen_utils::thread_poller {
   public:
 
-    explicit monero_daemon_poller(monero_daemon* daemon, uint64_t poll_period_ms = 10000): m_daemon(daemon) {
+    explicit monero_daemon_poller(monero_daemon* daemon, const std::shared_ptr<monero_rpc_connection>& rpc, uint64_t poll_period_ms = 10000):
+      m_daemon(daemon), m_rpc(rpc), m_daemon_poll_period_ms(poll_period_ms) {
       init_common("monero_daemon_rpc");
       m_poll_period_ms = poll_period_ms;
+      set_zmq_uri(rpc->m_zmq_uri);
     }
 
     ~monero_daemon_poller() override {
       set_is_polling(false);
     }
 
-    void poll() override {
-      if (!m_last_header) {
-        m_last_header = m_daemon->get_last_block_header();
-        return;
-      }
+    void set_daemon_poll_period_in_ms(uint64_t period_ms) {
+      m_daemon_poll_period_ms = period_ms;
+    }
 
-      auto header = m_daemon->get_last_block_header();
-      if (header->m_hash != m_last_header->m_hash) {
-        m_last_header = header;
-        announce_block_header(header);
+    void set_zmq_uri(const boost::optional<std::string>& zmq_uri) {
+      std::string uri = zmq_uri == boost::none ? "" : zmq_uri.get();
+      boost::lock_guard<boost::mutex> lock(m_zmq_uri_mutex);
+      if (uri == m_zmq_uri) return;
+      m_zmq_uri = uri;
+      m_zmq_changed = true;
+    }
+
+    void request_listening(bool listening) {
+      if (!listening) m_listening_stopped = true;
+      request_is_polling(listening);
+    }
+
+    void poll() override {
+      if (m_zmq_changed.exchange(false)) configure_zmq();
+      try {
+        poll_blocks();
+      } catch (...) {
+        update_poll_period();
+        throw;
       }
+      update_poll_period();
     }
 
   private:
+    static constexpr const char* ZMQ_CHAIN_MAIN_TOPIC = "json-minimal-chain_main";
+    static constexpr int ZMQ_WAIT_TIMEOUT_MS = 200;
+
     monero_daemon* m_daemon;
+    std::shared_ptr<monero_rpc_connection> m_rpc;
+    std::atomic<uint64_t> m_daemon_poll_period_ms;
     std::shared_ptr<monero_block_header> m_last_header;
+    std::chrono::steady_clock::time_point m_last_daemon_poll;
+
+    // guarded by m_zmq_uri_mutex
+    boost::mutex m_zmq_uri_mutex;
+    std::string m_zmq_uri;
+    std::atomic<bool> m_zmq_changed{false};
+    std::atomic<bool> m_listening_stopped{false};
+
+    // zmq state, poll thread only
+    std::unique_ptr<monero_zmq_subscriber> m_zmq;
+    uint64_t m_zmq_connections = 0;
+    bool m_catch_up = true;  // poll the daemon for blocks missed while zmq was not receiving
+
+    // poll() waits for zmq publications itself
+    void update_poll_period() {
+      m_poll_period_ms = m_zmq ? 0 : m_daemon_poll_period_ms.load();
+    }
+
+    void configure_zmq() {
+      m_zmq.reset();
+      m_zmq_connections = 0;
+      m_catch_up = true;
+
+      std::string uri;
+      {
+        boost::lock_guard<boost::mutex> lock(m_zmq_uri_mutex);
+        uri = m_zmq_uri;
+      }
+      if (uri.empty()) return;
+
+      try {
+        m_zmq = m_rpc->subscribe_zmq({ ZMQ_CHAIN_MAIN_TOPIC });
+      } catch (const std::exception& e) {
+        MWARNING("Could not receive blocks from zmq uri '" << uri << "', polling the daemon instead: " << e.what());
+      }
+    }
+
+    void poll_blocks() {
+      if (m_listening_stopped.exchange(false) && m_zmq) {
+        // discard what was published while not listening
+        m_zmq->discard_publications();
+        m_catch_up = true;
+      }
+
+      if (!m_zmq) {
+        poll_daemon();
+        return;
+      }
+
+      boost::optional<monero_zmq_publication> publication;
+      try {
+        publication = m_zmq->wait_for_publication(ZMQ_WAIT_TIMEOUT_MS);
+      } catch (const std::exception& e) {
+        MWARNING("Could not receive from zmq, polling the daemon instead: " << e.what());
+        m_zmq.reset();
+        poll_daemon();
+        return;
+      }
+
+      // catch up with the blocks added while disconnected
+      if (m_zmq->get_num_connections() != m_zmq_connections) {
+        m_zmq_connections = m_zmq->get_num_connections();
+        m_catch_up = true;
+      }
+      if (publication) announce_published_tip(publication.get());
+
+      // poll the daemon while zmq is not connected
+      bool poll_due = std::chrono::steady_clock::now() - m_last_daemon_poll >= std::chrono::milliseconds(m_daemon_poll_period_ms.load());
+      if (poll_due && (!m_zmq->is_connected() || m_catch_up)) poll_daemon();
+    }
+
+    void poll_daemon() {
+      m_last_daemon_poll = std::chrono::steady_clock::now();
+      auto header = m_daemon->get_last_block_header();
+      m_catch_up = false;
+      if (!m_last_header) {
+        m_last_header = header;
+        return;
+      }
+      announce_if_new(header);
+    }
+
+    void announce_published_tip(const monero_zmq_publication& publication) {
+      zmq_chain_main chain_main;
+      if (!epee::serialization::load_t_from_json(chain_main, publication.m_json) || chain_main.ids.empty()) {
+        MWARNING("Could not parse zmq publication: " << publication.m_json.substr(0, 256));
+        return;
+      }
+
+      // notify the new tip as when polling
+      try {
+        announce_if_new(m_daemon->get_block_header_by_hash(chain_main.ids.back()));
+      } catch (const std::exception& e) {
+        MWARNING("Could not fetch header of block published by zmq, polling the daemon: " << e.what());
+        m_catch_up = true;
+      }
+    }
+
+    void announce_if_new(const std::shared_ptr<monero_block_header>& header) {
+      if (m_last_header && header->m_hash == m_last_header->m_hash) return;
+      m_last_header = header;
+      announce_block_header(header);
+    }
 
     void announce_block_header(const std::shared_ptr<monero_block_header>& header) {
       gen_utils::thread_poller::announce_scope scope(*this); // see wait_for_callbacks_idle()
@@ -129,8 +268,8 @@ namespace monero {
 
   void monero_daemon_rpc::set_poll_period_in_ms(uint64_t period_ms) {
     boost::lock_guard<boost::mutex> poller_lock(m_poller_mutex);
-    if (!m_poller) m_poller = std::make_unique<monero_daemon_poller>(this);
-    m_poller->set_period_in_ms(period_ms);
+    if (!m_poller) m_poller = std::make_unique<monero_daemon_poller>(this, m_rpc);
+    m_poller->set_daemon_poll_period_in_ms(period_ms);
   }
 
   /**
@@ -1034,9 +1173,12 @@ namespace monero {
     }
 
     if (!m_poller && should_poll) {
-      m_poller = std::make_unique<monero_daemon_poller>(this);
+      m_poller = std::make_unique<monero_daemon_poller>(this, m_rpc);
     }
-    if (m_poller) m_poller->request_is_polling(should_poll);
+    if (m_poller) {
+      m_poller->set_zmq_uri(m_rpc->m_zmq_uri);
+      m_poller->request_listening(should_poll);
+    }
   }
 
   monero_daemon_rpc::~monero_daemon_rpc() {

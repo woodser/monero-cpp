@@ -91,7 +91,7 @@ namespace monero {
     bool is_connected();
 
     /**
-     * Set the daemon poll period.
+     * Set the daemon poll period, used when zmq is not configured or not connected.
      *
      * @param period_ms poll period in milliseconds.
      */
