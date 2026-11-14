@@ -105,6 +105,17 @@ jobs:
           cmake --build build
           cmake --install build
 
+      - name: Install zeromq
+        run: |
+          # the distro libzmq.a needs gssapi, which has no static archive, so build it without optional dependencies
+          wget https://github.com/zeromq/libzmq/releases/download/v4.3.5/zeromq-4.3.5.tar.gz
+          echo "6653ef5910f17954861fe72332e68b03ca6e4d9c7160eb3a8de5a5a913bfab43  zeromq-4.3.5.tar.gz" | sha256sum -c
+          tar xzf zeromq-4.3.5.tar.gz
+          cd zeromq-4.3.5
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DBUILD_SHARED=OFF -DBUILD_STATIC=ON -DZMQ_BUILD_TESTS=OFF -DWITH_LIBSODIUM=OFF -DWITH_LIBBSD=OFF -DWITH_DOCS=OFF -DWITH_PERF_TOOL=OFF -DENABLE_DRAFTS=OFF -DENABLE_CPACK=OFF -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+          cmake --build build -j3
+          cmake --install build
+
       - name: Install boost
         run: |
           # PIC static boost, same version on all platforms (no distro boost so headers and archives match)

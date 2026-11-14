@@ -105,6 +105,59 @@ namespace monero {
   };
 
   /**
+   * Models a publication of a Monero daemon's zmq publisher.
+   */
+  struct monero_zmq_publication {
+    std::string m_topic;
+    std::string m_json;
+  };
+
+  /**
+   * Receives the publications of a Monero daemon's zmq publisher, can only be used by one thread at a time.
+   */
+  class monero_zmq_subscriber {
+  public:
+    ~monero_zmq_subscriber();
+
+    /**
+     * Indicates if connected to the publisher, which is updated while waiting for publications.
+     *
+     * @return true if connected
+     */
+    bool is_connected() const { return m_is_connected; }
+
+    /**
+     * Get the number of times connected to the publisher, which is updated while waiting for publications.
+     *
+     * @return the number of connections
+     */
+    uint64_t get_num_connections() const { return m_num_connections; }
+
+    /**
+     * Wait for a publication.
+     *
+     * @param timeout_ms the maximum time to wait
+     * @return the publication, or none if there is none before the timeout
+     */
+    boost::optional<monero_zmq_publication> wait_for_publication(int timeout_ms);
+
+    /**
+     * Discard the publications which are pending.
+     */
+    void discard_publications();
+
+  private:
+    friend class monero_rpc_connection;
+    struct impl;
+    std::unique_ptr<impl> m_impl;
+    bool m_is_connected = false;
+    uint64_t m_num_connections = 0;
+
+    monero_zmq_subscriber(const std::string& uri, const std::vector<std::string>& topics);
+    void read_events();
+  };
+
+  /**
    * Maintains a connection and sends requests to a Monero RPC API.
    */
   class monero_rpc_connection : public serializable_struct {
@@ -114,7 +167,7 @@ namespace monero {
     boost::optional<std::string> m_password;
     boost::optional<std::string> m_proxy_uri;
     bool m_ssl_verify = true;                    // verify TLS certificates and hostnames
-    boost::optional<std::string> m_zmq_uri;      // TODO: implement zmq listener
+    boost::optional<std::string> m_zmq_uri;      // monerod/monero-wallet-rpc --zmq-pub uri
     boost::optional<uint32_t> m_timeout_ms;      // RPC request timeout in milliseconds
     boost::optional<uint64_t> m_response_time;   // automatically set by calling check_connection()
     int m_priority;                              // priority relative to other connections where 1 is highest, then 2, etc, and 0 is lowest (default)
@@ -218,6 +271,15 @@ namespace monero {
     bool check_connection(const boost::optional<uint32_t>& timeout_ms = boost::none);
 
     /**
+     * Subscribe to the publications of the connection's zmq uri.
+     *
+     * @param topics are the topics to receive, e.g. "json-minimal-chain_main"
+     * @return the subscriber
+     * @throws if the connection has no zmq uri or the subscription fails
+     */
+    std::unique_ptr<monero_zmq_subscriber> subscribe_zmq(const std::vector<std::string>& topics) const;
+
+    /**
      * Send a request to the RPC API.
      *
      * @param path specifies the method to request
@@ -274,6 +336,7 @@ namespace monero {
     mutable std::unique_ptr<epee::net_utils::http::abstract_http_client> m_http_client;
     std::unordered_map<std::string, std::string> m_attributes;
     mutable std::tuple<std::string, std::string, std::string, std::string, bool> m_applied{"", "", "", "", true};
+    mutable std::string m_path_prefix; // path of the uri, prepended to request paths (e.g. lws rest server prefix)
 
     void ensure_configured() const;
     std::string invoke_post(const boost::string_ref uri, const std::string& body, const boost::optional<uint32_t>& timeout_ms = boost::none) const;
