@@ -54,6 +54,7 @@
 #include "monero_wallet_rpc.h"
 #include "monero_wallet_rpc_model.h"
 #include "common/monero_error.h"
+#include "wallet/wallet_rpc_server_error_codes.h"
 #include "utils/gen_utils.h"
 #include "utils/monero_utils.h"
 #include <atomic>
@@ -491,8 +492,8 @@ namespace monero {
       return false;
     }
     catch (const monero_rpc_error& e) {
-      if (e.code == -29) return true;
-      if (e.code == -1) return false;
+      if (e.code == WALLET_RPC_ERROR_CODE_WATCH_ONLY) return true;
+      if (e.code == WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR) return false;
       throw;
     }
   }
@@ -558,7 +559,7 @@ namespace monero {
       return false;
     }
     catch (const monero_rpc_error& e) {
-      if (e.code == -13) throw; // no wallet file
+      if (e.code == WALLET_RPC_ERROR_CODE_NOT_OPEN) throw; // no wallet file
       return e.message.find("Failed to connect to daemon") == std::string::npos;
     }
   }
@@ -657,8 +658,8 @@ namespace monero {
       deserialize_integrated_address(result, integrated_address);
       return decode_integrated_address(integrated_address.m_integrated_address);
     } catch (const monero_rpc_error& ex) {
-      if (ex.code == -5 && std::string(ex.what()).find("Invalid payment ID") != std::string::npos) {
-        throw monero_rpc_error(-5, "Invalid payment ID: " + payment_id);
+      if (ex.code == WALLET_RPC_ERROR_CODE_WRONG_PAYMENT_ID && std::string(ex.what()).find("Invalid payment ID") != std::string::npos) {
+        throw monero_rpc_error(WALLET_RPC_ERROR_CODE_WRONG_PAYMENT_ID, "Invalid payment ID: " + payment_id);
       }
       throw;
     }
@@ -1281,7 +1282,7 @@ namespace monero {
       auto result = m_rpc->send_json_request("verify", params);
       deserialize_message_signature_result(result, sig_result);
     } catch (const monero_rpc_error& ex) {
-      if (ex.code != -2) throw;
+      if (ex.code != WALLET_RPC_ERROR_CODE_WRONG_ADDRESS) throw;
     }
 
     return sig_result;
@@ -1289,10 +1290,10 @@ namespace monero {
 
   void normalize_wallet_error(const monero_rpc_error& ex) {
     // normalize error message
-    if (ex.code == -1 && std::string(ex.what()).find("basic_string") != std::string::npos) {
-      throw monero_rpc_error(-1, "Must provide signature to check tx proof");
-    } else if (ex.code == -8 && ex.what() == std::string("TX ID has invalid format")) {
-      throw monero_rpc_error(-8, "TX hash has invalid format");
+    if (ex.code == WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR && std::string(ex.what()).find("basic_string") != std::string::npos) {
+      throw monero_rpc_error(WALLET_RPC_ERROR_CODE_UNKNOWN_ERROR, "Must provide signature to check tx proof");
+    } else if (ex.code == WALLET_RPC_ERROR_CODE_WRONG_TXID && ex.what() == std::string("TX ID has invalid format")) {
+      throw monero_rpc_error(WALLET_RPC_ERROR_CODE_WRONG_TXID, "TX hash has invalid format");
     }
     throw;
   }
@@ -1527,7 +1528,7 @@ namespace monero {
       return true;
     }
     catch (const monero_rpc_error& ex) {
-      if (ex.code == -45) {
+      if (ex.code == WALLET_RPC_ERROR_CODE_ATTRIBUTE_NOT_FOUND) {
         // attribute not found
         value = std::string("");
         return false;
@@ -1640,7 +1641,7 @@ namespace monero {
     try {
       get_primary_address();
     } catch (const monero_rpc_error& ex) {
-      return ex.code == -8 && std::string(ex.what()).find("No wallet file") != std::string::npos;
+      return ex.code == WALLET_RPC_ERROR_CODE_NOT_OPEN && std::string(ex.what()).find("No wallet file") != std::string::npos;
     } catch (const monero_error&) {
       return false;
     }
