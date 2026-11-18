@@ -171,6 +171,31 @@ include_directories(${SODIUM_INCLUDE_DIR})
 message(STATUS "Using libsodium library at ${SODIUM_LIBRARY}")
 
 ############
+# libzmq
+############
+
+# link before libsodium, which static libzmq depends on
+find_path(ZMQ_INCLUDE_DIR zmq.h REQUIRED)
+find_library(ZMQ_LIBRARY zmq REQUIRED)
+include_directories(${ZMQ_INCLUDE_DIR})
+set(ZMQ_LIBRARIES ${ZMQ_LIBRARY})
+if (STATIC)
+  add_definitions(-DZMQ_STATIC) # as monero-project, else windows expects a zmq dll
+  # optional transports of static libzmq
+  foreach(zmq_dep pgm norm gssapi_krb5 protolib protokit bsd md)
+    string(TOUPPER ${zmq_dep} zmq_dep_var)
+    find_library(ZMQ_DEP_${zmq_dep_var} ${zmq_dep})
+    if (ZMQ_DEP_${zmq_dep_var})
+      list(APPEND ZMQ_LIBRARIES ${ZMQ_DEP_${zmq_dep_var}})
+    endif()
+  endforeach()
+endif()
+if (WIN32)
+  list(APPEND ZMQ_LIBRARIES ws2_32 rpcrt4 iphlpapi)
+endif()
+message(STATUS "Using libzmq libraries: ${ZMQ_LIBRARIES}")
+
+############
 # HIDAPI
 ############
 
@@ -423,6 +448,7 @@ if (BUILD_LIBRARY)
       ${Protobuf_LIBRARY}
       ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
+      ${ZMQ_LIBRARIES}
       ${SODIUM_LIBRARY}
       ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
@@ -547,6 +573,7 @@ if (BUILD_SAMPLE)
       ${Protobuf_LIBRARY}
       ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
+      ${ZMQ_LIBRARIES}
       ${SODIUM_LIBRARY}
       ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
@@ -619,6 +646,7 @@ if (BUILD_SCRATCHPAD)
       ${Protobuf_LIBRARY}
       ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
+      ${ZMQ_LIBRARIES}
       ${SODIUM_LIBRARY}
       ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
@@ -691,6 +719,7 @@ if (BUILD_TESTS)
       ${Protobuf_LIBRARY}
       ${LibUSB_LIBRARIES}
       ${OPENSSL_LIBRARIES}
+      ${ZMQ_LIBRARIES}
       ${SODIUM_LIBRARY}
       ${HIDAPI_LIBRARIES}
       ${EXTRA_LIBRARIES}
