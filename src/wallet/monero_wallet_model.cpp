@@ -653,9 +653,8 @@ namespace monero {
   std::shared_ptr<monero_tx_query> monero_tx_query::deserialize_from_block(const std::string& tx_query_json) {
 
     // deserialize tx query std::string to property rooted at block
-    std::istringstream iss = tx_query_json.empty() ? std::istringstream() : std::istringstream(tx_query_json);
     boost::property_tree::ptree block_node;
-    boost::property_tree::read_json(iss, block_node);
+    gen_utils::deserialize(tx_query_json, block_node);
 
     // convert query property tree to block
     std::shared_ptr<monero_block> block = node_to_block_query(block_node);
@@ -1138,9 +1137,8 @@ namespace monero {
   std::shared_ptr<monero_transfer_query> monero_transfer_query::deserialize_from_block(const std::string& transfer_query_json) {
 
     // deserialize transfer query std::string to property rooted at block
-    std::istringstream iss = transfer_query_json.empty() ? std::istringstream() : std::istringstream(transfer_query_json);
     boost::property_tree::ptree blockNode;
-    boost::property_tree::read_json(iss, blockNode);
+    gen_utils::deserialize(transfer_query_json, blockNode);
 
     // convert query property tree to block
     std::shared_ptr<monero_block> block = node_to_block_query(blockNode);
@@ -1383,9 +1381,8 @@ namespace monero {
   std::shared_ptr<monero_output_query> monero_output_query::deserialize_from_block(const std::string& output_query_json) {
 
     // deserialize output query string to property rooted at block
-    std::istringstream iss = output_query_json.empty() ? std::istringstream() : std::istringstream(output_query_json);
     boost::property_tree::ptree blockNode;
-    boost::property_tree::read_json(iss, blockNode);
+    gen_utils::deserialize(output_query_json, blockNode);
 
     // convert query property tree to block
     std::shared_ptr<monero_block> block = node_to_block_query(blockNode);

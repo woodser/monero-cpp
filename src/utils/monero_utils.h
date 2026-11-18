@@ -288,33 +288,43 @@ namespace monero_utils
 
   // ------------------------------ FREE MEMORY -------------------------------
 
-  static void free(std::shared_ptr<monero_block> block) {
-    if (block == nullptr) return;
-    for (std::shared_ptr<monero_tx>& tx : block->m_txs) {
-      tx->m_block.reset();
-      monero_tx_wallet* tx_wallet = dynamic_cast<monero_tx_wallet*>(tx.get());
-      if (tx_wallet != nullptr) {
-        if (tx_wallet->m_tx_set != nullptr) tx_wallet->m_tx_set.reset();
-        if (tx_wallet->m_outgoing_transfer != nullptr) tx_wallet->m_outgoing_transfer->m_tx.reset();
-        for (std::shared_ptr<monero_transfer> transfer : tx_wallet->m_incoming_transfers) transfer->m_tx.reset();
-        for (std::shared_ptr<monero_output> output : tx_wallet->m_outputs) output->m_tx.reset();
-        for (std::shared_ptr<monero_output> input : tx_wallet->m_inputs) {
-          input->m_key_image.reset();
-          input->m_tx.reset();
-        }
+  // releases the links of the models of a tx that point back at them, so dropping the shared
+  // pointers frees the models: a wallet tx owns transfers that point back at it, every tx owns
+  // inputs and outputs that do, and a tx query owns its transfer, input and output queries
+  static void free_tx_links(const std::shared_ptr<monero_tx>& tx) {
+    tx->m_block.reset();
+    monero_tx_wallet* tx_wallet = dynamic_cast<monero_tx_wallet*>(tx.get());
+    if (tx_wallet != nullptr) {
+      if (tx_wallet->m_tx_set != nullptr) tx_wallet->m_tx_set.reset();
+      if (tx_wallet->m_outgoing_transfer != nullptr) tx_wallet->m_outgoing_transfer->m_tx.reset();
+      for (std::shared_ptr<monero_transfer> transfer : tx_wallet->m_incoming_transfers) transfer->m_tx.reset();
+    }
+    for (std::shared_ptr<monero_output> output : tx->m_outputs) output->m_tx.reset();
+    for (std::shared_ptr<monero_output> input : tx->m_inputs) {
+      input->m_key_image.reset();
+      input->m_tx.reset();
+    }
+    monero_tx_query* tx_query = dynamic_cast<monero_tx_query*>(tx.get());
+    if (tx_query != nullptr) {
+      if (tx_query->m_transfer_query != nullptr) {
+        tx_query->m_transfer_query->m_tx_query.reset();
+        tx_query->m_transfer_query.reset();
       }
-      monero_tx_query* tx_query = dynamic_cast<monero_tx_query*>(tx.get());
-      if (tx_query != nullptr) {
-        if (tx_query->m_transfer_query != nullptr) {
-          tx_query->m_transfer_query->m_tx_query.reset();
-          tx_query->m_transfer_query.reset();
-        }
-        if (tx_query->m_output_query != nullptr) {
-          tx_query->m_output_query->m_tx_query.reset();
-          tx_query->m_output_query.reset();
-        }
+      if (tx_query->m_input_query != nullptr) {
+        tx_query->m_input_query->m_tx_query.reset();
+        tx_query->m_input_query.reset();
+      }
+      if (tx_query->m_output_query != nullptr) {
+        tx_query->m_output_query->m_tx_query.reset();
+        tx_query->m_output_query.reset();
       }
     }
+  }
+
+  static void free(std::shared_ptr<monero_block> block) {
+    if (block == nullptr) return;
+    for (std::shared_ptr<monero_tx>& tx : block->m_txs) free_tx_links(tx);
+    if (block->m_miner_tx != nullptr) free_tx_links(block->m_miner_tx);
     block.reset();
   }
 
