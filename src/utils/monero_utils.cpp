@@ -606,7 +606,28 @@ bool monero_utils::vout_before(const std::shared_ptr<monero_output>& o1, const s
     if (ow1->m_subaddress_index.get() < ow2->m_subaddress_index.get()) return true;
     if (ow1->m_subaddress_index.get() == ow2->m_subaddress_index.get()) {
       if (ow1->m_index.get() < ow2->m_index.get()) return true;
-      if (ow1->m_index.get() == ow2->m_index.get()) throw std::runtime_error("Should never sort outputs with duplicate indices");
+      if (ow1->m_index.get() == ow2->m_index.get()) {
+        // TWO DIFFERENT OUTPUTS CAN CARRY THE SAME LOCAL INDEX. This comparator used to throw here, although
+        // std::sort is allowed to compare any two elements and a throwing comparator is not a valid ordering.
+        // Keep the order total with the fields the comment above already promised: the key image, then the
+        // transaction hash. Two truly identical outputs compare equal (false in both directions).
+        auto keyImageHex = [](const std::shared_ptr<monero_output_wallet>& output) {
+          if (output->m_key_image == nullptr || output->m_key_image->m_hex == boost::none) return std::string();
+          return output->m_key_image->m_hex.get();
+        };
+        auto txHash = [](const std::shared_ptr<monero_output_wallet>& output) {
+          if (output->m_tx == nullptr || output->m_tx->m_hash == boost::none) return std::string();
+          return output->m_tx->m_hash.get();
+        };
+        const std::string keyImage1 = keyImageHex(ow1);
+        const std::string keyImage2 = keyImageHex(ow2);
+        if (keyImage1 != keyImage2) return keyImage1 < keyImage2;
+        const std::string txHash1 = txHash(ow1);
+        const std::string txHash2 = txHash(ow2);
+        if (txHash1 != txHash2) return txHash1 < txHash2;
+        return false;
+      }
+      return false;
     }
   }
   return false;
