@@ -371,6 +371,7 @@ set_target_properties(randomx PROPERTIES IMPORTED_LOCATION
 set(
     LIBRARY_SRC_FILES
     src/common/monero_rpc_connection.cpp
+    src/common/monero_rpc_connection_zmq.cpp
     src/utils/gen_utils.cpp
     src/utils/monero_utils.cpp
     src/daemon/monero_daemon_model.cpp
