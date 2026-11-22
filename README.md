@@ -180,7 +180,14 @@ For example, [monero-java](https://github.com/woodser/monero-java) compiles this
     For 64-bit:
 
      ```
-     pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-openssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-unbound mingw-w64-x86_64-protobuf mingw-w64-x86_64-expat mingw-w64-x86_64-icu mingw-w64-x86_64-ntldd git make gettext base-devel wget
+     # curl-winssl keeps cmake working without the openssl 4 dlls that openssl 3 replaces below; confirm if asked to remove curl and libssh2
+     pacman -S mingw-w64-x86_64-toolchain mingw-w64-x86_64-cmake mingw-w64-x86_64-curl-winssl mingw-w64-x86_64-zeromq mingw-w64-x86_64-libsodium mingw-w64-x86_64-protobuf mingw-w64-x86_64-expat mingw-w64-x86_64-icu mingw-w64-x86_64-ntldd git make gettext base-devel wget
+     # mingw64 moved to openssl 4, which monero does not compile against, and removed unbound; install the archived openssl 3 builds
+     wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-openssl-3.6.5-1-any.pkg.tar.zst https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-unbound-1.26.2-1-any.pkg.tar.zst
+     echo "389d1af21e99223d9e2cd32d4c073131b276da85be7636bd8d23571f6938864f  mingw-w64-x86_64-openssl-3.6.5-1-any.pkg.tar.zst" | sha256sum -c
+     echo "478826706a4f520a763ba953c17c799ef6c96c7194815c1cc23335ec806df4b6  mingw-w64-x86_64-unbound-1.26.2-1-any.pkg.tar.zst" | sha256sum -c
+     # skip unbound's ldns dependency, which libunbound does not use
+     pacman -Udd mingw-w64-x86_64-openssl-3.6.5-1-any.pkg.tar.zst mingw-w64-x86_64-unbound-1.26.2-1-any.pkg.tar.zst
      # removed from the msys2 mingw64 repo; install the archived packages
      wget https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-hidapi-0.15.0-2-any.pkg.tar.zst https://repo.msys2.org/mingw/mingw64/mingw-w64-x86_64-libusb-1.0.30-1-any.pkg.tar.zst
      echo "89fb61549a437d65076a092a367fcb264fc7045ee9ebef48cd81f5a76a5588f8  mingw-w64-x86_64-hidapi-0.15.0-2-any.pkg.tar.zst" | sha256sum -c
