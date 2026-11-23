@@ -709,7 +709,10 @@ namespace monero {
      * @return the retrieved subaddress
      */
     virtual monero_subaddress get_subaddress(const uint32_t account_idx, const uint32_t subaddress_idx) const {
-      throw std::runtime_error("get_subaddress() not supported");
+      std::vector<monero_subaddress> subaddresses = get_subaddresses(account_idx, std::vector<uint32_t>{subaddress_idx});
+      if (subaddresses.empty()) throw std::runtime_error("Subaddress is not initialized");
+      if (subaddresses.size() != 1) throw std::runtime_error("Only 1 subaddress should be returned");
+      return subaddresses[0];
     }
 
     /**

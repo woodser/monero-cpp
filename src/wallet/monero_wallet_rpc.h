@@ -179,7 +179,6 @@ namespace monero {
     std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices, bool skip_balances) const;
     std::vector<monero_subaddress> get_subaddresses(uint32_t account_idx, const std::vector<uint32_t>& subaddress_indices) const override;
     std::vector<monero_subaddress> get_subaddresses(const uint32_t account_idx) const override;
-    monero_subaddress get_subaddress(const uint32_t account_idx, const uint32_t subaddress_idx) const override;
     monero_subaddress create_subaddress(uint32_t account_idx, const std::string& label = "") override;
     void set_subaddress_label(uint32_t account_idx, uint32_t subaddress_idx, const std::string& label = "") override;
     std::vector<std::shared_ptr<monero_tx_wallet>> get_txs() const override;
