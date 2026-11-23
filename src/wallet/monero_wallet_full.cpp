@@ -3745,7 +3745,7 @@ namespace monero {
 
     // translate from monero_tx_query to in, out, pending, pool, failed terminology used by monero-wallet-rpc
     bool can_be_confirmed = !gen_utils::bool_equals(false, tx_query->m_is_confirmed) && !gen_utils::bool_equals(true, tx_query->m_in_tx_pool) && !gen_utils::bool_equals(true, tx_query->m_is_failed) && !gen_utils::bool_equals(false, tx_query->m_is_relayed);
-    bool can_be_in_tx_pool = !gen_utils::bool_equals(true, tx_query->m_is_confirmed) && !gen_utils::bool_equals(false, tx_query->m_in_tx_pool) && !gen_utils::bool_equals(true, tx_query->m_is_failed) && tx_query->get_height() == boost::none && tx_query->m_min_height == boost::none && !gen_utils::bool_equals(false, tx_query->m_is_locked);
+    bool can_be_in_tx_pool = !gen_utils::bool_equals(true, tx_query->m_is_confirmed) && !gen_utils::bool_equals(false, tx_query->m_in_tx_pool) && !gen_utils::bool_equals(true, tx_query->m_is_failed) && tx_query->get_height() == boost::none && tx_query->m_max_height == boost::none && !gen_utils::bool_equals(false, tx_query->m_is_locked);
     bool can_be_incoming = !gen_utils::bool_equals(false, _query->m_is_incoming) && !gen_utils::bool_equals(true, _query->is_outgoing()) && !gen_utils::bool_equals(true, _query->m_has_destinations);
     bool can_be_outgoing = !gen_utils::bool_equals(false, _query->is_outgoing()) && !gen_utils::bool_equals(true, _query->m_is_incoming);
     bool is_in = can_be_incoming && can_be_confirmed;
