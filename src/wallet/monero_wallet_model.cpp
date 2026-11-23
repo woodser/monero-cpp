@@ -739,7 +739,7 @@ namespace monero {
     if (!m_hashes.empty() && find(m_hashes.begin(), m_hashes.end(), *tx->m_hash) == m_hashes.end()) return false;
     if (!m_payment_ids.empty() && (tx->m_payment_id == boost::none || find(m_payment_ids.begin(), m_payment_ids.end(), *tx->m_payment_id) == m_payment_ids.end())) return false;
     if (m_height != boost::none && (txHeight == boost::none || *txHeight != *m_height)) return false;
-    if (m_min_height != boost::none && (txHeight == boost::none || *txHeight < *m_min_height)) return false;
+    if (m_min_height != boost::none && txHeight != boost::none && *txHeight < *m_min_height) return false; // do not filter unconfirmed
     if (m_max_height != boost::none && (txHeight == boost::none || *txHeight > *m_max_height)) return false;
 
     // done if not querying transfers or outputs
