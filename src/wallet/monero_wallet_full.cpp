@@ -1788,6 +1788,7 @@ namespace monero {
         if (account_tags.second[account_idx] == tag_label.first) account_indices.push_back(account_idx);
       }
       tags.push_back(std::make_shared<monero_account_tag>(tag_label.first, tag_label.second, account_indices));
+      if (tag_label.second.empty()) tags.back()->m_label = boost::none; // an empty label is unset like with the wallet rpc
     }
     return tags;
   }
