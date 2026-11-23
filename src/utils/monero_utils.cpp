@@ -342,7 +342,7 @@ void monero_utils::validate_mnemonic(const std::string& mnemonic, const std::str
 
 void monero_utils::json_to_binary(const std::string &json, std::string &bin) {
   epee::serialization::portable_storage ps;
-  ps.load_from_json(json);
+  if (!ps.load_from_json(json)) throw std::runtime_error("Invalid JSON");
   epee::byte_stream bs;
   ps.store_to_binary(bs);
   bin = std::string((char*) bs.data(), bs.size());
@@ -350,7 +350,7 @@ void monero_utils::json_to_binary(const std::string &json, std::string &bin) {
 
 void monero_utils::binary_to_json(const std::string &bin, std::string &json) {
   epee::serialization::portable_storage ps;
-  ps.load_from_binary(bin);
+  if (!ps.load_from_binary(bin)) throw std::runtime_error("Invalid binary");
   ps.dump_as_json(json);
 }
 
