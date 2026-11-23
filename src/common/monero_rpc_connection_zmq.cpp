@@ -125,6 +125,7 @@ namespace monero {
     {
       boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
       if (m_zmq_uri == boost::none || m_zmq_uri.get().empty()) throw monero_error("Connection has no zmq uri");
+      if (m_proxy_uri != boost::none && !m_proxy_uri.get().empty()) throw monero_error("Cannot subscribe to zmq through a proxy"); // zmq would connect directly
       uri = m_zmq_uri.get();
     }
     return std::unique_ptr<monero_zmq_subscriber>(new monero_zmq_subscriber(uri, topics));

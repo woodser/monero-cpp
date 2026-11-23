@@ -275,7 +275,7 @@ namespace monero {
      *
      * @param topics are the topics to receive, e.g. "json-minimal-chain_main"
      * @return the subscriber
-     * @throws if the connection has no zmq uri or the subscription fails
+     * @throws if the connection has no zmq uri, uses a proxy, or the subscription fails
      */
     std::unique_ptr<monero_zmq_subscriber> subscribe_zmq(const std::vector<std::string>& topics) const;
 
