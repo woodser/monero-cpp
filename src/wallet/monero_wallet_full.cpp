@@ -1657,14 +1657,21 @@ namespace monero {
     std::vector<tools::wallet2::transfer_details> transfers;
     if (include_subaddresses) m_w2->get_transfers(transfers);
 
+    // get the account tags, the tag to filter by must be registered like with the wallet rpc
+    const auto account_tags = m_w2->get_account_tags();
+    if (!tag.empty() && account_tags.first.count(tag) == 0) throw std::runtime_error("Tag " + tag + " is unregistered.");
+
     // build accounts
     std::vector<monero_account> accounts;
     for (uint32_t account_idx = 0; account_idx < m_w2->get_num_subaddress_accounts(); account_idx++) {
+      const std::string& account_tag = account_tags.second[account_idx];
+      if (!tag.empty() && account_tag != tag) continue;
       monero_account account;
       account.m_index = account_idx;
       account.m_primary_address = get_address(account_idx, 0);
       account.m_balance = m_w2->balance(account_idx, STRICT_);
       account.m_unlocked_balance = m_w2->unlocked_balance(account_idx, STRICT_);
+      if (!account_tag.empty()) account.m_tag = account_tag;
       if (include_subaddresses) account.m_subaddresses = get_subaddresses_aux(account_idx, std::vector<uint32_t>(), transfers);
       accounts.push_back(account);
     }
@@ -1687,6 +1694,8 @@ namespace monero {
     account.m_primary_address = get_address(account_idx, 0);
     account.m_balance = m_w2->balance(account_idx, STRICT_);
     account.m_unlocked_balance = m_w2->unlocked_balance(account_idx, STRICT_);
+    const auto account_tags = m_w2->get_account_tags();
+    if (account_idx < account_tags.second.size() && !account_tags.second[account_idx].empty()) account.m_tag = account_tags.second[account_idx];
     if (include_subaddresses) account.m_subaddresses = get_subaddresses_aux(account_idx, std::vector<uint32_t>(), transfers);
     return account;
   }
@@ -1747,6 +1756,47 @@ namespace monero {
     cryptonote::subaddress_index index = {account_idx, subaddress_idx};
     sync_op_lock op_lock(*this); // do not refresh while modifying subaddresses
     m_w2->set_subaddress_label(index, label);
+  }
+
+  void monero_wallet_full::tag_accounts(const std::string& tag, const std::vector<uint32_t>& account_indices) {
+    MTRACE("tag_accounts(" << tag << ")");
+    assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while modifying accounts
+    m_w2->get_account_tags(); // size the tags to the accounts before setting them
+    m_w2->set_account_tag(std::set<uint32_t>(account_indices.begin(), account_indices.end()), tag);
+  }
+
+  void monero_wallet_full::untag_accounts(const std::vector<uint32_t>& account_indices) {
+    MTRACE("untag_accounts()");
+    assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while modifying accounts
+    m_w2->get_account_tags(); // size the tags to the accounts before setting them
+    m_w2->set_account_tag(std::set<uint32_t>(account_indices.begin(), account_indices.end()), "");
+  }
+
+  std::vector<std::shared_ptr<monero_account_tag>> monero_wallet_full::get_account_tags() const {
+    MTRACE("get_account_tags()");
+    assert_not_closed();
+    sync_op_lock op_lock(*this, false); // wait for the current sync chunk without interrupting it
+
+    // build the tags like the wallet rpc, each with the indices of its accounts
+    const auto account_tags = m_w2->get_account_tags();
+    std::vector<std::shared_ptr<monero_account_tag>> tags;
+    for (const auto& tag_label : account_tags.first) {
+      std::vector<uint32_t> account_indices;
+      for (uint32_t account_idx = 0; account_idx < account_tags.second.size(); account_idx++) {
+        if (account_tags.second[account_idx] == tag_label.first) account_indices.push_back(account_idx);
+      }
+      tags.push_back(std::make_shared<monero_account_tag>(tag_label.first, tag_label.second, account_indices));
+    }
+    return tags;
+  }
+
+  void monero_wallet_full::set_account_tag_label(const std::string& tag, const std::string& label) {
+    MTRACE("set_account_tag_label(" << tag << ", " << label << ")");
+    assert_not_closed();
+    sync_op_lock op_lock(*this); // do not refresh while modifying accounts
+    m_w2->set_account_tag_description(tag, label);
   }
 
   std::vector<std::shared_ptr<monero_tx_wallet>> monero_wallet_full::get_txs() const {
