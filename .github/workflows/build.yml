@@ -132,6 +132,9 @@ jobs:
           cmake --build . -j3
           cd ..
 
+      - name: Test binary serialization
+        run: ./build/monero_tests --utils
+
       - name: Verify libraries
         run: |
           file build/libmonero-cpp.so | grep -q '${{ matrix.filearch }}' || { echo "wrong architecture: $(file build/libmonero-cpp.so)"; exit 1; }
@@ -252,6 +255,10 @@ jobs:
           cmake --build .
           cd ..
 
+      - name: Test binary serialization
+        shell: msys2 {0}
+        run: ./build/monero_tests --utils
+
       - name: Verify libraries
         shell: msys2 {0}
         run: |
@@ -370,6 +377,9 @@ jobs:
           cmake -DSTATIC=ON -DBOOST_ROOT=/usr/local -DBoost_NO_SYSTEM_PATHS=ON -DBUILD_SAMPLE=ON -DBUILD_SCRATCHPAD=ON -DBUILD_TESTS=ON -DOPENSSL_ROOT_DIR="$(brew --prefix openssl@3)" ..
           cmake --build . -j3
           cd ..
+
+      - name: Test binary serialization
+        run: ./build/monero_tests --utils
 
       - name: Verify libraries
         run: |

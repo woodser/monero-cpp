@@ -344,14 +344,14 @@ void monero_utils::json_to_binary(const std::string &json, std::string &bin) {
   epee::serialization::portable_storage ps;
   if (!ps.load_from_json(json)) throw std::runtime_error("Invalid JSON");
   epee::byte_stream bs;
-  ps.store_to_binary(bs);
+  if (!ps.store_to_binary(bs)) throw std::runtime_error("Failed to serialize binary");
   bin = std::string((char*) bs.data(), bs.size());
 }
 
 void monero_utils::binary_to_json(const std::string &bin, std::string &json) {
   epee::serialization::portable_storage ps;
   if (!ps.load_from_binary(bin)) throw std::runtime_error("Invalid binary");
-  ps.dump_as_json(json);
+  if (!ps.dump_as_json(json)) throw std::runtime_error("Failed to serialize JSON");
 }
 
 void monero_utils::binary_blocks_to_json(const std::string &bin, std::string &json) {

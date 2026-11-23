@@ -15,6 +15,59 @@ const int LOG_LEVEL = 2;
 const string DAEMON_URI = "http://localhost:28081";
 const monero_network_type NETWORK_TYPE = monero_network_type::TESTNET;
 
+// ------------------------- BINARY SERIALIZATION ----------------------------
+
+void test_conversion_error(void (*convert)(const string&, string&), const string& input, const string& expected_error) {
+  string output = "unchanged";
+  try {
+    convert(input, output);
+  } catch (const runtime_error& e) {
+    if (string(e.what()) != expected_error) throw runtime_error("Unexpected conversion error: " + string(e.what()));
+    if (output != "unchanged") throw runtime_error("Conversion changed output on failure");
+    return;
+  }
+  throw runtime_error("Expected conversion error: " + expected_error);
+}
+
+void test_binary_serialization() {
+
+  // round trip supported values and the largest supported field name
+  // fields are in epee's sorted order so the output compares as text
+  vector<string> jsons = {
+    "{}",
+    R"({"amount":18446744073709551615,"fraction":1.5,"ids":[1,2,3],"nested":{"value":42},"no":false,"ok":true,"signed":-9223372036854775808,"text":"line\ntext"})",
+    "{\"" + string(254, 'k') + "\":1}"
+  };
+  for (const string& json : jsons) {
+    string bin;
+    string result;
+    monero_utils::json_to_binary(json, bin);
+    monero_utils::binary_to_json(bin, result);
+    rapidjson::Document actual;
+    actual.Parse(result.c_str());
+    if (actual.HasParseError() || gen_utils::serialize(actual) != json) throw runtime_error("JSON/binary round trip changed values");
+  }
+
+  // reject inputs reported as invalid by epee without changing the output
+  for (const string& json : {"not json at all", "[]", "null", "{\"amount\":42,\"bad\":invalid}", "{\"amount\":18446744073709551616}"}) {
+    test_conversion_error(monero_utils::json_to_binary, json, "Invalid JSON");
+  }
+  for (const string& bin : {string(), string("garbage"), string(10, '\0')}) {
+    test_conversion_error(monero_utils::binary_to_json, bin, "Invalid binary");
+  }
+
+  // reject every truncation of a valid binary object
+  string bin;
+  monero_utils::json_to_binary("{\"amount\":42}", bin);
+  for (size_t size = 0; size < bin.size(); size++) {
+    test_conversion_error(monero_utils::binary_to_json, bin.substr(0, size), "Invalid binary");
+  }
+
+  // a field name of 255 bytes loads successfully but cannot be serialized
+  test_conversion_error(monero_utils::json_to_binary, "{\"" + string(255, 'k') + "\":1}", "Failed to serialize binary");
+  test_conversion_error(monero_utils::json_to_binary, "{\"amount\":42,\"" + string(255, 'k') + "\":1}", "Failed to serialize binary");
+}
+
 // ------------------------ MULTISIG STRESS TEST ------------------------------
 
 void synchronize_multisig_participants(vector<monero_wallet*> wallets) {
@@ -395,6 +448,17 @@ void test_multisig_stress(monero_wallet* funding_wallet, string wallet_name = ""
  * Main entry point for tests.
  */
 int main(int argc, const char* argv[]) {
+
+  if (argc == 2 && string(argv[1]) == "--utils") {
+    try {
+      test_binary_serialization();
+      cout << "Binary serialization tests passed" << endl;
+      return 0;
+    } catch (const exception& e) {
+      cerr << e.what() << endl;
+      return 1;
+    }
+  }
 
   // configure logging
   //mlog_configure("log_cpp_scratchpad.txt", true);
