@@ -264,6 +264,20 @@ namespace monero {
      */
     monero_rpc_response send_binary_request(const monero_rpc_request &request, const boost::optional<uint32_t>& timeout_ms = boost::none) const;
 
+    /**
+     * Invoke a POST request to the RPC API and get the raw response body.
+     *
+     * The body is returned as is: a JSON-RPC error in it is not raised.
+     *
+     * @param uri is the request uri
+     * @param body is the request body
+     * @param timeout_ms is the request timeout in milliseconds, the connection's timeout if none, 0 for no timeout
+     * @return the RPC API response body
+     * @throws monero_rpc_error if the response has an HTTP status other than 2xx, or the login is rejected (401)
+     * @throws monero_error if the request cannot be sent or gets no response
+     */
+    std::string invoke_post(const boost::string_ref uri, const std::string& body, const boost::optional<uint32_t>& timeout_ms = boost::none) const;
+
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const override;
 
   protected:
@@ -276,7 +290,6 @@ namespace monero {
     mutable std::tuple<std::string, std::string, std::string, std::string, bool> m_applied{"", "", "", "", true};
 
     void ensure_configured() const;
-    std::string invoke_post(const boost::string_ref uri, const std::string& body, const boost::optional<uint32_t>& timeout_ms = boost::none) const;
     void send_rpc_request(const boost::string_ref uri, const monero_rpc_request& request, monero_rpc_response& response, const boost::optional<uint32_t>& timeout_ms = boost::none, bool binary = false) const;
   };
 
