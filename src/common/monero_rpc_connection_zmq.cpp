@@ -23,8 +23,10 @@ namespace monero {
     if (!m_impl->m_socket) throw monero_error("Failed to create zmq subscriber: " + net::zmq::get_error_code().message());
     int linger_ms = 0;
     int reconnect_ms = ZMQ_RECONNECT_INTERVAL_MS;
+    int ipv6 = uri.find('[') != std::string::npos; // an ipv6 address is in brackets, a host name keeps resolving to ipv4
     zmq_setsockopt(m_impl->m_socket.get(), ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     zmq_setsockopt(m_impl->m_socket.get(), ZMQ_RECONNECT_IVL, &reconnect_ms, sizeof(reconnect_ms));
+    zmq_setsockopt(m_impl->m_socket.get(), ZMQ_IPV6, &ipv6, sizeof(ipv6));
 
     for (const std::string& topic : topics) {
       if (zmq_setsockopt(m_impl->m_socket.get(), ZMQ_SUBSCRIBE, topic.c_str(), topic.size()) < 0) {
