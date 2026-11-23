@@ -2863,9 +2863,10 @@ namespace monero {
       }
 
       // build and return tx set
-      monero_tx_set tx_set;
-      tx_set.m_txs = txs;
-      return tx_set;
+      std::shared_ptr<monero_tx_set> described_tx_set = std::make_shared<monero_tx_set>();
+      described_tx_set->m_txs = txs;
+      for (const std::shared_ptr<monero_tx_wallet>& tx : txs) tx->m_tx_set = described_tx_set;
+      return *described_tx_set;
     }
     catch (const std::exception &e)
     {
