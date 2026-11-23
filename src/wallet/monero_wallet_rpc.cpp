@@ -951,15 +951,6 @@ namespace monero {
     return get_subaddresses(account_idx, empty_indices);
   }
 
-  monero_subaddress monero_wallet_rpc::get_subaddress(const uint32_t account_idx, const uint32_t subaddress_idx) const {
-    std::vector<uint32_t> subaddress_indices;
-    subaddress_indices.push_back(subaddress_idx);
-    auto subaddresses = get_subaddresses(account_idx, subaddress_indices);
-    if (subaddresses.empty()) throw monero_error("Subaddress is not initialized");
-    if (subaddresses.size() != 1) throw monero_error("Only 1 subaddress should be returned");
-    return subaddresses[0];
-  }
-
   monero_subaddress monero_wallet_rpc::create_subaddress(uint32_t account_idx, const std::string& label) {
     MTRACE("monero_wallet_rpc::create_subaddress(" << account_idx << ", " << label << ")");
     auto params = std::make_shared<monero_create_edit_subaddress_params>(account_idx, label);
