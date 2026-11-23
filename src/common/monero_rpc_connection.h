@@ -120,20 +120,6 @@ namespace monero {
     ~monero_zmq_subscriber();
 
     /**
-     * Indicates if connected to the publisher, which is updated while waiting for publications.
-     *
-     * @return true if connected
-     */
-    bool is_connected() const { return m_is_connected; }
-
-    /**
-     * Get the number of times connected to the publisher, which is updated while waiting for publications.
-     *
-     * @return the number of connections
-     */
-    uint64_t get_num_connections() const { return m_num_connections; }
-
-    /**
      * Wait for a publication.
      *
      * @param timeout_ms the maximum time to wait
@@ -150,11 +136,8 @@ namespace monero {
     friend class monero_rpc_connection;
     struct impl;
     std::unique_ptr<impl> m_impl;
-    bool m_is_connected = false;
-    uint64_t m_num_connections = 0;
 
     monero_zmq_subscriber(const std::string& uri, const std::vector<std::string>& topics);
-    void read_events();
   };
 
   /**
