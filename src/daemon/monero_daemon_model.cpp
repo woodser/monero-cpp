@@ -754,6 +754,11 @@ namespace monero {
 
   // ------------------------------ MONERO OUTPUT -----------------------------
 
+  boost::optional<bool> monero_output::is_locked() const {
+    if (m_tx == nullptr) return boost::none;
+    return m_tx->m_is_locked;
+  }
+
   rapidjson::Value monero_output::to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const {
 
     // create root

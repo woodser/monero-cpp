@@ -285,6 +285,7 @@ namespace monero {
     boost::optional<std::string> m_stealth_public_key;
     boost::optional<std::string> m_mask;
 
+    boost::optional<bool> is_locked() const;
     rapidjson::Value to_rapidjson_val(rapidjson::Document::AllocatorType& allocator) const;
     static void from_property_tree(const boost::property_tree::ptree& node, const std::shared_ptr<monero_output>& output);
     static std::shared_ptr<monero_output> deserialize(const std::string& json);
