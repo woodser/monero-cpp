@@ -62,15 +62,17 @@
 namespace monero {
 
   namespace {
-    // RAII guard for monero_tx_query trees copied for get_txs()/get_transfers_aux()/
-    // get_outputs_aux(): they hold circular shared_ptr references (m_tx_query <->
-    // m_transfer_query/m_output_query) that plain refcounting can't break, so
-    // monero_utils::free() must run on every exit path or the copies leak. Swallow: free()
-    // can throw (e.g. allocation failure), and a throwing destructor during unwind is
-    // std::terminate.
-    struct query_free_guard {
-      std::shared_ptr<monero_tx_query> tx_query;
-      ~query_free_guard() { try { monero_utils::free(tx_query); } catch (...) {} }
+    // break circular references in temporary tx and query graphs on every exit path
+    // cleanup can allocate for blockless txs, so do not let it throw during unwinding
+    struct tx_free_guard {
+      std::shared_ptr<monero_tx> tx;
+      ~tx_free_guard() { try { monero_utils::free(tx); } catch (...) {} }
+    };
+
+    // same for the txs fetched and announced by a poll
+    struct txs_free_guard {
+      const std::vector<std::shared_ptr<monero_tx_wallet>>& txs;
+      ~txs_free_guard() { try { monero_utils::free(txs); } catch (...) {} }
     };
   }
 
@@ -131,6 +133,7 @@ namespace monero {
           monero_tx_query tx_query;
           tx_query.m_is_locked = true;
           m_prev_locked_txs = m_wallet->get_txs(tx_query);
+          monero_utils::free(m_prev_locked_txs); // only their hashes are compared
           if (generation != m_generation) return;
           m_prev_balances = m_wallet->get_balances(boost::none, boost::none);
           return;
@@ -157,6 +160,7 @@ namespace monero {
         tx_query.m_include_outputs = true;
 
         auto locked_txs = m_wallet->get_txs(tx_query);
+        txs_free_guard locked_txs_guard{locked_txs};
         if (generation != m_generation) return;
 
         // collect hashes of txs no longer locked
@@ -172,6 +176,7 @@ namespace monero {
         m_prev_locked_txs = locked_txs;
         m_prev_locked_txs_min_height = min_height;
         std::vector<std::shared_ptr<monero_tx_wallet>> unlocked_txs;
+        txs_free_guard unlocked_txs_guard{unlocked_txs};
 
         if (!no_longer_locked_hashes.empty()) {
           // use the previous snapshot's bound so tracked txs do not age out between polls
@@ -208,9 +213,21 @@ namespace monero {
         // announce new unlocked outputs
         for (const auto &unlocked_tx : unlocked_txs) {
           std::string tx_hash = unlocked_tx->m_hash.get();
+          bool missed_confirm = gen_utils::bool_equals(true, unlocked_tx->m_is_confirmed) && std::find(m_prev_confirmed_notifications.begin(), m_prev_confirmed_notifications.end(), tx_hash) == m_prev_confirmed_notifications.end();
           // stop tracking tx notifications
           m_prev_confirmed_notifications.erase(std::remove_if(m_prev_confirmed_notifications.begin(), m_prev_confirmed_notifications.end(), [&tx_hash](const std::string& iter){ return iter == tx_hash; }), m_prev_confirmed_notifications.end());
           m_prev_unconfirmed_notifications.erase(std::remove_if(m_prev_unconfirmed_notifications.begin(), m_prev_unconfirmed_notifications.end(), [&tx_hash](const std::string& iter){ return iter == tx_hash; }), m_prev_unconfirmed_notifications.end());
+          if (missed_confirm) { // announce missed confirm transition if tx unlocked between polls
+            std::shared_ptr<monero_tx_wallet> confirmed_tx = std::make_shared<monero_tx_wallet>();
+            tx_free_guard free_guard{confirmed_tx};
+            unlocked_tx->copy(unlocked_tx, confirmed_tx);
+            confirmed_tx->m_is_locked = true;
+            confirmed_tx->m_block = std::make_shared<monero_block>(); // tx copy excludes its block
+            unlocked_tx->m_block->monero_block_header::copy(unlocked_tx->m_block, confirmed_tx->m_block);
+            confirmed_tx->m_block->m_txs.push_back(confirmed_tx);
+            notify_outputs(confirmed_tx, generation);
+            if (generation != m_generation) return;
+          }
           notify_outputs(unlocked_tx, generation);
           if (generation != m_generation) return;
         }
@@ -1882,7 +1899,7 @@ namespace monero {
     std::shared_ptr<monero_tx_query> _query = query_sp->copy(query_sp, std::make_shared<monero_tx_query>()); // deep copy
 
     // covers the special-case re-fetch below throwing on a recursive call, too
-    query_free_guard free_guard{_query};
+    tx_free_guard free_guard{_query};
 
     // temporarily disable transfer and output queries in order to collect all tx context
     std::shared_ptr<monero_transfer_query> transfer_query = _query->m_transfer_query;
@@ -1900,7 +1917,7 @@ namespace monero {
     {
       // free unconditionally, even if get_transfers_aux() throws an error
       // otherwise this circularly-referenced copy leaks
-      query_free_guard free_guard{temp_transfer_query->m_tx_query};
+      tx_free_guard free_guard{temp_transfer_query->m_tx_query};
       transfers = get_transfers_aux(*temp_transfer_query);
     }
 
@@ -1934,7 +1951,7 @@ namespace monero {
       {
         // free unconditionally, even if get_outputs_aux() throws an error
         // otherwise this circularly-referenced copy leaks
-        query_free_guard free_guard{temp_output_query->m_tx_query};
+        tx_free_guard free_guard{temp_output_query->m_tx_query};
         outputs = get_outputs_aux(*temp_output_query);
       }
 
@@ -2067,7 +2084,7 @@ namespace monero {
     // _query/tx_query hold circular shared_ptr references (m_tx_query <-> m_transfer_query)
     // that plain refcounting can't break; monero_utils::free() breaks the cycle manually and
     // must run on every exit path, or the copies leak
-    query_free_guard free_guard{tx_query};
+    tx_free_guard free_guard{tx_query};
 
     // translate from monero_tx_query to in, out, pending, pool, failed terminology used by monero-wallet-rpc
     bool can_be_confirmed = !gen_utils::bool_equals(false, tx_query->m_is_confirmed) && !gen_utils::bool_equals(true, tx_query->m_in_tx_pool) && !gen_utils::bool_equals(true, tx_query->m_is_failed) && !gen_utils::bool_equals(false, tx_query->m_is_relayed);
@@ -2180,7 +2197,7 @@ namespace monero {
     // _query/tx_query hold circular shared_ptr references (m_tx_query <-> m_transfer_query)
     // that plain refcounting can't break; monero_utils::free() breaks the cycle manually and
     // must run on every exit path, or the copies leak
-    query_free_guard free_guard{tx_query};
+    tx_free_guard free_guard{tx_query};
 
     // determine account and subaddress indices to be queried
     std::map<uint32_t, std::vector<uint32_t>> indices;
