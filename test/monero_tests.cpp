@@ -68,6 +68,29 @@ void test_binary_serialization() {
   test_conversion_error(monero_utils::json_to_binary, "{\"amount\":42,\"" + string(255, 'k') + "\":1}", "Failed to serialize binary");
 }
 
+// --------------------------- JSON DESERIALIZATION ---------------------------
+
+void test_json_nesting() {
+  boost::property_tree::ptree node;
+  string nested = string(64, '[') + string(64, ']');
+
+  // accept nesting up to the limit, ignoring brackets within strings
+  for (const string& json : {nested, "\xEF\xBB\xBF" + nested, "[\"" + string(65, '[') + "\\\"\"]"}) {
+    gen_utils::deserialize(json, node);
+  }
+
+  // reject deeper nesting, including after bytes skipped as a byte order mark
+  for (const string& json : {"[" + nested + "]", "\xEF\"a[" + nested + "]"}) {
+    try {
+      gen_utils::deserialize(json, node);
+    } catch (const runtime_error& e) {
+      if (string(e.what()) != "Invalid JSON") throw runtime_error("Unexpected deserialization error: " + string(e.what()));
+      continue;
+    }
+    throw runtime_error("Expected deeply nested JSON to be rejected");
+  }
+}
+
 // ------------------------ MULTISIG STRESS TEST ------------------------------
 
 void synchronize_multisig_participants(vector<monero_wallet*> wallets) {
@@ -453,6 +476,8 @@ int main(int argc, const char* argv[]) {
     try {
       test_binary_serialization();
       cout << "Binary serialization tests passed" << endl;
+      test_json_nesting();
+      cout << "JSON nesting tests passed" << endl;
       return 0;
     } catch (const exception& e) {
       cerr << e.what() << endl;
