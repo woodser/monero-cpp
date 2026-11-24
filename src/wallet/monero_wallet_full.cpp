@@ -1896,6 +1896,8 @@ namespace monero {
         tx_map.erase(tx->m_hash.get());
         tx_iter = txs.erase(tx_iter);
         if (tx->m_block != nullptr) tx->m_block->m_txs.erase(std::remove(tx->m_block->m_txs.begin(), tx->m_block->m_txs.end(), tx), tx->m_block->m_txs.end()); // TODO, no way to use tx_iter?
+        tx->m_block = nullptr; // detach from block so only this tx is freed
+        monero_utils::free(tx);
       }
     }
     txs = queried_txs;
@@ -3828,7 +3830,10 @@ namespace monero {
       for (std::list<std::pair<crypto::hash, tools::wallet2::unconfirmed_transfer_details>>::const_iterator i = upayments.begin(); i != upayments.end(); ++i) {
         if (!tx_query->m_hashes.empty() && std::find(tx_query->m_hashes.begin(), tx_query->m_hashes.end(), epee::string_tools::pod_to_hex(i->first)) == tx_query->m_hashes.end()) continue; // skip if hash filtered
         std::shared_ptr<monero_tx_wallet> tx = build_tx_with_outgoing_transfer_unconfirmed(*m_w2, *this, i->first, i->second);
-        if (tx_query->m_is_failed != boost::none && tx_query->m_is_failed.get() != tx->m_is_failed.get()) continue; // skip if failure filtered
+        if (tx_query->m_is_failed != boost::none && tx_query->m_is_failed.get() != tx->m_is_failed.get()) { // skip if failure filtered
+          monero_utils::free(tx);
+          continue;
+        }
         monero_utils::merge_tx(tx, tx_map, block_map);
       }
     }
