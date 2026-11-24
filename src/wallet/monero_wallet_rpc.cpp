@@ -208,6 +208,15 @@ namespace monero {
         // announce new unlocked outputs
         for (const auto &unlocked_tx : unlocked_txs) {
           std::string tx_hash = unlocked_tx->m_hash.get();
+          // a tx can leave the pool and unlock between two polls, so no poll caught it as
+          // confirmed and locked: a listener that reads every state of a tx still sees that one
+          if (std::find(m_prev_unconfirmed_notifications.begin(), m_prev_unconfirmed_notifications.end(), tx_hash) != m_prev_unconfirmed_notifications.end()
+              && std::find(m_prev_confirmed_notifications.begin(), m_prev_confirmed_notifications.end(), tx_hash) == m_prev_confirmed_notifications.end()) {
+            std::shared_ptr<monero_tx_wallet> confirmed_tx = unlocked_tx->copy(unlocked_tx, std::make_shared<monero_tx_wallet>());
+            confirmed_tx->m_is_locked = true;
+            notify_outputs(confirmed_tx, generation);
+            if (generation != m_generation) return;
+          }
           // stop tracking tx notifications
           m_prev_confirmed_notifications.erase(std::remove_if(m_prev_confirmed_notifications.begin(), m_prev_confirmed_notifications.end(), [&tx_hash](const std::string& iter){ return iter == tx_hash; }), m_prev_confirmed_notifications.end());
           m_prev_unconfirmed_notifications.erase(std::remove_if(m_prev_unconfirmed_notifications.begin(), m_prev_unconfirmed_notifications.end(), [&tx_hash](const std::string& iter){ return iter == tx_hash; }), m_prev_unconfirmed_notifications.end());
