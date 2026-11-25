@@ -247,8 +247,7 @@ void init_multisig_wallets(monero_wallet* funding_wallet, vector<monero_wallet*>
       // outputs are not spent
       
       // break if output is unlocked
-      shared_ptr<monero_tx_wallet> tx = std::static_pointer_cast<monero_tx_wallet>(outputs[0]->m_tx);
-      if (!tx->m_is_locked.get()) {
+      if (!outputs[0]->is_locked().get()) {
         monero_utils::free(outputs);
         break;
       }
@@ -353,7 +352,7 @@ void test_multisig_stress(monero_wallet* funding_wallet, string wallet_name = ""
       uint64_t amount = output.m_amount.get();
       string tx_hash = output.m_tx->m_hash.get();
       bool is_confirmed = output.m_tx->m_is_confirmed.get();
-      bool is_locked = static_pointer_cast<monero_tx_wallet>(output.m_tx)->m_is_locked.get();
+      bool is_locked = output.is_locked().get();
       int account_index = output.m_account_index.get();
       int subaddress_index = output.m_subaddress_index.get();
     }
