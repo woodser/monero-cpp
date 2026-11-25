@@ -59,7 +59,7 @@ int main(int argc, const char* argv[]) {
       uint64_t amount = output.m_amount.get();
       string tx_hash = output.m_tx->m_hash.get();
       bool is_confirmed = output.m_tx->m_is_confirmed.get();
-      bool is_locked = dynamic_pointer_cast<monero_tx_wallet>(output.m_tx)->m_is_locked.get();
+      bool is_locked = output.is_locked().get();
       FUNDS_RECEIVED = true;
     }
   } my_listener;
