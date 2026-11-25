@@ -977,6 +977,8 @@ namespace monero {
     for (boost::property_tree::ptree::const_iterator it = node.begin(); it != node.end(); ++it) {
       std::string key = it->first;
       if (key == std::string("blob")) block->m_hex = it->second.data();
+      // the json of a block repeats the tx hashes that this field of the response already took, so the parse of
+      // the json, which is nested, skips them instead of taking them twice
       else if (key == std::string("tx_hashes") && !is_nested) {
         for(const auto &hex : it->second) block->m_tx_hashes.push_back(hex.second.data());
       }
@@ -1002,9 +1004,8 @@ namespace monero {
       }
       else if (key == std::string("json")) {
         auto json = it->second.data();
-        std::istringstream iss = json.empty() ? std::istringstream() : std::istringstream(json);
         boost::property_tree::ptree json_node;
-        boost::property_tree::read_json(iss, json_node);
+        gen_utils::deserialize(json, json_node);
         deserialize_block(json_node, block, true);
       }
     }
