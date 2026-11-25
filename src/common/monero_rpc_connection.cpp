@@ -3,6 +3,7 @@
 #include "utils/monero_utils.h"
 #include "daemon/monero_daemon_rpc_model.h"
 #include "monero_error.h"
+#include "net/net_parse_helpers.h"
 
 static const uint32_t DEFAULT_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
 
@@ -355,6 +356,11 @@ namespace monero {
     if (!m_http_client->set_server(uri, login, std::move(ssl))) throw monero_error("Could not set uri: " + uri);
     if (!m_http_client->connect(std::chrono::milliseconds(DEFAULT_TIMEOUT_MS))) MWARNING("Could not connect to server: " + uri);
 
+    // the http client only keeps host and port, so requests are sent under the path of the uri
+    epee::net_utils::http::url_content parsed;
+    m_path_prefix = epee::net_utils::parse_url(uri, parsed) ? parsed.m_uri_content.m_path : "";
+    while (!m_path_prefix.empty() && m_path_prefix.back() == '/') m_path_prefix.pop_back();
+
     m_applied = key;
   }
 
@@ -373,7 +379,7 @@ namespace monero {
 
     // invoke http json
     const uint64_t received_before = m_http_client->get_bytes_received();
-    if (!m_http_client->invoke_post(uri, body, std::chrono::milliseconds(timeout), std::addressof(pri))) {
+    if (!m_http_client->invoke_post(m_path_prefix + uri.to_string(), body, std::chrono::milliseconds(timeout), std::addressof(pri))) {
 
       // epee never surfaces the 401 status, but a rejected login means the server answered;
       // a dead or idle-closed socket yields no response bytes at all
