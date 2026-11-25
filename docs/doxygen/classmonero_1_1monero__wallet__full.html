@@ -216,6 +216,14 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2ce8da5afc25411f5dd1384543d9e6a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9500587ef6d520358a1c5831c6cdaa2" id="r_ae9500587ef6d520358a1c5831c6cdaa2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae9500587ef6d520358a1c5831c6cdaa2">set_subaddress_label</a> (uint32_t account_idx, uint32_t subaddress_idx, const std::string &amp;label=&quot;&quot;) override</td></tr>
 <tr class="separator:ae9500587ef6d520358a1c5831c6cdaa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a79fc4f24889c24cbfe500de2bced0496" id="r_a79fc4f24889c24cbfe500de2bced0496"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a79fc4f24889c24cbfe500de2bced0496">tag_accounts</a> (const std::string &amp;tag, const std::vector&lt; uint32_t &gt; &amp;account_indices) override</td></tr>
+<tr class="separator:a79fc4f24889c24cbfe500de2bced0496"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3230f0813fa2e7d692e4b784356cbf39" id="r_a3230f0813fa2e7d692e4b784356cbf39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3230f0813fa2e7d692e4b784356cbf39">untag_accounts</a> (const std::vector&lt; uint32_t &gt; &amp;account_indices) override</td></tr>
+<tr class="separator:a3230f0813fa2e7d692e4b784356cbf39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac19d2c041c566dc3f4300a2f48030e7d" id="r_ac19d2c041c566dc3f4300a2f48030e7d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__account__tag.html">monero_account_tag</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac19d2c041c566dc3f4300a2f48030e7d">get_account_tags</a> () const override</td></tr>
+<tr class="separator:ac19d2c041c566dc3f4300a2f48030e7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae36e620a174b0ab7571279c5035ba0eb" id="r_ae36e620a174b0ab7571279c5035ba0eb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae36e620a174b0ab7571279c5035ba0eb">set_account_tag_label</a> (const std::string &amp;tag, const std::string &amp;label) override</td></tr>
+<tr class="separator:ae36e620a174b0ab7571279c5035ba0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f751d58a46342674b25584a20011f3a" id="r_a5f751d58a46342674b25584a20011f3a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5f751d58a46342674b25584a20011f3a">get_txs</a> () const override</td></tr>
 <tr class="separator:a5f751d58a46342674b25584a20011f3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa3ea881f83a3abbb76587b7b1cfbfd43" id="r_aa3ea881f83a3abbb76587b7b1cfbfd43"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa3ea881f83a3abbb76587b7b1cfbfd43">get_txs</a> (const <a class="el" href="structmonero_1_1monero__tx__query.html">monero_tx_query</a> &amp;query) const override</td></tr>
@@ -356,14 +364,6 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>get_cache_file
 <tr class="separator:a8812deaadbc364b15be6b2f4f88c8ace inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2892affa378f7a465ca045172ba2c270 inherit pub_methods_classmonero_1_1monero__wallet" id="r_a2892affa378f7a465ca045172ba2c270"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__account.html">monero_account</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a2892affa378f7a465ca045172ba2c270">get_account</a> (uint32_t account_idx) const</td></tr>
 <tr class="separator:a2892affa378f7a465ca045172ba2c270 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a934926814cfb131670905b0d31f75715 inherit pub_methods_classmonero_1_1monero__wallet" id="r_a934926814cfb131670905b0d31f75715"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a934926814cfb131670905b0d31f75715">tag_accounts</a> (const std::string &amp;tag, const std::vector&lt; uint32_t &gt; &amp;account_indices)</td></tr>
-<tr class="separator:a934926814cfb131670905b0d31f75715 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9477d44f8e8da185ef56d7f122862b6d inherit pub_methods_classmonero_1_1monero__wallet" id="r_a9477d44f8e8da185ef56d7f122862b6d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a9477d44f8e8da185ef56d7f122862b6d">untag_accounts</a> (const std::vector&lt; uint32_t &gt; &amp;account_indices)</td></tr>
-<tr class="separator:a9477d44f8e8da185ef56d7f122862b6d inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4fa4de692cff6073ecfdf746e48af87 inherit pub_methods_classmonero_1_1monero__wallet" id="r_aa4fa4de692cff6073ecfdf746e48af87"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__account__tag.html">monero_account_tag</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aa4fa4de692cff6073ecfdf746e48af87">get_account_tags</a> () const</td></tr>
-<tr class="separator:aa4fa4de692cff6073ecfdf746e48af87 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2bf2d7bd032e3c0d27f850d62749bdd9 inherit pub_methods_classmonero_1_1monero__wallet" id="r_a2bf2d7bd032e3c0d27f850d62749bdd9"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a2bf2d7bd032e3c0d27f850d62749bdd9">set_account_tag_label</a> (const std::string &amp;tag, const std::string &amp;label)</td></tr>
-<tr class="separator:a2bf2d7bd032e3c0d27f850d62749bdd9 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ff3968708422df3ac4c7ba000975b31 inherit pub_methods_classmonero_1_1monero__wallet" id="r_a6ff3968708422df3ac4c7ba000975b31"><td class="memItemLeft" align="right" valign="top">virtual std::vector&lt; <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a6ff3968708422df3ac4c7ba000975b31">get_subaddresses</a> (const uint32_t account_idx) const</td></tr>
 <tr class="separator:a6ff3968708422df3ac4c7ba000975b31 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1fde8e1361233c51d4cad7aba28a10e inherit pub_methods_classmonero_1_1monero__wallet" id="r_aa1fde8e1361233c51d4cad7aba28a10e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aa1fde8e1361233c51d4cad7aba28a10e">get_subaddress</a> (const uint32_t account_idx, const uint32_t subaddress_idx) const</td></tr>
@@ -1289,6 +1289,35 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 <dl class="section return"><dt>Returns</dt><dd>the retrieved account </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aea7bd458801615a1fa94e99a7c83dd6b">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
+<a id="ac19d2c041c566dc3f4300a2f48030e7d" name="ac19d2c041c566dc3f4300a2f48030e7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac19d2c041c566dc3f4300a2f48030e7d">&#9670;&#160;</a></span>get_account_tags()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__account__tag.html">monero_account_tag</a> &gt; &gt; monero::monero_wallet_full::get_account_tags </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"><em></em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Return all account tags.</p>
+<dl class="section return"><dt>Returns</dt><dd>the wallet's account tags </dd></dl>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aa4fa4de692cff6073ecfdf746e48af87">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
@@ -3634,6 +3663,45 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 
 </div>
 </div>
+<a id="ae36e620a174b0ab7571279c5035ba0eb" name="ae36e620a174b0ab7571279c5035ba0eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae36e620a174b0ab7571279c5035ba0eb">&#9670;&#160;</a></span>set_account_tag_label()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void monero::monero_wallet_full::set_account_tag_label </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>label</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Sets a human-readable description for a tag.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>is the tag to set a description for </td></tr>
+    <tr><td class="paramname">label</td><td>is the label to set for the tag </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a2bf2d7bd032e3c0d27f850d62749bdd9">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
 <a id="a1261441354e76f0b3b6dc108e4d083e7" name="a1261441354e76f0b3b6dc108e4d083e7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1261441354e76f0b3b6dc108e4d083e7">&#9670;&#160;</a></span>set_attribute()</h2>
 
@@ -4497,6 +4565,45 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 
 </div>
 </div>
+<a id="a79fc4f24889c24cbfe500de2bced0496" name="a79fc4f24889c24cbfe500de2bced0496"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a79fc4f24889c24cbfe500de2bced0496">&#9670;&#160;</a></span>tag_accounts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void monero::monero_wallet_full::tag_accounts </td>
+          <td>(</td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>tag</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>account_indices</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Tag accounts.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td>is the tag to apply to the specified accounts </td></tr>
+    <tr><td class="paramname">account_indices</td><td>are the indices of the accounts to tag </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a934926814cfb131670905b0d31f75715">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
 <a id="a443bba504a3df69453dee1a575d8d767" name="a443bba504a3df69453dee1a575d8d767"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a443bba504a3df69453dee1a575d8d767">&#9670;&#160;</a></span>thaw_output()</h2>
 
@@ -4528,6 +4635,40 @@ struct&#160;</td><td class="memItemRight" valign="bottom"><b>wallet2_listener</b
 </dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aac40822e28d9a96e45cae5396dbb783f">monero::monero_wallet</a>.</p>
+
+</div>
+</div>
+<a id="a3230f0813fa2e7d692e4b784356cbf39" name="a3230f0813fa2e7d692e4b784356cbf39"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3230f0813fa2e7d692e4b784356cbf39">&#9670;&#160;</a></span>untag_accounts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void monero::monero_wallet_full::untag_accounts </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>account_indices</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Untag accounts.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">account_indices</td><td>are the indices of the accounts to untag </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a9477d44f8e8da185ef56d7f122862b6d">monero::monero_wallet</a>.</p>
 
 </div>
 </div>

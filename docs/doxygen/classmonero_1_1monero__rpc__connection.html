@@ -144,6 +144,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ace52bbfb463bea8e58580ea9a107967a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa2796192402addbd0e80c26443b5514" id="r_aaa2796192402addbd0e80c26443b5514"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmonero_1_1monero__rpc__response.html">monero_rpc_response</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aaa2796192402addbd0e80c26443b5514">send_binary_request</a> (const <a class="el" href="structmonero_1_1monero__rpc__request.html">monero_rpc_request</a> &amp;request, const boost::optional&lt; uint32_t &gt; &amp;timeout_ms=boost::none) const</td></tr>
 <tr class="separator:aaa2796192402addbd0e80c26443b5514"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bce2f428391ab2015844171140705fa" id="r_a3bce2f428391ab2015844171140705fa"><td class="memItemLeft" align="right" valign="top">std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a3bce2f428391ab2015844171140705fa">invoke_post</a> (const boost::string_ref uri, const std::string &amp;body, const boost::optional&lt; uint32_t &gt; &amp;timeout_ms=boost::none) const</td></tr>
+<tr class="separator:a3bce2f428391ab2015844171140705fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef91b1d36c45f33b2e3898e3d82820d7" id="r_aef91b1d36c45f33b2e3898e3d82820d7"><td class="memItemLeft" align="right" valign="top">rapidjson::Value&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aef91b1d36c45f33b2e3898e3d82820d7">to_rapidjson_val</a> (rapidjson::Document::AllocatorType &amp;allocator) const override</td></tr>
 <tr class="separator:aef91b1d36c45f33b2e3898e3d82820d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_structmonero_1_1serializable__struct"><td colspan="2" onclick="javascript:dynsection.toggleInherit('pub_methods_structmonero_1_1serializable__struct')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="structmonero_1_1serializable__struct.html">monero::serializable_struct</a></td></tr>
@@ -196,9 +198,6 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a70afad120c4f9e813ecdc8190b408121" id="r_a70afad120c4f9e813ecdc8190b408121"><td class="memItemLeft" align="right" valign="top"><a id="a70afad120c4f9e813ecdc8190b408121" name="a70afad120c4f9e813ecdc8190b408121"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>ensure_configured</b> () const</td></tr>
 <tr class="separator:a70afad120c4f9e813ecdc8190b408121"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bce2f428391ab2015844171140705fa" id="r_a3bce2f428391ab2015844171140705fa"><td class="memItemLeft" align="right" valign="top"><a id="a3bce2f428391ab2015844171140705fa" name="a3bce2f428391ab2015844171140705fa"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>invoke_post</b> (const boost::string_ref uri, const std::string &amp;body, const boost::optional&lt; uint32_t &gt; &amp;timeout_ms=boost::none) const</td></tr>
-<tr class="separator:a3bce2f428391ab2015844171140705fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a813c26343c3d9404ef695073d4d02058" id="r_a813c26343c3d9404ef695073d4d02058"><td class="memItemLeft" align="right" valign="top"><a id="a813c26343c3d9404ef695073d4d02058" name="a813c26343c3d9404ef695073d4d02058"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>send_rpc_request</b> (const boost::string_ref uri, const <a class="el" href="structmonero_1_1monero__rpc__request.html">monero_rpc_request</a> &amp;request, <a class="el" href="structmonero_1_1monero__rpc__response.html">monero_rpc_response</a> &amp;response, const boost::optional&lt; uint32_t &gt; &amp;timeout_ms=boost::none, bool binary=false) const</td></tr>
 <tr class="separator:a813c26343c3d9404ef695073d4d02058"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -395,6 +394,50 @@ std::tuple&lt; std::string, std::string, std::string, std::string, bool &gt;&#16
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>key's value if set </dd></dl>
+
+</div>
+</div>
+<a id="a3bce2f428391ab2015844171140705fa" name="a3bce2f428391ab2015844171140705fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bce2f428391ab2015844171140705fa">&#9670;&#160;</a></span>invoke_post()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::string monero::monero_rpc_connection::invoke_post </td>
+          <td>(</td>
+          <td class="paramtype">const boost::string_ref</td>          <td class="paramname"><span class="paramname"><em>uri</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::string &amp;</td>          <td class="paramname"><span class="paramname"><em>body</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const boost::optional&lt; uint32_t &gt; &amp;</td>          <td class="paramname"><span class="paramname"><em>timeout_ms</em></span><span class="paramdefsep"> = </span><span class="paramdefval">boost::none</span>&#160;) const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>Invoke a POST request to the RPC API and get the raw response body.</p>
+<p>The body is returned as is: a JSON-RPC error in it is not raised.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">uri</td><td>is the request uri </td></tr>
+    <tr><td class="paramname">body</td><td>is the request body </td></tr>
+    <tr><td class="paramname">timeout_ms</td><td>is the request timeout in milliseconds, the connection's timeout if none, 0 for no timeout </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the RPC API response body </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname"><a class="el" href="classmonero_1_1monero__rpc__error.html">monero_rpc_error</a></td><td>if the response has an HTTP status other than 2xx, or the login is rejected (401) </td></tr>
+    <tr><td class="paramname"><a class="el" href="classmonero_1_1monero__error.html">monero_error</a></td><td>if the request cannot be sent or gets no response </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>

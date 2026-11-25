@@ -229,8 +229,6 @@ std::vector&lt; <a class="el" href="structmonero_1_1monero__subaddress.html">mon
 <tr class="separator:a3e98a04f4556d77074f65fc8fa7e4b9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac05b92b38ef3767f15d0de4d99d4129a" id="r_ac05b92b38ef3767f15d0de4d99d4129a"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac05b92b38ef3767f15d0de4d99d4129a">get_subaddresses</a> (const uint32_t account_idx) const override</td></tr>
 <tr class="separator:ac05b92b38ef3767f15d0de4d99d4129a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a476cea516f59f3f1945a15e6d3c639a3" id="r_a476cea516f59f3f1945a15e6d3c639a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a476cea516f59f3f1945a15e6d3c639a3">get_subaddress</a> (const uint32_t account_idx, const uint32_t subaddress_idx) const override</td></tr>
-<tr class="separator:a476cea516f59f3f1945a15e6d3c639a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44ee77825f7d236bb84e533e554f41df" id="r_a44ee77825f7d236bb84e533e554f41df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a44ee77825f7d236bb84e533e554f41df">create_subaddress</a> (uint32_t account_idx, const std::string &amp;label=&quot;&quot;) override</td></tr>
 <tr class="separator:a44ee77825f7d236bb84e533e554f41df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf2d1a3720ce5f1e273dae40427d37da" id="r_acf2d1a3720ce5f1e273dae40427d37da"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acf2d1a3720ce5f1e273dae40427d37da">set_subaddress_label</a> (uint32_t account_idx, uint32_t subaddress_idx, const std::string &amp;label=&quot;&quot;) override</td></tr>
@@ -389,6 +387,8 @@ std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__subaddress.html"
 <tr class="separator:a8812deaadbc364b15be6b2f4f88c8ace inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2892affa378f7a465ca045172ba2c270 inherit pub_methods_classmonero_1_1monero__wallet" id="r_a2892affa378f7a465ca045172ba2c270"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__account.html">monero_account</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a2892affa378f7a465ca045172ba2c270">get_account</a> (uint32_t account_idx) const</td></tr>
 <tr class="separator:a2892affa378f7a465ca045172ba2c270 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa1fde8e1361233c51d4cad7aba28a10e inherit pub_methods_classmonero_1_1monero__wallet" id="r_aa1fde8e1361233c51d4cad7aba28a10e"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aa1fde8e1361233c51d4cad7aba28a10e">get_subaddress</a> (const uint32_t account_idx, const uint32_t subaddress_idx) const</td></tr>
+<tr class="separator:aa1fde8e1361233c51d4cad7aba28a10e inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30e0dd5c7a46c10f5076845fde417fd8 inherit pub_methods_classmonero_1_1monero__wallet" id="r_a30e0dd5c7a46c10f5076845fde417fd8"><td class="memItemLeft" align="right" valign="top">virtual std::shared_ptr&lt; <a class="el" href="structmonero_1_1monero__tx__wallet.html">monero_tx_wallet</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#a30e0dd5c7a46c10f5076845fde417fd8">create_tx</a> (const <a class="el" href="structmonero_1_1monero__tx__config.html">monero_tx_config</a> &amp;config)</td></tr>
 <tr class="separator:a30e0dd5c7a46c10f5076845fde417fd8 inherit pub_methods_classmonero_1_1monero__wallet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa4fe7492f5ffbfeaf0e268e202936cd8 inherit pub_methods_classmonero_1_1monero__wallet" id="r_aa4fe7492f5ffbfeaf0e268e202936cd8"><td class="memItemLeft" align="right" valign="top">virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmonero_1_1monero__wallet.html#aa4fe7492f5ffbfeaf0e268e202936cd8">relay_tx</a> (const std::string &amp;tx_metadata)</td></tr>
@@ -2299,46 +2299,6 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>monero_wallet_poller
 <dl class="section return"><dt>Returns</dt><dd>the transaction signature </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#a070af75f28e9b6a6e0240ab64de2dc4c">monero::monero_wallet</a>.</p>
-
-</div>
-</div>
-<a id="a476cea516f59f3f1945a15e6d3c639a3" name="a476cea516f59f3f1945a15e6d3c639a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a476cea516f59f3f1945a15e6d3c639a3">&#9670;&#160;</a></span>get_subaddress()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structmonero_1_1monero__subaddress.html">monero_subaddress</a> monero::monero_wallet_rpc::get_subaddress </td>
-          <td>(</td>
-          <td class="paramtype">const uint32_t</td>          <td class="paramname"><span class="paramname"><em>account_idx</em></span>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const uint32_t</td>          <td class="paramname"><span class="paramname"><em>subaddress_idx</em></span>&#160;) const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel override">override</span><span class="mlabel virtual">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>Get a subaddress.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">account_idx</td><td>specifies the index of the subaddress's account </td></tr>
-    <tr><td class="paramname">subaddress_idx</td><td>specifies index of the subaddress within the account </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the retrieved subaddress </dd></dl>
-
-<p>Reimplemented from <a class="el" href="classmonero_1_1monero__wallet.html#aa1fde8e1361233c51d4cad7aba28a10e">monero::monero_wallet</a>.</p>
 
 </div>
 </div>
