@@ -717,6 +717,7 @@ namespace monero {
           std::shared_ptr<monero_tx_wallet> tx = std::static_pointer_cast<monero_tx_wallet>(monero_utils::cn_tx_to_tx(cn_tx, true));
           tx->m_hash = epee::string_tools::pod_to_hex(txid);
           tx->m_is_confirmed = false;
+          tx->m_in_tx_pool = true;
           tx->m_is_locked = true;
           std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
           tx->m_outputs.push_back(output);
@@ -761,6 +762,8 @@ namespace monero {
           tx->m_block = block;
           tx->m_hash = epee::string_tools::pod_to_hex(txid);
           tx->m_is_confirmed = true;
+          tx->m_in_tx_pool = false;
+          tx->m_is_failed = false;
           tx->m_is_locked = true;
           tx->m_unlock_time = unlock_time;
           std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
@@ -804,6 +807,8 @@ namespace monero {
           tx->m_block = block;
           tx->m_hash = epee::string_tools::pod_to_hex(txid);
           tx->m_is_confirmed = true;
+          tx->m_in_tx_pool = false;
+          tx->m_is_failed = false;
           tx->m_is_locked = true;
           std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
           tx->m_inputs.push_back(output);
@@ -936,6 +941,9 @@ namespace monero {
         input->m_tx = tx_notify;
         tx_notify->m_inputs.push_back(input);
         tx_notify->m_hash = tx->m_hash;
+        tx_notify->m_is_confirmed = tx->m_is_confirmed;
+        tx_notify->m_in_tx_pool = tx->m_in_tx_pool;
+        tx_notify->m_is_failed = tx->m_is_failed;
         tx_notify->m_is_locked = tx->m_is_locked;
         tx_notify->m_unlock_time = tx->m_unlock_time;
         if (tx->m_block != nullptr) {
@@ -2906,9 +2914,10 @@ namespace monero {
       }
 
       // build and return tx set
-      monero_tx_set tx_set;
-      tx_set.m_txs = txs;
-      return tx_set;
+      std::shared_ptr<monero_tx_set> described_tx_set = std::make_shared<monero_tx_set>();
+      described_tx_set->m_txs = txs;
+      for (const std::shared_ptr<monero_tx_wallet>& tx : txs) tx->m_tx_set = described_tx_set;
+      return *described_tx_set;
     }
     catch (const std::exception &e)
     {
