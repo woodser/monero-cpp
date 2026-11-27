@@ -56,6 +56,8 @@
 
 using namespace gen_utils;
 
+static const int MAX_JSON_DEPTH = 64; // maximum nesting of json to deserialize
+
 // ------------------------- SERIALIZATION ---------------------------
 
 std::string gen_utils::serialize(const rapidjson::Document& doc) {
@@ -73,6 +75,22 @@ std::string gen_utils::serialize(const boost::property_tree::ptree& node) {
 }
 
 void gen_utils::deserialize(const std::string& json, boost::property_tree::ptree& root) {
+
+  // limit nesting since boost's parser recurses per level and deep nesting overflows the stack
+  int depth = 0;
+  bool in_string = false;
+  size_t start = !json.empty() && static_cast<unsigned char>(json[0]) == 0xEF ? 3 : 0; // boost skips 3 bytes unparsed as a byte order mark
+  for (size_t i = start; i < json.size(); i++) {
+    char c = json[i];
+    if (in_string) {
+      if (c == '\\') i++;
+      else if (c == '"') in_string = false;
+    } else if (c == '"') in_string = true;
+    else if (c == '[' || c == '{') {
+      if (++depth > MAX_JSON_DEPTH) throw std::runtime_error("Invalid JSON");
+    } else if ((c == ']' || c == '}') && depth > 0) depth--;
+  }
+
   std::istringstream iss = json.empty() ? std::istringstream() : std::istringstream(json);
   try {
     boost::property_tree::read_json(iss, root);
