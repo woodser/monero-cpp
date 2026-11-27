@@ -363,6 +363,7 @@ namespace monero {
     void calculate_balance();
 
     // transactions
+    std::shared_ptr<monero_tx_light> get_tx(const std::string& hash) const;
     std::vector<std::shared_ptr<monero_tx_light>> get_txs() const { return m_tx_list; }
     void add_unconfirmed_tx(const std::shared_ptr<monero_tx_wallet>& tx, const std::string& change_pubkey = "");
     void for_each_unconfirmed_tx(const std::function<void(const std::string&, const std::shared_ptr<monero_tx_wallet>&)>& visitor) const;
@@ -418,7 +419,6 @@ namespace monero {
     serializable_unordered_map<std::string, std::shared_ptr<monero_tx_wallet>> m_self_constructed_txs;
     serializable_unordered_map<std::string, bool> m_spent_key_images;
 
-    std::shared_ptr<monero_tx_light> get_tx(const std::string& hash) const;
     void set_txs(monero_get_address_txs_response& response, const monero_get_address_info_response& addr_info_response);
 
     // blockchain

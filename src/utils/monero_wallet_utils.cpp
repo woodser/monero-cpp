@@ -128,8 +128,6 @@ std::shared_ptr<monero_tx_wallet> monero_wallet_utils::ptx_to_tx(const tools::wa
   uint64_t out_amount = 0;
   i = 0;
 
-  std::map<uint32_t, std::map<uint32_t, std::shared_ptr<monero_destination>>> destination_index;
-
   // one destination for each output of the tx. The destinations of a pending tx of wallet2, such as the one that a signer returns,
   // are the requested ones: the change, or the dummy output that replaces it, is only in the splitted destinations
   const auto &output_dests = ptx.dests.size() >= tx->m_outputs.size() ? ptx.dests : cd.splitted_dsts;
@@ -170,10 +168,6 @@ std::shared_ptr<monero_tx_wallet> monero_wallet_utils::ptx_to_tx(const tools::wa
         transfer->m_subaddress_index = subaddress_idx;
         transfer->m_num_suggested_confirmations = 10;
         tx->m_incoming_transfers.push_back(transfer);
-        auto destination = std::make_shared<monero_destination>();
-        destination->m_amount = dest.amount;
-        destination->m_address = dest_address;
-        destination_index[receiver_account_idx][subaddress_idx] = destination;
       }
     }
     catch (...) {
@@ -214,11 +208,13 @@ std::shared_ptr<monero_tx_wallet> monero_wallet_utils::ptx_to_tx(const tools::wa
   sort(tx->m_outputs.begin(), tx->m_outputs.end(), monero_utils::vout_before);
   sort(tx->m_incoming_transfers.begin(), tx->m_incoming_transfers.end(), monero_utils::incoming_transfer_before);
 
-  // order destinations
-  for(const auto &kv_index : destination_index) {
-    for(const auto  &kv : kv_index.second) {
-      outgoing_transfer->m_destinations.push_back(kv.second);
-    }
+  // the destinations of the transfer are the requested ones, in their order: the construction data has them, without the change
+  for (const auto& dest : cd.dests) {
+    crypto::hash payment_id = crypto::null_hash;
+    auto destination = std::make_shared<monero_destination>();
+    destination->m_amount = dest.amount;
+    destination->m_address = dest.address(nettype, payment_id);
+    outgoing_transfer->m_destinations.push_back(destination);
   }
 
   return tx;

@@ -1100,6 +1100,7 @@ namespace monero {
   }
 
   std::shared_ptr<monero_tx_wallet> monero_wallet_light_cache::get_self_constructed_tx(const std::string& tx_hash) const {
+    boost::lock_guard<boost::recursive_mutex> lock(m_mutex);
     auto it = m_self_constructed_txs.find(tx_hash);
     if (it == m_self_constructed_txs.end()) return nullptr;
     return it->second;

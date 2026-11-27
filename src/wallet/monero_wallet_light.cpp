@@ -701,7 +701,7 @@ namespace monero {
     }
 
     // builds the destination list (recipients + change), matching wallet2's decompose logic for a 0 change amount
-    std::vector<cryptonote::tx_destination_entry> prepare_destinations(const std::vector<cryptonote::address_parse_info>& to_addrs, const std::vector<uint64_t>& sending_amounts, uint64_t change_amount, cryptonote::tx_destination_entry& change_dst, uint32_t subaddr_account_idx) const {
+    std::vector<cryptonote::tx_destination_entry> prepare_destinations(const std::vector<std::string>& to_address_strings, const std::vector<cryptonote::address_parse_info>& to_addrs, const std::vector<uint64_t>& sending_amounts, uint64_t change_amount, cryptonote::tx_destination_entry& change_dst, uint32_t subaddr_account_idx) const {
       // TODO: if this is a multisig wallet, create a list of multisig signers we can use
       std::vector<cryptonote::tx_destination_entry> splitted_dsts;
       if (to_addrs.size() != sending_amounts.size()) throw std::runtime_error("Amounts don't match destinations");
@@ -710,6 +710,8 @@ namespace monero {
         to_dst.addr = to_addrs[i].address;
         to_dst.amount = sending_amounts[i];
         to_dst.is_subaddress = to_addrs[i].is_subaddress;
+        to_dst.original = to_address_strings[i];
+        to_dst.is_integrated = to_addrs[i].has_payment_id;
         splitted_dsts.push_back(to_dst);
       }
 
@@ -822,7 +824,7 @@ namespace monero {
       std::vector<cryptonote::tx_source_entry> sources = prepare_sources(outputs, mix_outs, extra, found_money, spent_key_images);
 
       cryptonote::tx_destination_entry change_dst = AUTO_VAL_INIT(change_dst);
-      std::vector<cryptonote::tx_destination_entry> splitted_dsts = prepare_destinations(to_addrs, sending_amounts, change_amount, change_dst, subaddr_account_idx);
+      std::vector<cryptonote::tx_destination_entry> splitted_dsts = prepare_destinations(to_address_strings, to_addrs, sending_amounts, change_amount, change_dst, subaddr_account_idx);
 
       if (found_money > needed_money) {
         if (change_dst.amount != fee_amount) throw std::runtime_error("result fee not equal to given");
@@ -975,6 +977,7 @@ namespace monero {
           // seed tracking state so the next on_sync_end() diff doesn't re-notify this tx as "new"
           if (tx->m_hash != boost::none) {
             m_prev_known_tx_hashes.insert(tx->m_hash.get());
+            if (!tx->m_is_confirmed.value_or(false)) m_prev_unconfirmed_tx_hashes.insert(tx->m_hash.get());
             if (tx->m_is_locked.value_or(true)) m_prev_locked_tx_hashes.insert(tx->m_hash.get());
           }
         }
@@ -989,6 +992,7 @@ namespace monero {
     uint64_t m_prev_balance;
     uint64_t m_prev_unlocked_balance;
     std::set<std::string> m_prev_known_tx_hashes;            // txs seen as of the last diff, to detect newly-appeared ones
+    std::set<std::string> m_prev_unconfirmed_tx_hashes;      // unconfirmed txs seen as of the last diff, to detect newly-confirmed ones
     std::set<std::string> m_prev_locked_tx_hashes;           // locked txs seen as of the last diff, to detect newly-unlocked ones
     std::unique_ptr<tools::threadpool> m_notification_pool;  // threadpool of size 1 to queue notifications for external announcement
 
@@ -1017,23 +1021,28 @@ namespace monero {
       std::vector<std::shared_ptr<monero_tx_wallet>> recent_txs = m_wallet.get_txs(query);
 
       std::set<std::string> current_tx_hashes;
+      std::set<std::string> current_unconfirmed_tx_hashes;
       std::set<std::string> current_locked_tx_hashes;
       std::vector<std::shared_ptr<monero_tx_wallet>> txs_to_notify;
 
       for (const std::shared_ptr<monero_tx_wallet>& tx : recent_txs) {
         const std::string& hash = tx->m_hash.get();
+        bool confirmed = tx->m_is_confirmed.value_or(false);
         bool locked = tx->m_is_locked.value_or(false);
         current_tx_hashes.insert(hash);
+        if (!confirmed) current_unconfirmed_tx_hashes.insert(hash);
         if (locked) current_locked_tx_hashes.insert(hash);
 
         bool is_new = m_prev_known_tx_hashes.find(hash) == m_prev_known_tx_hashes.end();
+        bool newly_confirmed = confirmed && m_prev_unconfirmed_tx_hashes.find(hash) != m_prev_unconfirmed_tx_hashes.end();
         bool newly_unlocked = !locked && m_prev_locked_tx_hashes.find(hash) != m_prev_locked_tx_hashes.end();
-        if (is_new || newly_unlocked) txs_to_notify.push_back(tx);
+        if (is_new || newly_confirmed || newly_unlocked) txs_to_notify.push_back(tx);
       }
 
       for (const std::shared_ptr<monero_tx_wallet>& tx : txs_to_notify) notify_outputs(tx);
 
       m_prev_known_tx_hashes = current_tx_hashes;
+      m_prev_unconfirmed_tx_hashes = current_unconfirmed_tx_hashes;
       m_prev_locked_tx_hashes = current_locked_tx_hashes;
 
       // free memory
@@ -1041,39 +1050,84 @@ namespace monero {
     }
 
     void notify_outputs(const std::shared_ptr<monero_tx_wallet>& tx) {
+      bool is_confirmed = tx->m_is_confirmed.value_or(false);
+
+      // lws does not report the txs of the pool: what is known of them is what the wallet kept when it created them
+      std::shared_ptr<monero_tx_wallet> constructed_tx = nullptr;
+      if (!is_confirmed) constructed_tx = m_wallet.m_cache->get_self_constructed_tx(tx->m_hash.get());
 
       // notify spent outputs
       if (tx->m_outgoing_transfer != nullptr) {
 
-        // build dummy input for notification // TODO: this provides one input with outgoing amount like monero-wallet-rpc client, use real inputs instead
+        // the amount of the inputs includes the change, which is notified as a received output
+        uint64_t input_amount = tx->m_outgoing_transfer->m_amount.get() + tx->m_fee.get();
+        if (is_confirmed) input_amount = m_wallet.m_cache->get_tx(tx->m_hash.get())->m_total_sent.get();
+        else if (constructed_tx != nullptr) input_amount += constructed_tx->m_change_amount.value_or(0);
+
+        // build dummy input for notification // TODO: this provides one input with the total amount, use real inputs instead
         std::shared_ptr<monero_output_wallet> input = std::make_shared<monero_output_wallet>();
-        input->m_amount = tx->m_outgoing_transfer->m_amount.get() + tx->m_fee.get();
+        input->m_amount = input_amount;
         input->m_account_index = tx->m_outgoing_transfer->m_account_index;
         if (tx->m_outgoing_transfer->m_subaddress_indices.size() == 1) input->m_subaddress_index = tx->m_outgoing_transfer->m_subaddress_indices[0]; // initialize if transfer sourced from single subaddress
-        std::shared_ptr<monero_tx_wallet> tx_notify = std::make_shared<monero_tx_wallet>();
+        std::shared_ptr<monero_tx_wallet> tx_notify = build_notification_tx(tx);
         input->m_tx = tx_notify;
         tx_notify->m_inputs.push_back(input);
-        tx_notify->m_hash = tx->m_hash;
-        tx_notify->m_is_locked = tx->m_is_locked;
-        tx_notify->m_unlock_time = tx->m_unlock_time;
-        if (tx->m_block != nullptr) {
-          std::shared_ptr<monero_block> block_notify = std::make_shared<monero_block>();
-          tx_notify->m_block = block_notify;
-          block_notify->m_height = tx->get_height();
-          block_notify->m_txs.push_back(tx_notify);
-        }
 
         // notify listeners and free memory
         for (monero_wallet_listener* listener : m_wallet.get_listeners()) listener->on_output_spent(*input);
         monero_utils::free(tx_notify);
       }
 
-      // notify received outputs
-      if (!tx->m_incoming_transfers.empty()) {
+      // notify received outputs, the change too
+      if (constructed_tx != nullptr) notify_unconfirmed_outputs(tx, constructed_tx);
+      else {
         for (const std::shared_ptr<monero_output_wallet>& output : tx->get_outputs_wallet()) {
           for (monero_wallet_listener* listener : m_wallet.get_listeners()) listener->on_output_received(*output);
         }
       }
+    }
+
+    void notify_unconfirmed_outputs(const std::shared_ptr<monero_tx_wallet>& tx, const std::shared_ptr<monero_tx_wallet>& constructed_tx) {
+      std::shared_ptr<monero_tx_wallet> tx_notify = build_notification_tx(tx);
+      auto add_output = [&tx_notify](uint32_t account_idx, uint32_t subaddress_idx, uint64_t amount) {
+        std::shared_ptr<monero_output_wallet> output = std::make_shared<monero_output_wallet>();
+        output->m_account_index = account_idx;
+        output->m_subaddress_index = subaddress_idx;
+        output->m_amount = amount;
+        output->m_tx = tx_notify;
+        tx_notify->m_outputs.push_back(output);
+      };
+
+      // outputs sent to the wallet itself have an account index
+      for (const std::shared_ptr<monero_output_wallet>& output : constructed_tx->get_outputs_wallet()) {
+        if (output->m_account_index == boost::none) continue;
+        add_output(output->m_account_index.get(), output->m_subaddress_index.get(), output->m_amount.get());
+      }
+
+      // the change returns to the primary address of the source account
+      uint64_t change_amount = constructed_tx->m_change_amount.value_or(0);
+      if (change_amount > 0) add_output(constructed_tx->m_outgoing_transfer->m_account_index.get(), 0, change_amount);
+
+      // notify listeners and free memory
+      for (const std::shared_ptr<monero_output_wallet>& output : tx_notify->get_outputs_wallet()) {
+        for (monero_wallet_listener* listener : m_wallet.get_listeners()) listener->on_output_received(*output);
+      }
+      monero_utils::free(tx_notify);
+    }
+
+    static std::shared_ptr<monero_tx_wallet> build_notification_tx(const std::shared_ptr<monero_tx_wallet>& tx) {
+      std::shared_ptr<monero_tx_wallet> tx_notify = std::make_shared<monero_tx_wallet>();
+      tx_notify->m_hash = tx->m_hash;
+      tx_notify->m_is_confirmed = tx->m_is_confirmed;
+      tx_notify->m_is_locked = tx->m_is_locked;
+      tx_notify->m_unlock_time = tx->m_unlock_time;
+      if (tx->m_block != nullptr) {
+        std::shared_ptr<monero_block> block_notify = std::make_shared<monero_block>();
+        tx_notify->m_block = block_notify;
+        block_notify->m_height = tx->get_height();
+        block_notify->m_txs.push_back(tx_notify);
+      }
+      return tx_notify;
     }
   };
 
