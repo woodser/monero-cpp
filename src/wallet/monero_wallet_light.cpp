@@ -168,6 +168,14 @@ namespace monero {
       return response;
     }
 
+    // submits a tx and throws if it is not accepted
+    void relay_tx(const std::string& tx_hex) const {
+      std::shared_ptr<monero_submit_raw_tx_response> response;
+      try { response = submit_raw_tx(tx_hex); }
+      catch (const std::exception& e) { throw std::runtime_error(std::string("Failed to commit tx: ") + e.what()); }
+      if (response->m_status == boost::none || response->m_status.get() != std::string("OK")) throw std::runtime_error("Failed to commit tx");
+    }
+
     bool is_connected() const {
       try {
         auto response = get_daemon_status();
@@ -2209,16 +2217,14 @@ namespace monero {
       }
 
       bool relayed = false;
-      if (relay) {
-        try {
-          auto submit_res = m_client->submit_raw_tx(full_hex);
-          if (submit_res->m_status != boost::none && submit_res->m_status == std::string("OK")) {
-            MINFO("monero_wallet_light::create_txs(): relayed tx");
-            relayed = true;
-          }
-          else MINFO("monero_wallet_light::create_txs(): tx not relayed");
+      if (relay && !is_view_only()) { // a view-only wallet cannot sign, so it has nothing to relay
+        try { m_client->relay_tx(full_hex); }
+        catch (...) {
+          m_cache->calculate_balance(); // the txs relayed before this one spent their outputs
+          throw;
         }
-        catch(...) { }
+        MINFO("monero_wallet_light::create_txs(): relayed tx");
+        relayed = true;
       }
 
       tx->m_in_tx_pool = relayed;
@@ -2328,16 +2334,14 @@ namespace monero {
       }
 
       bool relayed = false;
-      if (relay) {
-        try {
-          auto submit_res = m_client->submit_raw_tx(full_hex);
-          if (submit_res->m_status != boost::none && submit_res->m_status == std::string("OK")) {
-            MINFO("monero_wallet_light::sweep_account(): relayed tx");
-            relayed = true;
-          }
-          else MINFO("monero_wallet_light::sweep_account(): tx not relayed");
+      if (relay && !is_view_only()) { // a view-only wallet cannot sign, so it has nothing to relay
+        try { m_client->relay_tx(full_hex); }
+        catch (...) {
+          m_cache->calculate_balance(); // the txs relayed before this one spent their outputs
+          throw;
         }
-        catch(...) { }
+        MINFO("monero_wallet_light::sweep_account(): relayed tx");
+        relayed = true;
       }
 
       tx->m_in_tx_pool = relayed;
@@ -2481,16 +2485,10 @@ namespace monero {
 
     bool relayed = false;
     bool relay = config.m_relay == boost::none ? false : config.m_relay.get();
-    if (relay) {
-      try {
-        auto submit_res = m_client->submit_raw_tx(full_hex);
-        if (submit_res->m_status != boost::none && submit_res->m_status == std::string("OK")) {
-          MINFO("monero_wallet_light::sweep_output(): relayed tx");
-          relayed = true;
-        }
-        else MINFO("monero_wallet_light::sweep_output(): tx not relayed");
-      }
-      catch(...) { }
+    if (relay && !is_view_only()) { // a view-only wallet cannot sign, so it has nothing to relay
+      m_client->relay_tx(full_hex);
+      MINFO("monero_wallet_light::sweep_output(): relayed tx");
+      relayed = true;
     }
 
     tx->m_in_tx_pool = relayed;
@@ -3346,13 +3344,14 @@ namespace monero {
         if (last_height < start_height) last_height = start_height == 0 ? 0 : start_height + 1;
       }
 
-      // notify listeners of sync start
-      m_wallet_listener->on_sync_start(last_height);
-
+      // nothing to sync without new blocks
       if (new_height == last_height) {
         m_cache->set_sync_status(*addr_info);
         return result;
       }
+
+      // notify listeners of sync start
+      m_wallet_listener->on_sync_start(last_height);
 
       boost::unique_lock<boost::recursive_mutex> lock(m_sync_data_mutex);
 
